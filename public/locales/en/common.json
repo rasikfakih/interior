@@ -1,0 +1,49 @@
+{
+  "navigation": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "journal": "Journal",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Transforming Spaces Into Experiences",
+    "subtitle": "Premium interior design that reflects your personality and elevates your lifestyle.",
+    "cta": "Explore Our Work",
+    "scroll": "Scroll to explore"
+  },
+  "stats": {
+    "clients": "Happy Clients",
+    "projects": "Projects Done",
+    "awards": "Awards Won",
+    "years": "Years Experience"
+  },
+  "services": {
+    "title": "Our Services",
+    "residential": "Residential Design",
+    "commercial": "Commercial Design",
+    "hospitality": "Hospitality",
+    "furniture": "Custom Furniture",
+    "planning": "Space Planning",
+    "renovation": "Renovation"
+  },
+  "projects": {
+    "title": "Featured Projects",
+    "viewAll": "View All Projects"
+  },
+  "testimonials": {
+    "title": "What Clients Say"
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "name": "Your Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "message": "Your Message",
+    "send": "Send Message",
+    "success": "Thank you! We will contact you soon."
+  },
+  "footer": {
+    "copyright": "Etihad Interiors. All rights reserved."
+  }
+}

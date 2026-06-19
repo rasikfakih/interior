@@ -1,0 +1,58 @@
+[
+  {
+    "id": "demo-living-1",
+    "kind": "image",
+    "url": "/demo/living-room-1.jpg",
+    "alt": "Living room with stone floor and cedar joinery",
+    "tags": ["living", "stone", "cedar", "interior"]
+  },
+  {
+    "id": "demo-kitchen-1",
+    "kind": "image",
+    "url": "/demo/kitchen-1.jpg",
+    "alt": "Open kitchen with warm wood and stone",
+    "tags": ["kitchen", "wood", "stone"]
+  },
+  {
+    "id": "demo-bedroom-1",
+    "kind": "image",
+    "url": "/demo/bedroom-1.jpg",
+    "alt": "Master bedroom in soft natural light",
+    "tags": ["bedroom", "soft"]
+  },
+  {
+    "id": "demo-bath-1",
+    "kind": "image",
+    "url": "/demo/bathroom-1.jpg",
+    "alt": "Bathroom with lime plaster and brushed fittings",
+    "tags": ["bathroom", "lime-plaster"]
+  },
+  {
+    "id": "demo-entry-1",
+    "kind": "image",
+    "url": "/demo/entry-1.jpg",
+    "alt": "Entry vestibule, low ceiling, daylight slot",
+    "tags": ["entry", "low-ceiling"]
+  },
+  {
+    "id": "demo-stair-1",
+    "kind": "image",
+    "url": "/demo/stair-1.jpg",
+    "alt": "Stairwell in white lime plaster",
+    "tags": ["stair", "lime-plaster"]
+  },
+  {
+    "id": "demo-outdoor-1",
+    "kind": "image",
+    "url": "/demo/outdoor-1.jpg",
+    "alt": "Outdoor reading corner under shade",
+    "tags": ["outdoor"]
+  },
+  {
+    "id": "demo-process-1",
+    "kind": "image",
+    "url": "/demo/process-1.jpg",
+    "alt": "Studio process day",
+    "tags": ["process", "studio"]
+  }
+]

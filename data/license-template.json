@@ -1,0 +1,17 @@
+{
+  "note": "Template license placeholder. Replaced at install time by /install or /admin/license.",
+  "purchaseCode": "",
+  "domain": "",
+  "tier": "personal",
+  "installedAt": "",
+  "expiresAt": null,
+  "features": {
+    "feature.3d-viewer": false,
+    "feature.multilingual": false,
+    "feature.unlimited-pages": false,
+    "feature.unlimited-media": false,
+    "feature.multi-domain": false
+  },
+  "signature": "",
+  "issuedBy": "template"
+}

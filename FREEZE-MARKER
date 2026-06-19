@@ -1,0 +1,54 @@
+FREEZE-MARKER
+
+# Etihad Interiors Theme v1.0.0 - Freeze Lock
+
+This file is the **authoritative freeze marker**. Until something changes
+it, the codebase is feature-frozen.
+
+## Frozen manifest
+
+What this freeze covers:
+
+  - `src/app/**` - all routes, layouts, page blocks, server components
+  - `src/components/**` - all public + admin widgets
+  - `src/lib/**` - DB, schema, auth, license, blob adapter, etc.
+  - `src/cms/blocks/**` - block registry, page-renderer
+  - `scripts/migrate.mjs` - schema (idempotent changes only)
+  - `scripts/seed-pages.mjs` - home-page seed (no-op after first run)
+  - `vercel.json`, `next.config.mjs` - deploy shape
+
+This freeze **does not cover**:
+
+  - `CHANGELOG.md`, `OPERATOR.md`, `DEPLOY.md`, `INSTALL.md`, `README.md`, `SHIP.md`, `LICENSE.md`, `AGENT_BEST_PRACTICES.md`, `docs/feature-decisions.md` - documentation copy
+  - `.env.example`, `.env.local.example`, `OPERATOR.md` - config templates
+  - `docs/screenshot-bag.md` - marketing brief
+
+Document these hard rules in commit messages going forward.
+
+## Why this file exists
+
+Locking the freeze with a fixture is a defensive measure against:
+1. Agent drift ("quick fix" PRs that quietly expand scope)
+2. Buyer-sponsored scope ("just add my feature")
+3. Day-2 polish disguised as Day-2 architecture
+
+The freeze marker is protected by the same `AGENT_BEST_PRACTICES.md` and
+`docs/feature-decisions.md` discipline. To un-freeze, follow the procedure
+in `AGENT_BEST_PRACTICES.md` § "How to roll the freeze forward".
+
+## Procedural signature
+
+Freeze marker is changed only via:
+
+  - Bumping `package.json` version from `0.1.0` to `0.1.X`
+  - Adding a v1.X entry to `CHANGELOG.md` with `New feature frozen window: closed`
+  - Recording the rollout procedure in this file's git history
+
+## Current state
+
+  - **Frozen since**: 2026-06-18
+  - **Version**: 0.1.0 (v1.0.0-DEPLOYED)
+  - **Acceptance window ends**: 2026-07-15 (Day 28)
+  - **Decompose mechanism**: see `docs/feature-decisions.md` and `AGENT_BEST_PRACTICES.md`
+
+Pull this file's commit log to recover any change to this state.
