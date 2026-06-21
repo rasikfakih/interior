@@ -1,13 +1,8 @@
-import Hero from "@/components/Hero";
-import PageRenderer from "@/components/PageRenderer";
 import Reveal from "@/components/Reveal";
+import PageRenderer from "@/components/PageRenderer";
 import { getFrontPage } from "@/lib/pages";
 
 export const revalidate = 60;
-
-const fallbackBlocks: Array<{ id: number; type: string; data: any }> = [
-  { id: 1, type: "hero", data: Hero as any },
-];
 
 export default async function Home() {
   const { page, blocks } = await getFrontPage();
@@ -17,16 +12,20 @@ export default async function Home() {
         type: b.type,
         data: safeParse(b.data),
       }))
-    : fallbackBlocks;
+    : [];
 
   return (
     <>
-      <PageRenderer blocks={pageBlocks} />
+      {pageBlocks.length === 0 ? (
+        <Reveal>This page is empty. Open /admin to add blocks.</Reveal>
+      ) : (
+        <PageRenderer blocks={pageBlocks} />
+      )}
     </>
   );
 }
 
-function safeParse(json: string) {
+function safeParse(json: string): any {
   try {
     return JSON.parse(json);
   } catch {
