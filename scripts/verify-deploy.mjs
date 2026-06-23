@@ -132,6 +132,10 @@ check("upload JPGs present for block-registry defaults", () => {
   return `${required.length} files`;
 });
 
+check("stamp-demo-license script present", () =>
+  fs.existsSync(path.join(process.cwd(), "scripts", "stamp-demo-license.mjs"))
+);
+
 let exited0 = true;
 for (const c of checks) {
   console.log(`[${c.ok ? "OK" : "FAIL"}] ${c.name}${c.detail ? " - " + c.detail : ""}`);

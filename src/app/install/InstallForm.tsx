@@ -19,20 +19,20 @@ export default function InstallForm() {
     e.preventDefault();
     setBusy(true);
     setMsg("");
-    const r = await fetch("/api/license", {
+    const r = await fetch("/api/install/stamp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ purchaseCode, domain, tier }),
     });
     setBusy(false);
-    const j = await r.json();
+    const j = await r.json().catch(() => ({}));
     if (r.ok) {
-      setMsg("License installed. Reloading admin…");
+      setMsg("License installed. Reloading admin...");
       setTimeout(() => {
         window.location.href = "/admin";
       }, 800);
     } else {
-      setMsg(j.error || "License install failed");
+      setMsg(j.detail || j.error || "License install failed");
     }
   }
 
