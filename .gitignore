@@ -12,8 +12,21 @@ data/etihad.db-journal
 data/etihad.db-wal
 data/etihad.db-shm
 
-# Per-install license — buyer stamped.
+# Per-install license - buyer stamped.
 data/license.json
+data/license.localhost.json
+
+# Runtime dev scratch
+dev.log
+dev.pid
+
+# v1.1.0: dev-only generator scripts archived here; not part of normal runtime.
+scripts/dev-archive/
+
+# Operator-only generator scripts - repo-bundled once, kept under gitignore after first commit.
+# (Commented out so the generators stay in-tree. Toggle if you want them hidden.)
+# scripts/gen-demo-assets.mjs
+# scripts/gen-glb-reception.mjs
 
 # Editor + IDE cache
 .vscode/

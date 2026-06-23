@@ -1,54 +1,87 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.0.0 - Freeze Lock
+# Etihad Interiors Theme v1.1.0 - Freeze Marker (rolled forward)
 
-This file is the **authoritative freeze marker**. Until something changes
-it, the codebase is feature-frozen.
+This file is the authoritative freeze marker for v1.1.0.
+Until something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest
 
 What this freeze covers:
 
-  - `src/app/**` - all routes, layouts, page blocks, server components
-  - `src/components/**` - all public + admin widgets
-  - `src/lib/**` - DB, schema, auth, license, blob adapter, etc.
-  - `src/cms/blocks/**` - block registry, page-renderer
-  - `scripts/migrate.mjs` - schema (idempotent changes only)
-  - `scripts/seed-pages.mjs` - home-page seed (no-op after first run)
-  - `vercel.json`, `next.config.mjs` - deploy shape
+  - `src/app/**` (existing routes and components stay as-shipped)
+  - `src/components/**` (existing public + admin widgets stay as-shipped)
+  - `src/lib/**` (db, schema, auth, license, blob adapter, media, settings, pages, i18n, initDb)
+  - `src/cms/blocks/**` (block registry, page-renderer, types)
+  - `scripts/migrate.mjs` (idempotent schema migrations, tenants + tenant_data addition is part of v1.1.0)
+  - `scripts/seed-pages.mjs` (seed content; string edits only for white-label pass)
+  - `scripts/verify-deploy.mjs` (gates; additive only)
+  - `vercel.json`
+  - `next.config.mjs`
 
-This freeze **does not cover**:
+## Operator carve-out (added to v1.1.0)
 
-  - `CHANGELOG.md`, `OPERATOR.md`, `DEPLOY.md`, `INSTALL.md`, `README.md`, `SHIP.md`, `LICENSE.md`, `AGENT_BEST_PRACTICES.md`, `docs/feature-decisions.md` - documentation copy
-  - `.env.example`, `.env.local.example`, `OPERATOR.md` - config templates
-  - `docs/screenshot-bag.md` - marketing brief
+The v1.1.0 release introduces operator surfaces that are **not** under the
+buyer-visible freeze. These files can be added or edited to support the
+superadmin console and Envato onboarding without breaking the buyer promise:
 
-Document these hard rules in commit messages going forward.
+  - `src/app/superadmin/**` (operator console pages)
+  - `src/app/api/operator/**` (operator-only routes)
+  - `src/app/api/envato/webhook/route.ts` (Envato purchase intake)
+  - `src/components/operator/**` (operator-only components)
+  - `src/lib/operator-store.ts` (operator data layer)
+  - `src/lib/operator-auth.ts` (operator cookie session)
+  - `src/lib/tenant-brand.ts` (tenant brand + palette reader)
 
-## Why this file exists
+These surfaces are gated by `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env vars.
+Buyers do not see them.
 
-Locking the freeze with a fixture is a defensive measure against:
-1. Agent drift ("quick fix" PRs that quietly expand scope)
-2. Buyer-sponsored scope ("just add my feature")
-3. Day-2 polish disguised as Day-2 architecture
+## Tenant carve-out (added to v1.1.0)
 
-The freeze marker is protected by the same `AGENT_BEST_PRACTICES.md` and
-`docs/feature-decisions.md` discipline. To un-freeze, follow the procedure
-in `AGENT_BEST_PRACTICES.md` § "How to roll the freeze forward".
+  - `scripts/apply-distro.mjs` (apply theme.distro.json to a tenant)
+  - `data/theme.distro.json` (the studio demo distro override)
+  - `data/studio-brand.json` (white-label fallback surface)
+  - `docs/CONTEXT.md` (session continuity harness)
+  - `data/tenants license + distro rows` (idempotent; re-running `npm run migrate` is the source)
+
+## Documentation carve-out
+
+What this freeze **does not cover**:
+
+  - `CHANGELOG.md`, `OPERATOR.md`, `DEPLOY.md`, `INSTALL.md`, `README.md`, `SHIP.md`,
+    `LICENSE.md`, `AGENT_BEST_PRACTICES.md`, `docs/feature-decisions.md` - documentation copy
+  - `docs/CONTEXT.md` - session continuity harness
+  - `docs/CLIENT_HANDOFF.md`, `docs/OPERATOR_QUICKREF.md`, `docs/SALES_NOTES.md`,
+    `docs/envato-sales-brief.md`, `docs/theme-distro.schema.md`,
+    `docs/theme-distro.example.json`, `docs/thumbs/v110/**`
+  - `.env.example`, `.env.local.example`
+  - `FREEZE-MARKER` (this file)
+  - `AGENTS.md`, `CLAUDE.md`
+
+## Why the carve-out exists
+
+v1.0.0 was sold as a buyer-complete artifact. v1.1.0 adds:
+
+  - a superadmin console for the studio + Envato onboarding
+  - a tenant model + theme.distro.json overlay
+  - white-label-friendly defaults so the same codebase serves multiple studios
+
+The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
+`/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
+gated auth and the buyer can never reach them.
+
+## Current state
+
+  - **Frozen since**: 2026-06-23 (roll-forward from v1.0.0 frozen 2026-06-18)
+  - **Version**: 1.1.0
+  - **Status (operator fills in after deploy)**: `_PENDING_ - enter timestamp and URL here on first success_`
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `0.1.0` to `0.1.X`
-  - Adding a v1.X entry to `CHANGELOG.md` with `New feature frozen window: closed`
+  - Bumping `package.json` version from `1.1.X` to `1.2.0`
+  - Adding a v1.2 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
-
-## Current state
-
-  - **Frozen since**: 2026-06-18
-  - **Version**: 0.1.0 (v1.0.0-DEPLOYED)
-  - **Acceptance window ends**: 2026-07-15 (Day 28)
-  - **Decompose mechanism**: see `docs/feature-decisions.md` and `AGENT_BEST_PRACTICES.md`
 
 Pull this file's commit log to recover any change to this state.
