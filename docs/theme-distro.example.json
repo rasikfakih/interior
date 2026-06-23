@@ -1,0 +1,27 @@
+{
+  "brand_name": "Linnaeus Interiors",
+  "tagline": "Residential interiors across the Gulf Coast.",
+  "palette": {
+    "ink": "#15201c",
+    "paper": "#f4ede0",
+    "accent": "#2c584a",
+    "muted": "#6f6557"
+  },
+  "accent_mode": "auto",
+  "footer_credit": "Linnaeus Interiors. Powered by Interior Studio Theme v1.1.0.",
+  "hero": {
+    "eyebrow": "Residential Studio",
+    "headline": "Coastal *residences* drawn once, built once.",
+    "subtext": "A 5-person studio. One team draws, specifies, and supervises. Twenty-three weeks per home, average."
+  },
+  "contact_email": "hello@linnaeusinteriors.com",
+  "contact_phone": "+1 504 555 0117",
+  "studio_address": "New Orleans, LA",
+  "calendly_url": "https://calendly.com/linnaeus-interiors/intro",
+  "instagram_url": "https://instagram.com/linnaeus.interiors",
+  "year_established": "2019",
+  "residences_delivered": "38+",
+  "default_locales": ["en"],
+  "tier": "business",
+  "domain": "linnaeusinteriors.com"
+}

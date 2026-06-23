@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * verify-deploy.mjs — pre-flight checks for Vercel deploy.
+ * verify-deploy.mjs - pre-flight checks for Vercel deploy.
  * Pure Node so it runs on Windows + macOS + Linux.
  */
 import fs from "fs";
 import path from "path";
 import { spawnSync } from "child_process";
+import { createRequire } from "module";
 
 const checks = [];
 
@@ -44,14 +45,29 @@ check("Demo SQLite seeded", () => {
   const db = path.join(process.cwd(), "data", "etihad.db");
   if (!fs.existsSync(db)) {
     console.log("  ! running seed-pages.mjs to seed DB");
-    const r = spawnSync("node", ["scripts/seed-pages.mjs"], {
-      cwd: process.cwd(),
-      stdio: "inherit",
-    });
+    const r = spawnSync("node", ["scripts/seed-pages.mjs"], { cwd: process.cwd(), stdio: "inherit" });
     if (r.status !== 0) throw new Error("seed failed");
   }
   return true;
 });
+
+check("tenants table present with at least one row", () => {
+  const Database = require_mem("better-sqlite3");
+  const db = new Database(path.join(process.cwd(), "data", "etihad.db"), { readonly: true });
+  try {
+    const c = db.prepare("SELECT COUNT(*) AS c FROM tenants").get();
+    if (c.c === 0) throw new Error("tenants empty - run migrate then apply-distro");
+    return `tenants=${c.c}`;
+  } finally {
+    db.close();
+  }
+});
+
+function require_mem(name) {
+  // Inline CommonJS require because this file is ESM. Used only for better-sqlite3.
+  const mod = createRequire(import.meta.url);
+  return mod(name);
+}
 
 check(".env.example present", () =>
   fs.existsSync(path.join(process.cwd(), ".env.example"))
@@ -69,9 +85,52 @@ check("INSTALL.md present", () =>
   fs.existsSync(path.join(process.cwd(), "INSTALL.md"))
 );
 
-check("models seed (reception-room.glb) present", () =>
-  fs.existsSync(path.join(process.cwd(), "public", "models", "seed", "reception-room.glb"))
+check("CONTEXT.md present (session continuity)", () =>
+  fs.existsSync(path.join(process.cwd(), "docs", "CONTEXT.md"))
 );
+
+check("theme.distro.json present", () =>
+  fs.existsSync(path.join(process.cwd(), "data", "theme.distro.json"))
+);
+
+check("studio-brand.json present (white-label override)", () =>
+  fs.existsSync(path.join(process.cwd(), "data", "studio-brand.json"))
+);
+
+check("operator console page present", () =>
+  fs.existsSync(path.join(process.cwd(), "src", "app", "superadmin", "page.tsx"))
+);
+
+check("envato webhook present", () =>
+  fs.existsSync(path.join(process.cwd(), "src", "app", "api", "envato", "webhook", "route.ts"))
+);
+
+check("models seed (reception-room.glb) present", () => {
+  const f = path.join(process.cwd(), "public", "models", "seed", "reception-room.glb");
+  if (!fs.existsSync(f)) return false;
+  const size = fs.statSync(f).size;
+  if (size < 1000) throw new Error(`stub file (${size} bytes); real model needs >1 KB`);
+  return `${(size / 1024).toFixed(1)} KB`;
+});
+
+check("demo JPGs (>= 8 in public/demo)", () => {
+  const dir = path.join(process.cwd(), "public", "demo");
+  if (!fs.existsSync(dir)) throw new Error("public/demo missing");
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".jpg"));
+  if (files.length < 8) throw new Error(`only ${files.length} JPGs found; need >= 8`);
+  return `${files.length} files`;
+});
+
+check("upload JPGs present for block-registry defaults", () => {
+  const dir = path.join(process.cwd(), "public", "uploads", "images");
+  const required = [
+    "hero.jpg", "services-1.jpg", "services-2.jpg", "services-3.jpg", "services-4.jpg",
+    "grid-1.jpg", "grid-2.jpg", "grid-3.jpg", "placeholder.jpg",
+  ];
+  const missing = required.filter((f) => !fs.existsSync(path.join(dir, f)));
+  if (missing.length > 0) throw new Error(`missing: ${missing.join(", ")}`);
+  return `${required.length} files`;
+});
 
 let exited0 = true;
 for (const c of checks) {

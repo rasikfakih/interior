@@ -39,12 +39,12 @@ if (blockCount.c === 0) {
     {
       type: "hero",
       data: {
-        eyebrow: "Residential · Maharashtra",
+        eyebrow: "Residential Studio",
         headlinePlain: "Homes built around",
         headlineItalic: "how you live",
         afterPlain: ", not how a catalogue looks",
         subtext:
-          "Etihad Interiors is a residential studio in Kalyan. Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands.",
+          "A residential interior studio. Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands.",
         photoUrl:
           "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1600&auto=format&fit=crop",
         studioNote: "Every project supervised on-site. No remote hand-offs.",

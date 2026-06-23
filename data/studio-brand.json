@@ -1,0 +1,24 @@
+{
+  "brand_name": "Your Studio",
+  "tagline": "A residential interior studio. Set your story in /admin/settings.",
+  "contact_email": "studio@example.com",
+  "contact_phone": "",
+  "studio_address": "",
+  "calendly_url": "",
+  "year_established": "",
+  "residences_delivered": "",
+  "instagram_url": "",
+  "footer_credit": "Powered by Interior Studio Theme",
+  "palette": {
+    "ink": "#1a1814",
+    "paper": "#efe6d2",
+    "accent": "#8a5d3b",
+    "muted": "#5a4f3e"
+  },
+  "hero": {
+    "eyebrow": "Residential Studio",
+    "headline": "Considered spaces",
+    "subtext": "Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands."
+  },
+  "default_locales": ["en"]
+}

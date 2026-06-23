@@ -1,0 +1,26 @@
+{
+  "brand_name": "Etihad Interiors",
+  "tagline": "A residential interior studio based in Kalyan, Maharashtra.",
+  "contact_email": "studio@etihadinteriors.com",
+  "contact_phone": "+91 99999 99999",
+  "studio_address": "Kalyan, Maharashtra, India",
+  "calendly_url": "https://calendly.com/etihadinteriors/intro",
+  "year_established": "2017",
+  "residences_delivered": "60+",
+  "instagram_url": "https://instagram.com/etihadinteriors",
+  "footer_credit": "Powered by Etihad Interiors Theme v1.1.0",
+  "palette": {
+    "ink": "#1a1814",
+    "paper": "#efe6d2",
+    "accent": "#8a5d3b",
+    "muted": "#5a4f3e"
+  },
+  "hero": {
+    "eyebrow": "Residential · Maharashtra",
+    "headline": "Homes built around how you live",
+    "subtext": "Etihad Interiors is a residential studio in Kalyan. Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands."
+  },
+  "default_locales": ["en", "hi", "mr"],
+  "tier": "business",
+  "domain": "ethinterior.vercel.app"
+}

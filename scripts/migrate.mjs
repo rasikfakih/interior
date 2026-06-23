@@ -304,6 +304,35 @@ const TABLES = [
     )`,
     columns: [],
   },
+  {
+    name: "tenants",
+    create: `CREATE TABLE tenants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE NOT NULL,
+      studio_name TEXT NOT NULL,
+      owner_email TEXT,
+      domain TEXT,
+      tier TEXT NOT NULL DEFAULT 'personal',
+      theme_distro TEXT,
+      state TEXT NOT NULL DEFAULT 'pending',
+      hmac_key TEXT,
+      installed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME,
+      revoked_at DATETIME
+    )`,
+    columns: [],
+  },
+  {
+    name: "tenant_data",
+    create: `CREATE TABLE tenant_data (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER NOT NULL,
+      kind TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
 ];
 
 console.log("Migration: declarative run");
@@ -344,7 +373,24 @@ if (!sid) {
   run(
     "site_identity seed",
     `INSERT INTO site_identity (brand_name, tagline, accent_mode, footer_credit)
-     VALUES ('Etihad Interiors', 'A residential interior studio based in Kalyan, Maharashtra.', 'auto', 'Powered by Etihad Interiors Theme v1.0.0')`
+     VALUES ('Your Studio', 'A studio of considered spaces. Set your tagline in /admin/settings.', 'auto', 'Powered by Interior Studio Theme')`
+  );
+}
+
+// Default tenant - studio (Etihad demo)
+const studioTenant = sqlite.prepare("SELECT id FROM tenants LIMIT 1").get();
+if (!studioTenant) {
+  run(
+    "tenants seed (default studio)",
+    `INSERT INTO tenants (slug, studio_name, owner_email, domain, tier, theme_distro, state, hmac_key)
+     VALUES ('studio', 'Etihad Interiors', 'admin@etihadinteriors.com', 'ethinterior.vercel.app', 'business', '${JSON.stringify({
+       brand_name: 'Etihad Interiors',
+       palette: { ink: '#1a1814', accent: '#8a5d3b', paper: '#efe6d2' },
+       accent_mode: 'auto',
+       footer_credit: 'Powered by Etihad Interiors Theme v1.1.0',
+       hero_text: 'Homes built around how you live',
+       default_locales: ['en', 'hi', 'mr'],
+     }).replaceAll("'", "''")}', 'active', 'etihad-interiors-license-fallback-2026')`
   );
 }
 
@@ -367,15 +413,15 @@ function seedDefaultAdmin() {
 
 function seedDefaultSettings() {
   const defaults = [
-    ["contact_email", "studio@etihadinteriors.com"],
-    ["contact_phone", "+91 99999 99999"],
-    ["studio_address", "Kalyan, Maharashtra, India"],
-    ["calendly_url", "https://calendly.com/etihadinteriors/intro"],
-    ["site_seo_title", "Etihad Interiors — Residential Design Studio"],
-    ["site_seo_description", "A residential studio shaping considered homes across Maharashtra."],
-    ["instagram_url", "https://instagram.com/etihadinteriors"],
-    ["year_established", "2017"],
-    ["residences_delivered", "60+"],
+    ["contact_email", "studio@example.com"],
+    ["contact_phone", ""],
+    ["studio_address", ""],
+    ["calendly_url", ""],
+    ["site_seo_title", "Studio — Residential Interior Design"],
+    ["site_seo_description", "A residential studio shaping considered spaces."],
+    ["instagram_url", ""],
+    ["year_established", ""],
+    ["residences_delivered", ""],
   ];
   for (const [k, v] of defaults) {
     try {
