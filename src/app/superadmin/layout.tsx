@@ -1,13 +1,10 @@
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { OperatorNav } from "@/components/operator/OperatorNav";
 
-export const metadata = { title: "Superadmin", robots: { index: false } };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-async function clear() {
-  const cookieStore = await cookies();
-  cookieStore.delete("superadmin_session");
-}
+export const metadata = { title: "Superadmin", robots: { index: false } };
 
 export default async function SuperadminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();

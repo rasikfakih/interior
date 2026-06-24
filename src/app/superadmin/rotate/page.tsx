@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { listTenants } from "@/lib/operator-store";
 import { RotateForm } from "@/components/operator/RotateForm";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = { title: "Rotate HMAC", robots: { index: false } };
 
 export default async function RotatePage() {

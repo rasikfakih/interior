@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { getTenant } from "@/lib/operator-store";
 import { TenantDetailClient } from "@/components/operator/TenantDetailClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = { title: "Tenant", robots: { index: false } };
 
 export default async function TenantDetailPage({ params }: { params: Promise<{ id: string }> }) {

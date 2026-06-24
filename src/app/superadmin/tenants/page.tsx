@@ -1,7 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { listTenants, listTenants as _lt } from "@/lib/operator-store";
+import { listTenants } from "@/lib/operator-store";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata = { title: "Tenants", robots: { index: false } };
 

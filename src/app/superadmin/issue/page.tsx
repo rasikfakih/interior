@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { listTenants } from "@/lib/operator-store";
 import { IssueForm } from "@/components/operator/IssueForm";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = { title: "Issue license", robots: { index: false } };
 
 export default async function IssuePage() {

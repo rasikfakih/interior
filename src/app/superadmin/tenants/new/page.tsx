@@ -2,6 +2,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NewTenantForm } from "@/components/operator/NewTenantForm";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = { title: "New tenant", robots: { index: false } };
 
 export default async function NewTenantPage() {
