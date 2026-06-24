@@ -49,7 +49,7 @@ const seedProjects: Record<
     description:
       "Double-height living room, four bedrooms arranged around a courtyard. The villa's spine is a single corridor with cross-ventilation from east to west. Teak, stone, lime plaster. A small library off the master suite is the project's quiet centre.",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a89a2c?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
     gallery: [
       "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=1600&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?q=80&w=1600&auto=format&fit=crop",
@@ -69,7 +69,7 @@ const seedProjects: Record<
     description:
       "A single-storey weekend home within eighty metres of the shoreline. Lime plaster walls, Mangalore tile roof, exposed rafters in Kathiawar cedar. Built to salt, sun, and monsoon. All outdoor furniture in A-frames, designed for storage.",
     image:
-      "https://images.unsplash.com/photo-1613553497126-a44624272013?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
     gallery: [
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?q=80&w=1600&auto=format&fit=crop",
@@ -102,7 +102,7 @@ export default async function ProjectDetailPage({
         descriptionJson: row.descriptionJson,
         image:
           row.beforeImage ||
-          "https://images.unsplash.com/photo-1600585154340-be6161a89a2c?q=80&w=1600&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
         gallery:
           (project?.gallery?.length ? project.gallery : []) || [],
         has3D: Boolean(row.model3d),

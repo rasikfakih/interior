@@ -35,7 +35,7 @@ const seed: Item[] = [
     title: "Salt Flats",
     location: "Alibaug, Maharashtra",
     modelUrl: "/models/seed/salt-flats.glb",
-    posterUrl: "https://images.unsplash.com/photo-1613553497126-a44624272013?q=80&w=1600&auto=format&fit=crop",
+    posterUrl: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
     scope: "3,400 sq.ft · Coastal",
   },
 ];

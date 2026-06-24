@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -110,7 +110,7 @@ export default function InstallForm() {
           className="btn-primary disabled:opacity-50"
         >
           {busy ? "Installing" : "Install license"}
-          <span aria-hidden>↗</span>
+          <span aria-hidden>Γåù</span>
         </button>
       </div>
     </form>

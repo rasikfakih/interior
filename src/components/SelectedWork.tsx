@@ -25,7 +25,7 @@ const seed: Project[] = [
     location: "Kalyan, Maharashtra",
     year: "2024",
     scope: "4,200 sq.ft · Independent villa",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a89a2c?q=80&w=1600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
   },
   {
     slug: "salt-flats",
@@ -33,7 +33,7 @@ const seed: Project[] = [
     location: "Alibaug, Maharashtra",
     year: "2023",
     scope: "3,400 sq.ft · Coastal home",
-    image: "https://images.unsplash.com/photo-1613553497126-a44624272013?q=80&w=1600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
   },
 ];
 

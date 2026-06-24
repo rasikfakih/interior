@@ -3,12 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { I18nProvider } from "@/components/I18nProvider";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { SessionProvider } from "@/components/SessionProvider";
-import SmoothScroll from "@/components/SmoothScroll";
-import GrainOverlay from "@/components/GrainOverlay";
-import LicenseBanner from "@/components/LicenseBanner";
 import GA4Script from "@/components/GA4Script";
 
 const geist = Geist({
@@ -54,14 +49,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-canvas text-ink">
         <SessionProvider>
           <ThemeProvider>
-          <I18nProvider>
-            <LicenseBanner />
-            <SmoothScroll />
-            <GrainOverlay />
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-          </I18nProvider>
+            <I18nProvider>{children}</I18nProvider>
           </ThemeProvider>
         </SessionProvider>
         <GA4Script />

@@ -28,7 +28,7 @@ const seedProjects = [
     year: "2024",
     scope: "4,200 sq.ft · Independent villa",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a89a2c?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
     has3D: true,
     modelUrl: "/models/seed/reception-room.glb",
     posterUrl:
@@ -41,11 +41,11 @@ const seedProjects = [
     year: "2023",
     scope: "3,400 sq.ft · Coastal home",
     image:
-      "https://images.unsplash.com/photo-1613553497126-a44624272013?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
     has3D: true,
     modelUrl: "/models/seed/salt-flats.glb",
     posterUrl:
-      "https://images.unsplash.com/photo-1613553497126-a44624272013?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
   },
   {
     slug: "ashok-villa",
@@ -104,7 +104,7 @@ function getDbProjects() {
       scope: r.scope || r.category || "Residential",
       image:
         r.before_image ||
-        "https://images.unsplash.com/photo-1600585154340-be6161a89a2c?q=80&w=1600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
       has3D: Boolean(r.model_3d),
       modelUrl: r.model_3d || null,
       posterUrl: r.before_image || null,
