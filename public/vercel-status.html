@@ -1,0 +1,35 @@
+# Vercel Deploy Quick Status
+
+This page is reachable from your URL.
+
+If you see "Build d7b3b85" or the most recent commit hash on this list:
+
+- Latest stable: `d7b3b85` (force-dynamic fix)
+- Earlier broken: `bafe07b` (defensive layers only)
+- Earlier broken: `d6b89ec` (error boundaries only)
+- Earlier broken: `2805352` (license stamp fix)
+
+If the Vercel dashboard's top-of-list deployment is at this commit
+hash and tagged `Production`, the fix is live. Open
+`https://ethinterior.vercel.app/admin` in an incognito window. The
+expected paint is the credentials form (heading: "Sign in").
+
+If you still see ERROR 1495112208:
+
+1. Open Vercel dashboard -> Project -> Settings -> Environment
+   Variables.
+2. Confirm the Production scope has all of:
+   - `NEXTAUTH_URL = https://ethinterior.vercel.app`
+   - `NEXT_PUBLIC_SITE_URL = https://ethinterior.vercel.app`
+   - `NEXTAUTH_SECRET`
+   - `LICENSE_HMAC_KEY`
+   - `ADMIN_EMAIL`, `ADMIN_PASSWORD`
+   - `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`
+   - `ENVATO_WEBHOOK_SECRET`
+3. After changing any env var, Project -> Deployments -> top
+   deployment -> three dots -> Redeploy (NOT on an older deployment).
+4. Hard-refresh the URL with cache cleared.
+
+If the env vars are all in place and the latest deployment is
+`d7b3b85` and the page still errors, capture the visible digest
+from `src/app/global-error.tsx` and send it to me.
