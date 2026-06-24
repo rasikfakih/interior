@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLicense } from "@/lib/license-gate";
-import Database from "better-sqlite3";
-import path from "path";
-
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
-
-function openDb() {
-  const sqlite = new Database(DB_PATH);
-  sqlite.pragma("journal_mode = WAL");
-  return sqlite;
-}
+import { openDb } from "@/lib/db";
 
 async function gateOrFail(action: "mutate" | "admin" | "read-public" = "admin") {
   const g = await requireLicense(action);
@@ -18,22 +9,26 @@ async function gateOrFail(action: "mutate" | "admin" | "read-public" = "admin") 
 }
 
 export async function GET() {
-  const fail = await gateOrFail("read-public");
-  if (fail) return fail;
-  const sqlite = openDb();
-  const rows = sqlite
-    .prepare(
-      `SELECT id, slug, title, status, is_front, seo_title, seo_description, published_at FROM pages ORDER BY id ASC`
-    )
-    .all();
-  sqlite.close();
-  return NextResponse.json(rows);
+  try {
+    const fail = await gateOrFail("read-public");
+    if (fail) return fail;
+    const sqlite = openDb();
+    const rows = sqlite
+      .prepare(
+        `SELECT id, slug, title, status, is_front, seo_title, seo_description, published_at FROM pages ORDER BY id ASC`
+      )
+      .all();
+    sqlite.close();
+    return NextResponse.json(rows);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const fail = await gateOrFail("admin");
-  if (fail) return fail;
   try {
+    const fail = await gateOrFail("admin");
+    if (fail) return fail;
     const d = await req.json();
     if (!d.slug || !d.title) {
       return NextResponse.json({ error: "slug and title required" }, { status: 400 });

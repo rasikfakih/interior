@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Database from "better-sqlite3";
-import path from "path";
+import { openReadonlyDb } from "@/lib/db";
 import ProjectsClient from "./ProjectsClient";
 
 export const metadata: Metadata = {
   title: "Selected work",
   description: "Residential interiors delivered since 2017.",
 };
-
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
 
 const seedProjects = [
   {
@@ -90,7 +87,7 @@ const seedProjects = [
 
 function getDbProjects() {
   try {
-    const sqlite = new Database(DB_PATH);
+    const sqlite = openReadonlyDb();
     const rows = sqlite
       .prepare(
         `SELECT slug, title, category, location, year, scope, before_image, model_3d

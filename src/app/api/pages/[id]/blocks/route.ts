@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Database from "better-sqlite3";
-import path from "path";
+import { openDb } from "@/lib/db";
 import { requireLicense } from "@/lib/license-gate";
-
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
-
-function openDb() {
-  const sqlite = new Database(DB_PATH);
-  sqlite.pragma("journal_mode = WAL");
-  return sqlite;
-}
 
 async function gateOrFail(action: "mutate" | "admin" = "admin") {
   const g = await requireLicense(action);
@@ -21,11 +12,11 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const fail = await gateOrFail();
-  if (fail) return fail;
-  const { id } = await params;
-  const pageId = Number(id);
   try {
+    const fail = await gateOrFail();
+    if (fail) return fail;
+    const { id } = await params;
+    const pageId = Number(id);
     const d = await req.json();
     const blocks = Array.isArray(d.blocks) ? d.blocks : [];
     const sqlite = openDb();
@@ -44,6 +35,6 @@ export async function PUT(
     sqlite.close();
     return NextResponse.json({ success: true });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    return NextResponse.json({ error: e.message ?? "db error" }, { status: 400 });
   }
 }

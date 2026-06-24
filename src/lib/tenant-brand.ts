@@ -1,5 +1,4 @@
-import Database from "better-sqlite3";
-import path from "path";
+import { openReadonlyDb } from "@/lib/db";
 
 export type TenantBrand = {
   brand_name: string;
@@ -26,18 +25,16 @@ export type TenantBrand = {
   default_locales?: string[];
 };
 
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
-
 const FALLBACK: TenantBrand = {
   brand_name: "Your Studio",
   tagline: "A studio of considered spaces.",
-  palette: { ink: "#1a1814", paper: "#efe6d2", accent: "#8a5d3b", muted: "#7a6e58" },
+  palette: { ink: "#1a1814", paper: "#efe6d2", accent: "#8a5d3b", muted: "#5a4f3e" },
 };
 
 export function readBrandFor(domain?: string | null, slug?: string | null): TenantBrand {
   try {
     if (!domain && !slug) return readDefaultBrand();
-    const db = new Database(DB_PATH, { readonly: true, fileMustExist: false });
+    const db = openReadonlyDb();
     const tenant =
       (slug && db.prepare("SELECT id FROM tenants WHERE slug = ?").get(slug)) ||
       (domain && db.prepare("SELECT id FROM tenants WHERE domain = ?").get(domain)) ||
@@ -67,21 +64,29 @@ export function listTenants(): Array<{
   expires_at: string | null;
   revoked_at: string | null;
 }> {
-  const db = new Database(DB_PATH, { readonly: true, fileMustExist: false });
-  const rows = db.prepare(`
-    SELECT id, slug, studio_name, owner_email, domain, tier, state, installed_at, expires_at, revoked_at
-    FROM tenants ORDER BY id ASC
-  `).all();
-  db.close();
-  return rows as any;
+  try {
+    const db = openReadonlyDb();
+    const rows = db.prepare(`
+      SELECT id, slug, studio_name, owner_email, domain, tier, state, installed_at, expires_at, revoked_at
+      FROM tenants ORDER BY id ASC
+    `).all();
+    db.close();
+    return rows as any;
+  } catch {
+    return [];
+  }
 }
 
 export function findTenant(id: number) {
-  const db = new Database(DB_PATH, { readonly: true, fileMustExist: false });
-  const t = db.prepare(`SELECT * FROM tenants WHERE id = ?`).get(id);
-  const distroRow = db.prepare(`SELECT payload FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1`).get(id);
-  db.close();
-  return { tenant: t, distro: distroRow ? JSON.parse((distroRow as any).payload) : null };
+  try {
+    const db = openReadonlyDb();
+    const t = db.prepare(`SELECT * FROM tenants WHERE id = ?`).get(id);
+    const distroRow = db.prepare(`SELECT payload FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1`).get(id);
+    db.close();
+    return { tenant: t, distro: distroRow ? JSON.parse((distroRow as any).payload) : null };
+  } catch {
+    return { tenant: null, distro: null };
+  }
 }
 
 function readDefaultBrand(): TenantBrand {

@@ -1,10 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import Database from 'better-sqlite3';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'data', 'etihad.db');
+import { openReadonlyDb } from '@/lib/db';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,7 +14,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const sqlite = new Database(DB_PATH);
+        const sqlite = openReadonlyDb();
         const user = sqlite.prepare('SELECT * FROM users WHERE email = ?').get(credentials.email) as any;
         sqlite.close();
 

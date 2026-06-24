@@ -158,15 +158,14 @@ export function appendAudit(
   meta?: Record<string, any>
 ) {
   try {
-    const Database = require("better-sqlite3");
-    const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
-    const sqlite = new Database(DB_PATH);
-    sqlite
+    const { openDb } = require("@/lib/db") as typeof import("@/lib/db");
+    const db = openDb();
+    db
       .prepare(
         `INSERT INTO audit_log (kind, message, meta) VALUES (?, ?, ?)`
       )
       .run(kind, message, meta ? JSON.stringify(meta) : null);
-    sqlite.close();
+    db.close();
   } catch {}
 }
 
