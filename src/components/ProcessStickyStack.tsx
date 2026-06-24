@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -27,10 +27,18 @@ export default function ProcessStickyStack({ data }: { data?: any }) {
   const eyebrow = data?.eyebrow || "How we work";
   const title = data?.title || "Five phases. Twenty-four weeks. One team.";
   const ref = useRef<HTMLDivElement>(null);
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || !ref.current || phases.length < 2) return;
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mql.matches);
+    const onChange = () => setReduceMotion(mql.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || !ref.current || phases.length < 2) return;
 
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".process-card");
@@ -59,7 +67,7 @@ export default function ProcessStickyStack({ data }: { data?: any }) {
     }, ref);
 
     return () => ctx.revert();
-  }, [phases.length]);
+  }, [phases.length, reduceMotion]);
 
   return (
     <section ref={ref} className="relative bg-elev py-20 md:py-28" aria-label="Process">
