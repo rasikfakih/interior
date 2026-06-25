@@ -111,6 +111,22 @@ Read order on entering a new session:
 6. For copy: scan with no-em-dash + no-emoji + brief-appropriate tone
 7. End of session: append a fresh "Last session log" section to this file
 
+Knowledge graph (Graphify) is auto-installed and wired into OpenCode
+(see `.opencode/opencode.json` plugin entry and `.opencode/plugins/graphify.js`).
+For codebase questions, the agent uses `graphify query/path/explain` against
+`graphify-out/graph.json` first instead of grep. The graph rebuilds on code
+changes via `graphify update .` (AST-only, no API cost). If `graphify-out/`
+is missing or stale, run `graphify update .` before answering codebase
+questions — that is the read-only path Graphify supports without an LLM
+key. The full `graphify .` re-extraction (semantic doc/paper/image
+embedding) requires an LLM key and is opt-in per session.
+
+Session-close protocol:
+
+- Run `graphify update .` to capture any code changes that landed this session.
+- Append a "Last session log" entry below recording what changed, which
+  Graphify Community Hubs were touched, and any carry-forward items.
+
 `npm run verify:deploy` is the single source-of-truth pre-flight check. It
 checks: node version, node_modules, `.next` build, `vercel.json`,
 `data/etihad.db` (or Supabase reachability when `DATABASE_URL` is set),
@@ -181,3 +197,13 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
   - Phase 5: Admin and Superadmin write-path integrity. Add a smoke that creates a project in admin, signs in as superadmin, issues a license, applies a distro, and verifies the rows persist on the next cold-start container. This is the proof that Vercel writes work.
   - Phase 6: Deploy + verify:deploy. Cut `v1.1.2` CHANGELOG. Roll freeze marker forward. Bump `package.json` to `1.1.2`.
 - Pending gate: operator to provide Supabase Project URL + DATABASE_URL. Until that arrives, no code changes.
+
+### 2026-06-25 — Graphify install + session protocol wiring
+- Operator requested Graphify install as the persistent memory engine. Confirmed scope via four-question intake: CLI globally via uv, pre-session shell hooks, migration-independent (Graphify indexes whatever is in the repo at session start), Supabase URL to be supplied before v1.1.2 Phase 1.
+- Verified on PyPI: package `graphifyy` exists at version 0.8.49 with 165 released versions across the 0.1.1 to 0.8.49 range. Binary name on PATH is `graphify`. Binary runs without an LLM key for code-only extraction, requires an LLM key only for the 48 non-code files in the corpus (docs + JSON + images).
+- Initial code-only indexing pass via `graphify update .`: 869 nodes, 1182 edges, 85 communities. Built from commit `97f228eb`. Wrote `graph.json`, `graph.html`, `GRAPH_REPORT.md` plus a 31 KB `manifest.json` into `graphify-out/`. No API cost.
+- Wired into OpenCode via `graphify opencode install`. Generated three artifacts: a Graphify section appended to `AGENTS.md`; a `.opencode/plugins/graphify.js` hook that prepends a one-shot `echo` reminder onto the first `bash` tool call of a session; and a `.opencode/opencode.json` plugin registration.
+- Added session-start and session-close instructions to `docs/CONTEXT.md` so any new opencode session knows to use `graphify query/path/explain` for codebase questions and to run `graphify update .` at session close to keep the graph current.
+- Used the read-only `graphify update .` path deliberately. The full `graphify .` semantic re-extraction now requires an LLM key on the operator's machine; not configured, so we leave that as opt-in for future sessions where a developer chooses to provide one.
+- Notable from the introspection trip: `db.ts` confirmed to be SQLite-only with no Postgres adapter path; the NextAuth `LoginCard.tsx` deployed with token-only CSRF (the live `/admin` HTML shows the hash half is missing). Both are in v1.1.2 plan.
+- Confirm: `graph.json` built off commit `97f228eb` (last commit at the time of indexing). Any new commits after this entry need `graphify update .` to refresh.
