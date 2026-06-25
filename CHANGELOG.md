@@ -72,6 +72,28 @@ See `FREEZE-MARKER` for the new carve-outs. The freeze is rolled forward:
 
 ---
 
+## v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)
+
+### Fixes
+
+- **Admin login submit silently failed.** `src/app/admin/LoginCard.tsx` was a Client Component that read the CSRF cookie via inline script and stripped the signature with `.split('%')[0]`. The form POST hit `/api/auth/callback/credentials` with a token that lacked the matching hash, NextAuth rejected it silently, and operators experienced "nothing happens" when submitting the form. Replaced with a Server Component that calls `getCsrfToken()` and renders the full `<token>|<hash>` pair. Commit `e7e7669`.
+
+- **`/admin` and `/superadmin` had the marketing navbar mounted on top of them.** The fixed-position `<Navbar />` was rendered in `src/app/layout.tsx`, which wraps every route, so the public chrome overlapped the operator login forms. Moved marketing pages (`/`, `/about`, `/contact`, `/projects`, `/journal`, `/install`) into a new `(public)` route group with its own `layout.tsx`. URLs are unchanged (route groups do not affect routing). `/admin` and `/superadmin` now resolve under the bare root layout (only providers, no chrome), so admin/operator surfaces render without the public navbar, footer, license banner, grain overlay, or smooth-scroll wrapper. Commit `4650a06`.
+
+- **Two Unsplash image IDs in seed fallback components returned HTTP 404** (`photo-1613553497126-a44624272013` and `photo-1600585154340-be6161a89a2c`). They were referenced from `SelectedWork.tsx`, `SpatialWalkthroughs.tsx`, the projects list, and the project-detail page. Replaced at the same call sites with two verified-living residential Unsplash URLs (`photo-1565538810643-b5bdb714032a` and `photo-1600585154526-990dced4db0d`). `next.config.mjs` `images.remotePatterns` already allowed `images.unsplash.com`, no config change required. Same commit as the layout hotspotting fix, `4650a06`.
+
+- **Home page sticky-stack pinned even when `prefers-reduced-motion` was set.** `src/components/ProcessStickyStack.tsx` read `window.matchMedia("(prefers-reduced-motion: reduce)").matches` inline at effect mount and did not subscribe to subsequent changes. Pinned siblings relied on the sticky stack running their `pin: true` ScrollTrigger, so a reduced-motion user could not release the pin mid-session. Replaced with React-state-driven `reduceMotion`, MQL change subscription with cleanup, and an effect dependency that re-runs on change. Commit `14cbb39`.
+
+### Public runtime impact
+
+None for marketing pages. The admin/operator login flows now submit successfully; project image fallbacks now resolve without 404s; the home process section collapses to natural scroll under reduce-motion.
+
+### Compatibility
+
+Bugfix-only. No schema changes, no route changes from the buyer's perspective, no new operator surfaces. Buyers on a fresh install see identical public output to v1.1.0.
+
+---
+
 ## v1.0.0 - 2026-06-18 (historic)
 
 ### Scope freeze
