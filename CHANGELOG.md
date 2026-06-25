@@ -72,6 +72,57 @@ See `FREEZE-MARKER` for the new carve-outs. The freeze is rolled forward:
 
 ---
 
+## v1.1.2 - 2026-06-25 (planned, pending Supabase URL)
+
+### Why
+
+The v1.1.1 surface shipped. Operator reported that admin and superadmin login do not actually submit (`/admin` form returns the visual state "still on /admin"), `/journal` listing is empty, projects have no before/after images, the 3D walkthrough and admin/superadmin write paths do not persist between deploys, and these hit together with several smaller regressions. Investigation identified two structural problems that the bugfix band-aid cannot cover:
+
+- **`db.ts` writes to `/tmp/etihad-{region}.db` (SQLite)** and Vercel serverless filesystems are ephemeral. Any admin save, superadmin save, tenant modification, license issue, theme distro apply, or testimonial save returns 200 but evaporates on the next cold start when the container rehydrates from the bundled `data/etihad.db`. The Phase 1 fix landed a `write-once /tmp copy` for **reads** (`4f64ca0`) but no fix exists for writes.
+- **NextAuth CSRF hidden field on the deployed `LoginCard.tsx`** is rendering `value="12bbab…"` (token only). NextAuth v4 requires the value to be `<token>%<hash>` so it can match against the cookie. `getCsrfToken()` (next-auth/react) returns only the token half. The v1.1.1 `e7e7669` attempt was incomplete.
+
+### Scope
+
+Operator-confirmed:
+
+- Full migration off SQLite to Supabase Postgres for all writes.
+- All current tables migrate (users, tenants, tenant_data, projects, journal, testimonials, team, pages, pages_blocks, settings, site_identity, media, license, hmac_audit, distro).
+- Tenants + tenant_data include the v1.1.0 schema even though the v1.1.0 ship modeled them locally only.
+- `projects` table gains `before_image` and `after_image` columns (schema is incomplete today, confirmed).
+- `/api/auth`, `/api/operator/*`, `/api/admin/*`, `/api/license`, `/api/journal/*`, `/api/team/*`, `/api/testimonials/*`, `/api/media/*`, `/api/pages/*`, `/api/projects/*`, `/api/settings`, `/api/envato/webhook`, `/api/upload` all run on Supabase.
+- Local dev keeps SQLite via a `DATABASE_URL` branch in `db.ts`.
+- Existing SQLite row contents export to SQL once and replay on first boot of the empty Postgres schema.
+- v1.250 release. `package.json` bumps to `1.1.2`. `FREEZE-MARKER` rolls forward.
+
+### What is in scope to land
+
+| Phase | Deliverable | Status |
+|---|---|---|
+| 1 | `src/lib/db.ts` rewritten as a driver-branch (SQLite vs Postgres) selected by `DATABASE_URL`. Postgres schema mirrors current SQLite tables verbatim plus `before_image` and `after_image` on `projects`. Migration script exports `data/etihad.db` to a SQL dump that is replayed on empty Postgres. | pending `DATABASE_URL` |
+| 2 | NextAuth provider wiring + superadmin operator API port + license / HMAC sign paths. JWT secret env contract preserved. | depends on 1 |
+| 3 | NextAuth CSRF token reformat (proper `<token>%<hash>` plumbing). Re-run live `/admin` login probe on Vercel preview. Sign-off: form submit reaches `?error=CredentialsSignin` or `/admin/pages` not "nothing happens." | depends on 2 |
+| 4 | `projects` schema additive update for before/after. Public `/projects` and `/projects/[slug]` read these columns. Journal listing fix: inspect whether `journal_posts` rows exist post-migration (probably not), seed at least three, fix slug resolver to match the listing. | depends on 3 |
+| 5 | Admin and Superadmin write-path integrity smoke. Create a project in admin, sign in as superadmin, issue a license, apply a distro, verify the rows persist on the next cold-start container. | depends on 4 |
+| 6 | Deploy + `npm run verify:deploy`. Cut this entry as the actual released v1.1.2 CHANGELOG bullet. Bump `package.json` to `1.1.2`. | depends on 5 |
+
+### Out of scope this round
+
+- Plain raw `<img>` tags in `PageRenderer.tsx`, `SpatialWalkthroughs.tsx`, `(public)/projects/[slug]/page.tsx` are not yet swapped for `next/image` (carry-forward from v1.1.1 session log).
+- Pre-flight checklist from taste-skill Section 4.7 has not been run against the home page after the layout restructure.
+
+### Public runtime impact at release
+
+- `/admin` and `/superadmin` writes persist across cold starts.
+- `/journal` lists at least three published posts and each `[slug]` resolves with content.
+- `/projects/[slug]` shows a paired before/after image slot.
+- Otherwise shape of the public site is unchanged.
+
+### Pending gate
+
+Operator to provide Supabase Project URL plus the `DATABASE_URL` (with the `?sslmode=require` Supabase query string) plus either `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_KEY` if the adapter requires them. Until these arrive, no code changes.
+
+---
+
 ## v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)
 
 ### Fixes
