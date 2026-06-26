@@ -198,6 +198,36 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
   - Phase 6: Deploy + verify:deploy. Cut `v1.1.2` CHANGELOG. Roll freeze marker forward. Bump `package.json` to `1.1.2`.
 - Pending gate: operator to provide Supabase Project URL + DATABASE_URL. Until that arrives, no code changes.
 
+### 2026-06-25 — Phase 1 connectivity landed + admin seed + abandoned CSRF chain
+- Supabase Postgres URL provided by operator and accepted.
+- Commits in this session of the v1.1.2 phase 1 work:
+    b43da6d (Phase 1 connectivity): Postgres schema mirror in Supabase,
+      content replay from bundled SQLite, driver-branch surface in
+      db.ts. Live runtime still SQLite (kept for safety because the
+      env-branching proxy turned out not to survive Turbopack
+      prerender as documented in the commit message).
+    6f525b2 (Phase 2 partial): Postgres-aware credentials lookup,
+      schema mirror, content seed script (3 projects / 3 journal
+      / 3 testimonials / 3 team members seeded into Supabase via
+      'npm run seed:content' and 'npm run migrate:supabase').
+- Six commits between 5265787 and 0a002ca experimented with the
+  admin CSRF fix. None validated end-to-end against the live URL.
+  They were all reverted by commit eaeb1db. LoginCard and auth.ts
+  are now back to the v1.1.1 Server Component shape. The two
+  helper routes added during the chase (csrf-full,
+  cookie-read) were deleted. Operator-visible behaviour on the
+  live URL for /admin is unchanged from when this session started.
+- Net assessment: Phase 1 is real progress. Phase 2 has a small
+  foothold (credentials lookup, content seed). The user-visible
+  regressions are largely untouched, mostly because the
+  underlying NextAuth v4 csrf shape was speculative. A fresh
+  session should pick a single approach to csrf and validate
+  per-commit before pushing.
+- Note for the next session: readNextAuth v4 csr proken; reads
+  next-auth/lib/web/specend on /web/spec/routes/ to confirm
+  the actual shape the verifier expects, then do one
+  validated commit with a curl-driven real-world verify step.
+
 ### 2026-06-25 — Graphify install + session protocol wiring
 - Operator requested Graphify install as the persistent memory engine. Confirmed scope via four-question intake: CLI globally via uv, pre-session shell hooks, migration-independent (Graphify indexes whatever is in the repo at session start), Supabase URL to be supplied before v1.1.2 Phase 1.
 - Verified on PyPI: package `graphifyy` exists at version 0.8.49 with 165 released versions across the 0.1.1 to 0.8.49 range. Binary name on PATH is `graphify`. Binary runs without an LLM key for code-only extraction, requires an LLM key only for the 48 non-code files in the corpus (docs + JSON + images).
