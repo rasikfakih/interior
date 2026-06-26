@@ -7,18 +7,17 @@ export default function LoginCard() {
 
   useEffect(() => {
     let cancelled = false;
-    // We hit our own route rather than /api/auth/csrf because NextAuth's
-    // /api/auth/csrf returns only the token portion. Our route reads the
-    // server-side cookie (the full token%hash) and returns it.
-    fetch("/api/auth/csrf-full")
-      .then((r) => r.json() as Promise<{ csrfToken: string; cookieValue: string | null }>)
-      .then((j) => {
-        if (cancelled) return;
-        // Prefer the full cookie value when available - that is what
-        // NextAuth's /api/auth/callback/credentials verifier expects.
-        setCsrfToken(j.cookieValue || j.csrfToken || "");
-      })
-      .catch(() => {});
+    (async () => {
+      // Step 1: hit NextAuth's csrf endpoint to mint the cookie on the
+      // client. NextAuth returns 200 with Set-Cookie: __Host-next-auth.csrf-token.
+      await fetch("/api/auth/csrf", { credentials: "same-origin" }).catch(() => {});
+      if (cancelled) return;
+      // Step 2: read the cookie via our read endpoint. The cookie is now
+      // present in the browser jar, so cookies() on the server can see it.
+      const r = await fetch("/api/auth/cookie-read", { credentials: "same-origin" });
+      const j = await r.json() as { cookieValue: string | null };
+      if (!cancelled) setCsrfToken(j.cookieValue || "");
+    })();
     return () => {
       cancelled = true;
     };
