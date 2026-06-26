@@ -1,15 +1,15 @@
-import { getCsrfToken } from "next-auth/react";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function LoginCard() {
   const cookieStore = await cookies();
-  const cookie = cookieStore.get("next-auth.csrf-token");
-  const token = await getCsrfToken();
-  const csrfToken = cookie
-    ? decodeURIComponent(cookie.value)
-    : (token || "");
+  const cookie = cookieStore.get("next-auth.csrf-token") || cookieStore.get("__Host-next-auth.csrf-token") || cookieStore.get("__Secure-next-auth.csrf-token");
+  // Pass the cookie value verbatim - NextAuth v4 stores the value as
+  // <urlEncodedToken>%<urlEncodedHash>, and the credentials callback verifies
+  // the submitted csrfToken by splitting on '%' and matching the hash half.
+  // The plain-token form (from getCsrfToken()) is rejected with HTTP 401.
+  const csrfToken = cookie?.value || "";
 
   return (
     <section className="min-h-[80dvh] flex items-center px-4">
