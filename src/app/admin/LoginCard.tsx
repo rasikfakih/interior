@@ -1,27 +1,7 @@
-"use client";
+import { getCsrfToken } from "next-auth/react";
 
-import { useEffect, useState } from "react";
-
-export default function LoginCard() {
-  const [csrfToken, setCsrfToken] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      // Step 1: hit NextAuth's csrf endpoint to mint the cookie on the
-      // client. NextAuth returns 200 with Set-Cookie: __Host-next-auth.csrf-token.
-      await fetch("/api/auth/csrf", { credentials: "same-origin" }).catch(() => {});
-      if (cancelled) return;
-      // Step 2: read the cookie via our read endpoint. The cookie is now
-      // present in the browser jar, so cookies() on the server can see it.
-      const r = await fetch("/api/auth/cookie-read", { credentials: "same-origin" });
-      const j = await r.json() as { cookieValue: string | null };
-      if (!cancelled) setCsrfToken(j.cookieValue || "");
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+export default async function LoginCard() {
+  const csrfToken = await getCsrfToken();
 
   return (
     <section className="min-h-[80dvh] flex items-center px-4">
@@ -33,9 +13,10 @@ export default function LoginCard() {
         >
           <h1 className="text-4xl tracking-tighter">Sign in</h1>
           <p className="text-ink-mute text-sm">
-            Use the seeded admin credentials.
+            Use the seeded admin credentials. Loss of password requires
+            editing the SQLite users row manually.
           </p>
-          <input type="hidden" name="csrfToken" value={csrfToken} readOnly />
+          <input type="hidden" name="csrfToken" value={csrfToken || ""} readOnly />
           <label className="block">
             <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
               Email
@@ -60,7 +41,7 @@ export default function LoginCard() {
               className="input-line"
             />
           </label>
-          <button type="submit" className="btn-primary w-full" disabled={!csrfToken}>
+          <button type="submit" className="btn-primary w-full">
             Sign in
           </button>
         </form>
