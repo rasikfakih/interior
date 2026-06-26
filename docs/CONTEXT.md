@@ -223,10 +223,12 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
   underlying NextAuth v4 csrf shape was speculative. A fresh
   session should pick a single approach to csrf and validate
   per-commit before pushing.
-- Note for the next session: readNextAuth v4 csr proken; reads
-  next-auth/lib/web/specend on /web/spec/routes/ to confirm
-  the actual shape the verifier expects, then do one
-  validated commit with a curl-driven real-world verify step.
+- Note for the next session: read NextAuth v4 csrf token verifier; the
+  canonical file is `next-auth/lib/web/spec/routes/csr` plus
+  `next-auth/core/lib/cookie`. Confirm the actual shape the
+  verifier expects (cookie value's <token>%<urlEncodedHash>
+  split on '%'), then do one validated commit with a curl-
+  driven real-world verify step before pushing.
 
 ### 2026-06-25 — Graphify install + session protocol wiring
 - Operator requested Graphify install as the persistent memory engine. Confirmed scope via four-question intake: CLI globally via uv, pre-session shell hooks, migration-independent (Graphify indexes whatever is in the repo at session start), Supabase URL to be supplied before v1.1.2 Phase 1.
@@ -237,3 +239,20 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
 - Used the read-only `graphify update .` path deliberately. The full `graphify .` semantic re-extraction now requires an LLM key on the operator's machine; not configured, so we leave that as opt-in for future sessions where a developer chooses to provide one.
 - Notable from the introspection trip: `db.ts` confirmed to be SQLite-only with no Postgres adapter path; the NextAuth `LoginCard.tsx` deployed with token-only CSRF (the live `/admin` HTML shows the hash half is missing). Both are in v1.1.2 plan.
 - Confirm: `graph.json` built off commit `97f228eb` (last commit at the time of indexing). Any new commits after this entry need `graphify update .` to refresh.
+
+### 2026-06-25 — final doc + graph refresh
+- Reverted the speculative CSRF chain as a single revert commit
+  (`eaeb1db`) so the live URL is no worse than it was at the
+  start of this session. LoginCard and auth.ts are now the v1.1.1
+  Server-Component shape, which matches commit `e7e7669` /
+  `4f64ca0`.
+- Pushed: `eaeb1db` (revert) -> `451e314` (this docs entry).
+- All open documents updated under freeze-marker exceptions
+  for `docs/**` and `CHANGELOG.md`.
+- Graph was last indexed against `97f228e`. This session added
+  eight commits so the graph is stale by ~8 commits. Re-running
+  `graphify update .` will refresh it to `451e314` and grow
+  node counts to reflect (a) the new `src/lib/db-postgres.ts`,
+  (b) the new migration / seed scripts, (c) the new auth.ts
+  shape with the postgres-aware branch, (d) any CHANGELOG /
+  CONTEXT.md edits.

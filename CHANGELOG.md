@@ -2,124 +2,94 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
-## v1.1.0 - 2026-06-23 (current)
-
-### What changed
-
-This release converts the codebase from a single-license demo into a multi-tenant commercial product. The buyer-visible site stays in its v1.0.0 contract. New product surfaces live under a separate carve-out so they cannot accidentally ship into a buyer install.
-
-### New surfaces (operator-only - not visible to buyers)
-
-- **`/superadmin`** - tenant + license console (gated by `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env)
-  - Tenants list + filter
-  - Tenant detail: edit tier, set expiration, mark revoked, change domain, paste distro
-  - Issue license action: tenant HMAC-signed offline license payload
-  - Theme distro apply: distribute `theme.distro.json` overrides per tenant
-  - Rotate HMAC action: re-sign a tenant key; buyers re-stamp at /install
-  - Metrics tile: total/active/pending/revoked/by-tier/expiring-7d/audit-7d
-
-- **`/api/operator/**`** - seven operator-only routes (login, tenants CRUD, issue, rotate-hmac, metrics)
-- **`/api/envato/webhook`** - Envato purchase intake, manual operator approval (no auto-issue)
-- **`scripts/apply-distro.mjs`** - apply a `theme.distro.json` to a tenant locally
-
-### Tenant model
-
-- `tenants` table: slug, studio_name, owner_email, domain, tier, state, hmac_key, installed_at, expires_at, revoked_at
-- `tenant_data` table: per-tenant JSON sidecar (distro, future settings overrides)
-- All legacy tables preserved unchanged. Seed data + schema are backward-compatible.
-
-### White-label pass (studio demo neutralised)
-
-- `site_identity` default brand name: `Etihad Interiors` -> `Your Studio`
-- Default settings rows: `contact_email`, `studio_address`, etc become placeholders
-- `seed-pages.mjs` hero copy: Etihad-specific line removed, eyebrow becomes `Residential Studio`
-- `data/theme.distro.json`: the Etihad-themed override lives here (read by `tenant-brand.ts`)
-- `data/studio-brand.json`: white-label default surface used when a tenant has no distro row
-
-The studio demo at `https://ethinterior.vercel.app` keeps painting as Etihad because the studio tenant's row 1 has `data/theme.distro.json` applied. Removing that distro row paints the demo as `Your Studio`.
-
-### Public runtime impact
-
-None. The demo at `/`, `/install`, `/admin`, `/projects`, `/journal`, `/contact` renders identically to v1.0.0. Buyers on a fresh install see neutral defaults until they (or the superadmin) apply a distro.
-
-### Session continuity
-
-- `docs/CONTEXT.md` - written so any new opencode session reads it first and picks up the build state, freeze status, and known tradeoffs
-- `AGENTS.md` patched to point at it on every session start
-
-### Verify-deploy gate additions (`scripts/verify-deploy.mjs`)
-
-Added gates for: tenants row present, theme.distro.json present, studio-brand.json present, operator page tree present, envato webhook route present, GLB > 1 KB (rejects the 369-byte stub), demo JPGs (>= 8), upload JPGs (9 required paths).
-
-## Lifecycle roll-forward
-
-See `FREEZE-MARKER` for the new carve-outs. The freeze is rolled forward:
-
-- v1.0.0 freeze remained in effect for buyer-visible code
-- v1.1.0 added an explicit operator carve-out (above)
-- White-label edits changed `seed-pages.mjs` and `site_identity` default content (string-only); no schema or route changes
-
-## Post-deploy checklist (operator fills in)
-
-- Deploy to `https://ethinterior.vercel.app` (auto-deploys from `rasikfakih/interior/main`)
-- Verify `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env vars are set in Vercel Production scope
-- Run the SHIP.md §5 incognito smoke (4 checks) on the live URL
-- Stamp CHANGELOG when first-visit passes
+## v1.1.2 - 2026-06-25 (Phase 1 connectivity - infra only, not yet shipped to runtime)
 
 ### Status
 
-- **Status (operator fills in after deploy)**: `_PENDING_ - enter timestamp here on first success_`
+**NOT deployed.** This entry documents the pieces that landed on
+`main`. None of them are active on the live Vercel runtime yet. The
+runtime continues to read from the bundled SQLite copy of
+`data/etihad.db`. Activation happens once Phase 2 ports the
+raw-sqlite call sites AND Phase 3 fixes the admin login page.
+At that point this entry rolls forward in release status (rather
+than `in-progress`) with the freeze marker bumped.
 
----
+### What landed in this series
 
-## v1.1.2 - 2026-06-25 (planned, pending Supabase URL)
+- `supabase-bootstrap.sql`: idempotent CREATE TABLE IF NOT EXISTS
+  DDL mirroring every SQLite table in `src/lib/schema.ts`, plus
+  the `before_image` and `after_image` columns on `projects`
+  (which were already in `schema.ts` but never had a UPLOAD path
+  wired up). Postgres-typed columns with proper SERIAL PK,
+  JSONB for the JSON text columns, TIMESTAMPTZ for timestamps.
 
-### Why
+- `src/lib/db-postgres.ts`: drizzle-orm/pg-core mirror of
+  `src/lib/schema.ts`. Same column names and table names so the
+  SQL DDL is symmetrical between the two engines. Exports a
+  `drizzlePostgres(pool)` factory used by the runtime.
 
-The v1.1.1 surface shipped. Operator reported that admin and superadmin login do not actually submit (`/admin` form returns the visual state "still on /admin"), `/journal` listing is empty, projects have no before/after images, the 3D walkthrough and admin/superadmin write paths do not persist between deploys, and these hit together with several smaller regressions. Investigation identified two structural problems that the bugfix band-aid cannot cover:
+- `src/lib/auth.ts`: Postgres-aware credentials provider via
+  a new `lookupUser()` helper. When DATABASE_URL is set, opens
+  a pg.Pool and queries the Supabase `users` table; otherwise
+  falls back to the existing SQLite openReadonlyDb path. No
+  change to local dev.
 
-- **`db.ts` writes to `/tmp/etihad-{region}.db` (SQLite)** and Vercel serverless filesystems are ephemeral. Any admin save, superadmin save, tenant modification, license issue, theme distro apply, or testimonial save returns 200 but evaporates on the next cold start when the container rehydrates from the bundled `data/etihad.db`. The Phase 1 fix landed a `write-once /tmp copy` for **reads** (`4f64ca0`) but no fix exists for writes.
-- **NextAuth CSRF hidden field on the deployed `LoginCard.tsx`** is rendering `value="12bbab…"` (token only). NextAuth v4 requires the value to be `<token>%<hash>` so it can match against the cookie. `getCsrfToken()` (next-auth/react) returns only the token half. The v1.1.1 `e7e7669` attempt was incomplete.
+- `src/lib/db.ts`: openPostgres() lazy helper. The `db` proxy
+  itself still resolves to the SQLite drizzle handle because
+  the env-branching version caused Turbopack prerender errors
+  ("i is not a function"); Phase 2 will resolve that.
 
-### Scope
+- `scripts/migrate-to-supabase.mjs` ('npm run migrate:supabase'):
+  reads DATABASE_URL from .env.local, applies
+  supabase-bootstrap.sql, then runs INSERT ... ON CONFLICT DO
+  UPDATE for users, tenants, site_identity, settings, pages,
+  page_blocks, menus, menu_items. Each row preserves its
+  original id from the bundled SQLite. Idempotent.
 
-Operator-confirmed:
+- `scripts/seed-content-supabase.mjs` ('npm run seed:content'):
+  inserts a representative content set (3 projects,
+  3 journal_posts, 3 testimonials, 3 team_members). Uses ON
+  CONFLICT DO NOTHING and skips tables that already have
+  operator content, so re-runs are safe.
 
-- Full migration off SQLite to Supabase Postgres for all writes.
-- All current tables migrate (users, tenants, tenant_data, projects, journal, testimonials, team, pages, pages_blocks, settings, site_identity, media, license, hmac_audit, distro).
-- Tenants + tenant_data include the v1.1.0 schema even though the v1.1.0 ship modeled them locally only.
-- `projects` table gains `before_image` and `after_image` columns (schema is incomplete today, confirmed).
-- `/api/auth`, `/api/operator/*`, `/api/admin/*`, `/api/license`, `/api/journal/*`, `/api/team/*`, `/api/testimonials/*`, `/api/media/*`, `/api/pages/*`, `/api/projects/*`, `/api/settings`, `/api/envato/webhook`, `/api/upload` all run on Supabase.
-- Local dev keeps SQLite via a `DATABASE_URL` branch in `db.ts`.
-- Existing SQLite row contents export to SQL once and replay on first boot of the empty Postgres schema.
-- v1.250 release. `package.json` bumps to `1.1.2`. `FREEZE-MARKER` rolls forward.
+- `scripts/inspect-db.mjs` ('npm run db:inspect'): prints table
+  row counts from the bundled SQLite.
 
-### What is in scope to land
+- `src/lib/db-postgres.ts`: required peer to `db-postgres.ts`
+  above the runtime path - a `require('./db-postgres')` call
+  inside `db.ts` to break circularity.
 
-| Phase | Deliverable | Status |
-|---|---|---|
-| 1 | `src/lib/db.ts` rewritten as a driver-branch (SQLite vs Postgres) selected by `DATABASE_URL`. Postgres schema mirrors current SQLite tables verbatim plus `before_image` and `after_image` on `projects`. Migration script exports `data/etihad.db` to a SQL dump that is replayed on empty Postgres. | pending `DATABASE_URL` |
-| 2 | NextAuth provider wiring + superadmin operator API port + license / HMAC sign paths. JWT secret env contract preserved. | depends on 1 |
-| 3 | NextAuth CSRF token reformat (proper `<token>%<hash>` plumbing). Re-run live `/admin` login probe on Vercel preview. Sign-off: form submit reaches `?error=CredentialsSignin` or `/admin/pages` not "nothing happens." | depends on 2 |
-| 4 | `projects` schema additive update for before/after. Public `/projects` and `/projects/[slug]` read these columns. Journal listing fix: inspect whether `journal_posts` rows exist post-migration (probably not), seed at least three, fix slug resolver to match the listing. | depends on 3 |
-| 5 | Admin and Superadmin write-path integrity smoke. Create a project in admin, sign in as superadmin, issue a license, apply a distro, verify the rows persist on the next cold-start container. | depends on 4 |
-| 6 | Deploy + `npm run verify:deploy`. Cut this entry as the actual released v1.1.2 CHANGELOG bullet. Bump `package.json` to `1.1.2`. | depends on 5 |
+### What is NOT yet fixed
 
-### Out of scope this round
+- The `/admin` and `/superadmin` login pages still look the same
+  as the v1.1.0 demo: form submits silently because the CSRF
+  hidden input only carries the token half. Six commits in
+  this session attempted to fix it (5265787, 58eb775, c9d68d6,
+  fd17531, 23da701, 0a002ca) and were reverted by eaeb1db.
+  Phase 3 needs to read the actual NextAuth v4 csrf route
+  (next-auth/lib/web/spec/routes/csr + next-auth/core/lib/cookie)
+  and pick a single approach validated with a curl-driven
+  live probe.
 
-- Plain raw `<img>` tags in `PageRenderer.tsx`, `SpatialWalkthroughs.tsx`, `(public)/projects/[slug]/page.tsx` are not yet swapped for `next/image` (carry-forward from v1.1.1 session log).
-- Pre-flight checklist from taste-skill Section 4.7 has not been run against the home page after the layout restructure.
+- 91 raw-sqlite call sites across lib/pages.ts, lib/media.ts,
+  lib/auth.ts (SQLite branch unchanged), lib/operator-store.ts,
+  lib/license.ts, lib/initDb.ts, and the api routes still
+  target the SQLite copy. They will continue to evaporate
+  across Vercel cold starts until Phase 2 ports them.
 
-### Public runtime impact at release
+- The admin project form has no input for `before_image` /
+  `after_image` even though the columns now exist on the
+  Prock Postgres `projects` table.
 
-- `/admin` and `/superadmin` writes persist across cold starts.
-- `/journal` lists at least three published posts and each `[slug]` resolves with content.
-- `/projects/[slug]` shows a paired before/after image slot.
-- Otherwise shape of the public site is unchanged.
+- Run `npm run verify:deploy` before any deploy - per AGENTS.md
+  session protocol. This commit did not run it.
 
-### Pending gate
+### Public runtime impact
 
-Operator to provide Supabase Project URL plus the `DATABASE_URL` (with the `?sslmode=require` Supabase query string) plus either `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_KEY` if the adapter requires them. Until these arrive, no code changes.
+None at the moment. The Vercel Production runtime sees only
+the SQLite copy. Once Phase 2 lands AND Phase 3 lands AND
+the operator sets DATABASE_URL on Vercel, the deletions below
+become visible.
 
 ---
 
@@ -127,21 +97,177 @@ Operator to provide Supabase Project URL plus the `DATABASE_URL` (with the `?ssl
 
 ### Fixes
 
-- **Admin login submit silently failed.** `src/app/admin/LoginCard.tsx` was a Client Component that read the CSRF cookie via inline script and stripped the signature with `.split('%')[0]`. The form POST hit `/api/auth/callback/credentials` with a token that lacked the matching hash, NextAuth rejected it silently, and operators experienced "nothing happens" when submitting the form. Replaced with a Server Component that calls `getCsrfToken()` and renders the full `<token>|<hash>` pair. Commit `e7e7669`.
+- `/admin` and `/superadmin` had the marketing navbar mounted
+  on top of them. The fixed-position `<Navbar />` was rendered
+  in `src/app/layout.tsx` for every route, so the public chrome
+  overlapped the operator login forms. Marketing pages
+  (`/`, `/about`, `/contact`, `/projects`, `/project/[slug]`,
+  `/journal`, `/journal/[slug]`, `/install`) moved into a new
+  `(public)` route group with its own `layout.tsx`. Root layout
+  now only provides SessionProvider + ThemeProvider +
+  I18nProvider. URLs unchanged because route groups do not
+  affect routing. Commit `4650a06`.
 
-- **`/admin` and `/superadmin` had the marketing navbar mounted on top of them.** The fixed-position `<Navbar />` was rendered in `src/app/layout.tsx`, which wraps every route, so the public chrome overlapped the operator login forms. Moved marketing pages (`/`, `/about`, `/contact`, `/projects`, `/journal`, `/install`) into a new `(public)` route group with its own `layout.tsx`. URLs are unchanged (route groups do not affect routing). `/admin` and `/superadmin` now resolve under the bare root layout (only providers, no chrome), so admin/operator surfaces render without the public navbar, footer, license banner, grain overlay, or smooth-scroll wrapper. Commit `4650a06`.
+- Two Unsplash image IDs in seed fallback components returned
+  HTTP 404 (`photo-1613553497126-a44624272013` and
+  `photo-1600585154340-be6161a89a2c`). Replaced at the same
+  call sites with two verified-living residential interiors
+  URLs (`photo-1565538810643-b5bdb714032a` and
+  `photo-1600585154526-990dced4db0d`) in `SelectedWork.tsx`,
+  `SpatialWalkthroughs.tsx`, `(public)/projects/page.tsx`, and
+  `(public)/projects/[slug]/page.tsx`. `next.config.mjs`
+  `images.remotePatterns` already allowed `images.unsplash.com`.
+  Same commit `4650a06`.
 
-- **Two Unsplash image IDs in seed fallback components returned HTTP 404** (`photo-1613553497126-a44624272013` and `photo-1600585154340-be6161a89a2c`). They were referenced from `SelectedWork.tsx`, `SpatialWalkthroughs.tsx`, the projects list, and the project-detail page. Replaced at the same call sites with two verified-living residential Unsplash URLs (`photo-1565538810643-b5bdb714032a` and `photo-1600585154526-990dced4db0d`). `next.config.mjs` `images.remotePatterns` already allowed `images.unsplash.com`, no config change required. Same commit as the layout hotspotting fix, `4650a06`.
+- The home process sticky-stack ignored live changes to
+  prefers-reduced-motion. `src/components/ProcessStickyStack.tsx`
+  read `window.matchMedia("(prefers-reduced-motion: reduce)").matches`
+  inline at effect mount, did not subscribe to subsequent MQL
+  change events, and did not include the value in the effect
+  dependency array. Result: an OS-level reduce-motion toggle
+  could not release pinned siblings back to natural layout.
+  Replaced with React-state-driven reduceMotion, MQL change
+  subscription with cleanup, and a useEffect key that re-runs
+  on change. Commit `14cbb39`.
 
-- **Home page sticky-stack pinned even when `prefers-reduced-motion` was set.** `src/components/ProcessStickyStack.tsx` read `window.matchMedia("(prefers-reduced-motion: reduce)").matches` inline at effect mount and did not subscribe to subsequent changes. Pinned siblings relied on the sticky stack running their `pin: true` ScrollTrigger, so a reduced-motion user could not release the pin mid-session. Replaced with React-state-driven `reduceMotion`, MQL change subscription with cleanup, and an effect dependency that re-runs on change. Commit `14cbb39`.
+- Run hygiene gap: session log LLM intended to run
+  `npm run verify:deploy` before the v1.1.1 push; it did not.
+  Carried forward into Phase 6.
 
 ### Public runtime impact
 
-None for marketing pages. The admin/operator login flows now submit successfully; project image fallbacks now resolve without 404s; the home process section collapses to natural scroll under reduce-motion.
+- Admin and superadmin login forms render without the public
+  navbar overlay, so credentials can now be seen / submitted.
+- Project image fallbacks resolve to 200 instead of 404 on
+  the homepage and the projects list.
+- The home process section collapses to natural scroll under
+  reduce-motion.
 
-### Compatibility
+### Important caveat
 
-Bugfix-only. No schema changes, no route changes from the buyer's perspective, no new operator surfaces. Buyers on a fresh install see identical public output to v1.1.0.
+The attempt in this series to fix the CSRF chain itself
+(commit `e7e7669`) was incomplete - `getCsrfToken()` returns
+the bare token, but NextAuth's cookie verifier expects
+`<token>%<urlEncoded hash>`. As of v1.1.1 the form still ships
+a token-only value and submit still appears to "do nothing"
+against the live URL. **The user-visible CSRF bug re-surfaces
+in v1.1.2 from this gap**, and Phase 3 of v1.1.2 will close it.
+
+---
+
+## v1.1.0 - 2026-06-23 (current shipped release on runtime)
+
+### What changed
+
+This release converts the codebase from a single-license demo
+into a multi-tenant commercial product. The buyer-visible site
+stays in its v1.0.0 contract. New product surfaces live under
+a separate carve-out so they cannot accidentally ship into a
+buyer install.
+
+### New surfaces (operator-only - not visible to buyers)
+
+- **`/superadmin`** - tenant + license console (gated by
+  `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env).
+  - Tenants list + filter
+  - Tenant detail: edit tier, set expiration, mark revoked,
+    change domain, paste distro
+  - Issue license action: tenant HMAC-signed offline license
+    payload
+  - Theme distro apply: distribute `theme.distro.json` overrides
+    per tenant
+  - Rotate HMAC action: re-sign a tenant key; buyers re-stamp
+    at /install
+  - Metrics tile: total/active/pending/revoked/by-tier/
+    expiring-7d/audit-7d
+
+- **`/api/operator/**`** - seven operator-only routes (login,
+  tenants CRUD, issue, rotate-hmac, metrics).
+- **`/api/envato/webhook`** - Envato purchase intake, manual
+  operator approval (no auto-issue).
+- **`scripts/apply-distro.mjs`** - apply a `theme.distro.json`
+  to a tenant locally.
+
+### Tenant model
+
+- `tenants` table: slug, studio_name, owner_email, domain,
+  tier, state, hmac_key, installed_at, expires_at, revoked_at.
+- `tenant_data` table: per-tenant JSON sidecar (distro, future
+  settings overrides).
+- All legacy tables preserved unchanged. Seed data + schema
+  are backward-compatible.
+
+### White-label pass (studio demo neutralised)
+
+- `site_identity` default brand name: `Etihad Interiors` ->
+  `Your Studio`.
+- Default settings rows: `contact_email`, `studio_address`, etc
+  become placeholders.
+- `seed-pages.mjs` hero copy: Etihad-specific line removed,
+  eyebrow becomes `Residential Studio`.
+- `data/theme.distro.json`: the Etihad-themed override lives
+  here (read by `tenant-brand.ts`).
+- `data/studio-brand.json`: white-label default surface used
+  when a tenant has no distro row.
+
+The studio demo at `https://ethinterior.vercel.app` keeps
+painting as Etihad because the studio tenant's row 1 has
+`data/theme.distro.json` applied. Removing that distro row
+paints the demo as `Your Studio`.
+
+### Public runtime impact
+
+None. The demo at `/`, `/install`, `/admin`, `/projects`,
+`/journal`, `/contact` renders identically to v1.0.0. Buyers
+on a fresh install see neutral defaults until they (or the
+superadmin) apply a distro.
+
+### Session continuity
+
+- `docs/CONTEXT.md` - written so any new opencode session
+  reads it first and picks up the build state, freeze status,
+  and known tradeoffs.
+- `AGENTS.md` patched to point at it on every session start.
+
+### Verify-deploy gate additions (`scripts/verify-deploy.mjs`)
+
+Added gates for: tenants row present, theme.distro.json
+present, studio-brand.json present, operator page tree present,
+envato webhook route present, GLB > 1 KB (rejects the 369-byte
+stub), demo JPGs (>= 8), upload JPGs (9 required paths).
+
+## Lifecycle roll-forward
+
+See `FREEZE-MARKER` for the new carve-outs:
+
+- v1.0.0 freeze remained in effect for buyer-visible code.
+- v1.1.0 added an explicit operator carve-out (above).
+- White-label edits changed `seed-pages.mjs` and `site_identity`
+  default content (string-only); no schema or route changes.
+- v1.1.1 hotfix applied bug fixes without breaking the
+  v1.0.0 contract; no schema changes (see Important caveat
+  above re: the CSRF claim).
+- v1.1.2 in progress: Phase 1 Supabase connectivity landed
+  on `main` but not yet shipped to runtime.
+
+## Post-deploy checklist (operator fills in)
+
+- Deploy to `https://ethinterior.vercel.app` (auto-deploys
+  from `rasikfakih/interior/main`).
+- Verify `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env vars
+  are set in Vercel Production scope.
+- Once v1.1.2 ships to runtime, also set `DATABASE_URL` and
+  the Supabase publishable/secret keys in Vercel Production.
+- Run the SHIP.md sec 5 incognito smoke (4 checks) on the live
+  URL after every release.
+- Stamp CHANGELOG when first-visit passes.
+
+### Status
+
+- **Status (operator fills in after deploy)**: `_PENDING_ -
+  enter timestamp here on first success_`. v1.1.0 has been in
+  PENDING for the merged v1.1.1 hotfix; upgrade after v1.1.2
+  deploy lands.
 
 ---
 
@@ -152,24 +278,32 @@ Bugfix-only. No schema changes, no route changes from the buyer's perspective, n
 This release was feature-frozen for sale to buyers:
 
 - Hard freeze date: Day 2 of Room 0 (2026-06-18).
-- Hard freeze scope: every code change after this point was bug-fix, copy edit, doc edit, or accessibility fix only.
-- Hard freeze intent: a freshly installed v1.0 keeps behaving exactly like what is in this build.
+- Hard freeze scope: every code change after this point was
+  bug-fix, copy edit, doc edit, or accessibility fix only.
+- Hard freeze intent: a freshly installed v1.0 keeps behaving
+  exactly like what is in this build.
 
-Anything new was queued in `docs/feature-decisions.md` for v1.1 / Room 1 / Room 2.
-The next room landed in v1.1.0 (this release) after one freeze-roll-forward session.
+Anything new was queued in `docs/feature-decisions.md` for
+v1.1 / Room 1 / Room 2. The next room landed in v1.1.0 (this
+release) after one freeze-roll-forward session.
 
 ### Public runtime (v1.0.0)
 
 - Public site reads from `pages_blocks` (CMS Room 0).
-- `/install` stamps the license from purchase code, domain, tier.
+- `/install` stamps the license from purchase code, domain,
+  tier.
 - `/admin` requires login + valid license.
 - License FeatureMatrix:
   - `feature.3d-viewer`: Personal = off, Business = on
   - `feature.multilingual`: Personal = off, Business = on
-  - `feature.unlimited-pages` / `feature.unlimited-media`: Personal = capped, Business = unlimited
-  - `feature.multi-domain`: Personal = 1 site, Business = 5 sites
+  - `feature.unlimited-pages` / `feature.unlimited-media`:
+    Personal = capped, Business = unlimited
+  - `feature.multi-domain`: Personal = 1 site, Business = 5
+    sites
 
 ### Migration hooks (v1.0.0)
 
-- `node scripts/migrate.mjs` is idempotent. Re-runnable. Always safe to run.
-- `node scripts/seed-pages.mjs` is conditional. Only seeds if `home` page row is missing.
+- `node scripts/migrate.mjs` is idempotent. Re-runnable. Always
+  safe to run.
+- `node scripts/seed-pages.mjs` is conditional. Only seeds if
+  `home` page row is missing.

@@ -10,6 +10,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 3. Run `npm run verify:deploy` before any deploy.
 4. Do not use emojis or em-dashes anywhere visible to the user.
 5. End every session by appending to the "Last session log" section of `docs/CONTEXT.md`.
+5a. Before ending the session, run `npm run graphify:update` (which calls `graphify update .`) so the knowledge graph at `graphify-out/` reflects every code change made this session. The graph ships with the repo from commit to commit.
+5b. If the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before answering, and refresh the graph first if it has not been touched in 5+ commits since HEAD.
 <!-- END:nextjs-agent-rules -->
 
 ## graphify
