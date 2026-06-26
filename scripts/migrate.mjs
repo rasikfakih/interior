@@ -394,7 +394,12 @@ if (!studioTenant) {
   );
 }
 
-// Default admin user
+// Default admin user - idempotent upsert keyed on ADMIN_EMAIL. The
+// INSERT OR IGNORE form left a stale studio@etihadinteriors.com row
+// when the bundled SQLite shipped with that row, so the seed step
+// silently failed to add admin@etihadinteriors.com. Switched to an
+// UPSERT pattern: if a row matching ADMIN_EMAIL exists, refresh the
+// password hash; otherwise insert a new row with role='admin'.
 function seedDefaultAdmin() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@etihadinteriors.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
@@ -402,10 +407,12 @@ function seedDefaultAdmin() {
   try {
     sqlite
       .prepare(
-        `INSERT OR IGNORE INTO users (email, password_hash, role) VALUES (?, ?, 'admin')`
+        `INSERT INTO users (email, password_hash, role)
+         VALUES (?, ?, 'admin')
+         ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash, role = 'admin'`
       )
       .run(adminEmail, passwordHash);
-    console.log("+ users seed (admin)");
+    console.log(`+ users seed (admin) -> ${adminEmail}`);
   } catch (e) {
     console.log(`- users seed failed: ${e.message}`);
   }
