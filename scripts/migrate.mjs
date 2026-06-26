@@ -394,17 +394,29 @@ if (!studioTenant) {
   );
 }
 
-// Default admin user - idempotent upsert keyed on ADMIN_EMAIL. The
-// INSERT OR IGNORE form left a stale studio@etihadinteriors.com row
-// when the bundled SQLite shipped with that row, so the seed step
-// silently failed to add admin@etihadinteriors.com. Switched to an
-// UPSERT pattern: if a row matching ADMIN_EMAIL exists, refresh the
-// password hash; otherwise insert a new row with role='admin'.
+// Default admin user - demonstrates the expected admin identity.
+// Remove any stale rows that were inserted by earlier seeds
+// (e.g. studio@etihadinteriors.com from a v1.1.0 build) and insert
+// the row that the operator expects to log in with. This keeps the
+// users table predictable regardless of which bundled SQLite shipped
+// in the deploy.
 function seedDefaultAdmin() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@etihadinteriors.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
   const passwordHash = bcrypt.hashSync(adminPassword, 10);
   try {
+    // Drop any stale non-admin rows whose email differs from env. The
+    // env row is the only one we want.
+    const stale = sqlite
+      .prepare("SELECT id, email FROM users WHERE email != ?")
+      .all(adminEmail);
+    if (stale.length > 0) {
+      sqlite
+        .prepare("DELETE FROM users WHERE email != ?")
+        .run(adminEmail);
+      console.log(`- users seed: removed ${stale.length} stale row(s) (${stale.map(s => s.email).join(", ")})`);
+    }
+
     sqlite
       .prepare(
         `INSERT INTO users (email, password_hash, role)
