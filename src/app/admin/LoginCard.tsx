@@ -1,15 +1,24 @@
+import { getCsrfToken } from "next-auth/react";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function LoginCard() {
+  // Calling getCsrfToken() is what populates the csrf cookie via
+  // NextAuth's server helper when the request carries no cookie
+  // header of its own. The subsequent cookies() read should then
+  // return the full cookie value, which is what NextAuth's
+  // /api/auth/callback/credentials POST handler verifies against.
+  const token = await getCsrfToken();
   const cookieStore = await cookies();
-  const cookie = cookieStore.get("next-auth.csrf-token") || cookieStore.get("__Host-next-auth.csrf-token") || cookieStore.get("__Secure-next-auth.csrf-token");
-  // Pass the cookie value verbatim - NextAuth v4 stores the value as
-  // <urlEncodedToken>%<urlEncodedHash>, and the credentials callback verifies
-  // the submitted csrfToken by splitting on '%' and matching the hash half.
-  // The plain-token form (from getCsrfToken()) is rejected with HTTP 401.
-  const csrfToken = cookie?.value || "";
+  const cookie =
+    cookieStore.get("next-auth.csrf-token")
+    || cookieStore.get("__Host-next-auth.csrf-token")
+    || cookieStore.get("__Secure-next-auth.csrf-token");
+  // The cookie value is <urlEncodedToken>%<urlEncodedHash>. Pass
+  // it verbatim to the form. NextAuth's verifier splits on the
+  // literal % in the submitted value and compares.
+  const csrfToken = cookie?.value || token || "";
 
   return (
     <section className="min-h-[80dvh] flex items-center px-4">
@@ -21,9 +30,7 @@ export default async function LoginCard() {
         >
           <h1 className="text-4xl tracking-tighter">Sign in</h1>
           <p className="text-ink-mute text-sm">
-            Use the seeded admin credentials. Loss of password requires
-            editing the SQLite users row manually or issuing a new admin
-            via the operator console once Vercel writes are wired in.
+            Use the seeded admin credentials.
           </p>
           <input type="hidden" name="csrfToken" value={csrfToken} readOnly />
           <label className="block">
