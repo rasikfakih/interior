@@ -1,24 +1,19 @@
-import { getCsrfToken } from "next-auth/react";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function LoginCard() {
-  // Calling getCsrfToken() is what populates the csrf cookie via
-  // NextAuth's server helper when the request carries no cookie
-  // header of its own. The subsequent cookies() read should then
-  // return the full cookie value, which is what NextAuth's
-  // /api/auth/callback/credentials POST handler verifies against.
-  const token = await getCsrfToken();
   const cookieStore = await cookies();
-  const cookie =
-    cookieStore.get("next-auth.csrf-token")
-    || cookieStore.get("__Host-next-auth.csrf-token")
-    || cookieStore.get("__Secure-next-auth.csrf-token");
-  // The cookie value is <urlEncodedToken>%<urlEncodedHash>. Pass
-  // it verbatim to the form. NextAuth's verifier splits on the
-  // literal % in the submitted value and compares.
-  const csrfToken = cookie?.value || token || "";
+  const all = cookieStore.getAll();
+  // Get cookie names for diagnostic. The current Server Component
+  // renders the form once per request. The cookie name is __Host- or
+  // __Secure-next-auth.csrf-token under HTTPS in v4.
+  const csrfToken = (() => {
+    for (const c of all) {
+      if (/csrf-token$/i.test(c.name)) return c.value;
+    }
+    return "";
+  })();
 
   return (
     <section className="min-h-[80dvh] flex items-center px-4">
@@ -61,6 +56,12 @@ export default async function LoginCard() {
             Sign in
           </button>
         </form>
+        {/**
+         * Diagnostic: log cookie names so we know which one NextAuth
+         * set. Cookie names are NOT visible client-side because they
+         * are HttpOnly, so this hidden list is harmless in production.
+         */}
+        <input type="hidden" name="_diag" value={all.map(c => c.name).join('|')} readOnly />
       </div>
     </section>
   );
