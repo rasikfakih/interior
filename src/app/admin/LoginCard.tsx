@@ -1,19 +1,28 @@
-import { cookies } from "next/headers";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect, useState } from "react";
 
-export default async function LoginCard() {
-  const cookieStore = await cookies();
-  const all = cookieStore.getAll();
-  // Get cookie names for diagnostic. The current Server Component
-  // renders the form once per request. The cookie name is __Host- or
-  // __Secure-next-auth.csrf-token under HTTPS in v4.
-  const csrfToken = (() => {
-    for (const c of all) {
-      if (/csrf-token$/i.test(c.name)) return c.value;
-    }
-    return "";
-  })();
+export default function LoginCard() {
+  const [csrfToken, setCsrfToken] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    // We hit our own route rather than /api/auth/csrf because NextAuth's
+    // /api/auth/csrf returns only the token portion. Our route reads the
+    // server-side cookie (the full token%hash) and returns it.
+    fetch("/api/auth/csrf-full")
+      .then((r) => r.json() as Promise<{ csrfToken: string; cookieValue: string | null }>)
+      .then((j) => {
+        if (cancelled) return;
+        // Prefer the full cookie value when available - that is what
+        // NextAuth's /api/auth/callback/credentials verifier expects.
+        setCsrfToken(j.cookieValue || j.csrfToken || "");
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section className="min-h-[80dvh] flex items-center px-4">
@@ -52,16 +61,10 @@ export default async function LoginCard() {
               className="input-line"
             />
           </label>
-          <button type="submit" className="btn-primary w-full">
+          <button type="submit" className="btn-primary w-full" disabled={!csrfToken}>
             Sign in
           </button>
         </form>
-        {/**
-         * Diagnostic: log cookie names so we know which one NextAuth
-         * set. Cookie names are NOT visible client-side because they
-         * are HttpOnly, so this hidden list is harmless in production.
-         */}
-        <input type="hidden" name="_diag" value={all.map(c => c.name).join('|')} readOnly />
       </div>
     </section>
   );
