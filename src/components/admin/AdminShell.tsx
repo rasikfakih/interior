@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
@@ -215,7 +215,7 @@ function SettingsPanel() {
         or use <code className="font-mono text-xs">/.env.local</code> for env-tied keys.
       </p>
       <div className="divide-y hairline">
-        {rows.map((r) => (
+        {rows.map((r: any) => (
           <div key={r.label} className="py-3 grid grid-cols-1 md:grid-cols-12 gap-2">
             <p className="md:col-span-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
               {r.label}

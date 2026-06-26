@@ -20,7 +20,7 @@ export default async function PageEditor({
     .select()
     .from(pageBlocks)
     .where(eq(pageBlocks.pageId, pageId));
-  const initialBlocks = rows.map((r) => ({
+  const initialBlocks = rows.map((r: any) => ({
     type: r.type as any,
     data: safeJson(r.data),
   }));

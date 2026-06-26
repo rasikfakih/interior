@@ -25,13 +25,13 @@ export async function GET() {
     <changefreq>weekly</changefreq>
     <priority>${route === '' ? '1.0' : '0.8'}</priority>
   </url>`).join('\n')}
-  ${projectList.map(p => `  <url>
+  ${projectList.map((p: any) => `  <url>
     <loc>${baseUrl}/projects/${p.slug}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>`).join('\n')}
-  ${journalList.map(j => `  <url>
+  ${journalList.map((j: any) => `  <url>
     <loc>${baseUrl}/journal/${j.slug}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>

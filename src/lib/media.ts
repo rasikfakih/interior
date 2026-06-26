@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 import Database from "better-sqlite3";
 import path from "path";
 
@@ -52,7 +52,7 @@ export async function listMedia(filters: MediaListFilters = {}): Promise<MediaIt
         return kindOk && qOk;
       });
       resolve(
-        filtered.map((r) => ({
+        filtered.map((r: any) => ({
           id: r.id,
           kind: r.kind,
           mime: r.mime,

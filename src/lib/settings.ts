@@ -21,7 +21,7 @@ const defaults: SiteSettings = {
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
     const rows = await db.select().from(settings);
-    const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+    const map = Object.fromEntries(rows.map((r: any) => [r.key, r.value]));
     return {
       contact_email: map.contact_email || defaults.contact_email,
       contact_phone: map.contact_phone || defaults.contact_phone,
