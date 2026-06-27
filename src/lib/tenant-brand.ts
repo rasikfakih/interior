@@ -1,5 +1,17 @@
 import { openReadonlyDb } from "@/lib/db";
 
+/**
+ * tenant-brand.ts - v1.1.2 in-flight port.
+ *
+ * Currently still reads from SQLite via the legacy db.ts shim.
+ * The shim throws when called, so any prod runtime that hits this
+ * code will fall through to the readDefaultBrand fallback path.
+ *
+ * Postgres port lives in src/lib/tenant-brand.pg.ts; the switch
+ * over is part of Phase 7 (theme distro editor). Until then the
+ * operator sees the FALLBACK brand instead of the studio's data.
+ */
+
 export type TenantBrand = {
   brand_name: string;
   tagline?: string;

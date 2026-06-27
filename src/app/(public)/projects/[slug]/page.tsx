@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { projects } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { ensureMigrated, pgOne } from "@/lib/pg";
 import Model3DViewer from "@/components/Model3DViewer";
 import RichTextRenderer from "@/components/RichTextRenderer";
 
@@ -88,9 +86,26 @@ export default async function ProjectDetailPage({
 
   let project: any = seedProjects[slug];
   try {
-    const rows = await db.select().from(projects).where(eq(projects.slug, slug));
-    const row = rows?.[0];
-    if (row && row.isPublished !== false) {
+    await ensureMigrated();
+    const row = await pgOne<{
+      slug: string;
+      title: string;
+      category: string | null;
+      location: string | null;
+      year: string | null;
+      scope: string | null;
+      description: string;
+      description_json: unknown | null;
+      before_image: string | null;
+      model_3d: string | null;
+      is_published: boolean;
+    }>(
+      `SELECT slug, title, category, location, year, scope, description,
+              description_json, before_image, model_3d, is_published
+       FROM projects WHERE slug = $1 LIMIT 1`,
+      [slug]
+    );
+    if (row && row.is_published !== false) {
       project = {
         ...(project || {}),
         title: row.title,
@@ -99,14 +114,14 @@ export default async function ProjectDetailPage({
         year: row.year || "—",
         scope: row.scope || row.category || "Residential",
         description: row.description,
-        descriptionJson: row.descriptionJson,
+        descriptionJson: row.description_json,
         image:
-          row.beforeImage ||
+          row.before_image ||
           "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
         gallery:
           (project?.gallery?.length ? project.gallery : []) || [],
-        has3D: Boolean(row.model3d),
-        modelUrl: row.model3d,
+        has3D: Boolean(row.model_3d),
+        modelUrl: row.model_3d,
       };
     }
   } catch {}

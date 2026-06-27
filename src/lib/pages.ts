@@ -1,12 +1,12 @@
 import "server-only";
-import { openDb } from "@/lib/db";
+import { ensureMigrated, pgOne, pgMany } from "@/lib/pg";
 
 export type PageRow = {
   id: number;
   slug: string;
   title: string;
   status: string;
-  is_front: number;
+  is_front: boolean;
   seo_title: string | null;
   seo_description: string | null;
   published_at: string | null;
@@ -17,19 +17,18 @@ export type BlockRow = {
   id: number;
   page_id: number;
   type: string;
-  data: string;
+  data: unknown;
   order_index: number;
 };
 
+const PAGE_COLUMNS = `id, slug, title, status, is_front, seo_title, seo_description, published_at, created_at`;
+
 export async function listPages(): Promise<PageRow[]> {
   try {
-    const sqlite = openDb();
-    return sqlite
-      .prepare(
-        `SELECT id, slug, title, status, is_front, seo_title, seo_description, published_at, created_at
-         FROM pages ORDER BY created_at ASC`
-      )
-      .all() as PageRow[];
+    await ensureMigrated();
+    return await pgMany<PageRow>(
+      `SELECT ${PAGE_COLUMNS} FROM pages ORDER BY created_at ASC`
+    );
   } catch (e) {
     console.error("[lib/pages] listPages failed:", (e as Error)?.message);
     return [];
@@ -38,42 +37,43 @@ export async function listPages(): Promise<PageRow[]> {
 
 export async function getPageBySlug(slug: string) {
   try {
-    const sqlite = openDb();
-    const page = sqlite
-      .prepare("SELECT * FROM pages WHERE slug = ?")
-      .get(slug) as PageRow | undefined;
-    if (!page) return { page: null, blocks: [] };
-    const blocks = sqlite
-      .prepare(
-        `SELECT * FROM page_blocks WHERE page_id = ? ORDER BY order_index ASC, id ASC`
-      )
-      .all(page.id) as BlockRow[];
+    await ensureMigrated();
+    const page = await pgOne<PageRow>(
+      `SELECT ${PAGE_COLUMNS} FROM pages WHERE slug = $1`,
+      [slug]
+    );
+    if (!page) return { page: null, blocks: [] as BlockRow[] };
+    const blocks = await pgMany<BlockRow>(
+      `SELECT id, page_id, type, data, order_index
+       FROM page_blocks WHERE page_id = $1
+       ORDER BY order_index ASC, id ASC`,
+      [page.id]
+    );
     return { page, blocks };
   } catch (e) {
     console.error("[lib/pages] getPageBySlug failed:", (e as Error)?.message);
-    return { page: null, blocks: [] };
+    return { page: null, blocks: [] as BlockRow[] };
   }
 }
 
 export async function getPageById(id: number) {
   try {
-    const sqlite = openDb();
-    const page = sqlite
-      .prepare(
-        `SELECT id, slug, title, status, is_front, seo_title, seo_description, published_at, created_at
-         FROM pages WHERE id = ?`
-      )
-      .get(id) as PageRow | undefined;
-    if (!page) return { page: null, blocks: [] };
-    const blocks = sqlite
-      .prepare(
-        `SELECT * FROM page_blocks WHERE page_id = ? ORDER BY order_index ASC, id ASC`
-      )
-      .all(page.id) as BlockRow[];
+    await ensureMigrated();
+    const page = await pgOne<PageRow>(
+      `SELECT ${PAGE_COLUMNS} FROM pages WHERE id = $1`,
+      [id]
+    );
+    if (!page) return { page: null, blocks: [] as BlockRow[] };
+    const blocks = await pgMany<BlockRow>(
+      `SELECT id, page_id, type, data, order_index
+       FROM page_blocks WHERE page_id = $1
+       ORDER BY order_index ASC, id ASC`,
+      [page.id]
+    );
     return { page, blocks };
   } catch (e) {
     console.error("[lib/pages] getPageById failed:", (e as Error)?.message);
-    return { page: null, blocks: [] };
+    return { page: null, blocks: [] as BlockRow[] };
   }
 }
 

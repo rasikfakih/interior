@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { journalPosts } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { ensureMigrated, pgOne } from "@/lib/pg";
 import RichTextRenderer from "@/components/RichTextRenderer";
 
 export const dynamic = "force-dynamic";
@@ -16,14 +14,30 @@ export default async function JournalEntryPage({
 
   let entry: any = null;
   try {
-    const rows = await db.select().from(journalPosts).where(eq(journalPosts.slug, slug));
-    entry = rows?.[0] || null;
+    await ensureMigrated();
+    entry = await pgOne<{
+      slug: string;
+      title: string;
+      excerpt: string | null;
+      content: string;
+      content_json: unknown | null;
+      cover_image: string | null;
+      category: string | null;
+      author_name: string | null;
+      created_at: string | Date;
+      is_published: boolean;
+    }>(
+      `SELECT slug, title, excerpt, content, content_json, cover_image,
+              category, author_name, created_at, is_published
+       FROM journal_posts WHERE slug = $1 LIMIT 1`,
+      [slug]
+    );
   } catch {}
 
   if (!entry) notFound();
 
-  const dateLabel = entry.createdAt
-    ? new Date(entry.createdAt as any).toLocaleDateString("en-US", {
+  const dateLabel = entry.created_at
+    ? new Date(entry.created_at as any).toLocaleDateString("en-US", {
         month: "short",
         year: "numeric",
       })
@@ -43,17 +57,17 @@ export default async function JournalEntryPage({
           <div className="flex gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-4">
             <span>{dateLabel}</span>
             <span className="text-warm">· {entry.category || "Note"}</span>
-            <span>· {entry.authorName || "Studio"}</span>
+            <span>· {entry.author_name || "Studio"}</span>
           </div>
           <h1 className="text-[clamp(2.2rem,5vw,4rem)] tracking-[-0.025em] leading-[1.05]">
             {entry.title}
           </h1>
         </header>
 
-        {entry.coverImage && (
+        {entry.cover_image && (
           <div className="aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] mb-10">
             <img
-              src={entry.coverImage}
+              src={entry.cover_image}
               alt={entry.title}
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
@@ -62,7 +76,7 @@ export default async function JournalEntryPage({
         )}
 
         <RichTextRenderer
-          json={entry.contentJson}
+          json={entry.content_json}
           fallbackText={entry.content}
         />
       </div>

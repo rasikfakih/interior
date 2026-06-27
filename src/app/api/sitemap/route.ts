@@ -1,13 +1,26 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { projects, journalPosts } from '@/lib/schema'
+import { ensureMigrated, pgMany } from '@/lib/pg'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  
-  // Fetch dynamic routes
-  const projectList = db.select().from(projects).all()
-  const journalList = db.select().from(journalPosts).all()
+
+  const projectList: Array<{ slug: string }> = []
+  const journalList: Array<{ slug: string }> = []
+  try {
+    await ensureMigrated()
+    const projects = await pgMany<{ slug: string }>(
+      `SELECT slug FROM projects WHERE is_published = TRUE ORDER BY id ASC`
+    )
+    const journals = await pgMany<{ slug: string }>(
+      `SELECT slug FROM journal_posts WHERE is_published = TRUE ORDER BY id ASC`
+    )
+    projectList.push(...projects)
+    journalList.push(...journals)
+  } catch {
+    // keep empty lists on cold boot
+  }
 
   const staticRoutes = [
     '',
@@ -25,13 +38,13 @@ export async function GET() {
     <changefreq>weekly</changefreq>
     <priority>${route === '' ? '1.0' : '0.8'}</priority>
   </url>`).join('\n')}
-  ${projectList.map((p: any) => `  <url>
+  ${projectList.map(p => `  <url>
     <loc>${baseUrl}/projects/${p.slug}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>`).join('\n')}
-  ${journalList.map((j: any) => `  <url>
+  ${journalList.map(j => `  <url>
     <loc>${baseUrl}/journal/${j.slug}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>

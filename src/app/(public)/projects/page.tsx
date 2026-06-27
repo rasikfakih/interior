@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { openReadonlyDb } from "@/lib/db";
+import { ensureMigrated, pgMany } from "@/lib/pg";
 import ProjectsClient from "./ProjectsClient";
 
 export const metadata: Metadata = {
@@ -85,26 +85,35 @@ const seedProjects = [
   },
 ];
 
-function getDbProjects() {
+interface DbProjectRow {
+  slug: string;
+  title: string;
+  category: string | null;
+  location: string | null;
+  year: string | null;
+  scope: string | null;
+  before_image: string | null;
+  model_3d: string | null;
+}
+
+async function getDbProjects() {
   try {
-    const sqlite = openReadonlyDb();
-    const rows = sqlite
-      .prepare(
-        `SELECT slug, title, category, location, year, scope, before_image, model_3d
-         FROM projects WHERE is_published = 1 ORDER BY order_index ASC, id ASC`
-      )
-      .all();
-    sqlite.close();
-    return rows.map((r: any) => ({
+    await ensureMigrated();
+    const rows = await pgMany<DbProjectRow>(
+      `SELECT slug, title, category, location, year, scope, before_image, model_3d
+       FROM projects WHERE is_published = TRUE
+       ORDER BY order_index ASC, id ASC`
+    );
+    return rows.map((r) => ({
       slug: r.slug,
       title: r.title,
-      category: r.category,
+      category: r.category || "Residential",
       location: r.location || "Maharashtra",
       year: r.year || "—",
       scope: r.scope || r.category || "Residential",
       image:
         r.before_image ||
-    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
       has3D: Boolean(r.model_3d),
       modelUrl: r.model_3d || null,
       posterUrl: r.before_image || null,
@@ -115,10 +124,8 @@ function getDbProjects() {
 }
 
 export default async function ProjectsPage() {
-  const dbProjects: any[] = getDbProjects();
-  const items = dbProjects.length
-    ? dbProjects
-    : seedProjects;
+  const dbProjects = await getDbProjects();
+  const items = dbProjects.length ? dbProjects : seedProjects;
 
   return (
     <section className="pt-24 md:pt-28 pb-24">
