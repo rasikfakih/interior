@@ -577,3 +577,88 @@ Build: green. 38 pages prerender. Phase 1 status unchanged.
 - Smoke script for Phase 1 acceptance: TODO. Two cold starts
   asserts a project POST survives the next container. Will
   land in the same session as the push.
+
+### 2026-06-28 - Phase 4 ship (schema-driven block editor + URL fix)
+
+Two commits on `main`, pushed:
+
+- `0b3a826` phase4(blocks-editor): schema-driven per-type forms
+- `6d8e8ce` phase4(url-fix): swap stub /api/admin/pages tree for /api/pages
+
+Pre-session ground truth discovered:
+
+- PageBuilder/BlockPicker/PagesAdmin already existed from Phase 1 work,
+  with drag-reorder via @dnd-kit and BlockPicker modal.
+- RichTextEditor (TipTap) was already complete and ready to embed.
+- The full /api/pages/* server API was already in place (Postgres-backed
+  via pg.ts, license-gated).
+- The actual gap was (a) the editor was editing raw JSON, (b) client
+  components were calling /api/admin/pages/* routes that did not exist -
+  only a self-proxying stub at /api/admin/pages/route.ts existed, with
+  no GET [id] / PUT [id] / DELETE [id] / PUT [id]/blocks anywhere on
+  that prefix.
+
+What landed this session:
+
+- `src/components/admin/block-schemas.ts` (new): one BlockSchema per
+  block type, with Field kinds (text / longtext / number / select /
+  richtext / media / toggle) and ArraySchema arrays with reorder + remove
+  + defaults factory. Covers all 14 registry block types.
+- `src/components/admin/BlockEditor.tsx` (new): schema-driven renderer.
+  Field primitive delegates richtext to existing RichTextEditor.tsx, and
+  media to existing MediaPicker.tsx (image accept, with thumbnail
+  preview on the row after pick). ArrayEditor wraps each item in a
+  numbered surface-tile with up/down/remove/add and per-field maxlength
+  enforcement.
+- `src/components/admin/PageBuilder.tsx` (rewritten): SortableBlock now
+  expands to `BlockEditor` instead of a raw JSON textarea. Save calls
+  PUT /api/pages/[id] (meta) and PUT /api/pages/[id]/blocks (blocks).
+  Header has a "Saved HH:MM:SS" indicator instead of alert-confetti.
+  Open-state on the editor row tracks drag-reorder (closing, moving,
+  etc.). Cmd/Ctrl-S still works.
+- `src/components/admin/PagesAdmin.tsx`: GET/POST/DELETE all moved to
+  /api/pages*. Added credentials:'include' on each fetch so the admin
+  CSRF/cookie contract rides the cross-site request.
+- `src/components/admin/AdminShell.tsx` ProjectsPanel: the no-op
+  /api/admin/pages GET (was a sister-fetch guard before projects) is
+  now /api/pages.
+- `src/app/api/admin/pages/route.ts`: deleted. No callers remain.
+
+Live URL probe:
+
+```
+GET /                        -> 200
+GET /admin                   -> 200
+GET /admin/pages/1..5        -> 200 (all five)
+GET /api/pages               -> 200 (5 rows: home, journal, about,
+                                  contact, projects)
+GET /api/pages/3             -> 200 (page + blocks payload, 0 blocks)
+```
+
+verify:deploy: 19/19 green. build: typecheck green, 38 pages
+prerender, two pre-existing Turbopack NFT-list warnings about
+src/lib/pg.ts path.join - unchanged from previous session,
+unrelated to this work.
+
+graph: 1038->1049 nodes, 1609->1620 edges, 97->95 communities.
+The community count dropped because the orphan /api/admin/pages
+node (with its NEXTAUTH_URL self-proxy edges) is gone, and the
+schema-driven editor consolidated what used to be a textarea.
+
+Outstanding carry-forward (operator to address):
+
+- Admin/supersamin write-path integrity is still proven by Phase 5.
+  Upload + project save now exist as APIs and a smoke is needed to
+  prove they survive a cold-start container on Vercel.
+- Tiered role gating: admin vs superadmin share the requireLicense
+  ('admin') gate on /api/pages right now. If the operator wants
+  Split-on-role (superadmin can create tenants, admin cannot) the
+  /api/admin/pages namespace needs to come back with distinct
+  auth checks.
+- Phase 4 did not touch /api/admin/projects, journal, testimonials,
+  team, settings. Each of those still serves stubs at best.
+  Phase 5 - Project CRUD - is the next bullet per the v1.1.2 plan.
+- Working tree dirty from this session: .opencode/opencode.json,
+  graph outputs, scripts/csrf-curl-probe.sh from the 2026-06-26
+  diagnostic edit. None blocking. Learned: this is consistent with
+  what graphify-out shows; it is expected.
