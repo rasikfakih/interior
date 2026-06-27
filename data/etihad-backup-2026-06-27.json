@@ -1,0 +1,214 @@
+{
+  "generated_at": "2026-06-27T20:28:58.167Z",
+  "source": "C:\\Users\\ASL-USER.ASL-R-1080.000\\Documents\\Projects\\etihad interiors OG\\etihad-interiors-website\\data\\etihad.db",
+  "sqlite_version": "3.53.2",
+  "tables": {
+    "users": {
+      "present": true,
+      "rows": [
+        {
+          "id": 2,
+          "email": "admin@etihadinteriors.com",
+          "password_hash": "$2b$10$yQRh4ffYr4HyH1r1TK5Q5.9TUUJ.aLRt9X8P3ZXnuvC7SGnmla9aG",
+          "role": "admin"
+        }
+      ]
+    },
+    "tenants": {
+      "present": true,
+      "rows": [
+        {
+          "id": 1,
+          "slug": "studio",
+          "studio_name": "Etihad Interiors",
+          "owner_email": "admin@etihadinteriors.com",
+          "domain": "ethinterior.vercel.app",
+          "tier": "business",
+          "theme_distro": "{\"brand_name\":\"Etihad Interiors\",\"palette\":{\"ink\":\"#1a1814\",\"accent\":\"#8a5d3b\",\"paper\":\"#efe6d2\"},\"accent_mode\":\"auto\",\"footer_credit\":\"Powered by Etihad Interiors Theme v1.1.0\",\"hero_text\":\"Homes built around how you live\",\"default_locales\":[\"en\",\"hi\",\"mr\"]}",
+          "state": "active",
+          "hmac_key": "etihad-interiors-license-fallback-2026",
+          "installed_at": "2026-06-24 04:14:30",
+          "expires_at": null,
+          "revoked_at": null
+        }
+      ]
+    },
+    "tenant_data": {
+      "present": true,
+      "rows": [
+        {
+          "id": 1,
+          "tenant_id": 1,
+          "kind": "distro",
+          "payload": "{\"brand_name\":\"Etihad Interiors\",\"tagline\":\"A residential interior studio based in Kalyan, Maharashtra.\",\"contact_email\":\"studio@etihadinteriors.com\",\"contact_phone\":\"+91 99999 99999\",\"studio_address\":\"Kalyan, Maharashtra, India\",\"calendly_url\":\"https://calendly.com/etihadinteriors/intro\",\"year_established\":\"2017\",\"residences_delivered\":\"60+\",\"instagram_url\":\"https://instagram.com/etihadinteriors\",\"footer_credit\":\"Powered by Etihad Interiors Theme v1.1.0\",\"palette\":{\"ink\":\"#1a1814\",\"paper\":\"#efe6d2\",\"accent\":\"#8a5d3b\",\"muted\":\"#5a4f3e\"},\"hero\":{\"eyebrow\":\"Residential · Maharashtra\",\"headline\":\"Homes built around how you live\",\"subtext\":\"Etihad Interiors is a residential studio in Kalyan. Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands.\"},\"default_locales\":[\"en\",\"hi\",\"mr\"],\"tier\":\"business\",\"domain\":\"ethinterior.vercel.app\"}",
+          "updated_at": "2026-06-24 04:14:31"
+        }
+      ]
+    },
+    "projects": {
+      "present": true,
+      "rows": []
+    },
+    "journal": {
+      "present": false,
+      "rows": []
+    },
+    "testimonials": {
+      "present": true,
+      "rows": []
+    },
+    "team": {
+      "present": false,
+      "rows": []
+    },
+    "pages": {
+      "present": true,
+      "rows": [
+        {
+          "id": 1,
+          "slug": "home",
+          "title": "Etihad Interiors — Residential Design Studio",
+          "status": "published",
+          "seo_title": "Etihad Interiors — Residential Design Studio",
+          "seo_description": "A residential studio shaping considered homes across Maharashtra.",
+          "og_media_id": null,
+          "is_front": 1,
+          "published_at": "2026-06-24T04:14:31.063Z",
+          "created_at": "2026-06-24 04:14:31"
+        },
+        {
+          "id": 2,
+          "slug": "journal",
+          "title": "Journal",
+          "status": "published",
+          "seo_title": null,
+          "seo_description": null,
+          "og_media_id": null,
+          "is_front": 0,
+          "published_at": "2026-06-24T04:14:31.071Z",
+          "created_at": "2026-06-24 04:14:31"
+        },
+        {
+          "id": 3,
+          "slug": "about",
+          "title": "About the studio",
+          "status": "published",
+          "seo_title": null,
+          "seo_description": null,
+          "og_media_id": null,
+          "is_front": 0,
+          "published_at": "2026-06-24T04:14:31.071Z",
+          "created_at": "2026-06-24 04:14:31"
+        },
+        {
+          "id": 4,
+          "slug": "contact",
+          "title": "Contact",
+          "status": "published",
+          "seo_title": null,
+          "seo_description": null,
+          "og_media_id": null,
+          "is_front": 0,
+          "published_at": "2026-06-24T04:14:31.071Z",
+          "created_at": "2026-06-24 04:14:31"
+        },
+        {
+          "id": 5,
+          "slug": "projects",
+          "title": "Selected work",
+          "status": "published",
+          "seo_title": null,
+          "seo_description": null,
+          "og_media_id": null,
+          "is_front": 0,
+          "published_at": "2026-06-24T04:14:31.071Z",
+          "created_at": "2026-06-24 04:14:31"
+        }
+      ]
+    },
+    "pages_blocks": {
+      "present": false,
+      "rows": []
+    },
+    "settings": {
+      "present": true,
+      "rows": [
+        {
+          "id": 1,
+          "key": "contact_email",
+          "value": "studio@example.com"
+        },
+        {
+          "id": 2,
+          "key": "contact_phone",
+          "value": ""
+        },
+        {
+          "id": 3,
+          "key": "studio_address",
+          "value": ""
+        },
+        {
+          "id": 4,
+          "key": "calendly_url",
+          "value": ""
+        },
+        {
+          "id": 5,
+          "key": "site_seo_title",
+          "value": "Studio — Residential Interior Design"
+        },
+        {
+          "id": 6,
+          "key": "site_seo_description",
+          "value": "A residential studio shaping considered spaces."
+        },
+        {
+          "id": 7,
+          "key": "instagram_url",
+          "value": ""
+        },
+        {
+          "id": 8,
+          "key": "year_established",
+          "value": ""
+        },
+        {
+          "id": 9,
+          "key": "residences_delivered",
+          "value": ""
+        }
+      ]
+    },
+    "site_identity": {
+      "present": true,
+      "rows": [
+        {
+          "id": 1,
+          "brand_name": "Your Studio",
+          "tagline": "A studio of considered spaces. Set your tagline in /admin/settings.",
+          "logo_media_id": null,
+          "favicon_media_id": null,
+          "accent_mode": "auto",
+          "footer_credit": "Powered by Interior Studio Theme"
+        }
+      ]
+    },
+    "media": {
+      "present": true,
+      "rows": []
+    },
+    "license": {
+      "present": false,
+      "rows": []
+    },
+    "hmac_audit": {
+      "present": false,
+      "rows": []
+    },
+    "distro": {
+      "present": false,
+      "rows": []
+    }
+  }
+}

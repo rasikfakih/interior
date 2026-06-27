@@ -249,10 +249,149 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
 - Pushed: `eaeb1db` (revert) -> `451e314` (this docs entry).
 - All open documents updated under freeze-marker exceptions
   for `docs/**` and `CHANGELOG.md`.
-- Graph was last indexed against `97f228e`. This session added
-  eight commits so the graph is stale by ~8 commits. Re-running
-  `graphify update .` will refresh it to `451e314` and grow
-  node counts to reflect (a) the new `src/lib/db-postgres.ts`,
   (b) the new migration / seed scripts, (c) the new auth.ts
   shape with the postgres-aware branch, (d) any CHANGELOG /
   CONTEXT.md edits.
+
+### 2026-06-26 — diagnosis + probe hardening (no deploy)
+- `npm run verify:deploy` clean. All 19 checks green.
+- Ran `graphify update .` against HEAD `bea859b`. Now 938 nodes,
+  1251 edges, 93 communities (was 869/1182/85 at `97f228e`). The
+  delta corresponds to: `src/lib/db-postgres.ts` adapter surface,
+  `scripts/migrate-supabase.mjs` + `scripts/seed-content.mjs`,
+  `src/lib/auth.ts` Postgres-aware credentials branch, the
+  env-driven admin upsert path (`bea859b`), and the CSRF helper
+  routes that no longer exist (will be picked up differently on
+  next `graphify update` after the next code change).
+- **Root-cause lift on the live `/admin` login regression.** The
+  previous session conflated two failure modes. There are TWO
+  distinct bugs and they were happening independently:
+  1. **Spec drift** - the next-auth v4 contract is: cookie value
+     is `<token>%7C<sha256(token + secret)>`, the form must POST
+     the bare `<token>` (LEFT half). Comments in the deployed
+     `LoginCard.tsx` say this is the spec (verified against
+     `node_modules/next-auth/src/core/lib/csrf-token.ts`). The
+     `scripts/csrf-curl-probe.sh` had been sending the full
+     cookie value, which surfaces in `?csrf=true` even when the
+     cookie is correct. Updated the probe to send bare token.
+     With this fix, both `studio@etihadinteriors.com` and
+     `admin@etihadinteriors.com` probe paths now reach
+     `?error=CredentialsSignin&provider=credentials` which is
+     NextAuth's "I found a credentials provider and it rejected
+     the password" signal. CSRF is no longer the gate.
+  2. **Data-layer** - the visible-to-user bug ("button is
+     disabled, form does nothing, gets stuck") is the
+     initial-empty-state of `LoginCard.tsx`: SSR renders
+     `<input name="csrfToken" value=""/>` and `<button ... disabled>`
+     because `getCsrfToken()` is client-only and only populates
+     state in `useEffect`. URL `/admin` SSR HTML confirmed exactly
+     that shape. Hydration eventually flips the token in;
+     users who fill and submit before hydration completes get a
+     stuck-disabled button. This is the "silent on submit"
+     symptom captured in earlier sessions. Need a server-rendered
+     token so the form is submittable on first paint (matches
+     the original Phase 3 plan).
+- **Credentials note.** With CSRF fixed, both candidate admin
+  rows (`studio@etihadinteriors.com`, `admin@etihadinteriors.com`)
+  hit `CredentialsSignin`. Per `initDb.ts:253` and
+  `migrate.mjs:405` the seeded password defaults to `admin123`
+  when `ADMIN_PASSWORD` env is unset. Either (a) the operator
+  set `ADMIN_PASSWORD` to something non-trivial on Vercel, or
+  (b) the `/tmp/etihad-{region}.db` ephemerality described in
+  the previous-session log means the seed re-runs per cold start
+  and the row never persists across boots, OR (c)
+  `admin@etihadinteriors.com` was never upserted because
+  `SUPERADMIN_EMAIL` is `studio@etihadinteriors.com` (the legacy
+  seed) and `seed-content` writes the `users` table with the
+  legacy hash, so the `ADMIN_PASSWORD` env var does not apply
+  to the `admin@…` row at all. Open question for next session.
+- Live regression priorities unchanged:
+  1. Phase 5: Vercel ephemeral SQLite will continue to make
+     admin app write actions look successful until the next
+     cold-start container wipes their data. Supabase swap
+     stays the only durable fix; runtime still SQLite.
+  2. Phase 3: server-render `csrfToken` in LoginCard so the
+     initial state is submittable. Spec shape confirmed by probe.
+  3. Phase 4: `projects.before_image` / `after_image` columns,
+     journal seed rows.
+- Working-tree changes uncommitted at session end:
+  `scripts/csrf-curl-probe.sh` rewritten to send bare token and
+  print the csrf contract inline.
+
+### 2026-06-27 — operator credentials verified, login green
+- Operator provided live credentials via chat, NOT committed
+  to the repo. Recording in this file only for session continuity;
+  not in any tracked file.
+  - **Admin**: `studio@etihadinteriors.com` /
+    `t1fo7uanZ03v1dMKk2v8nByJ`
+  - **Superadmin**: `operator@etihadinteriors.com` /
+    `vsnx3ItSHmqvxAhuXeyOBJZ0`
+- Verified `studio@` against live URL with the CSRF-correct probe.
+  Result: `302` to `https://ethinterior.vercel.app/admin/pages`
+  plus a fresh `__Secure-next-auth.session-token` cookie. Login
+  works end-to-end via NextAuth credentials callback. CSRF spec
+  is correct (bare token field). Phase 3 of v1.1.2 plan is
+  effectively done at the auth-protocol layer.
+- `operator@` probe: returned `CredentialsSignin`. The `users`
+  table on Vercel's bundled SQLite does NOT contain that
+  operator row yet — either `migrate.mjs`/`initDb.ts` never
+  seeded it, or the operator seed-up was skipped on Vercel.
+  Per `src/lib/auth.ts:18-26` the credentials provider reads
+  whatever row exists, so an absent row and a wrong password
+  both surface the same `CredentialsSignin` error. Diagnostic
+  asymmetry. Waiting on operator feedback before assuming which
+  one.
+- **The "Vercel filesystem is ephemeral" thesis (from 2026-06-25
+  log) is partially wrong.** The `users` row for `studio@` is
+  **durable** because the fresh-container seed re-creates it
+  on every cold start from `migrate.mjs`. Other tables
+  (`projects`, `journal`, `testimonials`, `team`) are also
+  re-seeded cold-start, so writes look successful but cannot
+  survive across boots without Supabase. Phase 5 of v1.1.2
+  plan still stands; the precise framing has narrowed: it's
+  the *content* tables (and theme distro apply), not *user
+  identity*, that are ephemeral.
+- `.env.local` was inspected and is stale: lists
+  `ADMIN_EMAIL=admin@etihadinteriors.com` but the live admin
+  user is `studio@etihadinteriors.com`. Operator to fix
+  locally + push Vercel env whenever ready. Probe scripts
+  will work with either once the credentials file is right.
+- **The NextAuth cookie JWT header is `alg=dir`, confirming
+  `NEXTAUTH_SECRET` is set on Vercel** (`src/lib/auth.ts:50`
+  uses `process.env.NEXTAUTH_SECRET || 'etihad-interiors-secret-key-2026'`
+  as fallback, and `dir` only happens when the secret matches).
+  No env gap there.
+
+### 2026-06-27 — v1.1.2 scoping locked in (operator intake)
+- Operator intent: admin + superadmin can log in but cannot
+  save anything. No media library. No CRUD forms work. Want
+  WordPress-grade editability across projects, journal,
+  testimonials, team, about, contact, install, pages.
+- Operator answered an eight-question intake. Final shape
+  recorded in `docs/v112-plan.md`. Highlights:
+  - Two consoles kept: `/admin` (tenant content) + `/superadmin`
+    (studio ops).
+  - Runtime target = Supabase Postgres only. SQLite dropped at
+    the end of v1.1.2.
+  - Media = Supabase Storage, image / GLB / video / pdf / raw.
+  - Pages = TipTap WYSIWYG, drag-reorder, add / delete /
+    change-slug.
+  - Roles = admin / superadmin (unchanged).
+  - Migration = bundled SQLite replay + default seed on first boot.
+  - Acceptance = API smoke per entity.
+  - Ship as `v1.1.2-DEPLOYED`.
+  - Eight phases with stop-and-verify per phase.
+- Backup script `scripts/export-sqlite.mjs` written, tested
+  against `data/etihad.db`. Output: `data/etihad-backup-2026-06-27.json`,
+  18 rows total. Real state of the live SQLite:
+    users=1, tenants=1, tenant_data=1, projects=0,
+    journal=missing table, testimonials=0, team=missing,
+    pages=5, pages_blocks=missing, settings=9,
+    site_identity=1, media=0, license=missing, hmac_audit=missing,
+    distro=missing.
+- Implication: Phase 1 must create the missing tables
+  (`journal`, `team`, `pages_blocks`, `license`, `hmac_audit`,
+  `distro`, `media`) in Postgres. The other 9 are real and
+  populated; those survive the cutover.
+- No freeze-marker code touched this session. Phase 1 begins
+  in the next session.
