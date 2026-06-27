@@ -395,3 +395,61 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
   populated; those survive the cutover.
 - No freeze-marker code touched this session. Phase 1 begins
   in the next session.
+
+### 2026-06-28 - Phase 1 mega-commit on two commits, build green
+- Phase 0 commit `b9686ab`: backup script, plan doc, context log.
+- Phase 1 commit `e8a61e2` (amended from earlier):
+  Postgres runtime core + ports of the prerender-critical pages.
+  New surface:
+  - `src/lib/pg.ts`: pgPool / pgQuery / pgOne / pgMany /
+    withPgTx / ensureMigrated. `ensureMigrated` boots
+    `supabase-bootstrap.sql` behind a Postgres advisory lock,
+    once per cold start.
+  - `src/lib/db.ts`: legacy shim. `openDb / openReadonlyDb`
+    return `any`-typed proxies that throw at runtime on access.
+    `db: any` proxy same. Imports keep typechecking quiet on
+    the still-unported call sites.
+  - `src/lib/auth.ts`: credentials provider queries `users`
+    via `pg.ts`. Login no longer reads SQLite.
+  - `src/lib/pages.ts`: listPages / getPageBySlug / getPageById
+    now async, Postgres-backed.
+  - `src/app/(public)/projects/page.tsx`,
+    `src/app/(public)/projects/[slug]/page.tsx`,
+    `src/app/(public)/journal/[slug]/page.tsx`,
+    `src/app/api/sitemap/route.ts`: prerender-critical SQLite
+    call sites ported to `pg.ts`. Without these the next build
+    `next build` crashes at static generation.
+  - `scripts/verify-deploy.mjs`: prefecture replaced the local
+    SQLite tenancy check with a Postgres reachability probe
+    that times out at 5s when `DATABASE_URL` is set.
+  - `tenant-brand.ts`: still uses the legacy shim; the shim
+    raises at runtime, so prod surfaces that call it fall
+    through to the FALLBACK brand. Postgres port is part of
+    Phase 7.
+- Build: `npm run build` green. 36 pages prerender.
+- Not pushed. Operator did not ask for push. Phase 1 ships only
+  after a real Vercel cold-start probe proves the boot-migrate
+  + login + prerender story end to end.
+- Phase 1 port backlog remaining (admin / superadmin / api):
+    - `src/lib/operator-store.ts`
+    - `src/lib/license.ts` (writer + audit)
+    - `src/lib/settings.ts`
+    - `src/app/admin/pages/[id]/page.tsx`
+    - `src/app/api/pages/route.ts`
+    - `src/app/api/pages/[id]/route.ts`
+    - `src/app/api/pages/[id]/blocks/route.ts`
+    - `src/app/api/admin/*/route.ts`
+    - `src/app/api/projects/*/route.ts`
+    - `src/app/api/journal/*/route.ts`
+    - `src/app/api/testimonials/*/route.ts`
+    - `src/app/api/team/*/route.ts`
+    - `src/app/api/settings/route.ts`
+    - `src/app/api/newsletter/route.ts`
+    - `src/app/(public)/about/page.tsx`
+    - `src/app/(public)/journal/page.tsx` ... actually
+      the `(public)/journal` listing page does not exist in
+      the live tree; the journal index reads `(public)/page.tsx`
+      for the same path? Verifying is part of Phase 6.
+- Smoke script for Phase 1 acceptance: TODO. Two cold starts
+  asserts a project POST survives the next container. Will
+  land in the same session as the push.
