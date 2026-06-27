@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "tenant_id required" }, { status: 400 });
   }
   try {
-    const license = signLicense(tenantId, body.expires_at || null);
+    const license = await signLicense(tenantId, body.expires_at || null);
     return NextResponse.json({ ok: true, license });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e.message }, { status: 400 });

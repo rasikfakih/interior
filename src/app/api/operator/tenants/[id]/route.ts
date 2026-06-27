@@ -10,7 +10,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!Number.isFinite(numericId)) {
     return NextResponse.json({ error: "invalid id" }, { status: 400 });
   }
-  return NextResponse.json({ ok: true, ...getTenant(numericId) });
+  return NextResponse.json({ ok: true, ...(await getTenant(numericId)) });
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -23,13 +23,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
   const body = await req.json().catch(() => ({}));
   if (body.distro && typeof body.distro === "object") {
-    applyDistro(numericId, body.distro);
+    await applyDistro(numericId, body.distro);
   }
   const tPatch: Record<string, any> = {};
   for (const k of ["studio_name", "owner_email", "domain", "tier", "state", "expires_at"]) {
     if (body[k] !== undefined) tPatch[k] = body[k];
   }
-  if (Object.keys(tPatch).length > 0) updateTenant(numericId, tPatch);
+  if (Object.keys(tPatch).length > 0) await updateTenant(numericId, tPatch);
   return NextResponse.json({ ok: true });
 }
 
@@ -43,7 +43,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   }
   const url = new URL(req.url);
   if (url.searchParams.get("revoke") === "1") {
-    revokeTenant(numericId, "manual");
+    await revokeTenant(numericId, "manual");
     return NextResponse.json({ ok: true, revoked: true });
   }
   return NextResponse.json({ error: "pass ?revoke=1 to revoke" }, { status: 400 });

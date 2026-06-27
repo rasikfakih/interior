@@ -152,21 +152,22 @@ export function writeLicense(license: License) {
   fs.writeFileSync(LICENSE_FILE, JSON.stringify(license, null, 2), "utf8");
 }
 
-export function appendAudit(
+export async function appendAudit(
   kind: string,
   message: string,
   meta?: Record<string, any>
 ) {
   try {
-    const { openDb } = require("@/lib/db") as typeof import("@/lib/db");
-    const db = openDb();
-    db
-      .prepare(
-        `INSERT INTO audit_log (kind, message, meta) VALUES (?, ?, ?)`
-      )
-      .run(kind, message, meta ? JSON.stringify(meta) : null);
-    db.close();
-  } catch {}
+    const { ensureMigrated, pgQuery } = await import("@/lib/pg");
+    await ensureMigrated();
+    await pgQuery(
+      `INSERT INTO audit_log (kind, message, meta)
+       VALUES ($1, $2, $3::jsonb)`,
+      [kind, message, meta ? JSON.stringify(meta) : null]
+    );
+  } catch {
+    // audit is best-effort - never block the caller
+  }
 }
 
 export const LICENSE_SERVER_URL = SERVER_URL;

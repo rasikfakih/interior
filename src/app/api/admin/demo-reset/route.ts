@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { openDb } from "@/lib/db";
+import { ensureMigrated, withPgTx } from "@/lib/pg";
 
 async function ok() {
   const session = await getServerSession(authOptions);
@@ -19,17 +19,16 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
-    const sqlite = openDb();
-    sqlite.exec(`
-      DELETE FROM page_blocks;
-      DELETE FROM media;
-      DELETE FROM projects;
-      DELETE FROM journal_posts;
-      DELETE FROM testimonials;
-      DELETE FROM team_members;
-      DELETE FROM revisions;
-    `);
-    sqlite.close();
+    await ensureMigrated();
+    await withPgTx(async (client) => {
+      await client.query(`DELETE FROM page_blocks`);
+      await client.query(`DELETE FROM media`);
+      await client.query(`DELETE FROM projects`);
+      await client.query(`DELETE FROM journal_posts`);
+      await client.query(`DELETE FROM testimonials`);
+      await client.query(`DELETE FROM team_members`);
+      await client.query(`DELETE FROM revisions`);
+    });
     return NextResponse.json({
       success: true,
       message: "Demo data reset. Pages, media, blocks cleared.",

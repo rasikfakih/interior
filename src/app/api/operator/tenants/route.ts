@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getOperatorSession } from "@/lib/operator-auth";
-import { listTenants } from "@/lib/operator-store";
+import { listTenants, createTenant } from "@/lib/operator-store";
 
 export async function GET() {
   const ok = await getOperatorSession();
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  return NextResponse.json({ ok: true, tenants: listTenants() });
+  return NextResponse.json({ ok: true, tenants: await listTenants() });
 }
 
 export async function POST(req: Request) {
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "slug and studio_name required" }, { status: 400 });
   }
   const tier = body.tier === "business" ? "business" : "personal";
-  const id = (await import("@/lib/operator-store")).createTenant({
+  const id = await createTenant({
     slug,
     studio_name,
     owner_email: (body.owner_email || "").toString().trim(),

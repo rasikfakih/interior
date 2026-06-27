@@ -12,6 +12,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "tenant_id required" }, { status: 400 });
   }
   const newKey = (body.new_key as string) || crypto.randomBytes(32).toString("hex");
-  rotateHmac(tenantId, newKey);
+  await rotateHmac(tenantId, newKey);
   return NextResponse.json({ ok: true, new_key: newKey });
 }

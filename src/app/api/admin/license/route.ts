@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { readLicense } from "@/lib/license";
+import { readLicense, appendAudit } from "@/lib/license";
 import { requireLicense } from "@/lib/license-gate";
-import { openDb } from "@/lib/db";
 import path from "path";
 
 async function isAuthorized() {
@@ -85,15 +84,10 @@ export async function POST(req: NextRequest) {
     const dir = path.dirname(file);
     if (!fsSync.existsSync(dir)) fsSync.mkdirSync(dir, { recursive: true });
     await fs.writeFile(file, JSON.stringify(license, null, 2), "utf8");
-    try {
-      const sqlite = openDb();
-      sqlite
-        .prepare(
-          `INSERT INTO audit_log (kind, message) VALUES ('license.reinstalled', ?)`
-        )
-        .run(`License re-installed on ${license.domain}, tier=${license.tier}`);
-      sqlite.close();
-    } catch {}
+    await appendAudit(
+      "license.reinstalled",
+      `License re-installed on ${license.domain}, tier=${license.tier}`
+    );
     return NextResponse.json({ success: true, license });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "license error" }, { status: 500 });

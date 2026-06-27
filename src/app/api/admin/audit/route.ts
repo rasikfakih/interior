@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { requireLicense } from "@/lib/license-gate";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { openDb } from "@/lib/db";
+import { ensureMigrated, pgMany } from "@/lib/pg";
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,19 +17,17 @@ export async function GET(req: NextRequest) {
     }
     const url = new URL(req.url);
     const kind = url.searchParams.get("kind");
-    const sqlite = openDb();
+    await ensureMigrated();
     const rows = kind
-      ? sqlite
-          .prepare(
-            `SELECT id, kind, message, meta, created_at FROM audit_log WHERE kind LIKE ? ORDER BY id DESC LIMIT 100`
-          )
-          .all(`${kind}%`)
-      : sqlite
-          .prepare(
-            `SELECT id, kind, message, meta, created_at FROM audit_log ORDER BY id DESC LIMIT 100`
-          )
-          .all();
-    sqlite.close();
+      ? await pgMany(
+          `SELECT id, kind, message, meta, created_at FROM audit_log
+           WHERE kind LIKE $1 ORDER BY id DESC LIMIT 100`,
+          [`${kind}%`]
+        )
+      : await pgMany(
+          `SELECT id, kind, message, meta, created_at FROM audit_log
+           ORDER BY id DESC LIMIT 100`
+        );
     return NextResponse.json(rows);
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
