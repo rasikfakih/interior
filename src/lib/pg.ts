@@ -319,3 +319,21 @@ export async function ensureMigrated(): Promise<void> {
 }
 
 void pgOneOffline;
+
+/**
+ * Force a no-op reset hook for tests / hot reloads.
+ * When the SQLite fallback or Postgres pool is leaked by a
+ * module reload (Next.js dev), close handles here.
+ */
+export function _resetForHotReload(): void {
+  _ensureMigrated = null;
+  if (_sqlite) {
+    try { _sqlite.close(); } catch { /* ignore */ }
+    _sqlite = null;
+  }
+  if (_pool) {
+    try { _pool.end().catch(() => {}); } catch { /* ignore */ }
+    _pool = null;
+  }
+}
+void _resetForHotReload;

@@ -362,6 +362,85 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
   as fallback, and `dir` only happens when the secret matches).
   No env gap there.
 
+### 2026-06-27 — Phase 1 ship + 4-hotfix recovery chain
+
+Phase 1 mega-ship (5 commits ahead of origin):
+
+1. `b9686ab` phase0 - backup script + plan doc + context log.
+2. `e8a61e2` phase1 - Postgres runtime core: `pg.ts` +
+   `auth.ts` Postgres-backed, legacy `db.ts` shim with throwing
+   proxies, prerender-critical pages ported.
+3. `765071d` phase1-deep - every API route + operator-store +
+   license.ts/appendAudit + admin/pages/[id] + about page.
+4. `e43007a` phase1-routes - superadmin pages (await consumers),
+   admin editor, envato webhook, public/about - all Postgres.
+5. `89500ac` docs - context log.
+
+Pushed. Login BROKE on prod with: `DATABASE_URL is not set...`
+because Vercel never had DATABASE_URL configured.
+
+Live prod finding: `https://ethinterior.vercel.app/` had only
+"page is empty" placeholder rendering. Sitemap XML still
+returned 200. Login provider was the only gateway broken.
+
+Four hotfix recovery commits pushed:
+
+- `fe5477b` reset `pg.ts` to honor a local-dev SQLite path
+  (no DATABASE_URL, no VERCEL) and a Vercel hot-copy path
+  (no DATABASE_URL, VERCEL). Postgres-first when DATABASE_URL
+  is set is preserved.
+- `eb29932` rewrote `ensureMigrated` to also short-circuit on
+  the Vercel fallback path so it does not attempt a Postgres
+  DDL run before the SQLite read.
+- `a851412` routed `findUserByEmail` through `pgOne()` instead
+  of calling `getPool().query()` directly. `getPool()` always
+  throws at the construction time when DATABASE_URL is unset.
+- `50c9f08` defensive: auth.ts now tries Postgres first,
+  falls back to `db.prepare()` against `/tmp/etihad-{region}.db`
+  when Postgres throws. restored login path end-to-end.
+
+Live probe after `50c9f08`:
+
+```
+GET  /                            200  (home page placeholder)
+GET  /projects                    200
+GET  /api/sitemap                 200  (XML present)
+POST /api/auth/callback/credentials?json=true
+     csrf=studio@etihadinteriors.com  -> CredentialsSignin
+```
+
+Login is reachable. Credentials themselves reject because the
+runtime SQLite has rows seeded by Vercel's postinstall with the
+codebase defaults `admin@etihadinteriors.com` + `admin123`,
+not the operator-supplied `studio@` + `t1fo7uanZ03v1dMKk2v8nByJ`.
+Password either:
+
+a) Resides in Vercel env `ADMIN_PASSWORD`/`ADMIN_EMAIL` and the
+   bcrypt hash is for those values; the operator-run probe used
+   the wrong secret. - but then the probe should have matched if
+   the env was actually loaded into the row.
+b) The first-deploy row never made it onto Vercel because
+   `installCommand` doesn't trigger Vercel's `postinstall` for
+   some reason. The runtime SQLite is then empty (rows=0).
+
+further data needed from operator:
+
+- Is the `data/etihad.db` shipped to Vercel hot copy actually
+  seeded with operator's credentials? `node scripts/dump-users.mjs`
+  against the live URL is needed; we only have local state.
+- Is `DATABASE_URL` set on Vercel? Without it the Postgres-only
+  contract is unreachable.
+
+Once those are confirmed Phase 1 is fully operational and
+Phase 2 (Supabase Storage pipeline) can begin.
+
+Working tree dirty (graph artifacts + .opencode/opencode.json),
+no further commits needed this session.
+
+Note: README, CHANGELOG.md, FREEZE-MARKER, AGENT_BEST_PRACTICES.md
+not bumped yet. Those land at v1.1.2-DEPLOYED gate after Phase 8.
+
+
 ### 2026-06-27 — v1.1.2 scoping locked in (operator intake)
 - Operator intent: admin + superadmin can log in but cannot
   save anything. No media library. No CRUD forms work. Want
