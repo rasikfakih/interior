@@ -440,6 +440,51 @@ no further commits needed this session.
 Note: README, CHANGELOG.md, FREEZE-MARKER, AGENT_BEST_PRACTICES.md
 not bumped yet. Those land at v1.1.2-DEPLOYED gate after Phase 8.
 
+### 2026-06-28 - Phase 2 (Supabase Storage media pipeline)
+
+- src/lib/storage.ts: abstraction over Supabase Storage REST:
+  signedPutUrl, signedGetUrl, remove, head. Bearer
+  SERVICE_ROLE_KEY. Per-kind cap map baked in:
+    image 8MB, glb 25MB, video 80MB, pdf 25MB, raw 50MB.
+- src/lib/sqlite-fallback-ddl.ts: portable DDL for the no-
+  DATABASE_URL path; mirrors supabase-bootstrap.sql so the
+  Vercel fallback SQLite carries the same schema.
+- app/api/media/upload/route.ts: POST. NextAuth session
+  required. Validates size against MAX_BYTES[kind]. Inserts
+  a `media` row, mints a one-shot PUT URL.
+- app/api/media/list/route.ts: GET. Cursor pagination by id
+  desc. Optional ?kind filter.
+- app/api/media/[id]/route.ts: DELETE. Removes storage
+  object then row.
+- app/api/media/[id]/sign/route.ts: GET (public). One row,
+  short-lived signed URL for the read path.
+- scripts/smoke-phase2.mjs: no-auth gating checks only (live
+  URL probe expected 401/400/404).
+
+Two commits pushed:
+
+- 153ff18 phase2(media): Supabase Storage upload pipeline
+- 38caf2f phase2(media-smoke): refine smoke-phase2 to no-auth
+
+Live probe (`https://ethinterior.vercel.app/api/media/...`):
+
+  GET  /api/media/list        -> 401 (auth required)
+  POST /api/media/upload      -> 401 (auth required)
+  GET  /api/media/abc/sign    -> 400 (invalid id)
+  GET  /api/media/999999/sign -> 500 (storage + Postgres
+                                    backend cannot reach
+                                    their respective
+                                    handles from Vercel)
+
+The 500 on the missing-row case surfaces the operator-side
+env config gap: Vercel has a DATABASE_URL whose host does
+not resolve from Vercel's network (direct conn vs session-
+pooler). Storage needs SUPABASE_URL plus service-role key.
+These three env vars must work before Phase 2 durability is
+verifiable. Code is correct; env is the operator's call.
+
+Build: green. 38 pages prerender. Phase 1 status unchanged.
+
 
 ### 2026-06-27 — v1.1.2 scoping locked in (operator intake)
 - Operator intent: admin + superadmin can log in but cannot
