@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import BlockPicker from "./BlockPicker";
+import BlockEditor from "./BlockEditor";
 import { BLOCK_REGISTRY, type BlockType } from "@/cms/blocks/registry";
 
 type Block = {
@@ -40,7 +41,8 @@ export default function PageBuilder({
   const [status, setStatus] = useState(initialStatus);
   const [blocks, setBlocks] = useState<Block[]>(initialBlocks);
   const [busy, setBusy] = useState(false);
-  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   useEffect(() => {
@@ -57,37 +59,49 @@ export default function PageBuilder({
 
   async function save() {
     setBusy(true);
-    const meta = await fetch(`/api/admin/pages/${pageId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, status }),
-    });
-    const block = await fetch(`/api/admin/pages/${pageId}/blocks`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        blocks: blocks.map((b, i) => ({
-          type: b.type,
-          data: b.data,
-          order_index: i,
-        })),
-      }),
-    });
-    setBusy(false);
-    if (!meta.ok || !block.ok) {
-      alert("Save failed.");
-      return;
+    try {
+      const meta = await fetch(`/api/pages/${pageId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ title, status }),
+      });
+      const block = await fetch(`/api/pages/${pageId}/blocks`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          blocks: blocks.map((b, i) => ({
+            type: b.type,
+            data: b.data,
+            order_index: i,
+          })),
+        }),
+      });
+      if (!meta.ok) {
+        const j = await meta.json().catch(() => ({}));
+        alert(`Save failed: ${j.error || meta.status}`);
+        return;
+      }
+      if (!block.ok) {
+        const j = await block.json().catch(() => ({}));
+        alert(`Save failed: ${j.error || block.status}`);
+        return;
+      }
+      setSavedAt(new Date().toLocaleTimeString());
+    } finally {
+      setBusy(false);
     }
-    alert("Page saved.");
   }
 
   function addBlock(type: BlockType) {
     const def = BLOCK_REGISTRY[type];
-    const data = typeof def.defaultData === "object" && def.defaultData !== null
-      ? structuredClone(def.defaultData)
-      : {};
+    const data =
+      typeof def.defaultData === "object" && def.defaultData !== null
+        ? structuredClone(def.defaultData)
+        : {};
     setBlocks([...blocks, { type, data }]);
-    setEditingIdx(blocks.length);
+    setOpenIdx(blocks.length);
   }
 
   function updateBlockData(idx: number, data: any) {
@@ -101,6 +115,7 @@ export default function PageBuilder({
   function removeBlock(idx: number) {
     if (!confirm("Remove this block?")) return;
     setBlocks((prev) => prev.filter((_, i) => i !== idx));
+    if (openIdx === idx) setOpenIdx(null);
   }
 
   function duplicateBlock(idx: number) {
@@ -119,7 +134,13 @@ export default function PageBuilder({
       const oldIndex = items.findIndex((_, i) => `b-${i}` === active.id);
       const newIndex = items.findIndex((_, i) => `b-${i}` === over.id);
       if (oldIndex < 0 || newIndex < 0) return items;
-      return arrayMove(items, oldIndex, newIndex);
+      const next = arrayMove(items, oldIndex, newIndex);
+      if (openIdx != null) {
+        if (openIdx === oldIndex) setOpenIdx(newIndex);
+        else if (oldIndex < openIdx && newIndex >= openIdx) setOpenIdx(openIdx - 1);
+        else if (oldIndex > openIdx && newIndex <= openIdx) setOpenIdx(openIdx + 1);
+      }
+      return next;
     });
   }
 
@@ -127,19 +148,24 @@ export default function PageBuilder({
     <div className="space-y-8">
       <header className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center surface-elevated p-5 rounded-[var(--radius-card)]">
         <input
-          className="input-line md:col-span-7"
+          className="input-line md:col-span-5"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Page title"
+          maxLength={200}
         />
         <select
-          className="input-line md:col-span-3 bg-transparent"
+          className="input-line md:col-span-2 bg-transparent"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          aria-label="Status"
         >
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </select>
+        <div className="md:col-span-3 text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
+          {savedAt ? `Saved ${savedAt}` : "Not saved"}
+        </div>
         <button
           onClick={save}
           disabled={busy}
@@ -150,7 +176,7 @@ export default function PageBuilder({
       </header>
 
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h2 className="text-xl tracking-tight">Blocks · {blocks.length}</h2>
+        <h2 className="text-xl tracking-tight">Blocks - {blocks.length}</h2>
         <div className="flex items-center gap-2">
           <BlockPicker onPick={addBlock} />
         </div>
@@ -172,8 +198,8 @@ export default function PageBuilder({
                 id={`b-${i}`}
                 index={i}
                 block={b}
-                editing={editingIdx === i}
-                onEdit={() => setEditingIdx(editingIdx === i ? null : i)}
+                open={openIdx === i}
+                onToggle={() => setOpenIdx(openIdx === i ? null : i)}
                 onDuplicate={() => duplicateBlock(i)}
                 onRemove={() => removeBlock(i)}
                 onChange={(data) => updateBlockData(i, data)}
@@ -196,8 +222,8 @@ function SortableBlock({
   id,
   block,
   index,
-  editing,
-  onEdit,
+  open,
+  onToggle,
   onDuplicate,
   onRemove,
   onChange,
@@ -205,8 +231,8 @@ function SortableBlock({
   id: string;
   index: number;
   block: Block;
-  editing: boolean;
-  onEdit: () => void;
+  open: boolean;
+  onToggle: () => void;
   onDuplicate: () => void;
   onRemove: () => void;
   onChange: (data: any) => void;
@@ -219,20 +245,6 @@ function SortableBlock({
     transition,
     opacity: isDragging ? 0.7 : 1,
   };
-  const [dataText, setDataText] = useState(() => JSON.stringify(block.data, null, 2));
-
-  useEffect(() => {
-    setDataText(JSON.stringify(block.data, null, 2));
-  }, [block.data]);
-
-  function commit() {
-    try {
-      const next = JSON.parse(dataText);
-      onChange(next);
-    } catch {
-      alert("Invalid JSON in block data");
-    }
-  }
 
   return (
     <article
@@ -253,14 +265,17 @@ function SortableBlock({
           </button>
           <p className="chrome-pill">{block.type}</p>
           <p className="text-sm text-ink-mute truncate">{def.label}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
+            #{index + 1}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={onEdit}
+            onClick={onToggle}
             className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
-            {editing ? "Close" : "Edit"}
+            {open ? "Close" : "Edit"}
           </button>
           <button
             type="button"
@@ -278,17 +293,13 @@ function SortableBlock({
           </button>
         </div>
       </header>
-      {editing && (
-        <div className="border-t hairline p-4 space-y-3">
-          <textarea
-            className="w-full font-mono text-xs bg-canvas border hairline rounded-[var(--radius-control)] p-3 h-64"
-            value={dataText}
-            onChange={(e) => setDataText(e.target.value)}
-            onBlur={commit}
+      {open && (
+        <div className="border-t hairline p-4">
+          <BlockEditor
+            type={block.type}
+            value={block.data}
+            onChange={onChange}
           />
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
-            JSON edits commit on blur. Block schema is in src/cms/blocks/registry.ts.
-          </p>
         </div>
       )}
     </article>
