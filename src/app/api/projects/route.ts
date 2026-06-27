@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { projects } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
@@ -11,7 +9,8 @@ async function isAuthorized() {
 }
 
 export async function GET() {
-  const allProjects = await db.select().from(projects);
+  await ensureMigrated();
+  const allProjects = await pgMany(`SELECT * FROM projects ORDER BY id ASC`);
   return NextResponse.json(allProjects);
 }
 
@@ -31,32 +30,34 @@ export async function POST(req: NextRequest) {
             .replace(/\s+/g, "-")
         : `project-${Date.now()}`);
 
-    const inserted = await db
-      .insert(projects)
-      .values({
+    await ensureMigrated();
+    const inserted = await pgOne(
+      `INSERT INTO projects
+         (slug, title, category, location, location_city, year, scope,
+          description, description_json, before_image, after_image,
+          model_3d, gallery_media_ids, is_published)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13::jsonb, $14)
+       RETURNING *`,
+      [
         slug,
-        title: String(data.title || "Untitled").slice(0, 200),
-        category: String(data.category || "Residential").slice(0, 80),
-        location: data.location ? String(data.location).slice(0, 160) : null,
-        locationCity: data.locationCity ? String(data.locationCity).slice(0, 80) : null,
-        year: data.year ? String(data.year).slice(0, 12) : null,
-        scope: data.scope ? String(data.scope).slice(0, 200) : null,
-        description: String(data.description || "").slice(0, 4000),
-        descriptionJson: data.descriptionJson ? String(data.descriptionJson).slice(0, 200000) : null,
-        beforeImage: data.beforeImage
-          ? String(data.beforeImage).slice(0, 500)
-          : null,
-        afterImage: data.afterImage
-          ? String(data.afterImage).slice(0, 500)
-          : null,
-        model3d: data.model3d ? String(data.model3d).slice(0, 500) : null,
-        galleryMediaIds: Array.isArray(data.galleryMediaIds)
+        String(data.title || "Untitled").slice(0, 200),
+        String(data.category || "Residential").slice(0, 80),
+        data.location ? String(data.location).slice(0, 160) : null,
+        data.locationCity ? String(data.locationCity).slice(0, 80) : null,
+        data.year ? String(data.year).slice(0, 12) : null,
+        data.scope ? String(data.scope).slice(0, 200) : null,
+        String(data.description || "").slice(0, 4000),
+        data.descriptionJson ? JSON.stringify(data.descriptionJson).slice(0, 200000) : null,
+        data.beforeImage ? String(data.beforeImage).slice(0, 500) : null,
+        data.afterImage ? String(data.afterImage).slice(0, 500) : null,
+        data.model3d ? String(data.model3d).slice(0, 500) : null,
+        Array.isArray(data.galleryMediaIds)
           ? JSON.stringify(data.galleryMediaIds)
           : null,
-        isPublished: data.isPublished !== false,
-      })
-      .returning();
-    return NextResponse.json({ success: true, project: inserted[0] });
+        data.isPublished !== false,
+      ]
+    );
+    return NextResponse.json({ success: true, project: inserted });
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || "Insert failed" },

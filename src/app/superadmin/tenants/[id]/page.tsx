@@ -15,7 +15,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
   const numericId = Number(id);
   if (!Number.isFinite(numericId)) redirect("/superadmin/tenants");
 
-  const data = getTenant(numericId);
+  const data = await getTenant(numericId);
   if (!data.tenant) redirect("/superadmin/tenants");
 
   return (

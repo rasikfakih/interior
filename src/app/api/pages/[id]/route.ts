@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { openDb } from "@/lib/db";
+import { ensureMigrated, pgMany, pgOne, pgQuery } from "@/lib/pg";
 import { requireLicense } from "@/lib/license-gate";
 
 async function gateOrFail(action: "mutate" | "admin" | "read-public" = "admin") {
@@ -16,12 +16,14 @@ export async function GET(
     const fail = await gateOrFail("read-public");
     if (fail) return fail;
     const { id } = await params;
-    const sqlite = openDb();
-    const page = sqlite.prepare("SELECT * FROM pages WHERE id = ?").get(Number(id));
-    const blocks = sqlite
-      .prepare("SELECT * FROM page_blocks WHERE page_id = ? ORDER BY order_index ASC, id ASC")
-      .all(Number(id));
-    sqlite.close();
+    await ensureMigrated();
+    const page = await pgOne(`SELECT * FROM pages WHERE id = $1`, [Number(id)]);
+    const blocks = await pgMany(
+      `SELECT * FROM page_blocks
+       WHERE page_id = $1
+       ORDER BY order_index ASC, id ASC`,
+      [Number(id)]
+    );
     if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ page, blocks });
   } catch (e: any) {
@@ -38,49 +40,51 @@ export async function PUT(
     if (fail) return fail;
     const { id } = await params;
     const d = await req.json();
-    const sqlite = openDb();
+    await ensureMigrated();
+
     const updates: string[] = [];
-    const args: any[] = [];
+    const args: unknown[] = [];
+    let i = 1;
     if (typeof d.title === "string") {
-      updates.push("title = ?");
+      updates.push(`title = $${i++}`);
       args.push(d.title.slice(0, 200));
     }
     if (typeof d.slug === "string") {
-      updates.push("slug = ?");
+      updates.push(`slug = $${i++}`);
       args.push(d.slug.slice(0, 200));
     }
     if (typeof d.status === "string") {
-      updates.push("status = ?");
+      updates.push(`status = $${i++}`);
       args.push(d.status.slice(0, 12));
       if (d.status === "published") {
-        updates.push("published_at = ?");
+        updates.push(`published_at = $${i++}`);
         args.push(new Date().toISOString());
       } else if (d.status === "draft") {
-        updates.push("published_at = NULL");
+        updates.push(`published_at = NULL`);
       }
     }
     if (typeof d.seoTitle === "string") {
-      updates.push("seo_title = ?");
+      updates.push(`seo_title = $${i++}`);
       args.push(d.seoTitle.slice(0, 200));
     }
     if (typeof d.seoDescription === "string") {
-      updates.push("seo_description = ?");
+      updates.push(`seo_description = $${i++}`);
       args.push(d.seoDescription.slice(0, 500));
     }
     if (typeof d.isFront === "boolean") {
-      updates.push("is_front = ?");
-      args.push(d.isFront ? 1 : 0);
+      updates.push(`is_front = $${i++}`);
+      args.push(d.isFront);
     }
     if (updates.length === 0) {
-      sqlite.close();
       return NextResponse.json({ success: true, noop: true });
     }
-    args.push(Number(id));
-    const r = sqlite
-      .prepare(`UPDATE pages SET ${updates.join(", ")} WHERE id = ?`)
-      .run(...args);
-    sqlite.close();
-    if (r.changes === 0) {
+    const numericId = Number(id);
+    args.push(numericId);
+    const r = await pgQuery(
+      `UPDATE pages SET ${updates.join(", ")} WHERE id = $${i}`,
+      args
+    );
+    if (!r.rowCount) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
     return NextResponse.json({ success: true });
@@ -97,11 +101,16 @@ export async function DELETE(
     const fail = await gateOrFail("admin");
     if (fail) return fail;
     const { id } = await params;
-    const sqlite = openDb();
-    sqlite.prepare("DELETE FROM page_blocks WHERE page_id = ?").run(Number(id));
-    const r = sqlite.prepare("DELETE FROM pages WHERE id = ?").run(Number(id));
-    sqlite.close();
-    if (r.changes === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const numericId = Number(id);
+    await ensureMigrated();
+    await pgQuery(`DELETE FROM page_blocks WHERE page_id = $1`, [numericId]);
+    const r = await pgQuery(
+      `DELETE FROM pages WHERE id = $1`,
+      [numericId]
+    );
+    if (!r.rowCount) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });

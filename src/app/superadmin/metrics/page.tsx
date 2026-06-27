@@ -10,8 +10,8 @@ export const metadata = { title: "Metrics", robots: { index: false } };
 export default async function MetricsPage() {
   const cookieStore = await cookies();
   if (cookieStore.get("superadmin_session")?.value !== "1") redirect("/superadmin");
-  const m = getMetrics();
-  const audit = getAuditLog(20);
+  const m = await getMetrics();
+  const audit = await getAuditLog(20);
 
   return (
     <section className="grid gap-8">

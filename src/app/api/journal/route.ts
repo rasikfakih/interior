@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { journalPosts } from "@/lib/schema";
+import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
@@ -10,7 +9,10 @@ async function isAuthorized() {
 }
 
 export async function GET() {
-  const rows = await db.select().from(journalPosts);
+  await ensureMigrated();
+  const rows = await pgMany(
+    `SELECT * FROM journal_posts ORDER BY id ASC`
+  );
   return NextResponse.json(rows);
 }
 
@@ -25,21 +27,26 @@ export async function POST(req: NextRequest) {
     }
     const slug =
       d.slug || d.title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
-    const inserted = await db
-      .insert(journalPosts)
-      .values({
+    await ensureMigrated();
+    const inserted = await pgOne(
+      `INSERT INTO journal_posts
+         (slug, title, excerpt, content, content_json, cover_image,
+          category, author_name, is_published)
+       VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9)
+       RETURNING *`,
+      [
         slug,
-        title: String(d.title).slice(0, 200),
-        excerpt: d.excerpt ? String(d.excerpt).slice(0, 500) : null,
-        content: d.content ? String(d.content).slice(0, 8000) : "",
-        contentJson: d.contentJson ? String(d.contentJson).slice(0, 200000) : null,
-        coverImage: d.coverImage ? String(d.coverImage).slice(0, 500) : null,
-        category: d.category ? String(d.category).slice(0, 80) : null,
-        authorName: d.authorName ? String(d.authorName).slice(0, 120) : "Studio",
-        isPublished: d.isPublished !== false,
-      })
-      .returning();
-    return NextResponse.json({ success: true, item: inserted[0] });
+        String(d.title).slice(0, 200),
+        d.excerpt ? String(d.excerpt).slice(0, 500) : null,
+        d.content ? String(d.content).slice(0, 8000) : "",
+        d.contentJson ? JSON.stringify(d.contentJson).slice(0, 200000) : null,
+        d.coverImage ? String(d.coverImage).slice(0, 500) : null,
+        d.category ? String(d.category).slice(0, 80) : null,
+        d.authorName ? String(d.authorName).slice(0, 120) : "Studio",
+        d.isPublished !== false,
+      ]
+    );
+    return NextResponse.json({ success: true, item: inserted });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

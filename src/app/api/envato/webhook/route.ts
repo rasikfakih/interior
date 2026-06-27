@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   const tier = (payload.tier || "personal").toLowerCase() === "business" ? "business" : "personal";
 
   try {
-    const id = createTenant({ slug, studio_name: studioName, owner_email: buyerEmail, tier });
+    const id = await createTenant({ slug, studio_name: studioName, owner_email: buyerEmail, tier });
     return NextResponse.json({ ok: true, tenant_id: id, slug, state: "pending" });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e.message }, { status: 400 });

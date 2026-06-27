@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { db } from "@/lib/db";
-import { teamMembers } from "@/lib/schema";
+import { ensureMigrated, pgMany } from "@/lib/pg";
 
 export const metadata: Metadata = {
   title: "About the studio",
@@ -10,7 +9,12 @@ export const metadata: Metadata = {
 
 async function getTeam() {
   try {
-    return await db.select().from(teamMembers);
+    await ensureMigrated();
+    return await pgMany<{ id: number; name: string; role: string | null }>(
+      `SELECT id, name, role FROM team_members
+       WHERE is_published = TRUE
+       ORDER BY "order" ASC, id ASC`
+    );
   } catch {
     return [];
   }

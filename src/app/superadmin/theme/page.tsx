@@ -14,7 +14,7 @@ export default async function ThemePage() {
   const cookieStore = await cookies();
   if (cookieStore.get("superadmin_session")?.value !== "1") redirect("/superadmin");
 
-  const tenants = listTenants();
+  const tenants = await listTenants();
   const examplePath = path.join(process.cwd(), "data", "theme.distro.json");
   const example = fs.existsSync(examplePath) ? fs.readFileSync(examplePath, "utf8") : "{}";
 

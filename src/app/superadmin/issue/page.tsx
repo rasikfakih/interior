@@ -11,7 +11,7 @@ export const metadata = { title: "Issue license", robots: { index: false } };
 export default async function IssuePage() {
   const cookieStore = await cookies();
   if (cookieStore.get("superadmin_session")?.value !== "1") redirect("/superadmin");
-  const tenants = listTenants();
+  const tenants = await listTenants();
   return (
     <section>
       <h1 className="text-3xl tracking-tight text-zinc-900">Issue license</h1>

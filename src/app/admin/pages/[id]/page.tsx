@@ -1,6 +1,4 @@
-import { db } from "@/lib/db";
-import { pages, pageBlocks } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
 import PageBuilder from "@/components/admin/PageBuilder";
 
 export const dynamic = "force-dynamic";
@@ -12,17 +10,33 @@ export default async function PageEditor({
 }) {
   const { id } = await params;
   const pageId = Number(id);
-  const [page] = await db.select().from(pages).where(eq(pages.id, pageId)).limit(1);
+  await ensureMigrated();
+  const page = await pgOne<{
+    id: number;
+    slug: string;
+    title: string;
+    status: string;
+  }>(
+    `SELECT id, slug, title, status FROM pages WHERE id = $1 LIMIT 1`,
+    [pageId]
+  );
   if (!page) {
-    return <div className="container-page py-24 text-ink-mute">Page not found.</div>;
+    return (
+      <div className="container-page py-24 text-ink-mute">Page not found.</div>
+    );
   }
-  const rows = await db
-    .select()
-    .from(pageBlocks)
-    .where(eq(pageBlocks.pageId, pageId));
-  const initialBlocks = rows.map((r: any) => ({
+  const rows = await pgMany<{
+    type: string;
+    data: unknown;
+  }>(
+    `SELECT type, data FROM page_blocks
+     WHERE page_id = $1
+     ORDER BY order_index ASC, id ASC`,
+    [pageId]
+  );
+  const initialBlocks = rows.map((r) => ({
     type: r.type as any,
-    data: safeJson(r.data),
+    data: typeof r.data === "string" ? safeJson(r.data) : r.data ?? {},
   }));
   return (
     <PageBuilder

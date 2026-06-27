@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { settings } from "@/lib/schema";
+import { ensureMigrated, pgMany, pgQuery } from "@/lib/pg";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
 export async function GET() {
-  const rows = await db.select().from(settings);
+  await ensureMigrated();
+  const rows = await pgMany(`SELECT * FROM settings ORDER BY key ASC`);
   return NextResponse.json(rows);
 }
 
@@ -22,18 +22,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const inserted = await db
-      .insert(settings)
-      .values({
-        key: String(key).slice(0, 100),
-        value: String(value).slice(0, 2000),
-      })
-      .onConflictDoUpdate({
-        target: settings.key,
-        set: { value: String(value).slice(0, 2000) },
-      })
-      .returning();
-    return NextResponse.json({ success: true, item: inserted[0] });
+    await ensureMigrated();
+    const k = String(key).slice(0, 100);
+    const v = String(value).slice(0, 2000);
+    const r = await pgQuery(
+      `INSERT INTO settings (key, value) VALUES ($1, $2)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+       RETURNING *`,
+      [k, v]
+    );
+    return NextResponse.json({ success: true, item: r.rows?.[0] ?? null });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

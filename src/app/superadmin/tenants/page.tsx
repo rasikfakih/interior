@@ -14,7 +14,7 @@ export default async function TenantsPage() {
     redirect("/superadmin");
   }
 
-  const rows = listTenants();
+  const rows = await listTenants();
 
   return (
     <section>
