@@ -285,12 +285,20 @@ function loadBootstrapDdl(): string {
 export async function ensureMigrated(): Promise<void> {
   if (_ensureMigrated) return _ensureMigrated;
   _ensureMigrated = (async () => {
-    if (isLocalDevPath()) {
-      // Local SQLite: rely on scripts/migrate.mjs (run via postinstall)
-      // to declare the schema. Just ensure the file is reachable.
-      const dbPath = path.join(process.cwd(), 'data', 'etihad.db');
+    if (isLocalDevPath() || isVercelFallbackPath()) {
+      // SQLite fallback: rely on scripts/migrate.mjs (run via
+      // postinstall) to declare the schema. Just ensure the file
+      // is reachable.
+      const dbPath = isVercelFallbackPath()
+        ? getVercelHotCopyPath()
+        : path.join(process.cwd(), 'data', 'etihad.db');
+      if (isVercelFallbackPath()) {
+        ensureHotCopy();
+      } else {
+        const dir = path.dirname(dbPath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      }
       if (!fs.existsSync(dbPath)) {
-        // best-effort create; better-sqlite3 will tolerate empty file
         new Database(dbPath).close();
       }
       return;
