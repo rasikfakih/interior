@@ -28,6 +28,7 @@ import path from 'path';
 import fs from 'fs';
 import pg from 'pg';
 import Database from 'better-sqlite3';
+import { SQLITE_FALLBACK_DDL } from '@/lib/sqlite-fallback-ddl';
 
 let _pool: pg.Pool | null = null;
 let _sqlite: Database.Database | null = null;
@@ -127,11 +128,19 @@ function getSqlite(): Database.Database {
   const dir = path.dirname(target);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const db = new Database(target, {
-    readonly: isVercelFallbackPath() && !process.env.ETIHAD_DB_PATH,
+    readonly: false,
     fileMustExist: false,
   });
   db.pragma('journal_mode = DELETE');
   db.pragma('synchronous = NORMAL');
+  // Apply fallback schema on first open. Idempotent.
+  for (const ddl of SQLITE_FALLBACK_DDL) {
+    try {
+      db.exec(ddl);
+    } catch (e: any) {
+      console.error('[pg.ts] fallback DDL error:', e?.message ?? String(e));
+    }
+  }
   _sqlite = db;
   return db;
 }
