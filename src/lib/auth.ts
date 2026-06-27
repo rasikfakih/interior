@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { ensureMigrated, getPool } from '@/lib/pg';
+import { ensureMigrated, pgOne } from '@/lib/pg';
 
 /**
  * Postgres-backed credentials provider for the v1.1.2 runtime.
@@ -13,14 +13,22 @@ import { ensureMigrated, getPool } from '@/lib/pg';
  * Roles: 'admin' or 'superadmin'. JWT callback stamps role into
  * the token; session callback exposes it on session.user.role.
  * Client-side route guards use the session.user.role value.
+ *
+ * The query goes through pgOne() so that the Vercel SQLite
+ * hot-copy path also serves login when DATABASE_URL is unset.
  */
 async function findUserByEmail(email: string) {
   await ensureMigrated();
-  const r = await getPool().query(
-    'SELECT id, email, password_hash, role FROM users WHERE email = $1 LIMIT 1',
+  return await pgOne<{
+    id: number | string;
+    email: string;
+    password_hash: string;
+    role: string | null;
+  }>(
+    `SELECT id, email, password_hash, role FROM users
+     WHERE email = $1 LIMIT 1`,
     [email]
   );
-  return r.rows[0] ?? null;
 }
 
 export const authOptions: NextAuthOptions = {
