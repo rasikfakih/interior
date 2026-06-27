@@ -151,7 +151,7 @@ function ProjectsPanel() {
   const [list, setList] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    fetch("/api/admin/pages").then(async () => {
+    fetch("/api/pages").then(async () => {
       const r = await fetch("/api/admin/projects");
       if (r.ok) setList(await r.json());
     });

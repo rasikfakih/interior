@@ -23,7 +23,7 @@ export default function PagesAdmin() {
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch("/api/admin/pages");
+      const r = await fetch("/api/pages", { credentials: "include" });
       if (r.ok) setPages(await r.json());
     } finally {
       setLoading(false);
@@ -38,9 +38,10 @@ export default function PagesAdmin() {
     e.preventDefault();
     if (!newPage.slug || !newPage.title) return;
     setBusy(true);
-    const r = await fetch("/api/admin/pages", {
+    const r = await fetch("/api/pages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ ...newPage, status: "draft" }),
     });
     setBusy(false);
@@ -48,13 +49,17 @@ export default function PagesAdmin() {
       setNewPage({ slug: "", title: "" });
       load();
     } else {
-      alert("Failed to create page");
+      const j = await r.json().catch(() => ({}));
+      alert(j.error ?? "Failed to create page");
     }
   }
 
   async function destroy(id: number) {
     if (!confirm("Delete this page and all its blocks?")) return;
-    const r = await fetch(`/api/admin/pages/${id}`, { method: "DELETE" });
+    const r = await fetch(`/api/pages/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
     if (r.ok) load();
     else alert("Delete failed");
   }
