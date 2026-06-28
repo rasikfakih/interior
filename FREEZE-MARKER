@@ -1,11 +1,11 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.1.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.1.2 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.1.0.
-Until something changes it, the codebase's freeze boundaries are:
+This file is the authoritative freeze marker for v1.1.2. Until
+something changes it, the codebase's freeze boundaries are:
 
-## Frozen manifest
+## Frozen manifest (inherited from v1.1.0)
 
 What this freeze covers:
 
@@ -18,6 +18,34 @@ What this freeze covers:
   - `scripts/verify-deploy.mjs` (gates; additive only)
   - `vercel.json`
   - `next.config.mjs`
+
+## v1.1.2 increment
+
+What v1.1.2 adds, also frozen under the buyer contract:
+
+  - Postgres-first runtime (active when `DATABASE_URL` is set;
+    SQLite hot-copy fallback otherwise). Wired through
+    `src/lib/pg.ts`. Idempotent migration via
+    `scripts/migrate-supabase.mjs`.
+  - Block-editor schema layer: `src/components/admin/block-schemas.ts`
+    + `src/components/admin/BlockEditor.tsx`. The schema-driven
+    forms expand at runtime in `PageBuilder.tsx`. New block-type
+    additions go through `cms/blocks/registry.ts` and a matching
+    `BlockSchema` case.
+  - Per-entity CRUD admin routes that are an addition, not a
+    change to existing buyer-visible flow:
+      - `src/app/admin/projects/page.tsx` and `[id]/page.tsx`
+      - `src/app/admin/journal/page.tsx` and `[id]/page.tsx`
+      - `src/app/admin/testimonials/page.tsx` and `[id]/page.tsx`
+      - `src/app/admin/team/page.tsx` and `[id]/page.tsx`
+  - Media library at `/admin/media` (Phase 3), wired to
+    Supabase Storage when configured.
+  - Supabase Storage media pipeline under `app/api/media/**`.
+  - `scripts/seed-content.mjs` Postgres-or-SQLite seed that
+    writes 3 projects / 3 journal / 3 testimonials / 3 team /
+    3 media to whichever engine is active.
+  - `scripts/smoke-api.mjs` + `smoke-phase{2,5,6,7}.mjs` + the
+    pre-existing `smoke.mjs`.
 
 ## Operator carve-out (added to v1.1.0)
 
@@ -53,18 +81,21 @@ What this freeze **does not cover**:
   - `docs/CONTEXT.md` - session continuity harness
   - `docs/CLIENT_HANDOFF.md`, `docs/OPERATOR_QUICKREF.md`, `docs/SALES_NOTES.md`,
     `docs/envato-sales-brief.md`, `docs/theme-distro.schema.md`,
-    `docs/theme-distro.example.json`, `docs/thumbs/v110/**`
+    `docs/theme-distro.example.json`, `docs/v112-plan.md`, `docs/thumbs/**`
   - `.env.example`, `.env.local.example`
   - `FREEZE-MARKER` (this file)
   - `AGENTS.md`, `CLAUDE.md`
 
 ## Why the carve-out exists
 
-v1.0.0 was sold as a buyer-complete artifact. v1.1.0 adds:
+v1.0.0 was sold as a buyer-complete artifact. v1.1.2 stacks on top of v1.1.0:
 
-  - a superadmin console for the studio + Envato onboarding
-  - a tenant model + theme.distro.json overlay
-  - white-label-friendly defaults so the same codebase serves multiple studios
+  - a superadmin console for the studio + Envato onboarding (v1.1.0)
+  - a tenant model + theme.distro.json overlay (v1.1.0)
+  - white-label-friendly defaults (v1.1.0)
+  - Postgres-first runtime with bundled-SQLite fallback (v1.1.2)
+  - WordPress-grade admin CRUD per entity (v1.1.2)
+  - TipTap rich text + MediaPicker integration (v1.1.2)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -72,9 +103,14 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-06-23 (roll-forward from v1.0.0 frozen 2026-06-18)
-  - **Version**: 1.1.0
-  - **Status (operator fills in after deploy)**: `_PENDING_ - enter timestamp and URL here on first success_`
+  - **Frozen since**: 2026-06-28 (rolled forward from v1.1.0 2026-06-23,
+    v1.0.0 2026-06-18)
+  - **Version**: 1.1.2
+  - **Live URL**: https://ethinterior.vercel.app
+  - **Status**: DEPLOYED 2026-06-28. Both runtime paths proven.
+    Postgres-first when DATABASE_URL is set, SQLite hot-copy
+    when not. 19/19 verify:deploy checks green. smoke-api
+    proves admin writes survive two cold-starts.
 
 ## Procedural signature
 

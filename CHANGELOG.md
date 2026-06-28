@@ -2,6 +2,161 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.1.2 - 2026-06-28 (DEPLOYED) - WordPress-grade admin + Postgres runtime
+
+### Status
+
+Shipped to `ethinterior.vercel.app`. The runtime is
+Postgres-first when `DATABASE_URL` is set, SQLite hot-copy
+(`/tmp/etihad-{region}.db`) otherwise. All four entity CRUD
+surfaces (pages, projects, journal, testimonials, team) have
+dedicated admin routes; the page builder is now schema-driven
+per block type with TipTap rich text and the MediaPicker for
+images. Login + admin write durability proven across two
+cold-starts via `/admin/smoke-api`.
+
+### What landed
+
+**Phase 0 (intake + dump):**
+- `data/etihad-backup-2026-06-27.json` operator-state archive.
+- `scripts/export-sqlite.mjs` reads the bundled SQLite and
+  dumps rows to JSON for pre-cutover insurance.
+
+**Phase 1 (Postgres-first runtime):**
+- `src/lib/pg.ts`: pgPool / pgQuery / pgOne / pgMany / withPgTx
+  / ensureMigrated. `ensureMigrated` boots `supabase-bootstrap.sql`
+  behind a Postgres advisory lock, once per cold start.
+- `src/lib/db.ts`: legacy shim. `openDb` / `openReadonlyDb` return
+  `any`-typed proxies that throw at runtime. `db: any` proxy same.
+- `src/lib/auth.ts`: credentials provider queries `users` via
+  `pg.ts`. Login no longer reads SQLite.
+- Prerender-critical pages ported: `src/app/(public)/projects/page.tsx`,
+  `src/app/(public)/projects/[slug]/page.tsx`,
+  `src/app/(public)/journal/[slug]/page.tsx`,
+  `src/app/api/sitemap/route.ts`,
+  `src/lib/pages.ts`. Without these the next `next build` would
+  crash at static generation.
+- Operator console ported from SQLite to Postgres across every
+  API route, the operator-store, license.ts/appendAudit, the
+  public about page, the admin pages/[id] editor, the superadmin
+  tenants pages, and the Envato webhook.
+
+**Phase 2 (media pipeline):**
+- `src/lib/storage.ts`: Supabase Storage REST abstraction with
+  per-kind cap (image 8MB / glb 25MB / video 80MB / pdf 25MB /
+  raw 50MB).
+- `src/lib/sqlite-fallback-ddl.ts`: portable DDL mirroring
+  `supabase-bootstrap.sql` so the no-DATABASE_URL path carries
+  the same schema.
+- `app/api/media/{upload,list,[id],[id]/sign}/route.ts`: POST,
+  GET cursor-paginated, DELETE, signed-GET. Auth-gated upload.
+- Media-library UI at `/admin/media` with GLB inline preview via
+  lazy three.js, video poster, PDF object render. `MediaPicker`
+  modal reused by PagesAdmin, MediaGrid, and AdminProjectForm.
+
+**Phase 3 (media UI):**
+- `src/components/admin/GLBThumb.tsx` (lazy three.js viewer).
+- `src/components/admin/media-types.ts` (per-kind cap map).
+- `src/components/admin/MediaGrid.tsx` (full library UI).
+- `src/components/admin/MediaPicker.tsx` (modal picker).
+- `src/app/api/media/[id]/route.ts`: PATCH added for alt /
+  original_name / mime updates.
+
+**Phase 4 (page builder schema-driven):**
+- `src/components/admin/block-schemas.ts`: one BlockSchema per
+  block type. Field kinds (text / longtext / number / select /
+  richtext / media / toggle).
+- `src/components/admin/BlockEditor.tsx`: schema-driven renderer.
+  Field primitive delegates to RichTextEditor (existing)
+  and MediaPicker (existing). ArrayEditor with reorder + remove +
+  defaults factory.
+- `src/components/admin/PageBuilder.tsx`: SortableBlock now
+  expands to BlockEditor instead of a raw JSON textarea. Save
+  calls PUT /api/pages/[id] (meta) and PUT /api/pages/[id]/blocks
+  (blocks). Cmd/Ctrl-S still works. "Saved HH:MM:SS" indicator
+  in the header. Open-state on the editor row tracks drag-reorder.
+- PagesAdmin + AdminShell + PageBuilder switched to /api/pages*
+  prefix. Orphan `/api/admin/pages/route.ts` deleted.
+
+**Phase 5 (project CRUD):**
+- `src/components/admin/AdminProjectsIndex.tsx`: client-side
+  list + search + sort. Publish toggle (PUT). Edit, View-site,
+  Delete (DELETE). credentials:'include' across.
+- `src/app/admin/projects/page.tsx` and
+  `src/app/admin/projects/[id]/page.tsx` new server route.
+- `AdminShell.tsx`: ProjectsRoutePanel routes the Projects tab
+  through /admin/projects.
+- `scripts/seed-content.mjs`: canonical Postgres-or-SQLite seed.
+  Three projects / three journal / three testimonials / three team
+  / three media rows. Branches on DATABASE_URL. Old
+  `scripts/seed-content-supabase.mjs` deleted.
+
+**Phase 6 (journal CRUD + slug audit):**
+- `src/components/admin/AdminJournalIndex.tsx`: search / sort /
+  publish toggle.
+- `src/app/admin/journal/page.tsx` and
+  `src/app/admin/journal/[id]/page.tsx` new server route.
+- `src/app/api/journal/[id]/route.ts`: GET added. Auth-gated.
+- `src/components/admin/AdminJournalForm.tsx`: slug derivation
+  matches the API regex `[^a-z0-9\s-]` strip -> trim -> spaces to
+  dashes; "Use derived slug" hint surfaces when input is dirty.
+- `src/app/(public)/journal/page.tsx`: rewrote from a hard-coded
+  six-item array to a `pgMany` read of `journal_posts WHERE
+  is_published = TRUE`. Slug audit: every seeded slug now resolves
+  through /journal/<slug>. force-dynamic so cold-start pages
+  read the bundled SQLite hot-copy.
+- `AdminShell.tsx`: JournalRoutePanel mirrors ProjectsRoutePanel.
+
+**Phase 7 (testimonials + team CRUD):**
+- `src/components/admin/AdminTestimonialsIndex.tsx` and
+  `AdminTestimonialForm.tsx` (name / role / quote / photo).
+- `src/components/admin/AdminTeamIndex.tsx` and
+  `AdminTeamForm.tsx` (name / role / bio / photo / order with
+  inline up-down reorder against PUT order).
+- `src/app/admin/testimonials/page.tsx`, `/admin/testimonials/[id]`,
+  `/admin/team/page.tsx`, `/admin/team/[id]` all new server
+  routes.
+- `src/app/api/testimonials/[id]/route.ts` and
+  `src/app/api/team/[id]/route.ts`: GET added.
+- `AdminShell.tsx`: TestimonialsRoutePanel and TeamRoutePanel.
+
+**Phase 8 (acceptance):**
+- `scripts/smoke-api.mjs`: login -> POST -> cold-start probe ->
+  GET round-trip -> DELETE cleanup. Proves admin writes persist
+  across two cold-starts.
+- `scripts/smoke-phase2.mjs` (media gating),
+  `scripts/smoke-phase5.mjs` (projects),
+  `scripts/smoke-phase6.mjs` (journal + slug resolver),
+  `scripts/smoke-phase7.mjs` (testimonials + team).
+- `scripts/smoke.mjs` (direct DB durability proof).
+
+### Verification
+
+- `npm run verify:deploy` - 19/19 checks green.
+- `npm run build` - green, 38+ pages prerender.
+- Live Vercel probes (post-deploy):
+  - `/api/projects` returns 200 with the seeded rows.
+  - `/api/journal` returns 200 with the seeded rows; each slug
+    round-trips through `/journal/<slug>` to 200.
+  - `/admin/{projects,journal,testimonials,team}` all 200.
+  - Login via NextAuth credentials with the operator-known
+    admin ID succeeds; session cookie rides subsequent requests.
+  - smoke-api: 16-step flow proven across two cold-starts.
+
+### Removed / replaced
+
+- `src/app/api/admin/pages/route.ts` deleted (stub).
+- `scripts/seed-content-supabase.mjs` deleted (replaced by
+  `scripts/seed-content.mjs`).
+
+### Carry-forward
+
+- Tiered admin/superadmin role gate. Currently both roles pass
+  `requireLicense('admin')`. Operator to confirm if a distinct
+  superadmin gate is required beyond same-route access.
+- Past v1.1.x add-ons go through the 3-buyer-counter rule in
+  `AGENT_BEST_PRACTICES.md`.
+
 ## v1.1.2 - 2026-06-25 (Phase 1 connectivity - infra only, not yet shipped to runtime)
 
 ### Status
