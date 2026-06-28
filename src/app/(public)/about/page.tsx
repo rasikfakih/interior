@@ -10,8 +10,14 @@ export const metadata: Metadata = {
 async function getTeam() {
   try {
     await ensureMigrated();
-    return await pgMany<{ id: number; name: string; role: string | null }>(
-      `SELECT id, name, role FROM team_members
+    return await pgMany<{
+      id: number;
+      name: string;
+      role: string | null;
+      bio: string | null;
+      photo: string | null;
+    }>(
+      `SELECT id, name, role, bio, photo FROM team_members
        WHERE is_published = TRUE
        ORDER BY "order" ASC, id ASC`
     );
@@ -81,29 +87,48 @@ export default async function AboutPage() {
               The team
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-              {team.map((m: any) => (
-                <article
-                  key={m.id}
-                  className="surface-tile p-6 md:p-7 flex flex-col gap-3"
-                >
-                  <div
-                    aria-hidden
-                    className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
-                    style={{
-                      background: "var(--accent-warm-soft)",
-                      color: "var(--accent-warm)",
-                    }}
+              {team.map((m: any) => {
+                const initial = (m.name || "·").charAt(0).toUpperCase();
+                const photo =
+                  m.photo && String(m.photo).trim() ? String(m.photo) : null;
+                return (
+                  <article
+                    key={m.id}
+                    className="surface-tile p-6 md:p-7 flex flex-col gap-3"
                   >
-                    {(m.name || "·").charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-lg">{m.name}</p>
-                    <p className="text-xs uppercase tracking-[0.18em] font-mono text-ink-mute">
-                      {m.role}
-                    </p>
-                  </div>
-                </article>
-              ))}
+                    {photo ? (
+                      <img
+                        src={photo}
+                        alt=""
+                        className="w-14 h-14 rounded-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div
+                        aria-hidden
+                        className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
+                        style={{
+                          background: "var(--accent-warm-soft)",
+                          color: "var(--accent-warm)",
+                        }}
+                      >
+                        {initial}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-lg">{m.name}</p>
+                      <p className="text-xs uppercase tracking-[0.18em] font-mono text-ink-mute">
+                        {m.role}
+                      </p>
+                    </div>
+                    {m.bio && (
+                      <p className="text-sm text-ink-mute leading-relaxed">
+                        {m.bio}
+                      </p>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
