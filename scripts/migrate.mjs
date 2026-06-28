@@ -397,26 +397,50 @@ if (!studioTenant) {
 // Default admin user - demonstrates the expected admin identity.
 // Remove any stale rows that were inserted by earlier seeds
 // (e.g. studio@etihadinteriors.com from a v1.1.0 build) and insert
-// the row that the operator expects to log in with. This keeps the
-// users table predictable regardless of which bundled SQLite shipped
-// in the deploy.
+// Default user seed. The env row is the admin row the operator
+// expected to log in with. This keeps the users table
+// predictable regardless of which bundled SQLite shipped in
+// the deploy.
+//
+// When the operator sets a second pair of env vars
+// SUPABASE_OPERATOR_EMAIL + SUPABASE_OPERATOR_PASSWORD, two
+// rows are seeded: the admin row at ADMIN_EMAIL and a second
+// row at SUPABASE_OPERATOR_EMAIL. Both survive subsequent
+// migrations. Without the operator pair, only the admin row
+// is seeded, which matches v1.0.0 / v1.1.0 behaviour.
 function seedDefaultAdmin() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@etihadinteriors.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
-  const passwordHash = bcrypt.hashSync(adminPassword, 10);
+  const operatorEmail = process.env.SUPABASE_OPERATOR_EMAIL || "";
+  const operatorPassword = process.env.SUPABASE_OPERATOR_PASSWORD || "";
+
+  const protectedEmails = [adminEmail];
+  if (operatorEmail && operatorEmail !== adminEmail) {
+    protectedEmails.push(operatorEmail);
+  }
+
   try {
-    // Drop any stale non-admin rows whose email differs from env. The
-    // env row is the only one we want.
     const stale = sqlite
-      .prepare("SELECT id, email FROM users WHERE email != ?")
-      .all(adminEmail);
+      .prepare(
+        `SELECT id, email FROM users WHERE email NOT IN (${protectedEmails
+          .map(() => "?")
+          .join(",")})`
+      )
+      .all(...protectedEmails);
     if (stale.length > 0) {
       sqlite
-        .prepare("DELETE FROM users WHERE email != ?")
-        .run(adminEmail);
-      console.log(`- users seed: removed ${stale.length} stale row(s) (${stale.map(s => s.email).join(", ")})`);
+        .prepare(
+          `DELETE FROM users WHERE email NOT IN (${protectedEmails
+            .map(() => "?")
+            .join(",")})`
+        )
+        .run(...protectedEmails);
+      console.log(
+        `- users seed: removed ${stale.length} stale row(s) (${stale.map((s) => s.email).join(", ")})`
+      );
     }
 
+    const passwordHash = bcrypt.hashSync(adminPassword, 10);
     sqlite
       .prepare(
         `INSERT INTO users (email, password_hash, role)
@@ -425,6 +449,25 @@ function seedDefaultAdmin() {
       )
       .run(adminEmail, passwordHash);
     console.log(`+ users seed (admin) -> ${adminEmail}`);
+
+    if (operatorEmail && operatorEmail !== adminEmail && operatorPassword) {
+      const operatorRole =
+        (process.env.SUPABASE_OPERATOR_ROLE || "superadmin").toLowerCase() ===
+        "admin"
+          ? "admin"
+          : "superadmin";
+      const operatorHash = bcrypt.hashSync(operatorPassword, 10);
+      sqlite
+        .prepare(
+          `INSERT INTO users (email, password_hash, role)
+           VALUES (?, ?, ?)
+           ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash, role = excluded.role`
+        )
+        .run(operatorEmail, operatorHash, operatorRole);
+      console.log(
+        `+ users seed (operator) -> ${operatorEmail} (role=${operatorRole})`
+      );
+    }
   } catch (e) {
     console.log(`- users seed failed: ${e.message}`);
   }

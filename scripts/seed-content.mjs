@@ -37,7 +37,16 @@ function loadEnvLocal() {
 }
 loadEnvLocal();
 
-const PHOTO_BASE = "https://images.unsplash.com/photo-1600585154526-990dced4db0d";
+const PHOTO_BEFORE_BASE =
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9";
+const PHOTO_AFTER_BASE =
+  "https://images.unsplash.com/photo-1600585154526-990dced4db0d";
+const PHOTO_DIFFERENT_BASE =
+  "https://images.unsplash.com/photo-1565538810643-b5bdb714032a";
+
+function img(base, w = 1600) {
+  return `${base}?q=80&w=${w}&auto=format&fit=crop`;
+}
 
 const PROJECTS = [
   {
@@ -50,8 +59,8 @@ const PROJECTS = [
     scope: "1,820 sq.ft · 3-bed apartment",
     description:
       "Casa Mira is a 1,820 sq.ft Bandra apartment, drawn across four months and built across seven. The brief asked for calm, and ended up being a study in restraint.",
-    before: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    after: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    before: img(PHOTO_BEFORE_BASE),
+    after: img(PHOTO_AFTER_BASE),
   },
   {
     slug: "nalanda-house",
@@ -63,8 +72,8 @@ const PROJECTS = [
     scope: "4,200 sq.ft · Independent villa",
     description:
       "A 4,200 sq.ft villa for a family of five. Drawings reflect how each room opens into the next. Stone and wood specified together, never apart.",
-    before: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    after: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    before: img(PHOTO_AFTER_BASE),
+    after: img(PHOTO_DIFFERENT_BASE),
   },
   {
     slug: "salt-flats",
@@ -76,8 +85,8 @@ const PROJECTS = [
     scope: "3,400 sq.ft · Coastal home",
     description:
       "A weekend house facing west. Salinity, monsoon, fungi finishes the home's first year softer than the renders.",
-    before: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    after: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    before: img(PHOTO_DIFFERENT_BASE),
+    after: img(PHOTO_BEFORE_BASE),
   },
 ];
 
@@ -88,7 +97,7 @@ const JOURNAL = [
     excerpt: "Every project we have built started at a kitchen table.",
     content:
       "Every project we have built started at a kitchen table. The mood board came later. Plans came later. But the conversation between two families, in a warm room, was where the work began.",
-    cover: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    cover: img(PHOTO_BEFORE_BASE),
   },
   {
     slug: "material-honesty",
@@ -96,7 +105,7 @@ const JOURNAL = [
     excerpt: "Stone, wood, metal, textile.",
     content:
       "Stone, wood, metal, textile. We source from quarries, mills and workshops. The list of vendors we have grown to trust over seven years fills three pages.",
-    cover: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    cover: img(PHOTO_DIFFERENT_BASE),
   },
   {
     slug: "spatial-design-vs-interior",
@@ -104,7 +113,7 @@ const JOURNAL = [
     excerpt: "A note on what we mean when we say spatial design.",
     content:
       "A spatial design considers how you move through a home before considering what it looks like. Interior is decoration. Spatial design is architecture.",
-    cover: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
+    cover: img(PHOTO_AFTER_BASE),
   },
 ];
 
@@ -134,19 +143,19 @@ const TEAM = [
     name: "Asha Luthra",
     role: "Principal, Spatial design",
     bio: "Twelve years on residential studios in Mumbai and Bengaluru. RIBA Part II.",
-    photo: `${PHOTO_BASE}?q=80&w=600&auto=format&fit=crop`,
+    photo: img(PHOTO_BEFORE_BASE, 600),
   },
   {
     name: "Karthik Rao",
     role: "Senior associate, Materials",
     bio: "Trained as a furniture maker. Sources stone, wood, and textile from quarries, mills and small workshops.",
-    photo: `${PHOTO_BASE}?q=80&w=600&auto=format&fit=crop`,
+    photo: img(PHOTO_DIFFERENT_BASE, 600),
   },
   {
     name: "Neha Pillai",
     role: "Associate, On-site direction",
     bio: "Site visits every week of construction. Reads plans the way a film editor reads a script.",
-    photo: `${PHOTO_BASE}?q=80&w=600&auto=format&fit=crop`,
+    photo: img(PHOTO_AFTER_BASE, 600),
   },
 ];
 
@@ -156,24 +165,24 @@ const MEDIA = [
     mime: "image/jpeg",
     size: 198400,
     original_name: "casa-mira-cover.jpg",
-    url: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    alt: "Casa Mira cover photograph",
+    url: img(PHOTO_BEFORE_BASE),
+    alt: "Casa Mira, before renovation. Wide loft, west light.",
   },
   {
     kind: "image",
     mime: "image/jpeg",
     size: 204800,
     original_name: "nalanda-house-cover.jpg",
-    url: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    alt: "Nalanda House cover photograph",
+    url: img(PHOTO_AFTER_BASE),
+    alt: "Nalanda House, after completion. Stone and wood interior.",
   },
   {
     kind: "image",
     mime: "image/jpeg",
     size: 212000,
     original_name: "salt-flats-cover.jpg",
-    url: `${PHOTO_BASE}?q=80&w=1600&auto=format&fit=crop`,
-    alt: "Salt Flats cover photograph",
+    url: img(PHOTO_DIFFERENT_BASE),
+    alt: "Salt Flats, west-facing coastal interior.",
   },
 ];
 
@@ -191,6 +200,10 @@ async function seedPostgres() {
     media: (await pool.query(`SELECT COUNT(*)::int AS n FROM media`)).rows[0].n,
   };
 
+  if (FORCE) {
+    await pool.query(`DELETE FROM projects`);
+    counts.projects = 0;
+  }
   if (FORCE || counts.projects === 0) {
     let order = 0;
     for (const p of PROJECTS) {
@@ -221,6 +234,10 @@ async function seedPostgres() {
     console.log(
       FORCE ? "projects forced-write" : "projects seeded"
     );
+  }
+  if (FORCE) {
+    await pool.query(`DELETE FROM journal_posts`);
+    counts.journal_posts = 0;
   }
   if (FORCE || counts.journal_posts === 0) {
     let order = 0;
@@ -256,6 +273,10 @@ async function seedPostgres() {
       FORCE ? "journal_posts forced-write" : "journal_posts seeded"
     );
   }
+  if (FORCE) {
+    await pool.query(`DELETE FROM testimonials`);
+    counts.testimonials = 0;
+  }
   if (FORCE || counts.testimonials === 0) {
     let order = 0;
     for (const t of TESTIMONIALS) {
@@ -269,6 +290,10 @@ async function seedPostgres() {
     console.log(
       FORCE ? "testimonials forced-write" : "testimonials seeded"
     );
+  }
+  if (FORCE) {
+    await pool.query(`DELETE FROM team_members`);
+    counts.team_members = 0;
   }
   if (FORCE || counts.team_members === 0) {
     let order = 0;
@@ -360,6 +385,15 @@ async function seedSqlite() {
      VALUES (?,?,?,?,?,?,?)`
   );
 
+  if (FORCE) {
+    for (const slug of PROJECTS.map((p) => p.slug)) {
+      try {
+        prep(`DELETE FROM page_blocks WHERE page_id IS NULL`).run();
+      } catch {}
+    }
+    prep(`DELETE FROM projects`).run();
+    counts.projects = 0;
+  }
   if (FORCE || counts.projects === 0) {
     let order = 0;
     const txn = db.transaction(() => {
@@ -385,6 +419,14 @@ async function seedSqlite() {
     console.log(
       FORCE ? "projects forced-write" : "projects seeded"
     );
+  }
+  if (FORCE) {
+    for (const slug of JOURNAL.map((j) => j.slug)) {
+      try {
+        prep(`DELETE FROM journal_posts`).run();
+      } catch {}
+    }
+    counts.journal_posts = 0;
   }
   if (FORCE || counts.journal_posts === 0) {
     let order = 0;
@@ -413,6 +455,10 @@ async function seedSqlite() {
       FORCE ? "journal_posts forced-write" : "journal_posts seeded"
     );
   }
+  if (FORCE) {
+    prep(`DELETE FROM testimonials`).run();
+    counts.testimonials = 0;
+  }
   if (FORCE || counts.testimonials === 0) {
     let order = 0;
     const txn = db.transaction(() => {
@@ -429,6 +475,10 @@ async function seedSqlite() {
     console.log(
       FORCE ? "testimonials forced-write" : "testimonials seeded"
     );
+  }
+  if (FORCE) {
+    prep(`DELETE FROM team_members`).run();
+    counts.team_members = 0;
   }
   if (FORCE || counts.team_members === 0) {
     let order = 0;
