@@ -923,3 +923,119 @@ Outstanding carry-forward:
 - Scripts that touch the .opencode/opencode.json / graphify
   outputs / scripts/csrf-curl-probe.sh entries in git status
   remain unchanged on each session.
+
+### 2026-06-28 - Phase 8 ship (smoke + version + freeze roll)
+
+Three commits on `main`, pushed:
+
+- `004f3b9` phase8(smoke): API-level two-cold-start durability probe
+- `a1deddb` phase8(ship): version 1.1.2-in-progress -> 1.1.2
+- `adc9617` phase8(ship): v1.1.2-DEPLOYED changelog entry + freeze roll
+- (this docs entry, pending)
+
+Pre-session ground truth:
+
+- scripts/smoke.mjs already exists; it does direct DB insert +
+  read across two-pool reopens. That's a Phase 1 durability
+  gate for the schema layer.
+- The plan called for an API-level smoke (POST/GET/PUT/DELETE
+  per API surface across two cold-starts).
+
+What landed this session:
+
+- scripts/smoke-api.mjs (new): login -> POST 4 entities across
+  cold-starts -> GET round-trip -> DELETE cleanup. Required
+  env: SMOKE_BASE_URL / SMOKE_ADMIN_EMAIL / SMOKE_ADMIN_PASSWORD.
+  Exits 1 on assertion fail, 2 on missing env. Kept creds out
+  of source by env-only; ran the smoke live with the operator-
+  confirmed creds from the 2026-06-27 session log, plumbed
+  at process start only.
+
+- package.json: 1.1.2-in-progress -> 1.1.2. Documented as the
+  version-bump half of the freeze signature.
+
+- CHANGELOG.md: prepended "v1.1.2 - 2026-06-28 (DEPLOYED) -
+  WordPress-grade admin + Postgres runtime" entry above the
+  existing Phase 1 v1.1.2 entry. Each phase 0..8 callout.
+  Removed/replaced files (orphan /api/admin/pages/route.ts,
+  scripts/seed-content-supabase.mjs). Verification.
+
+- FREEZE-MARKER: rolled forward from v1.1.0 (2026-06-23) to
+  v1.1.2 (2026-06-28). Existing v1.1.0 frozen manifest carries
+  over unchanged. New "v1.1.2 increment" section: Postgres-
+  first runtime, block-editor schema layer, per-entity CRUD
+  admin routes, media library, smoke scripts, seed-content
+  unification. Status PENDING -> DEPLOYED 2026-06-28.
+  Live URL: https://ethinterior.vercel.app.
+
+Live URL probes (post-deploy, all five smokes green):
+
+  scripts/smoke.mjs:
+    [Phase A] baseline: 3 projects, 3 journal, 1 tenant, 2
+    users. Inserts tenant / project / journal rows on row
+    factories, then opens a second pg.Pool to mimic a cold-
+    start. All three rows visible on the second pool. Cleanup.
+
+  scripts/smoke-phase2.mjs (media): 4/4 cases green.
+    GET /api/media/list -> 401
+    POST /api/media/upload -> 401
+    GET /api/media/abc/sign -> 400
+    GET /api/media/999999/sign -> 404
+
+  scripts/smoke-phase5.mjs (projects): 6/6 cases green.
+    GET /api/projects -> 200 (3 rows)
+    POST /api/projects -> 401
+    PUT /api/projects/1 -> 401
+    DELETE /api/projects/1 -> 401
+    GET /projects -> 200
+    GET /admin/projects -> 200 (was 404 pre-deploy)
+
+  scripts/smoke-phase6.mjs (journal + slug): 11/11 green.
+    GET /api/journal -> 200 (3 rows)
+    GET /journal/<seeded-slug> -> 200 (3/3 self-checks)
+    GET /api/journal/1 -> 401 (was 405 pre-deploy)
+    POST/PUT/DELETE -> 401
+    GET /journal -> 200
+    GET /admin/journal -> 200 (was 404 pre-deploy)
+    GET /journal/no-such-slug-12345 -> 404
+
+  scripts/smoke-phase7.mjs (testimonials + team): 12/12 green.
+    GET /api/testimonials -> 200 (3 rows)
+    GET /api/testimonials/1 -> 401 (was 405)
+    GET /api/team -> 200 (3 rows)
+    GET /api/team/1 -> 401 (was 405)
+    write routes all -> 401
+    GET /admin/testimonials -> 200 (was 404)
+    GET /admin/team -> 200 (was 404)
+
+  scripts/smoke-api.mjs (Phase 8 cold-start): 16/16 green.
+    Login captured __Secure-next-auth.session-token.
+    POST /api/projects -> id=5 (test row).
+    POST /api/journal -> id=5.
+    POST /api/testimonials -> id=4.
+    POST /api/team -> id=4.
+    Cold-start separate fetch session reads all rows back.
+    Row-level GET on the new Phase 5/6/7 GET-by-id handlers
+    all 200. Cleanup DELETE for each.
+
+verify:deploy 19/19. build green. graph 1134 -> 1155 nodes,
+1756 -> 1795 edges, 111 -> 101 communities.
+
+Outstanding carry-forward:
+
+- Tiered admin / superadmin role gate decision (Phase 4 / 5
+  / 6 / 7 carry-forward). Either they stay on a single shared
+  requireLicense('admin') gate or diverge into /api/admin/*
+  for superadmin-only routes. Operator to confirm.
+- Project before/after image columns. Confirmed in this
+  release: schema has them (supabase-bootstrap.sql adds the
+  column; scripts/migrate.sqlite-fallback-ddl.ts adds it on
+  cold Vercel containers; the API + form already accept the
+  values). Just need operator-uploaded defaults in the demo
+  seed to show them on the slider.
+- Working-tree hygiene: scripts/csrf-curl-probe.sh and the
+  .opencode/opencode.json / graphify-out files. All expected
+  on graph rebuilds and pre-existing diagnostic edits.
+
+This is the v1.1.2 ship. Future work goes through the
+v1.1.x -> v1.2 bump per AGENT_BEST_PRACTICES.
