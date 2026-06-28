@@ -832,3 +832,94 @@ Outstanding carry-forward (operator to address):
   confirm visible after a fresh /api/journal<next>.mjs GET.
 - Tiered admin/superadmin role gate decision (Phase 4 carry-
   forward).
+
+### 2026-06-28 - Phase 7 ship (testimonials + team admin UI)
+
+Four commits on `main`, pushed:
+
+- `6027fd1` phase7(testimonials/team): row-level GET + admin tab rerouting
+- `2c4c620` phase7(admin-ui): testimonials + team index and editor
+- `fe23cb8` phase7(smoke): testimonials + team CRUD no-auth gating check
+- (this docs entry, pending)
+
+Pre-session ground truth:
+
+- /api/testimonials + /api/testimonials/[id] had POST/PUT/DELETE
+  from Phase 1 work. GET on [id] missing.
+- /api/team + /api/team/[id] had POST/PUT/DELETE; GET on [id]
+  missing.
+- AdminTestimonialForm.tsx and AdminTeamForm.tsx did not exist.
+- /admin/testimonials and /admin/team did not exist.
+- About / Contact / Install are page-builder-driven (the page
+  builder at /admin/pages owns those surfaces via TipTap +
+  block registry), so no separate CRUD UI is needed for them.
+  The BlockEditor + PageBuilder already cover the WordPress-
+  grade editability those pages need.
+- The public Testimonials component reads the in-registry
+  default quotes (left untouched). DB-backed rows from this
+  phase complement the seal data.
+
+What landed this session:
+
+- src/app/api/testimonials/[id]/route.ts: GET added. Auth-gated,
+  404 on miss.
+- src/app/api/team/[id]/route.ts: same.
+- src/components/admin/AdminShell.tsx: TestimonialsRoutePanel
+  and TeamRoutePanel mirror ProjectsRoutePanel. Probe their
+  respective /api/index routes; on 200 push /admin/index. The
+  CrudPanel stub for both kinds is removed.
+- src/components/admin/AdminTestimonialsIndex.tsx (new):
+  search (name / role / quote), sort (name / role), Publish
+  toggle (PUT), Edit deep link, Delete with confirm (DELETE).
+- src/components/admin/AdminTestimonialForm.tsx (new): name /
+  role / quote / photo (text + MediaPicker with image accept +
+  live preview). Photo URL round-trips via the same MediaPicker
+  on Promise resolution.
+- src/components/admin/AdminTeamIndex.tsx (new): search, sort
+  (name / role / order), Publish, Edit, Delete.
+- src/components/admin/AdminTeamForm.tsx (new): name / role /
+  bio / photo / order with an inline up-down reorder against
+  the row-id (PUT order). MediaPicker for photo.
+- src/app/admin/testimonials/page.tsx (new): static-
+  prerendered passthrough.
+- src/app/admin/testimonials/[id]/page.tsx (new): pgOne +
+  ensureMigrated, 404 for missing rows. id 'new' -> blank form.
+- src/app/admin/team/page.tsx (new) and
+  src/app/admin/team/[id]/page.tsx (new): same shape, with the
+  Postgres `"order"` column quoted.
+- scripts/smoke-phase7.mjs (new): no-auth gating probe across
+  both entities plus their admin indices.
+
+Live URL probe:
+
+  GET  /api/testimonials               -> 200 (3 rows seeded)
+  GET  /api/testimonials/1             -> 405 pre-deploy (Phase
+                                          7 adds GET on [id])
+  POST /api/testimonials               -> 401
+  PUT  /api/testimonials/1             -> 401
+  DELETE /api/testimonials/1           -> 401
+  GET  /api/team                       -> 200 (3 rows seeded)
+  GET  /api/team/1                     -> 405 pre-deploy
+  POST /api/team                       -> 401
+  PUT  /api/team/1                     -> 401
+  DELETE /api/team/1                   -> 401
+  GET  /admin/testimonials             -> 404 pre-deploy
+  GET  /admin/team                     -> 404 pre-deploy
+
+verify:deploy 19/19. build green. graph 1097 -> 1134 nodes,
+1696 -> 1756 edges, 99 -> 111 communities.
+
+Outstanding carry-forward:
+
+- Phase 8 (full cold-start smoke + CHANGELOG v1.1.2 stamp +
+  freeze roll + package.json bump). Login -> create entry ->
+  confirm visible after a fresh /api/<kind> GET is the
+  acceptance test documented in docs/v112-plan.md Phase 8.
+- The /admin/testimonials and /admin/team pages render the
+  operator's chrome; once Vercel rebuilds from 2c4c620 they
+  surface with seeded rows.
+- Tiered role gating (Phase 4 carry-forward) still unaddressed;
+  admin and superadmin continue to share requireLicense('admin').
+- Scripts that touch the .opencode/opencode.json / graphify
+  outputs / scripts/csrf-curl-probe.sh entries in git status
+  remain unchanged on each session.
