@@ -5,9 +5,12 @@ import Link from "next/link";
 import ProcessStickyStack from "./ProcessStickyStack";
 import RichTextRenderer from "./RichTextRenderer";
 import SpatialWalkthroughs from "./SpatialWalkthroughs";
+import Services from "./Services";
 import SelectedWork from "./SelectedWork";
 import Testimonials from "./Testimonials";
+import Principles from "./Principles";
 import JournalPreview from "./JournalPreview";
+import ClosingCTA from "./ClosingCTA";
 import HeroClient from "./HeroClient";
 
 type Block = {
@@ -85,67 +88,75 @@ function HeroBlock({ data }: any) {
 }
 
 function PrinciplesBlock({ data }: any) {
-  const items = data?.items || [];
-  return (
-    <section className="py-20 md:py-28 bg-elev border-y hairline">
-      <div className="container-page">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
-          <div className="md:col-span-7">
-            <h2 className="text-3xl md:text-5xl tracking-tighter">{data?.title}</h2>
-          </div>
-          <div className="md:col-span-5 md:pt-3">
-            <p className="text-ink-mute">{data?.lede}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--line)] border hairline rounded-[var(--radius-card)] overflow-hidden">
-          {items.map((p: any, i: number) => (
-            <div key={i} className="bg-canvas p-6 md:p-7">
-              <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-warm">0{i + 1}</p>
-              <h3 className="text-xl md:text-2xl mt-3 mb-3 tracking-tight">{p.label}</h3>
-              <p className="text-sm text-ink-mute leading-relaxed">{p.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <Principles data={data} />;
 }
 
 function ServicesBlock({ data }: any) {
-  const cells = data?.cells || [];
-  return (
-    <section className="bg-elev py-24 md:py-36">
-      <div className="container-page">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-16">
-          <div className="md:col-span-7">
-            <h2 className="text-4xl md:text-[3.5rem] tracking-tighter">
-              {data?.title}
-              <em className="text-warm not-italic font-medium">{data?.titleEm}</em>
-              {data?.afterEm ? `, ${data.afterEm}` : "."}
-            </h2>
-          </div>
-          <div className="md:col-span-5 md:pt-3">
-            <p className="text-ink-mute text-base md:text-lg leading-relaxed">{data?.lede}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
-          {cells.map((c: any, i: number) => (
-            <div
-              key={i}
-              className={`${i % 4 === 0 || i % 4 === 3 ? "md:col-span-7" : "md:col-span-5"} group relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/10]`}
-            >
-              <img src={c.photo} alt={c.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-white/70">0{i + 1}</p>
-                <h3 className="text-white text-2xl md:text-3xl mt-3 tracking-tight">{c.title}</h3>
-                <p className="text-white/80 text-sm md:text-base mt-2 max-w-[40ch]">{c.body}</p>
-              </div>
+  // Render the GSAP-backed Services client component. If the block was
+  // authored with a custom title/lede/cells we fall back to inline render
+  // via the same shape Services uses internally - so existing seed pages
+  // that pass a custom shape still publish without re-authoring.
+  const cells = data?.cells;
+  if (Array.isArray(cells) && cells.length > 0) {
+    const title = data?.title || "A studio that draws, specifies, and";
+    const titleEm = data?.titleEm || "builds";
+    const lede = data?.lede || "";
+    return (
+      <section className="bg-elev py-24 md:py-36" aria-label="What we do">
+        <div className="container-page">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-16">
+            <div className="md:col-span-7">
+              <h2 className="text-4xl md:text-[3.5rem] tracking-tighter">
+                {title}{" "}
+                <em className="text-warm not-italic font-medium">{titleEm}</em>
+                {data?.afterEm ? `, ${data.afterEm}` : "."}
+              </h2>
             </div>
-          ))}
+            <div className="md:col-span-5 md:pt-3">
+              <p className="text-ink-mute text-base md:text-lg leading-relaxed">
+                {lede}
+              </p>
+            </div>
+          </div>
+          <ServicesTsxCells cells={cells} />
         </div>
-      </div>
-    </section>
+      </section>
+    );
+  }
+  return <Services />;
+}
+
+function ServicesTsxCells({ cells }: { cells: any[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
+      {cells.map((c, i) => (
+        <article
+          key={c.title || i}
+          className={`${i % 4 === 0 || i % 4 === 3 ? "md:col-span-7" : "md:col-span-5"} group relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/10]`}
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <img
+              src={c.photo}
+              alt={c.title}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+          <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
+            <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-white/70">
+              0{i + 1}
+            </p>
+            <h3 className="text-white text-2xl md:text-3xl mt-3 tracking-tight">
+              {c.title}
+            </h3>
+            <p className="text-white/80 text-sm md:text-base mt-2 max-w-[40ch]">
+              {c.body}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -175,29 +186,5 @@ function JournalPreviewBlock({ data }: any) {
 }
 
 function ClosingCTABlock({ data }: any) {
-  return (
-    <section className="py-24 md:py-40">
-      <div className="container-page">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-9">
-            <h2 className="text-[clamp(2.4rem,7vw,6rem)] tracking-[-0.03em] leading-[0.95]">
-              {data?.text?.split(data?.em || "").map((piece: string, i: number) => (
-                <span key={i}>
-                  {piece}
-                  {i === 0 && data?.em ? (
-                    <em className="text-warm not-italic font-medium">{data.em}</em>
-                  ) : null}
-                </span>
-              ))}
-            </h2>
-          </div>
-          <div className="md:col-span-3 md:pt-3 flex md:justify-end">
-            <Link href={data?.buttonHref || "/contact"} className="btn-primary w-fit">
-              {data?.buttonLabel || "Start a project"} <span aria-hidden>↗</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  return <ClosingCTA data={data} />;
 }

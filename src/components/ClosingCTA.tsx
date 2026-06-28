@@ -7,9 +7,14 @@ import { useGSAP } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ClosingCTA() {
+export default function ClosingCTA({ data }: { data?: any } = {}) {
   const ref = useRef<HTMLElement | null>(null);
   const btnRef = useRef<HTMLAnchorElement | null>(null);
+
+  const text = data?.text || "A home you'll live in for twenty years. Let's start with a kitchen table conversation.";
+  const em = data?.em || "twenty years";
+  const buttonLabel = data?.buttonLabel || "Start a project";
+  const buttonHref = data?.buttonHref || "/contact";
 
   useGSAP(
     () => {
@@ -73,30 +78,49 @@ export default function ClosingCTA() {
     []
   );
 
-  const title = (
-    <>
-      A home you'll live in for{" "}
-      <em className="text-warm not-italic font-medium">twenty years</em>. Let's
-      start with a kitchen table conversation.
-    </>
-  );
-
   return (
     <section ref={ref as any} className="py-24 md:py-40" aria-label="Start a project">
       <div className="container-page">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-9">
             <h2 className="ei-cta-head text-[clamp(2.4rem,7vw,6rem)] tracking-[-0.03em] leading-[0.95]">
-              {title}
+              {(() => {
+                const [before, ...afterParts] = text.split(em);
+                const after = afterParts.join(em);
+                const renderWords = (str: string, keyBase: string) =>
+                  str.split(/(\s+)/).map((part, i) =>
+                    /\s+/.test(part) ? (
+                      <span key={`${keyBase}-${i}-ws`}>{part}</span>
+                    ) : (
+                      <span
+                        key={`${keyBase}-${i}`}
+                        className="ei-cta-word inline-block overflow-hidden align-bottom"
+                      >
+                        {part}
+                      </span>
+                    )
+                  );
+                return (
+                  <>
+                    {renderWords(before, "b")}
+                    <em className="text-warm not-italic font-medium">
+                      <span className="ei-cta-word inline-block overflow-hidden align-bottom">
+                        {em}
+                      </span>
+                    </em>
+                    {renderWords(after, "a")}
+                  </>
+                );
+              })()}
             </h2>
           </div>
           <div className="md:col-span-3 md:pt-3 flex md:justify-end">
             <a
               ref={btnRef as any}
-              href="/contact"
+              href={buttonHref}
               className="btn-primary w-fit"
             >
-              Start a project <span aria-hidden>↗</span>
+              {buttonLabel} <span aria-hidden>↗</span>
             </a>
           </div>
         </div>

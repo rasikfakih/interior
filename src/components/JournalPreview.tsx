@@ -52,13 +52,26 @@ export default function JournalPreview({
   titleEm = "Studio",
   lede = "Field notes from the studio. Written by hand. Published when ready.",
   count = 3,
+  data,
 }: {
   title?: string;
   titleEm?: string;
   lede?: string;
   count?: number;
+  data?: any;
 }) {
-  const entries = defaultEntries.slice(0, Math.max(1, Math.min(count, defaultEntries.length)));
+  const cfg = (data && (data.sectionTitle || data.lede || data.count || data.sectionTitleEm))
+    ? {
+        title: data.sectionTitle ?? title,
+        titleEm: data.sectionTitleEm ?? titleEm,
+        lede: data.lede ?? lede,
+        count: typeof data.count === "number" ? data.count : count,
+      }
+    : { title, titleEm, lede, count };
+  const entries = defaultEntries.slice(
+    0,
+    Math.max(1, Math.min(cfg.count, defaultEntries.length))
+  );
   const ref = useRef<HTMLElement | null>(null);
 
   useGSAP(
@@ -128,10 +141,10 @@ export default function JournalPreview({
         <div className="ei-news-head flex items-end justify-between flex-wrap gap-6 mb-12 md:mb-16">
           <div>
             <h2 className="text-4xl md:text-6xl tracking-tighter">
-              <em className="text-accent not-italic font-medium">{titleEm}</em>{" "}
-              {title?.replace(titleEm, "")}
+              <em className="text-accent not-italic font-medium">{cfg.titleEm}</em>{" "}
+              {cfg.title?.replace(cfg.titleEm, "")}
             </h2>
-            <p className="mt-4 text-ink-mute max-w-[48ch]">{lede}</p>
+            <p className="mt-4 text-ink-mute max-w-[48ch]">{cfg.lede}</p>
           </div>
           <Link
             href="/journal"
