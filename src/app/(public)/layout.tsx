@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import LicenseBanner from "@/components/LicenseBanner";
 import SmoothScroll from "@/components/SmoothScroll";
 import GrainOverlay from "@/components/GrainOverlay";
+import CursorFollower from "@/components/CursorFollower";
 
 export default function PublicLayout({
   children,
@@ -14,6 +15,7 @@ export default function PublicLayout({
       <LicenseBanner />
       <SmoothScroll />
       <GrainOverlay />
+      <CursorFollower />
       <Navbar />
       <main>{children}</main>
       <Footer />

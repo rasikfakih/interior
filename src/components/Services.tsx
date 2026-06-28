@@ -1,4 +1,11 @@
-import Reveal from "./Reveal";
+"use client";
+
+import { useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@/lib/use-gsap";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const capabilities = [
   {
@@ -36,8 +43,60 @@ const capabilities = [
 ];
 
 export default function Services() {
+  const ref = useRef<HTMLElement | null>(null);
+
+  useGSAP(
+    () => {
+      const cards = ref.current?.querySelectorAll(".ei-cap");
+      if (!cards || cards.length === 0) return;
+
+      cards.forEach((card, idx) => {
+        const photo = card.querySelector(".ei-cap-photo");
+        const overlay = card.querySelector(".ei-cap-overlay");
+        if (photo) {
+          gsap.set(photo, { clipPath: "inset(0 0 100% 0)" });
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top 80%",
+            once: true,
+            onEnter: () =>
+              gsap.to(photo, {
+                clipPath: "inset(0 0 0% 0)",
+                duration: 1.2,
+                delay: idx * 0.08,
+                ease: "expo.out",
+              }),
+          });
+        }
+        if (overlay) {
+          const text = overlay.querySelectorAll(".ei-cap-fade");
+          if (text.length) {
+            gsap.set(text, { y: 16, opacity: 0 });
+            ScrollTrigger.create({
+              trigger: card,
+              start: "top 70%",
+              once: true,
+              onEnter: () =>
+                gsap.to(text, {
+                  y: 0,
+                  opacity: 1,
+                  duration: 0.7,
+                  stagger: 0.08,
+                  delay: 0.25 + idx * 0.05,
+                  ease: "expo.out",
+                }),
+            });
+          }
+        }
+      });
+    },
+    ref,
+    []
+  );
+
   return (
     <section
+      ref={ref as any}
       className="bg-elev py-24 md:py-36"
       aria-label="What we do"
     >
@@ -59,32 +118,33 @@ export default function Services() {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
           {capabilities.map((c, i) => (
-            <Reveal
+            <article
               key={c.title}
-              delay={i * 60}
-              className={`${c.span} group relative overflow-hidden rounded-[var(--radius-card)]`}
+              className={`ei-cap group relative overflow-hidden rounded-[var(--radius-card)] ${c.span}`}
             >
               <div className={`relative ${c.aspect} w-full overflow-hidden`}>
-                <img
-                  src={c.photo}
-                  alt={c.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                />
+                <div className="ei-cap-photo absolute inset-0">
+                  <img
+                    src={c.photo}
+                    alt={c.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
               </div>
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-white/70">
+              <div className="ei-cap-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8">
+                <p className="ei-cap-fade font-mono text-[10px] tracking-[0.22em] uppercase text-white/70">
                   0{i + 1}
                 </p>
-                <h3 className="text-white text-2xl md:text-3xl mt-3 tracking-tight">
+                <h3 className="ei-cap-fade text-white text-2xl md:text-3xl mt-3 tracking-tight">
                   {c.title}
                 </h3>
-                <p className="text-white/80 text-sm md:text-base mt-2 max-w-[40ch]">
+                <p className="ei-cap-fade text-white/80 text-sm md:text-base mt-2 max-w-[40ch]">
                   {c.body}
                 </p>
               </div>
-            </Reveal>
+            </article>
           ))}
         </div>
       </div>

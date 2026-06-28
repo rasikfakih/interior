@@ -34,7 +34,7 @@ export default function ContactForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          subject: `New project enquiry ΓÇö ${form.projectType}`,
+          subject: `New project enquiry - ${form.projectType}`,
         }),
       });
       if (r.ok) {
@@ -93,7 +93,7 @@ export default function ContactForm({
               Sent
             </p>
             <h2 className="text-3xl md:text-4xl tracking-tighter mt-3 mb-3">
-              Thanks ΓÇö we'll write back this week.
+              Thanks - we'll write back this week.
             </h2>
             <p className="text-ink-mute">
               In the meantime, check the{" "}
@@ -211,7 +211,7 @@ export default function ContactForm({
                 }}
                 role="alert"
               >
-                {errorMsg || "┬╖"}
+                {errorMsg || "\u00A0"}
               </p>
               <button
                 type="submit"
@@ -219,7 +219,7 @@ export default function ContactForm({
                 className="btn-primary disabled:opacity-50"
               >
                 {state === "submitting" ? "Sending" : "Send message"}
-                <span aria-hidden>Γåù</span>
+                <span aria-hidden>→</span>
               </button>
             </div>
           </form>

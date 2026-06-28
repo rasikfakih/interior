@@ -1,5 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import Reveal from "./Reveal";
+import { useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@/lib/use-gsap";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type Project = {
   slug: string;
@@ -51,6 +58,78 @@ export default function SelectedWork({
         .map((s) => seed.find((p) => p.slug === s))
         .filter((p): p is Project => Boolean(p))
     : seed;
+
+  const ref = useRef<HTMLElement | null>(null);
+
+  useGSAP(
+    () => {
+      const rows = ref.current?.querySelectorAll(".ei-work");
+      if (!rows || rows.length === 0) return;
+
+      rows.forEach((row) => {
+        const photo = row.querySelector(".ei-work-photo");
+        const meta = row.querySelector(".ei-work-meta");
+        if (photo) {
+          gsap.set(photo, { clipPath: "inset(0 100% 0 0)" });
+          ScrollTrigger.create({
+            trigger: row,
+            start: "top 75%",
+            once: true,
+            onEnter: () => {
+              gsap.to(photo, {
+                clipPath: "inset(0 0% 0 0)",
+                duration: 1.4,
+                ease: "expo.out",
+              });
+              gsap.fromTo(
+                photo.querySelector("img"),
+                { scale: 1.18 },
+                {
+                  scale: 1,
+                  duration: 2.2,
+                  ease: "expo.out",
+                }
+              );
+            },
+          });
+        }
+        if (meta) {
+          gsap.set(meta, { y: 32, opacity: 0 });
+          ScrollTrigger.create({
+            trigger: row,
+            start: "top 70%",
+            once: true,
+            onEnter: () =>
+              gsap.to(meta, {
+                y: 0,
+                opacity: 1,
+                duration: 0.9,
+                ease: "expo.out",
+              }),
+          });
+        }
+      });
+
+      const headline = ref.current?.querySelector(".ei-work-title");
+      if (headline) {
+        gsap.set(headline, { y: 24, opacity: 0 });
+        gsap.to(headline, {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: headline,
+            start: "top 88%",
+            once: true,
+          },
+        });
+      }
+    },
+    ref,
+    []
+  );
+
   if (projects.length === 0) {
     return (
       <section className="py-24 md:py-36">
@@ -62,11 +141,17 @@ export default function SelectedWork({
   }
 
   return (
-    <section className="py-24 md:py-36" aria-label="Selected work">
+    <section
+      ref={ref as any}
+      className="py-24 md:py-36"
+      aria-label="Selected work"
+    >
       <div className="container-page">
         <div className="flex items-end justify-between flex-wrap gap-6 mb-12 md:mb-20">
           <div>
-            <h2 className="text-4xl md:text-6xl tracking-tighter">{title}</h2>
+            <h2 className="ei-work-title text-4xl md:text-6xl tracking-tighter">
+              {title}
+            </h2>
             <p className="mt-4 text-ink-mute max-w-[48ch]">{lede}</p>
           </div>
           <Link
@@ -79,15 +164,15 @@ export default function SelectedWork({
 
         <div className="space-y-20 md:space-y-32">
           {projects.map((p, i) => (
-            <Reveal
+            <article
               key={p.slug}
-              className={`grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 items-end ${
+              className={`ei-work grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 items-end ${
                 i % 2 === 1 ? "md:[direction:rtl]" : ""
               }`}
             >
               <Link
                 href={`/projects/${p.slug}`}
-                className="md:col-span-8 block overflow-hidden rounded-[var(--radius-card)] aspect-[16/10] relative md:[direction:ltr]"
+                className="ei-work-photo md:col-span-8 block overflow-hidden rounded-[var(--radius-card)] aspect-[16/10] relative md:[direction:ltr]"
               >
                 <img
                   src={p.image}
@@ -96,7 +181,7 @@ export default function SelectedWork({
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-[1.04]"
                 />
               </Link>
-              <div className="md:col-span-4 md:[direction:ltr]">
+              <div className="ei-work-meta md:col-span-4 md:[direction:ltr]">
                 <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">
                   {p.year}
                 </p>
@@ -119,7 +204,7 @@ export default function SelectedWork({
                   View project
                 </Link>
               </div>
-            </Reveal>
+            </article>
           ))}
         </div>
       </div>

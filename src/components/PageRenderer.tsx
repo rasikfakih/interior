@@ -8,6 +8,7 @@ import SpatialWalkthroughs from "./SpatialWalkthroughs";
 import SelectedWork from "./SelectedWork";
 import Testimonials from "./Testimonials";
 import JournalPreview from "./JournalPreview";
+import HeroClient from "./HeroClient";
 
 type Block = {
   id: number;
@@ -80,65 +81,7 @@ let step = 0;
 function i_delay(n: number) { return 0; }
 
 function HeroBlock({ data }: any) {
-  const stats = data?.stats || [];
-  return (
-    <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
-      <div className="container-page">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-end">
-          <div className="md:col-span-7">
-            <Reveal>
-              <span className="chrome-pill inline-flex mb-6">{data?.eyebrow}</span>
-            </Reveal>
-            <Reveal delay={50}>
-              <h1 className="text-[clamp(2.4rem,6vw,5rem)] leading-[1] tracking-[-0.025em]">
-                {data?.headlinePlain}{" "}
-                <em className="text-accent not-italic font-medium">
-                  {data?.headlineItalic}
-                </em>
-                {data?.afterPlain ? `, ${data.afterPlain}` : "."}
-              </h1>
-            </Reveal>
-            <Reveal delay={140}>
-              <p className="mt-6 max-w-[58ch] text-ink-mute text-base md:text-lg leading-relaxed">
-                {data?.subtext}
-              </p>
-            </Reveal>
-          </div>
-          <Reveal delay={120} className="md:col-span-5 relative aspect-[4/5] w-full">
-            <div className="absolute inset-0 overflow-hidden rounded-[var(--radius-card)]">
-              <img
-                src={data?.photoUrl}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-transparent" />
-            </div>
-            {data?.studioNote && (
-              <div className="absolute -bottom-6 -left-6 hidden md:block">
-                <div className="surface-elevated px-5 py-4 max-w-[220px]">
-                  <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">
-                    Studio note
-                  </p>
-                  <p className="text-sm mt-2 leading-snug">{data.studioNote}</p>
-                </div>
-              </div>
-            )}
-          </Reveal>
-        </div>
-        {stats.length > 0 && (
-          <div className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((s: any, i: number) => (
-              <div key={i} className="border-t hairline-strong pt-4">
-                <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">{s.label}</p>
-                <p className="text-2xl md:text-3xl mt-2 tracking-tight">{s.value}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  );
+  return <HeroClient data={data} />;
 }
 
 function PrinciplesBlock({ data }: any) {

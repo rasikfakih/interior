@@ -1,21 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTheme } from "./ThemeProvider";
 import { useI18n } from "./I18nProvider";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const progressRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const el = progressRef.current;
+    if (!el) return;
+    if (reduce) {
+      el.style.transform = "scaleX(0)";
+      return;
+    }
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        start: 0,
+        end: "max",
+        onUpdate: (self) => {
+          gsap.to(el, {
+            scaleX: self.progress,
+            duration: 0.18,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        },
+      });
+    });
+    return () => ctx.revert();
   }, []);
 
   const navLinks = [
@@ -30,6 +61,16 @@ export const Navbar = () => {
       className="fixed top-0 left-0 right-0"
       style={{ zIndex: "var(--z-nav)" }}
     >
+      <div
+        ref={progressRef}
+        aria-hidden
+        className="absolute top-0 left-0 h-[2px] w-full origin-left"
+        style={{
+          background:
+            "linear-gradient(90deg, var(--accent) 0%, var(--accent-warm) 100%)",
+          transform: "scaleX(0)",
+        }}
+      />
       <div
         className={`transition-colors duration-300 ${
           scrolled

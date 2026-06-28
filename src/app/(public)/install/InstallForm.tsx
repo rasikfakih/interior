@@ -110,7 +110,7 @@ export default function InstallForm() {
           className="btn-primary disabled:opacity-50"
         >
           {busy ? "Installing" : "Install license"}
-          <span aria-hidden>Γåù</span>
+          <span aria-hidden>→</span>
         </button>
       </div>
     </form>
