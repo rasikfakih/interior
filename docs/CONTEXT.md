@@ -748,3 +748,87 @@ Outstanding carry-forward (operator to address):
 - Working tree dirty lists are unchanged: .opencode/opencode.json,
   graph outputs, scripts/csrf-curl-probe.sh. All git-tracked as
   expected on graph rebuild.
+
+### 2026-06-28 - Phase 6 ship (journal CRUD + slug audit + public DB)
+
+Four commits on `main`, pushed:
+
+- `67c671d` phase6(journal): admin index + editor + slug audit
+- `50ce8ea` phase6(journal-public): DB-backed listing + 404 path
+- `b20e476` phase6(smoke): journal CRUD + slug-resolver self-check
+- (this docs entry, pending)
+
+Pre-session ground truth:
+
+- /api/journal + /api/journal/[id] (PUT + DELETE) were already
+  complete from Phase 1 work. GET on [id] was missing.
+- AdminJournalForm.tsx existed but used the older regex that
+  stripped spaces in `/[^a-z0-9-]/` instead of preserving dashes.
+  The API derivation keeps spaces as dashes.
+- /admin/journal + /admin/journal/[id] did not exist.
+- Public /journal/page.tsx was hard-coded with six entries that
+  never had slug-page matches. Operator confirmed the listing was
+  empty / unhelpful in the 2026-06-25 log.
+- /journal/[slug] page was already DB-backed via pgOne.
+
+What landed this session:
+
+- src/components/admin/AdminJournalIndex.tsx (new): client-side
+  list + search + sort. Per-row Publish toggle, Edit, View-site,
+  Delete. credentials:'include' across.
+- src/app/admin/journal/page.tsx (new): static-prerendered
+  passthrough.
+- src/app/admin/journal/[id]/page.tsx (new): server route mounts
+  AdminJournalForm. id 'new' -> blank form; numeric id ->
+  pgOne + ensureMigrated.
+- src/app/api/journal/[id]/route.ts: GET added. Auth-gated,
+  404 on miss.
+- src/components/admin/AdminJournalForm.tsx: slug derivation
+  matches the API regex `[^a-z0-9\s-]` strip -> trim -> spaces to
+  dashes. Live 'Use "<derived>"' hint when the slug field is empty
+  or matches the original title's slug. Save now posts credentials:
+  'include' and routes a created row into /admin/journal/<newId>.
+- src/components/admin/AdminShell.tsx: JournalRoutePanel mirrors
+  ProjectsRoutePanel. CrudPanel kind="journal" stub removed.
+- src/app/(public)/journal/page.tsx: rewrote from hard-coded
+  six items to a pgMany read of journal_posts WHERE
+  is_published = TRUE. Order: created_at DESC NULLs last, then
+  id DESC. force-dynamic. Empty-state surface-tile with a "Sign
+  in to write one" link back to /admin/journal. Visual shell
+  preserved (date / category / title / excerpt / reading time
+  now derived from excerpt word count).
+- scripts/smoke-phase6.mjs (new): self-checks every seeded slug
+  round-trips through /journal/<slug>. Ghost slug yields 404.
+  Phase 6 GET handler legitimately accepts 405 pre-deploy.
+
+Live URL probe:
+
+  GET  /api/journal           -> 200 (3 rows)
+  GET  /journal/why-the-kitchen-table      -> 200
+  GET  /journal/material-honesty           -> 200
+  GET  /journal/spatial-design-vs-interior -> 200
+  GET  /journal/no-such-slug-12345          -> 404
+  GET  /api/journal/1         -> 405 (Vercel pre-deploy; new
+                                    GET ships with 67c671d)
+  POST /api/journal           -> 401
+  PUT  /api/journal/1         -> 401
+  DELETE /api/journal/1       -> 401
+  GET  /journal               -> 200 (now DB-backed)
+  GET  /admin/journal         -> 404 (pre-deploy)
+
+verify:deploy 19/19. build green. graph 1083 -> 1097 nodes,
+1664 -> 1696 edges, 105 -> 99 communities.
+
+Outstanding carry-forward (operator to address):
+
+- Phase 7 (Testimonials / Team / About / Contact / Install).
+  Same shape: server routes already present (Phase 1 work);
+  need admin index + editor pages for each entity. Public
+  surface reads from db already for testimonials / team (verify
+  per entity). About / Contact / Install are page-builder-driven,
+  so no separate CRUD.
+- Phase 8 (full cold-start smoke, CHANGELOG v1.1.2 stamp, freeze
+  roll). Authed round-trip: login -> create journal entry ->
+  confirm visible after a fresh /api/journal<next>.mjs GET.
+- Tiered admin/superadmin role gate decision (Phase 4 carry-
+  forward).
