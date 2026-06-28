@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Tab =
   | "pages"
@@ -111,12 +112,52 @@ function TabPanel({ tab }: { tab: Tab }) {
   if (tab === "pages") return <PagesPanel />;
   if (tab === "media") return <Dynamic mount="/admin/media" />;
   if (tab === "license") return <Dynamic mount="/admin/license" />;
-  if (tab === "projects") return <ProjectsPanel />;
+  if (tab === "projects") return <ProjectsRoutePanel />;
   if (tab === "journal") return <CrudPanel kind="journal" />;
   if (tab === "testimonials") return <CrudPanel kind="testimonials" />;
   if (tab === "team") return <CrudPanel kind="team" />;
   if (tab === "settings") return <SettingsPanel />;
   return null;
+}
+
+// ProjectsRoutePanel is a thin client-side router into the dedicated
+// /admin/projects index (which itself links to /admin/projects/[id]).
+function ProjectsRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    async function probe() {
+      try {
+        const r = await fetch("/api/projects", { credentials: "include" });
+        if (r.ok) {
+          router.push("/admin/projects");
+        } else {
+          setBusy(false);
+        }
+      } catch {
+        setBusy(false);
+      }
+    }
+    setBusy(true);
+    probe();
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Projects</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : "Could not reach /api/projects."}
+      </p>
+      {!busy && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/projects")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
 }
 
 // PagesPanel holds the page list routed via /admin/pages/[id] via Next.js routes.
@@ -142,46 +183,6 @@ function Dynamic({ mount }: { mount: string }) {
   return (
     <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
       {Content ?? <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">Loading…</p>}
-    </div>
-  );
-}
-
-function ProjectsPanel() {
-  const ProjectForm = require("@/components/admin/AdminProjectForm").default;
-  const [list, setList] = useState<any[]>([]);
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    fetch("/api/pages").then(async () => {
-      const r = await fetch("/api/admin/projects");
-      if (r.ok) setList(await r.json());
-    });
-  }, []);
-  return (
-    <div className="space-y-4">
-      <div className="flex items-end justify-between">
-        <h2 className="text-3xl tracking-tighter">Projects</h2>
-        <button className="btn-primary" onClick={() => setOpen((v) => !v)}>
-          {open ? "Cancel" : "New project"}
-        </button>
-      </div>
-      {open && <ProjectForm onSaved={() => setOpen(false)} />}
-      {list.length === 0 ? (
-        <p className="text-ink-mute">No projects yet.</p>
-      ) : (
-        <div className="divide-y hairline">
-          {list.map((p: any) => (
-            <article key={p.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 py-4 items-center">
-              <p className="md:col-span-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
-                /{p.slug}
-              </p>
-              <p className="md:col-span-6">{p.title}</p>
-              <p className="md:col-span-3 text-right text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
-                {p.isPublished ? "Published" : "Draft"}
-              </p>
-            </article>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
