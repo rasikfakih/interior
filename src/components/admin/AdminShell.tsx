@@ -114,10 +114,101 @@ function TabPanel({ tab }: { tab: Tab }) {
   if (tab === "license") return <Dynamic mount="/admin/license" />;
   if (tab === "projects") return <ProjectsRoutePanel />;
   if (tab === "journal") return <JournalRoutePanel />;
-  if (tab === "testimonials") return <CrudPanel kind="testimonials" />;
-  if (tab === "team") return <CrudPanel kind="team" />;
+  if (tab === "testimonials") return <TestimonialsRoutePanel />;
+  if (tab === "team") return <TeamRoutePanel />;
   if (tab === "settings") return <SettingsPanel />;
   return null;
+}
+
+// TestimonialsRoutePanel mirrors the projects/journal probe-then-push
+// pattern. Live pulls /api/testimonials; on 200 it pushes the operator
+// into /admin/testimonials where the dedicated editor owns the surface.
+function TestimonialsRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/testimonials", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/testimonials");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Testimonials</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/testimonials." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/testimonials")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+function TeamRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/team", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/team");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Team</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/team." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/team")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
 }
 
 // JournalRoutePanel mirrors ProjectsRoutePanel: probe the API then push
