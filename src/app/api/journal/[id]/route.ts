@@ -8,6 +8,22 @@ async function isAuthorized() {
   return Boolean((session?.user as any)?.id);
 }
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await isAuthorized())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { id } = await params;
+  await ensureMigrated();
+  const row = await pgOne(`SELECT * FROM journal_posts WHERE id = $1`, [
+    Number(id),
+  ]);
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json(row);
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

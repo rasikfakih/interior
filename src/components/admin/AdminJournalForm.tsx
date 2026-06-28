@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor";
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
 
 export default function AdminJournalForm({
   initial,
@@ -25,23 +33,42 @@ export default function AdminJournalForm({
     isPublished: initial?.isPublished ?? true,
   }));
 
+  const slugFromTitle = useMemo(() => slugify(form.title || ""), [form.title]);
+  const dirtyTitleSlug =
+    !form.slug || form.slug === slugify(initial?.title || "");
+  const showSuggestion =
+    Boolean(slugFromTitle) &&
+    (!form.slug || (dirtyTitleSlug && form.slug !== slugFromTitle));
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    const payload = {
+      ...form,
+      slug: form.slug?.trim() ? form.slug : slugFromTitle || undefined,
+    };
     const url = initial?.id ? `/api/journal/${initial.id}` : "/api/journal";
     const method = initial?.id ? "PUT" : "POST";
     const r = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      credentials: "include",
+      body: JSON.stringify(payload),
     });
-    setBusy(false);
     if (r.ok) {
+      const body = await r.json().catch(() => ({}));
+      const newId = body?.item?.id ?? initial?.id;
+      setBusy(false);
       router.refresh();
       onSaved?.();
-    } else {
-      alert("Save failed");
+      if (!initial?.id && newId) {
+        router.push(`/admin/journal/${newId}`);
+      }
+      return;
     }
+    setBusy(false);
+    const j = await r.json().catch(() => ({}));
+    alert(j.error || "Save failed");
   }
 
   return (
@@ -72,12 +99,20 @@ export default function AdminJournalForm({
             className="input-line"
             value={form.slug}
             onChange={(e) =>
-              setForm({
-                ...form,
-                slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-              })
+              setForm({ ...form, slug: slugify(e.target.value) })
             }
           />
+          {showSuggestion && (
+            <button
+              type="button"
+              className="mt-2 text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1"
+              onClick={() =>
+                setForm({ ...form, slug: slugFromTitle })
+              }
+            >
+              Use "{slugFromTitle}"
+            </button>
+          )}
         </label>
       </div>
 

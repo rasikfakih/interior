@@ -113,11 +113,57 @@ function TabPanel({ tab }: { tab: Tab }) {
   if (tab === "media") return <Dynamic mount="/admin/media" />;
   if (tab === "license") return <Dynamic mount="/admin/license" />;
   if (tab === "projects") return <ProjectsRoutePanel />;
-  if (tab === "journal") return <CrudPanel kind="journal" />;
+  if (tab === "journal") return <JournalRoutePanel />;
   if (tab === "testimonials") return <CrudPanel kind="testimonials" />;
   if (tab === "team") return <CrudPanel kind="team" />;
   if (tab === "settings") return <SettingsPanel />;
   return null;
+}
+
+// JournalRoutePanel mirrors ProjectsRoutePanel: probe the API then push
+// the tab to the dedicated editor route.
+function JournalRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/journal", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/journal");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Journal</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/journal." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/journal")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
 }
 
 // ProjectsRoutePanel is a thin client-side router into the dedicated
