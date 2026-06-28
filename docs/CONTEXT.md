@@ -662,3 +662,89 @@ Outstanding carry-forward (operator to address):
   graph outputs, scripts/csrf-curl-probe.sh from the 2026-06-26
   diagnostic edit. None blocking. Learned: this is consistent with
   what graphify-out shows; it is expected.
+
+### 2026-06-28 - Phase 5 ship (project CRUD + unified seed + smoke)
+
+Three commits on `main`, pushed:
+
+- `db72148` phase5(projects): admin index + editor route + tab routing
+- `ced2f6a` phase5(seed): unify Postgres-or-SQLite content seed
+- `6956782` phase5(smoke): no-auth gating check for project CRUD
+
+Pre-session ground truth:
+
+- /api/projects and /api/projects/[id] were already complete from
+  Phase 1 work: GET/POST/PUT/DELETE, Postgres-backed via pg.ts,
+  columns include before_image and after_image, slug auto-derived.
+- AdminProjectForm.tsx was already complete (title / slug / category /
+  location / year / scope / description (rich text + plain) /
+  beforeImage / model3d / isPublished).
+- /admin/projects + /admin/projects/[id] did not exist.
+- scripts/seed-content-supabase.mjs only worked against Postgres.
+- /projects public page query path already filters by is_published.
+
+What landed this session:
+
+- `src/components/admin/AdminProjectsIndex.tsx` (new): client-side
+  list + search + sort. Monospace id, per-row Publish toggle (PUT),
+  Edit deep link, View-site deep link, Delete with confirm
+  (DELETE). Both /api/projects and /api/projects/[id] are
+  credentials:'include'.
+- `src/app/admin/projects/page.tsx` (new): static-prerendered
+  passthrough to the index.
+- `src/app/admin/projects/[id]/page.tsx` (new): server route. id
+  'new' -> blank form (POST); numeric id -> pgOne + ensureMigrated,
+  404 rendered for missing ids without throwing.
+- `src/components/admin/AdminShell.tsx`: ProjectsRoutePanel probes
+  /api/projects and pushes /admin/projects on success. Removes
+  the inline ProjectsPanel that mounted AdminProjectForm inside the
+  shell.
+- `scripts/seed-content.mjs` (new): canonical Phase 5 seed.
+  Branches at runtime - DATABASE_URL set -> Postgres (pg.Pool);
+  unset -> SQLite (better-sqlite3 on data/etihad.db or $SQLITE_PATH).
+  Three projects, three journal_posts, three testimonials, three
+  team_members, three media rows. Idempotent on row-count per table.
+  --force re-asserts.
+- `scripts/seed-content-supabase.mjs`: deleted, replaced.
+- `package.json`: seed:content -> scripts/seed-content.mjs.
+  seed:content:postgres and seed:content:sqlite aliases added for
+  explicit dispatch.
+- `scripts/smoke-phase5.mjs` (new): no-auth gating check patterned on
+  scripts/smoke-phase2.mjs. GET /api/projects -> 200, three mutate
+  routes -> 401, GET /projects -> 200, GET /admin/projects
+  200-or-404 (404 pre-deploy, 200 after Vercel rebuilds).
+
+Live URL probe (BEFORE push):
+
+  GET  /api/projects           -> 200 (3 rows visible: casa-mira,
+                                    nalanda-house, salt-flats)
+  POST /api/projects           -> 401
+  PUT  /api/projects/1         -> 401
+  DELETE /api/projects/1       -> 401
+  GET  /projects               -> 200
+  GET  /admin/projects         -> 404 (Vercel had not rebuilt yet)
+
+Local SQLite seed (after temporarily moving .env.local out of the
+way so the script's loadEnvLocal did not see DATABASE_URL): ran
+the SQLite branch successfully against data/etihad.db. Five tables
+populated with three rows each. .env.local was restored.
+
+verify:deploy 19/19. build green. graph: 1049 -> 1083 nodes,
+1620 -> 1664 edges, 95 -> 105 communities.
+
+Outstanding carry-forward (operator to address):
+
+- Phase 6 (journal CRUD) is next per docs/v112-plan.md. Same shape
+  as Phase 5 but with the slug-format audit + resolver fix noted
+  in the 2026-06-25 session log.
+- The full cold-start proof (create project -> assert the row is
+  visible on a new GET after a Vercel cold start) is the Phase 8
+  acceptance test documented in the plan. smoke-phase5 splits
+  into a Phase 8 authed round-trip script when SMOKE_PHASE5_LOGIN=1
+  is set.
+- Vercel will rebuild on db72148 push; the smoke will see
+  /admin/projects -> 200 once the deploy lands.
+- Tiered admin/superadmin role gate is unchanged from Phase 4.
+- Working tree dirty lists are unchanged: .opencode/opencode.json,
+  graph outputs, scripts/csrf-curl-probe.sh. All git-tracked as
+  expected on graph rebuild.
