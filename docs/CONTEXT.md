@@ -1125,3 +1125,75 @@ includes the session of this commit.
 Future-version asks continue to go through the v1.1.x -> v1.2
 bump per the freeze marker.
 
+### 2026-06-28 - fix(home): home page was rendering with empty <h1>
+
+Operator flagged the live home rendering as broken. Probe:
+GET / returned 200 with HTML, but every block rendered
+empty `<h1>`, empty `<p>`, missing eyebrow. Body still
+carried the seed for "Selected work" / "Homes built around"
+/ "Kalyan, MH", etc. in the React payload, but the visible
+HTML stripped everything.
+
+Root cause:
+
+  src/app/(public)/page.tsx safeParse called JSON.parse on
+  the `page_blocks.data` column. On the Postgres runtime,
+  pg's JSONB driver returns `data` as a parsed JS object
+  already. JSON.parse of a non-string then threw and the
+  catch returned {}.
+
+  Combined with the post-fix render: every block had
+  `data = {}`, every `data?.headlinePlain` evaluated to
+  undefined, the home hero printed `<h1> <em></em>.</h1>`.
+
+Why this slipped past every smoke:
+
+  smoke-phase2/5/6/7 touch /api/* GETs only. smoke-api
+  login + POST + GET on /api/projects + DELETE only.
+  None of these exercise the home-page render path.
+  Build and typecheck don't run the render. The "200 +
+  body length 45 KB" lit no alarm because the visual
+  shape of the page is collapsed but the page still serves.
+
+Why SQLite hot-copy didn't show it:
+
+  better-sqlite3 returns TEXT columns as strings unless
+  they were bound by a JSON1 helper. SQLite's `data`
+  column is TEXT; on the Vercel hot-copy path the raw
+  string flowed into safeParse and JSON.parse worked.
+  Only the Postgres runtime saw the JS-shape JSONB.
+
+Why only the home page:
+
+  /projects/[slug] reads via typed row casting; it never
+  touches safeParse. /projects, /journal, /about all read
+  raw rows and use type-narrowed fields. Only the home
+  page used safeParse for its block rows.
+
+Fix:
+
+  src/app/(public)/page.tsx safeParse now:
+    null/undefined        -> {}
+    string (parseable)    -> JSON.parse(json)
+    string (unparseable)  -> {}
+    object                -> object
+    anything else         -> {}
+
+  Six-case inline probe confirms each branch. Build green.
+  Live probe post-Vercel rebuild shows the home renders
+  eyebrow "Residential Studio", headline "Homes built
+  around how you live.", subtext "Twenty-four weeks. One
+  team. ..." photo, four stat tiles, principles, services,
+  process, selected work, testimonials, journal preview,
+  walk through, closing CTA with "twenty years".
+
+learned:
+
+  The smoke suite covered API surfaces, not rendered
+  surfaces. A future smoke v9 should add a render probe
+  that GETs `/` and asserts hero copy renders, to catch
+  shape-mismatch regressions like this one.
+
+verify:deploy 19/19. smoke-api 16/16. Build green.
+
+
