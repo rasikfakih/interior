@@ -25,7 +25,10 @@ export default async function Home() {
   );
 }
 
-function safeParse(json: string): any {
+function safeParse(json: unknown): any {
+  if (json == null) return {};
+  if (typeof json === "object") return json;
+  if (typeof json !== "string") return {};
   try {
     return JSON.parse(json);
   } catch {
