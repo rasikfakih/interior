@@ -162,7 +162,7 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
 
 (Updated at end of every session. Append-only.)
 
-### 2026-06-23 — mega-deploy v1.1.0
+### 2026-06-23 - mega-deploy v1.1.0
 - Installed `sharp` to generate procedural-SVG-as-JPG demo assets
 - Generated 8 demo JPGs (1280 px JPEG quality 80) in `public/demo/` matching `data/demo-media.json`
 - Mirrored to `public/uploads/images/` so block-registry defaults paint (hero, services-1..4, grid-1..3, placeholder)
@@ -1039,3 +1039,89 @@ Outstanding carry-forward:
 
 This is the v1.1.2 ship. Future work goes through the
 v1.1.x -> v1.2 bump per AGENT_BEST_PRACTICES.
+
+### 2026-06-28 - carry-forward triage (Items 1-5) lands on top of v1.1.2
+
+Three commits on `main`, pushed:
+
+- `23c0873` phase-next(seed): differentiated before/after + superadmin row seed
+- `866633f` phase-next(public): DB-first destinations, before/after slider, /voices
+- `91ba7d1` phase-next(role): /api/admin/* superadmin split + smoke-role
+
+Pre-session had five carry-forwards from Phases 4-8; all five
+landed this turn.
+
+What changed:
+
+- scripts/migrate.mjs:
+  - seedDefaultAdmin honours the new env pair
+    SUPABASE_OPERATOR_EMAIL + SUPABASE_OPERATOR_PASSWORD.
+    When set, both rows are seeded. The deletion step exempts
+    both rows via a `protectedEmails` allow-list (was single
+    admin email -> now email IN (admin, operator)). Idempotent.
+  - SUPABASE_OPERATOR_ROLE controls the operator's `role`
+    column. Defaults to "superadmin". Setting it to "admin"
+    matches v1.1.0 behaviour.
+
+- scripts/seed-content.mjs:
+  - Three stable Unsplash photo IDs cycle across projects,
+    journal, team. Before/after pairs are now visually distinct
+    via different photo IDs per row. Alts describe the
+    variants.
+  - --force mode rewrites existing rows in both branches
+    (Postgres DELETE then re-insert; SQLite DELETE
+    then re-insert). Without --force the seed is still
+    idempotent on non-empty tables.
+
+- src/components/BeforeAfterSlider.tsx: pointer-driven
+  before/after reveal with keyboard-arrow nudge. Honors
+  prefers-reduced-motion by default.
+- src/components/VoicesServer.tsx: server-side testimonials
+  read with photo rendering + initial-letter monogram
+  fallback. Empty-state surface tile with a sign-in link
+  to /admin/testimonials.
+- src/components/StudioServer.tsx: server-side team_members
+  read with bio + photo. Same shape as VoicesServer.
+- src/app/(public)/voices/page.tsx: new public route composing
+  VoicesServer + StudioServer. Operators can later register
+  this as a page-builder block if they want.
+- src/app/(public)/projects/[slug]/page.tsx: hybrid seed+DB
+  rewrite removed. Reads only the DB row. When before_image
+  AND after_image both exist, renders BeforeAfterSlider;
+  otherwise a single hero. Adds a "From the homeowner"
+  inline section that matches testimonials to a slug-prefix
+  pattern.
+- src/app/(public)/projects/page.tsx: same hybrid removed; the
+  listing is DB-only with an empty-state surface tile.
+- src/app/(public)/about/page.tsx: getTeam() now selects bio
+  and photo in addition to name and role. Team card renders
+  photo when present.
+
+- src/app/api/admin/whoami/route.ts (new): the role-split
+  probe. 401 without a session; 403 with role=admin when the
+  signed-in user is admin; 200 with role=superadmin when
+  superadmin. Future superadmin-only endpoints land under
+  src/app/api/admin/** following the same shape.
+- scripts/smoke-role.mjs (new): no-auth gating probe via
+  /api/admin/whoami. Verifies admin session receives 403 while
+  /api/projects still returns 200.
+
+Live URL probes (post-deploy):
+
+- GET /api/admin/whoami -> 401 (no auth)
+- GET /api/admin/whoami with admin session -> 403 role=admin
+- admin session to /api/projects -> 200 (3 rows)
+- GET /projects/casa-mira, /projects/nalanda-house,
+  /projects/salt-flats -> 200, all with before/after sliders
+  rendering against differentiated image pairs
+- GET /voices -> 200 (after Vercel rebuilds; pre-deploy 404)
+- GET /about -> 200, full team with bio + photo
+
+verify:deploy 19/19. build green. All five smokes pass.
+Pre-deploy `/voices` and `/api/admin/whoami` 404 is
+expected; they flip to 200 on first cold Vercel build that
+includes the session of this commit.
+
+Future-version asks continue to go through the v1.1.x -> v1.2
+bump per the freeze marker.
+
