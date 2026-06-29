@@ -65,9 +65,15 @@ export async function POST(req: NextRequest) {
     const storagePath = `${kind}/${stamp}-${rand}-${safe}`;
 
     // Sanity: storage config reachable
-    getStorageConfig();
+    const cfg = getStorageConfig();
 
     const signed = await signedPutUrl(storagePath, mime, size);
+    // For local mode, the stored URL is the browser-reachable
+    // public path; the signed.url is the upload sink.
+    const storedUrl =
+      cfg.mode === "local"
+        ? `${cfg.publicBase}/${storagePath}`.replace(/\/+/g, "/")
+        : signed.url;
 
     await ensureMigrated();
     const row = await pgOne<{
@@ -90,7 +96,7 @@ export async function POST(req: NextRequest) {
         size,
         filename.slice(0, 255),
         storagePath,
-        signed.url,
+        storedUrl,
       ]
     );
     if (!row) {

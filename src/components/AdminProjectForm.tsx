@@ -1,20 +1,21 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import MediaPicker from "@/components/admin/MediaPicker";
 
 interface ProjectFormData {
-  title: string
-  slug: string
-  category: string
-  location: string
-  description: string
-  beforeImage: string
-  afterImage: string
+  title: string;
+  slug: string;
+  category: string;
+  location: string;
+  description: string;
+  beforeImage: string;
+  afterImage: string;
 }
 
 export default function AdminProjectForm() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState<ProjectFormData>({
     title: '',
     slug: '',
@@ -23,22 +24,22 @@ export default function AdminProjectForm() {
     description: '',
     beforeImage: '',
     afterImage: '',
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      })
+      });
 
       if (response.ok) {
-        router.refresh()
+        router.refresh();
         setFormData({
           title: '',
           slug: '',
@@ -47,12 +48,12 @@ export default function AdminProjectForm() {
           description: '',
           beforeImage: '',
           afterImage: '',
-        })
+        });
       }
     } catch (error) {
-      console.error('Failed to create project:', error)
+      console.error('Failed to create project:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -118,24 +119,48 @@ export default function AdminProjectForm() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium mb-2">Before Image URL</label>
-          <input
-            type="url"
-            value={formData.beforeImage}
-            onChange={(e) => setFormData({ ...formData, beforeImage: e.target.value })}
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              value={formData.beforeImage}
+              onChange={(e) => setFormData({ ...formData, beforeImage: e.target.value })}
+              className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
+            />
+            <MediaPicker
+              label="Pick"
+              accept="image"
+              onPick={(_item, signedUrl) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  beforeImage: signedUrl ?? "",
+                }))
+              }
+            />
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">After Image URL</label>
-          <input
-            type="url"
-            value={formData.afterImage}
-            onChange={(e) => setFormData({ ...formData, afterImage: e.target.value })}
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              value={formData.afterImage}
+              onChange={(e) => setFormData({ ...formData, afterImage: e.target.value })}
+              className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
+            />
+            <MediaPicker
+              label="Pick"
+              accept="image"
+              onPick={(_item, signedUrl) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  afterImage: signedUrl ?? "",
+                }))
+              }
+            />
+          </div>
         </div>
       </div>
 
@@ -147,5 +172,5 @@ export default function AdminProjectForm() {
         {isSubmitting ? 'Creating...' : 'Create Project'}
       </button>
     </form>
-  )
+  );
 }

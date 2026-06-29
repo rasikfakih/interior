@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor";
+import MediaPicker from "./MediaPicker";
 
 function slugify(input: string): string {
   return input
@@ -141,11 +142,20 @@ export default function AdminJournalForm({
           <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
             Cover image URL
           </span>
-          <input
-            className="input-line"
-            value={form.coverImage}
-            onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-          />
+          <div className="flex items-center gap-2">
+            <input
+              className="input-line flex-1"
+              value={form.coverImage}
+              onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
+            />
+            <MediaPicker
+              label="Pick"
+              accept="image"
+              onPick={(_item, signedUrl) =>
+                setForm({ ...form, coverImage: signedUrl ?? "" })
+              }
+            />
+          </div>
         </label>
       </div>
 

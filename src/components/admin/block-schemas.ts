@@ -8,6 +8,7 @@ export type FieldSchema = {
     | "select"
     | "richtext"
     | "media"
+    | "mediaGallery"
     | "toggle";
   label: string;
   path: string;
@@ -15,6 +16,14 @@ export type FieldSchema = {
   options?: string[];
   max?: number;
 };
+
+export type ArraySchemaKind =
+  | "items"
+  | "phases"
+  | "projectSlugs"
+  | "cells"
+  | "stats"
+  | "images";
 
 export type ArraySchema = {
   label: string;
@@ -163,6 +172,7 @@ export function getSchema(type: BlockType): BlockSchema {
         scalars: [
           scalar("text", "Section title", "sectionTitle", { max: 80 }),
           scalar("longtext", "Lede", "lede", { max: 400 }),
+          scalar("media", "Default cover (optional)", "coverUrl"),
         ],
         arrays: {
           projectSlugs: arr(

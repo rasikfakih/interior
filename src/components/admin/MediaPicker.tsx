@@ -12,16 +12,30 @@ import {
   type UploadIntent,
 } from "@/components/admin/media-types";
 
+type PickedItem = {
+  item: MediaRow;
+  signedUrl: string | null;
+};
+
 type Props = {
-  onPick: (item: MediaRow, signedUrl: string | null) => void;
+  onPick:
+    | ((item: MediaRow, signedUrl: string | null) => void)
+    | ((items: PickedItem[]) => void);
   accept?: "all" | MediaKind;
   label?: string;
+  /**
+   * WordPress-grade multi-select: when `true`, picking a tile
+   * toggles it in the local cart instead of closing the dialog.
+   * Click "Use selection" to commit the array of picked items.
+   */
+  multi?: boolean;
 };
 
 export default function MediaPicker({
   onPick,
   accept = "all",
   label = "Pick asset",
+  multi = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<MediaRow[]>([]);
@@ -29,11 +43,13 @@ export default function MediaPicker({
   const [kind, setKind] = useState<"all" | MediaKind>(accept);
   const [picking, setPicking] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Record<number, PickedItem>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
     setKind(accept);
+    setSelected({});
   }, [accept, open]);
 
   useEffect(() => {
@@ -42,33 +58,72 @@ export default function MediaPicker({
     setError(null);
     const qp = new URLSearchParams({ limit: "60" });
     if (kind !== "all") qp.set("kind", kind);
-    fetch(`/api/media/list?${qp.toString()}`, { credentials: "include" })
-      .then(async (r) => {
+    (async () => {
+      try {
+        const r = await fetch(`/api/media/list?${qp.toString()}`, {
+          credentials: "include",
+        });
         if (!r.ok) throw new Error(`list ${r.status}`);
-        return (await r.json()) as MediaListResponse;
-      })
-      .then((body) => setItems(body.rows))
-      .catch((e: any) => setError(e.message ?? "list failed"))
-      .finally(() => setLoading(false));
+        const body = (await r.json()) as MediaListResponse;
+        setItems(body.rows);
+      } catch (e: any) {
+        setError(e.message ?? "list failed");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [kind, open]);
 
-  async function pick(item: MediaRow) {
+  async function resolveUrl(item: MediaRow): Promise<string | null> {
+    if (item.url && /^https?:\/\//.test(item.url)) return item.url;
+    const r = await fetch(`/api/media/${item.id}/sign`, {
+      credentials: "include",
+    });
+    const j = (await r.json().catch(() => ({}))) as { url?: string };
+    return j.url ?? null;
+  }
+
+  async function pickSingle(item: MediaRow) {
     setPicking(item.id);
     setError(null);
     try {
-      if (item.url && /^https?:\/\//.test(item.url)) {
-        onPick(item, item.url);
-      } else {
-        const r = await fetch(`/api/media/${item.id}/sign`, {
-          credentials: "include",
-        });
-        const j = (await r.json().catch(() => ({}))) as { url?: string };
-        onPick(item, j.url ?? null);
-      }
+      const url = await resolveUrl(item);
+      (onPick as (i: MediaRow, url: string | null) => void)(item, url);
       setOpen(false);
     } finally {
       setPicking(null);
     }
+  }
+
+  function togglePicked(item: MediaRow, signedUrl: string | null) {
+    setSelected((prev) => {
+      const next = { ...prev };
+      if (next[item.id]) {
+        delete next[item.id];
+      } else {
+        next[item.id] = { item, signedUrl };
+      }
+      return next;
+    });
+  }
+
+  async function pickMulti(item: MediaRow) {
+    setPicking(item.id);
+    setError(null);
+    try {
+      const url = await resolveUrl(item);
+      togglePicked(item, url);
+    } finally {
+      setPicking(null);
+    }
+  }
+
+  async function commitMulti() {
+    const arr = Object.values(selected);
+    if (arr.length === 0) return;
+    (onPick as (items: PickedItem[]) => void)(arr);
+    setOpen(false);
+    setSelected({});
   }
 
   async function quickUpload(file: File) {
@@ -116,6 +171,8 @@ export default function MediaPicker({
     }
   }
 
+  const multiCount = Object.keys(selected).length;
+
   return (
     <>
       <button
@@ -131,7 +188,13 @@ export default function MediaPicker({
           aria-modal="true"
           aria-label="Media picker"
           className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/50"
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            if (multi && multiCount > 0) {
+              commitMulti();
+            } else {
+              setOpen(false);
+            }
+          }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -139,7 +202,7 @@ export default function MediaPicker({
           >
             <header className="flex items-center justify-between p-4 border-b hairline">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em]">
-                Media library
+                {multi ? `Media library · multi-select` : "Media library"}
               </p>
               <button
                 type="button"
@@ -194,6 +257,19 @@ export default function MediaPicker({
                 >
                   Upload
                 </button>
+                {multi && (
+                  <button
+                    type="button"
+                    onClick={() => commitMulti()}
+                    disabled={multiCount === 0}
+                    className="btn-primary text-xs h-8 px-3"
+                    aria-label="Use selection"
+                  >
+                    {multiCount === 0
+                      ? "Use"
+                      : `Use selection (${multiCount})`}
+                  </button>
+                )}
               </div>
             </div>
             {error && (
@@ -218,15 +294,41 @@ export default function MediaPicker({
               <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {items.map((m) => {
                   const disabled = picking !== null;
+                  const isSelected = !!selected[m.id];
                   return (
                     <li key={m.id}>
                       <button
                         type="button"
-                        onClick={() => void pick(m)}
+                        onClick={() =>
+                          multi ? void pickMulti(m) : void pickSingle(m)
+                        }
                         disabled={disabled}
-                        className="w-full text-left border hairline rounded-[var(--radius-control)] overflow-hidden hover:bg-[var(--surface)] transition-colors"
+                        aria-pressed={multi ? isSelected : undefined}
+                        className={
+                          "w-full text-left border rounded-[var(--radius-control)] overflow-hidden transition-colors " +
+                          (isSelected
+                            ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--surface)]"
+                            : "hairline hover:bg-[var(--surface)] ")
+                        }
                       >
                         <div className="aspect-[16/10] overflow-hidden bg-elev relative">
+                          {multi && (
+                            <span
+                              aria-hidden
+                              className="absolute top-1 left-1 z-10 w-5 h-5 rounded-sm border-2 flex items-center justify-center text-[11px] font-mono"
+                              style={{
+                                background: isSelected
+                                  ? "var(--accent)"
+                                  : "rgba(0,0,0,0.4)",
+                                color: "var(--bg)",
+                                borderColor: isSelected
+                                  ? "var(--accent)"
+                                  : "rgba(255,255,255,0.5)",
+                              }}
+                            >
+                              {isSelected ? "X" : ""}
+                            </span>
+                          )}
                           {m.kind === "image" && m.url && (
                             <img
                               src={m.url}

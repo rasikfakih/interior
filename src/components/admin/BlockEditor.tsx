@@ -193,6 +193,68 @@ function Field({
     );
   }
 
+  if (schema.kind === "mediaGallery") {
+    const gallery: string[] = Array.isArray(v) ? v : [];
+    return (
+      <div>
+        {labelEl}
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+          {gallery.map((url, i) => (
+            <li
+              key={i}
+              className="aspect-[16/10] relative surface-tile overflow-hidden"
+            >
+              {/^https?:\/\//.test(url) ? (
+                <img
+                  src={url}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
+                  {url || "(empty)"}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  const next = gallery.slice();
+                  next.splice(i, 1);
+                  update(next);
+                }}
+                className="absolute top-1 right-1 text-[10px] font-mono uppercase tracking-[0.18em] bg-black/60 text-white px-1.5 py-0.5"
+                aria-label="Remove"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+          {gallery.length === 0 && (
+            <li className="text-sm text-ink-mute col-span-full">
+              No assets picked yet.
+            </li>
+          )}
+        </ul>
+        <MediaPicker
+          label="Pick images"
+          accept="image"
+          multi
+          onPick={(picks: any) => {
+            const incoming = (Array.isArray(picks)
+              ? picks.map((p: any) => p?.signedUrl ?? p?.item?.url ?? "")
+              : []
+            ).filter(Boolean);
+            const merged = Array.from(
+              new Set([...(gallery || []), ...incoming])
+            );
+            update(merged);
+          }}
+        />
+      </div>
+    );
+  }
+
   return null;
 }
 

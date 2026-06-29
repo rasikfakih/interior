@@ -43,16 +43,20 @@ export default function MediaGrid() {
       const qp = new URLSearchParams({ limit: "48" });
       if (kind !== "all") qp.set("kind", kind);
       if (cursor) qp.set("before", String(cursor));
-      const r = await fetch(`/api/media/list?${qp.toString()}`, {
-        credentials: "include",
-      });
-      if (!r.ok) {
-        setActionError(`list failed: ${r.status}`);
-        return;
+      try {
+        const r = await fetch(`/api/media/list?${qp.toString()}`, {
+          credentials: "include",
+        });
+        if (!r.ok) {
+          setActionError(`list failed: ${r.status}`);
+          return;
+        }
+        const body = (await r.json()) as MediaListResponse;
+        setItems((prev) => (cursor ? [...prev, ...body.rows] : body.rows));
+        setNextBefore(body.nextBefore);
+      } catch (e: any) {
+        setActionError(`list error: ${e?.message ?? "network"}`);
       }
-      const body = (await r.json()) as MediaListResponse;
-      setItems((prev) => (cursor ? [...prev, ...body.rows] : body.rows));
-      setNextBefore(body.nextBefore);
     },
     [kind]
   );
@@ -62,8 +66,14 @@ export default function MediaGrid() {
     setItems([]);
     setNextBefore(null);
     void (async () => {
-      await loadPage();
-      setLoading(false);
+      try {
+        await loadPage();
+      } finally {
+        // Always clear the skeleton, even if loadPage hit an exception
+        // path the edit mutators did not always cover. Without this the
+        // grid sticks on SkeletonGrid forever on the first failed fetch.
+        setLoading(false);
+      }
     })();
   }, [loadPage]);
 
