@@ -1,27 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireLicense, requireSuperadmin } from "@/lib/license-gate";
 import { readLicense, appendAudit } from "@/lib/license";
-import { requireLicense } from "@/lib/license-gate";
 import path from "path";
-
-async function isAuthorized() {
-  try {
-    const session = await getServerSession(authOptions);
-    return Boolean((session?.user as any)?.id);
-  } catch {
-    return false;
-  }
-}
 
 export async function GET() {
   try {
     const gate = await requireLicense("admin");
     if (!gate.ok) {
       return NextResponse.json({ error: gate.reason, code: gate.code }, { status: gate.code });
-    }
-    if (!(await isAuthorized())) {
-      return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     }
     const license = readLicense();
     return NextResponse.json({
@@ -35,13 +21,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const gate = await requireLicense("admin");
-    if (!gate.ok) {
-      return NextResponse.json({ error: gate.reason, code: gate.code }, { status: gate.code });
-    }
-    if (!(await isAuthorized())) {
-      return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-    }
+    const gate = await requireSuperadmin();
+    if (!gate.ok) return gate.response;
     const { signLicense } = await import("@/lib/license-key.test");
     const d = await req.json();
     if (!d.purchaseCode || !d.domain || !d.tier)

@@ -51,6 +51,58 @@ export async function requireAdminSession(): Promise<
 }
 
 /**
+ * Superadmin-only gate. NextAuth session + license + role check.
+ *
+ * Used on operator-only routes: license re-install
+ * (/api/admin/license), HMAC rotation, demo reset,
+ * theme-distro apply, tenant create / delete. Admin role
+ * receives 403 with `role: 'admin'` and reason:
+ * 'superadmin-only'. Anonymous receives 401.
+ *
+ * Both admin and superadmin hold a license; the differentiation
+ * is the role column on the `users` row, plumbed through
+ * NextAuth's JWT in src/lib/auth.ts.
+ */
+export async function requireSuperadmin(): Promise<
+  | { ok: true }
+  | { ok: false; response: Response }
+> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+  if (!userId) {
+    return {
+      ok: false,
+      response: Response.json({ error: "unauthorized" }, { status: 401 }),
+    };
+  }
+  const license = await requireLicense("admin");
+  if (!license.ok) {
+    return {
+      ok: false,
+      response: Response.json(
+        { error: license.reason },
+        { status: license.code }
+      ),
+    };
+  }
+  const role = (session?.user as any)?.role ?? "admin";
+  if (role !== "superadmin") {
+    return {
+      ok: false,
+      response: Response.json(
+        {
+          error: "Forbidden",
+          role,
+          reason: "This route is superadmin-only.",
+        },
+        { status: 403 }
+      ),
+    };
+  }
+  return { ok: true };
+}
+
+/**
  * Read-only public gate. Caller must have a license with the
  * relevant feature flag; no session required.
  */

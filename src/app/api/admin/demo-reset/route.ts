@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireSuperadmin } from "@/lib/license-gate";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
 
-async function ok() {
-  const session = await getServerSession(authOptions);
-  return Boolean((session?.user as any)?.id);
-}
-
 export async function POST(req: NextRequest) {
-  if (!(await ok())) {
-    return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-  }
+  const gate = await requireSuperadmin();
+  if (!gate.ok) return gate.response;
   if (process.env.NODE_ENV === "production") {
     return NextResponse.json(
       { error: "Demo reset is disabled in production. Use database migrations instead." },

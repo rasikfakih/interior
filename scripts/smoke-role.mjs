@@ -159,7 +159,49 @@ async function main() {
   }
   log(`ok - admin still GET /api/projects  -> 200 (${projs.length} rows)`);
 
-  log("OK - role split confirmed via /api/admin/whoami");
+  log("step 5 - admin role POST /api/admin/license -> 403 (superadmin-only)");
+  const lic = await rawFetch("POST", "/api/admin/license", {
+    headers: { Cookie: cookieHeader(jar) },
+    body: JSON.stringify({
+      purchaseCode: "SMOKE-ATTEMPT-ADMIN-CANNOT",
+      domain: "smoke.invalid",
+      tier: "personal",
+    }),
+  });
+  if (lic.status !== 403) {
+    fail(
+      `admin POST /api/admin/license must hit 403; got ${lic.status}. ` +
+        `This is the operator-only gate asymmetry carry-forward.`
+    );
+  }
+  log(`ok - POST /api/admin/license  -> 403 with admin session`);
+
+  log("step 6 - admin role POST /api/admin/demo-reset -> 403");
+  const reset = await rawFetch("POST", "/api/admin/demo-reset", {
+    headers: { Cookie: cookieHeader(jar) },
+    body: "{}",
+  });
+  if (reset.status !== 403) {
+    fail(
+      `admin POST /api/admin/demo-reset must hit 403; got ${reset.status}.`
+    );
+  }
+  log(`ok - POST /api/admin/demo-reset  -> 403 with admin session`);
+
+  log("step 7 - anonymous POST /api/admin/license -> 401");
+  const anon = await rawFetch("POST", "/api/admin/license", {
+    body: JSON.stringify({
+      purchaseCode: "ANON-ATTEMPT",
+      domain: "smoke.invalid",
+      tier: "personal",
+    }),
+  });
+  if (anon.status !== 401) {
+    fail(`anonymous must hit 401; got ${anon.status}`);
+  }
+  log(`ok - POST /api/admin/license  -> 401 anon`);
+
+  log("OK - role split confirmed via /api/admin/*");
   process.exit(0);
 }
 
