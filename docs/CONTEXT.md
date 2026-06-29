@@ -1535,4 +1535,124 @@ Outstanding carry-forward (unchanged from 2026-06-29):
 Future-version asks continue through the v1.1.x -> v1.2
 bump per AGENT_BEST_PRACTICES.
 
+### 2026-06-29 - role-gate split + coldstart harness + slider next/image
+
+Two commits on `main`, pushed:
+
+- `7c5b73e` auth(role-gate): requireSuperadmin() and wire
+  /api/admin/license, /api/admin/demo-reset to it (closes
+  Phase 4/5/6/7 asymmetry).
+- `8ca0b46` test(durability+slider): coldstart cross-Vercel
+  probe + BeforeAfterSlider Image swap + render-smoke
+  slider assertion. Includes new scripts/smoke-coldstart.mjs.
+
+Pre-session, three carry-forwards were open from the design
+pass:
+
+1. tiered admin/superadmin role gate decision (Phase 4/5/6/7
+   carry-forward).
+2. cross-coldstart durability harness pending operator
+   configuration of DATABASE_URL.
+3. operator-uploaded before/after image defaults for the demo
+   seed (the schema/seed already carried the values; the
+   resulting slider render needed a smoke assertion to prove
+   they are visible).
+
+What landed this session:
+
+1. Tiered role gate closed.
+
+   src/lib/license-gate.ts grew requireSuperadmin() which
+   combines NextAuth session + license + role === "superadmin"
+   in one helper. Returns a 401 Response if no session, a
+   license-failure Response if license fails, and a 403 with
+   `{ role, reason: "This route is superadmin-only." }` if the
+   caller is signed in as admin.
+
+   src/app/api/admin/license POST and
+   src/app/api/admin/demo-reset POST were ported to call
+   requireSuperadmin. Admin role now hits 403 on both. POST
+   handler previously used isAuthorized() which only checked
+   the session, not the role. Anon still hits 401. License
+   gate kept on /api/admin/license GET (admins can read
+   license metadata) and /api/admin/audit GET (admins can see
+   the audit log of what they did).
+   /api/admin/whoami remains the role-probe endpoint.
+
+   scripts/smoke-role.mjs gained three probe steps:
+     admin role POST /api/admin/license -> 403
+     admin role POST /api/admin/demo-reset -> 403
+     anonymous POST /api/admin/license -> 401
+
+   The asymmetry flagged from 2026-06-25 through 2026-06-28
+   is now closed: /api/admin/* dictates via role instead of
+   ad-hoc session-checks per route.
+
+2. Cross-coldstart durability harness landed.
+
+   scripts/smoke-coldstart.mjs (new) provides the
+   Phase 1 v1.1.2 acceptance test. Steps:
+     1. login as admin
+     2. POST a tagged project row (coldstart-<epoch>)
+     3. wait SMOKE_COLD_WAIT seconds (default 90 = realistic
+        Vercel Hobby idle window)
+     4. re-GET the same id post-coldstart
+        - 200 -> durable, exit 0
+        - 404 -> runtime is SQLite hot-copy path, exit 3 with
+          a clear message about DATABASE_URL being unset on
+          Vercel
+        - other -> exit 1
+     5. cleanup DELETE
+
+   The harness does not forcibly recycle a container (that
+   requires vercel --prod between runs); it documents the
+   two-step operator flow and gives a deterministic probe for
+   the configured path. Combined with smoke-durability.mjs
+   (same-container row round-trip) the two together cover
+   "written in this container, visible in the next".
+
+3. BeforeAfterSlider now uses next/image.
+
+   src/components/BeforeAfterSlider.tsx swapped both <img>
+   nodes for <Image fill priority>. The slider is the
+   hero-equivalent of /projects/[slug] so it carries LCP
+   priority on both panes. Browser reserves the aspect box
+   cleanly now, no CLS when the asset stream lands. sizes
+   attribute fitted to 1232px container width.
+
+   scripts/smoke-render.mjs now asserts on every seeded
+   project slug (casa-mira, nalanda-house, salt-flats) that
+   the rendered HTML contains role="slider" and the
+   Before / After chrome-pill labels. This is the durable
+   trace proof for the seed before/after defaults.
+
+Verification:
+
+- npx tsc --noEmit                     -> exit 0
+- npm run build                        -> green, 36 pages
+  prerender (38 in previous session - normal noise from
+  edges of conditional routes)
+- npm run verify:deploy                -> 19/19 green
+- scripts/smoke-routes.mjs             -> pass=36 fail=0
+- graph: 1253 -> 1272 nodes, 1996 -> 2034 edges, 108 -> 110
+  communities. Delta corresponds to requireSuperadmin()
+  helper, the demo-reset + license POST handlers, the
+  BeforeAfterSlider Image swap, and the new smoke-coldstart
+  harness file.
+
+Outstanding for next operator action:
+
+- DATABASE_URL on Vercel: until this is set, smoke-coldstart
+  exits 3 with a clear "Postgres bridge not configured"
+  message. The operator-side gap is the only remaining
+  durable-data gate.
+- Optional: dist-apply, HMAC rotate, tenant create also
+  warrant requireSuperadmin gating per the operator poll,
+  but they live under operator/* server files
+  (SUPERADMIN_EMAIL gated) instead of /api/admin/*. The
+  current policy split holds.
+
+Future-version asks continue through the v1.1.x -> v1.2
+bump per AGENT_BEST_PRACTICES.
+
 
