@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -106,7 +106,7 @@ export default function AdminJournalForm({
           {showSuggestion && (
             <button
               type="button"
-              className="mt-2 text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1"
+              className="mt-2 text-xs font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-1"
               onClick={() =>
                 setForm({ ...form, slug: slugFromTitle })
               }
@@ -177,7 +177,7 @@ export default function AdminJournalForm({
         <RichTextEditor
           value={form.contentJson}
           onChange={(j) => setForm({ ...form, contentJson: j })}
-          placeholder="Tell the field story…"
+          placeholder="Tell the field storyâ€¦"
         />
         <label className="block mt-3">
           <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">

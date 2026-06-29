@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { BLOCK_REGISTRY, BLOCK_TYPES, type BlockType } from "@/cms/blocks/registry";
@@ -51,7 +51,7 @@ export default function BlockPicker({
                     }}
                     className="surface-tile p-4 text-left hover:bg-[var(--surface)] transition-colors"
                   >
-                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
                       {def.type}
                     </p>
                     <p className="text-base mt-1">{def.label}</p>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -202,7 +202,7 @@ export default function MediaPicker({
           >
             <header className="flex items-center justify-between p-4 border-b hairline">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em]">
-                {multi ? `Media library · multi-select` : "Media library"}
+                {multi ? `Media library Â· multi-select` : "Media library"}
               </p>
               <button
                 type="button"
@@ -275,7 +275,7 @@ export default function MediaPicker({
             {error && (
               <p
                 role="alert"
-                className="px-4 py-2 text-xs text-warm border-b hairline"
+                className="px-4 py-2 text-xs text-ink border-b hairline"
               >
                 {error}
               </p>
@@ -369,7 +369,7 @@ export default function MediaPicker({
                             {m.alt || m.original_name}
                           </p>
                           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute mt-1 truncate">
-                            {m.mime} · {formatBytes(m.size)}
+                            {m.mime} Â· {formatBytes(m.size)}
                           </p>
                         </div>
                       </button>

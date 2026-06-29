@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
@@ -337,7 +337,7 @@ function ArrayEditor({
                 <button
                   type="button"
                   onClick={() => removeItem(idx)}
-                  className="text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1"
+                  className="text-xs font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-1"
                   aria-label="Remove"
                 >
                   Remove

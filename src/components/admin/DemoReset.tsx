@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -32,7 +32,7 @@ export default function DemoReset() {
         type="button"
         disabled={busy}
         onClick={reset}
-        className="text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1"
+        className="text-xs font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-1"
       >
         {busy ? "Resetting" : "Reset demo data"}
       </button>

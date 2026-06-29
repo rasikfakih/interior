@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -167,7 +167,7 @@ export default function AdminProjectsIndex() {
       </div>
 
       {error && (
-        <div className="surface-elevated px-4 py-3 text-sm text-warm rounded-[var(--radius-card)]">
+        <div className="surface-elevated px-4 py-3 text-sm text-ink rounded-[var(--radius-card)]">
           {error}
         </div>
       )}
@@ -203,7 +203,7 @@ export default function AdminProjectsIndex() {
                   <span
                     className={
                       "chrome-pill inline-flex " +
-                      (r.is_published ? "" : "text-warm")
+                      (r.is_published ? "" : "text-ink")
                     }
                     title={r.is_published ? "Published" : "Draft"}
                   >
@@ -236,7 +236,7 @@ export default function AdminProjectsIndex() {
                     type="button"
                     onClick={() => destroy(r)}
                     disabled={busy}
-                    className="text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1 disabled:opacity-50"
+                    className="text-xs font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-1 disabled:opacity-50"
                   >
                     Delete
                   </button>

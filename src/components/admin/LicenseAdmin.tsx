@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import DemoReset from "./DemoReset";
@@ -70,14 +70,14 @@ export default function LicenseAdmin() {
       <div>
         <h2 className="text-3xl md:text-4xl tracking-tighter">License</h2>
         <p className="text-ink-mute text-sm mt-1">
-          Envato purchase code · tier · domain. Public reads continue even when missing.
+          Envato purchase code Â· tier Â· domain. Public reads continue even when missing.
         </p>
       </div>
 
       <div className="surface-elevated p-6 md:p-8 rounded-[var(--radius-card)] space-y-3">
         {license ? (
           <div className="space-y-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
               {expired ? "Expired" : "Active"}
             </p>
             <p className="text-lg">
@@ -182,12 +182,12 @@ export default function LicenseAdmin() {
                   onChange={() => setTier(t)}
                   className="mr-3"
                 />
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
                   {t}
                 </span>
                 <p className="text-sm mt-2">
                   {t === "personal"
-                    ? "1 site. EN-only. No 3D. Page builder ≤ 5. Media ≤ 50."
+                    ? "1 site. EN-only. No 3D. Page builder â‰¤ 5. Media â‰¤ 50."
                     : "Up to 5 sites. Multilingual. 3D viewer. Unlimited."}
                 </p>
               </label>
@@ -197,7 +197,7 @@ export default function LicenseAdmin() {
         <div className="flex items-center justify-between pt-2">
           <p
             className="text-xs font-mono tracking-[0.04em]"
-            style={{ color: msg.startsWith("License") ? "var(--accent)" : "var(--accent-warm)" }}
+            style={{ color: msg.startsWith("License") ? "var(--accent)" : "var(--accent)" }}
             role="status"
             aria-live="polite"
           >
@@ -227,7 +227,7 @@ export default function LicenseAdmin() {
               <p className="md:col-span-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
                 {new Date(a.created_at).toLocaleString()}
               </p>
-              <p className="md:col-span-3 font-mono text-[10px] uppercase tracking-[0.18em] text-warm">
+              <p className="md:col-span-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink">
                 {a.kind}
               </p>
               <p className="md:col-span-7 text-ink-mute">{a.message}</p>
@@ -238,7 +238,7 @@ export default function LicenseAdmin() {
 
       {!server && (
         <p className="text-xs text-ink-mute font-mono uppercase tracking-[0.18em]">
-          License server: not configured — running offline-first.
+          License server: not configured â€” running offline-first.
         </p>
       )}
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -239,7 +239,7 @@ export default function MediaGrid() {
       {actionError && (
         <div
           role="alert"
-          className="border border-[var(--accent-warm-soft)] bg-[var(--accent-warm-soft)]/30 text-ink px-4 py-3 text-sm"
+          className="border border-[var(--accent-soft)] bg-[var(--accent-soft)]/30 text-ink px-4 py-3 text-sm"
         >
           {actionError}
         </div>
@@ -441,7 +441,7 @@ function MediaTile({
               {item.alt || item.original_name}
             </p>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute truncate">
-              {item.mime} · {formatBytes(item.size)}
+              {item.mime} Â· {formatBytes(item.size)}
             </p>
             <div className="flex gap-3 pt-1">
               <button
@@ -456,7 +456,7 @@ function MediaTile({
               <button
                 type="button"
                 onClick={() => void destroy(item.id)}
-                className="text-[10px] font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-0.5"
+                className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-0.5"
               >
                 Delete
               </button>

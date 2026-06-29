@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -261,7 +261,7 @@ function SortableBlock({
             {...attributes}
             {...listeners}
           >
-            ⋮⋮
+            â‹®â‹®
           </button>
           <p className="chrome-pill">{block.type}</p>
           <p className="text-sm text-ink-mute truncate">{def.label}</p>
@@ -287,7 +287,7 @@ function SortableBlock({
           <button
             type="button"
             onClick={onRemove}
-            className="text-xs font-mono uppercase tracking-[0.18em] text-warm border-b border-[var(--accent-warm-soft)] pb-1"
+            className="text-xs font-mono uppercase tracking-[0.18em] text-ink border-b border-[var(--accent-soft)] pb-1"
           >
             Remove
           </button>
