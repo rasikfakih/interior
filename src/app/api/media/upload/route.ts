@@ -5,6 +5,7 @@ import { ensureMigrated, pgOne } from '@/lib/pg';
 import {
   getStorageConfig,
   kindFromMime,
+  localPublicPath,
   MAX_BYTES,
   signedPutUrl,
   type StorageKind,
@@ -68,11 +69,12 @@ export async function POST(req: NextRequest) {
     const cfg = getStorageConfig();
 
     const signed = await signedPutUrl(storagePath, mime, size);
-    // For local mode, the stored URL is the browser-reachable
-    // public path; the signed.url is the upload sink.
+    // For local mode, store the /api/uploads/local path so the
+    // browser streams bytes via the local serve route (Vercel's
+    // /public is read-only, so we cannot ship uploads there).
     const storedUrl =
       cfg.mode === "local"
-        ? `${cfg.publicBase}/${storagePath}`.replace(/\/+/g, "/")
+        ? localPublicPath(storagePath)
         : signed.url;
 
     await ensureMigrated();
