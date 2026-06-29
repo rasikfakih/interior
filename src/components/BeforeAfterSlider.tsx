@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 type Props = {
   beforeSrc: string;
@@ -48,20 +49,26 @@ export default function BeforeAfterSlider({
           if (e.key === "ArrowRight") setPos((p) => Math.min(100, p + 5));
         }}
       >
-        <img
+        <Image
           src={afterSrc}
           alt={afterAlt}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          sizes="(min-width: 1280px) 1232px, 100vw"
+          priority
+          className="object-cover"
           draggable={false}
         />
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ width: `${pos}%` }}
         >
-          <img
+          <Image
             src={beforeSrc}
             alt={beforeAlt}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            sizes="(min-width: 1280px) 1232px, 100vw"
+            priority
+            className="object-cover"
             style={{ width: `${(100 / pos) * 100}%`, maxWidth: "none" }}
             draggable={false}
           />

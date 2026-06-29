@@ -106,8 +106,23 @@ const EXPECTED = {
   head("/projects/[slug] render");
   for (const slug of ["casa-mira", "nalanda-house", "salt-flats"]) {
     const r = await fetch(BASE + "/projects/" + slug);
-    if (r.status !== 200) bad(`${slug}`, "status " + r.status);
-    else ok(`/projects/${slug}`);
+    if (r.status !== 200) {
+      bad(`projects/${slug}`, "status " + r.status);
+      continue;
+    }
+    const html = await r.text();
+    ok(`/projects/${slug}`);
+    if (
+      html.includes('role="slider"') &&
+      (html.includes(">Before<") || html.includes(">After<"))
+    ) {
+      ok(`/projects/${slug} before/after slider rendered`);
+    } else {
+      bad(
+        `/projects/${slug} before/after slider`,
+        "role=slider or Before/After labels missing"
+      );
+    }
   }
 
   head("/journal/[slug] render");
