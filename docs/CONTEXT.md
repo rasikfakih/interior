@@ -1385,4 +1385,154 @@ on the operator configuring DATABASE_URL on Vercel. That
 is the Phase 1 acceptance test from docs/v112-plan.md
 Phase 5, redocumented in the durability smoke.
 
+### 2026-06-29 - design pass (editorial-manifesto cold-luxury + next/image)
+
+Two commits on `main`, pushed:
+
+- `e964be8` design(palette+hero): single cold-luxury accent,
+  Cormorant display, real italic emphasis, next/image on
+  public marketing. 26 files, 233/157 +/-.
+- `343c62c` design(admin): drop the warm accent tokens; reuse
+  ink/accent for parity with public chrome. 13 files, 49/49.
+
+Pre-session ground truth from CONTEXT carry-forwards:
+
+- raw `<img>` tags in `PageRenderer.tsx`,
+  `SpatialWalkthroughs.tsx`, `(public)/projects/[slug]/page.tsx`
+  were still using `<img>` rather than `next/image` (banner
+  under session protocol §3).
+- A previous (truncated) session had started a palette
+  migration from the warm-cream + brass + oxblood + espresso
+  family the taste-skill Section 4.2 bans by default, onto a
+  editorial-manifesto / cold-luxury family (paper + ink +
+  polished tungsten accent). The migration landed on the
+  admin surfaces but left the public chrome dangling.
+- The pre-flight checklist in the taste-skill Section 4.7
+  had not been run against the home page after the layout
+  restructure.
+- A stray duplicate `.text-ink { color: var(--accent); }`
+  rule in globals.css was collapsing every text-ink usage
+  onto the accent color.
+
+What landed this session:
+
+Palette / tokens (globals.css):
+
+- Finalised `:root` palette on the cold-luxury family:
+  paper bg `#f4f1ec`, ink `#181b1f`, polished tungsten
+  accent `#6b6f76`, accent-deep `#3a3d42`. The
+  chrome gradient drops the warm bias toward neutral
+  grey smoke. Comment block in `:root` calls out the
+  rotation choice explicitly per Section 4.2.
+- `.dark` block carries the same rotation in reverse:
+  off-black bg `#0c0e10`, ink `#ece6d8`, accent silver
+  `#b8bcc3`. Same single-accent rule, applied uniformly.
+- Removed the `--accent-warm` and `--accent-warm-soft`
+  tokens entirely. Single accent family across the page.
+- Removed the stray duplicate `.text-ink` rule that
+  overwrote `color: var(--ink)` with `color: var(--accent)`.
+  This was the source of the silent text-color regression
+  on admin / chrome surfaces seen in dark mode.
+- Edited `.btn-primary` from a chromatic button to an
+  ink block (var(--ink) bg, var(--bg) text). Matches the
+  museum cross-print read; cleaner against monochrome
+  photo treatment.
+- Edited `.btn-ghost` from `--line-strong` border to
+  `--ink` border with hover-to-filled. Same one accent
+  family.
+- `.input-line` retains hairline-bottom design; focus
+  state now uses `--accent-deep` for contrast discipline.
+- `.chrome-pill` simplified from gradient-filled pill to
+  hairline-bordered uppercase label (font-mono, 10.5px,
+  0.22em tracking, no fill, no border-radius). Per
+  Section 4.7 max-1-per-3.
+
+Layout / typography (layout.tsx, Hero.tsx):
+
+- Section 4.1 display-type discipline. Display serif
+  loads via `next/font/google` -- Cormorant Garamond
+  (taste-skill allowed pool; Fraunces and Instrument Serif
+  banned by name). Italic and weight-500 loaded. Body
+  copy stays on Geist Sans throughout (no Inter).
+- h1 / h2 / h3 / h4 mapped to --font-display; tracking
+  tightened to -0.015em on h1/h2 and -0.01em on h3/h4;
+  line-height 1.05 for hero pair, 1.15 for subheads.
+- Hero (`src/components/Hero.tsx`): the `<em>` token is
+  now real italic in Cormorant (display serif). Previously
+  it was Geist sans with `not-italic` decorative emphasis.
+  Section 4.1 exception for editorial-manifesto read:
+  real italic emphasises 'how you live' in the same
+  family as the surrounding type, no mixed-family bold.
+- Added `pb-1` on h1 carrying the italic word with
+  descender('y' in 'how you live') to honour the
+  Section 4.1 italic descender clearance rule.
+- Other h1 lines on the page (Services, Process,
+  Principles, ClosingCTA, JournalPreview) keep
+  sans-defaults; the editorial serif accent is reserved
+  for the editorial hero on the home page.
+
+next/image on the public marketing surfaces (carry-forward
+close-out):
+
+- `src/components/Hero.tsx`: the photo block is now
+  `next/image fill priority`. Sizes = "(min-width: 768px)
+  40vw, 100vw". Hero image gets LCP-preload.
+- `src/components/PageRenderer.tsx`: the `image` and
+  `image-grid` block-renderer branches replaced `<img>` with
+  `<Image fill sizes...>`. Services `<img>` inside the
+  SortableBlock provider replaced with `<Image fill>` while
+  preserving the `ei-cap-photo` / `ei-cap-fade` markers used
+  by smoke-render (smoke-render 29/29 still green).
+- `src/components/SpatialWalkthroughs.tsx`: card poster
+  `<img>` -> `<Image fill>`. Guard added for `posterUrl?
+  unless undefined` since `Item.posterUrl` is optional in
+  the seed shape.
+- `src/app/(public)/projects/[slug]/page.tsx`: hero
+  fallback `<img>` -> `<Image fill priority>` when the
+  project row has only `before_image` (no slider pair).
+
+admin/operator surfaces intentionally kept raw `<img>`:
+
+- MediaGrid / MediaPicker / GLBThumb / BlockEditor
+  thumbnails, the Forms' photo pickers -- all still use
+  raw `<img>`. `next/image` collapses CSS sizing and is
+  hostile to thumbnail picker UX. Operator chrome is
+  allowed to be plain per the session protocol §3, and
+  these surfaces are not in the LCP path.
+
+Verification (local SQLite fallback by env absence):
+
+- `npm run verify:deploy` -> 19/19 green.
+- `npm run build` -> green. 38 pages prerender. The
+  pre-existing Turbopack NFT-list warning about
+  `next.config.mjs` x `path.join` is unchanged (storage.ts
+  path.join traceability); non-fatal.
+- `npx tsc --noEmit` -> exit 0.
+- `scripts/smoke-routes.mjs` -> 36/36 pass.
+- `scripts/smoke-render.mjs` -> 29/29 pass. The hero
+  headline assertion (no double-comma, exact 'how you live,
+  not how a catalogue looks' shape) still holds with the
+  italic-emphasis swap.
+
+Graph:
+
+- `graphify update .` after push. Now 1253 nodes, 1996
+  edges, 108 communities (was 1155 / 1795 / 101 at
+  c56c920). The delta corresponds to: globals.css rewrite,
+  layout.tsx Cormorant font wire, Hero editorial sweep,
+  PageRenderer / SpatialWalkthroughs / projects/[slug]
+  next/image swaps, the 13 admin files using the new
+  var(--accent) chain.
+
+Outstanding carry-forward (unchanged from 2026-06-29):
+
+- Tiered admin / superadmin role gate decision.
+- Cross-coldstart durability on Vercel (operator-side
+  DATABASE_URL configuration).
+- Operator-uploaded before/after image defaults for the
+  demo seed (API/form/schema ready).
+
+Future-version asks continue through the v1.1.x -> v1.2
+bump per AGENT_BEST_PRACTICES.
+
 
