@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@/lib/use-gsap";
@@ -175,12 +176,12 @@ export default function HeroClient({ data }: { data: HeroData }) {
 
             <h1
               ref={headlineRef}
-              className="text-[clamp(2.4rem,6vw,5rem)] leading-[1] tracking-[-0.025em]"
+              className="text-[clamp(2.4rem,6vw,5rem)] leading-[1.05] tracking-[-0.025em] pb-1"
             >
               <span className="ei-word inline-block overflow-hidden align-bottom">
                 <span className="inline-block">{data?.headlinePlain || "Homes built around"}</span>
               </span>{" "}
-              <em className="text-accent not-italic font-medium ei-word inline-block overflow-hidden align-bottom">
+              <em className="text-accent font-medium italic ei-word inline-block overflow-hidden align-bottom">
                 <span className="inline-block">{data?.headlineItalic || "how you live"}</span>
               </em>
               {normalizeTail(data?.afterPlain) && (
@@ -225,14 +226,16 @@ export default function HeroClient({ data }: { data: HeroData }) {
               ref={photoRef}
               className="absolute inset-0 overflow-hidden rounded-[var(--radius-card)]"
             >
-              <img
+              <Image
                 src={
                   data?.photoUrl ||
                   "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1600&auto=format&fit=crop"
                 }
                 alt="A residential interior in soft natural light"
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="eager"
+                fill
+                priority
+                sizes="(min-width: 768px) 40vw, 100vw"
+                className="object-cover"
                 style={{ willChange: "transform" }}
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-transparent" />
