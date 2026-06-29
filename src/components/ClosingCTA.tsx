@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import { gsap } from "gsap";
@@ -103,7 +103,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
                 return (
                   <>
                     {renderWords(before, "b")}
-                    <em className="text-warm not-italic font-medium">
+                    <em className="text-ink not-italic font-medium">
                       <span className="ei-cta-word inline-block overflow-hidden align-bottom">
                         {em}
                       </span>
@@ -120,7 +120,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
               href={buttonHref}
               className="btn-primary w-fit"
             >
-              {buttonLabel} <span aria-hidden>↗</span>
+              {buttonLabel} <span aria-hidden>â†—</span>
             </a>
           </div>
         </div>

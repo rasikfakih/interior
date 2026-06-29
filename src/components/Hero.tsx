@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Reveal from "./Reveal";
 
 export default function Hero() {
@@ -13,9 +14,9 @@ export default function Hero() {
             </Reveal>
 
             <Reveal delay={60}>
-              <h1 className="text-[clamp(2.4rem,6vw,5rem)] leading-[1] tracking-[-0.025em]">
+              <h1 className="text-[clamp(2.4rem,6vw,5rem)] leading-[1.05] tracking-[-0.025em] pb-1">
                 Homes built around{" "}
-                <em className="text-accent not-italic font-medium">
+                <em className="text-accent font-medium italic">
                   how you live
                 </em>
                 , not how a catalogue looks.
@@ -45,11 +46,13 @@ export default function Hero() {
 
           <Reveal delay={120} className="md:col-span-5 relative aspect-[4/5] w-full">
             <div className="absolute inset-0 overflow-hidden rounded-[var(--radius-card)]">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1600&auto=format&fit=crop"
                 alt="A residential interior in soft natural light"
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="eager"
+                fill
+                priority
+                sizes="(min-width: 768px) 40vw, 100vw"
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-transparent" />
             </div>

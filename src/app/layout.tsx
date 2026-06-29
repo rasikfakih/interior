@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { I18nProvider } from "@/components/I18nProvider";
@@ -15,6 +15,23 @@ const geist = Geist({
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
+  display: "swap",
+});
+
+/**
+ * Display serif for the editorial-manifesto read on the public
+ * marketing surfaces. Body copy stays on Geist Sans throughout.
+ * Cormorant Garamond is in the taste-skill Section 4.1 allowed
+ * pool for editorial / luxury briefs. Both Fraunces and
+ * Instrument Serif (the LLM-default display serifs) are banned
+ * here. Cormorant gives long ascenders, slight old-style
+ * contrast, and a museum-quality foot.
+ */
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -44,7 +61,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${cormorant.variable}`}
     >
       <body className="font-sans antialiased bg-canvas text-ink">
         <SessionProvider>

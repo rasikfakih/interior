@@ -83,7 +83,7 @@ export default function InstallForm() {
                 onChange={() => setTier(t)}
                 className="mr-3"
               />
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
                 {t}
               </span>
               <p className="text-sm mt-2">
@@ -98,7 +98,7 @@ export default function InstallForm() {
       <div className="flex items-center justify-between pt-2">
         <p
           className="text-xs font-mono tracking-[0.04em]"
-          style={{ color: msg && !msg.startsWith("License installed") ? "var(--accent-warm)" : "var(--ink-mute)" }}
+          style={{ color: msg && !msg.startsWith("License installed") ? "var(--accent)" : "var(--ink-mute)" }}
           role="status"
           aria-live="polite"
         >

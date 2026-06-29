@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -78,7 +78,7 @@ export default function NewsletterForm() {
         style={{
           color:
             state === "error"
-              ? "var(--accent-warm)"
+              ? "var(--accent)"
               : state === "success" || state === "duplicate"
               ? "var(--accent)"
               : "var(--ink-mute)",

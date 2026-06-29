@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import Model3DViewer from "@/components/Model3DViewer";
 import RichTextRenderer from "@/components/RichTextRenderer";
@@ -98,12 +99,14 @@ export default async function ProjectDetailPage({
           />
         ) : (
           <div className="relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/9] mb-16">
-            <img
+            <Image
               src={before}
               alt={row.title}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="eager"
+              fill
+              sizes="(min-width: 1280px) 1232px, 100vw"
+              priority
               fetchPriority="high"
+              className="object-cover"
             />
           </div>
         )}

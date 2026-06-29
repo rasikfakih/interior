@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import VoicesServer from "@/components/VoicesServer";
 import StudioServer from "@/components/StudioServer";
@@ -23,8 +23,8 @@ export default function VoicesPage() {
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute">
               The homeowner's view, then the studio that built it. Edits
-              live in <Link href="/admin/testimonials" className="text-warm border-b border-[var(--accent-warm-soft)]">/admin/testimonials</Link> and
-              {" "}<Link href="/admin/team" className="text-warm border-b border-[var(--accent-warm-soft)]">/admin/team</Link>.
+              live in <Link href="/admin/testimonials" className="text-ink border-b border-[var(--accent-soft)]">/admin/testimonials</Link> and
+              {" "}<Link href="/admin/team" className="text-ink border-b border-[var(--accent-soft)]">/admin/team</Link>.
             </p>
           </div>
         </div>

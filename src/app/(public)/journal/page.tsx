@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
@@ -79,7 +79,7 @@ export default async function JournalPage() {
             <p className="chrome-pill mb-3 inline-flex">No entries yet</p>
             <p className="text-ink-mute">
               The studio has not published any journal entries. Sign in to
-              <Link href="/admin/journal" className="ml-2 text-warm border-b border-[var(--accent-warm-soft)]">
+              <Link href="/admin/journal" className="ml-2 text-ink border-b border-[var(--accent-soft)]">
                 write one
               </Link>
               .
@@ -96,7 +96,7 @@ export default async function JournalPage() {
                 <article className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-10">
                   <div className="md:col-span-2 flex md:flex-col gap-3 md:gap-2 text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
                     <span>{fmtDate(e.created_at)}</span>
-                    <span className="text-warm">{e.category || "Note"}</span>
+                    <span className="text-ink">{e.category || "Note"}</span>
                   </div>
                   <div className="md:col-span-7">
                     <h2 className="text-2xl md:text-3xl tracking-tight group-hover:text-accent transition-colors">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRef } from "react";
@@ -150,7 +150,7 @@ export default function JournalPreview({
             href="/journal"
             className="text-sm font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
-            All entries →
+            All entries â†’
           </Link>
         </div>
 
@@ -162,7 +162,7 @@ export default function JournalPreview({
             >
               <div className="ei-news-meta md:col-span-2 flex md:flex-col gap-3 md:gap-2 text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
                 <span>{e.date}</span>
-                <span className="text-warm">{e.category}</span>
+                <span className="text-ink">{e.category}</span>
               </div>
               <div className="ei-news-body md:col-span-7">
                 <Link href={`/journal/${e.slug}`} className="group">

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Model3DViewer from "./Model3DViewer";
 import Link from "next/link";
+import Image from "next/image";
 
 type Item = {
   slug: string;
@@ -99,12 +100,18 @@ function WalkthroughCard({
     return (
       <article className="snap-start shrink-0 w-[88vw] md:w-[560px] surface-tile overflow-hidden">
         <div className="aspect-[16/10] relative">
-          <img
-            src={item.posterUrl}
-            alt={item.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
+          {item.posterUrl ? (
+            <Image
+              src={item.posterUrl}
+              alt={item.title}
+              fill
+              sizes="(min-width: 768px) 560px, 88vw"
+              className="object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-elev" aria-hidden />
+          )}
           <div className="absolute inset-0 flex items-end p-6 bg-gradient-to-t from-black/60 to-transparent">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/80">

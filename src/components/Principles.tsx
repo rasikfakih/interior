@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import { gsap } from "gsap";
@@ -84,7 +84,7 @@ export default function Principles({ data }: { data?: any }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--line)] border hairline rounded-[var(--radius-card)] overflow-hidden">
           {items.map((p: any, i: number) => (
             <article key={i} className="ei-prin bg-canvas p-6 md:p-7">
-              <p className="ei-prin-num font-mono text-[10px] tracking-[0.22em] uppercase text-warm">
+              <p className="ei-prin-num font-mono text-[10px] tracking-[0.22em] uppercase text-ink">
                 0{i + 1}
               </p>
               <h3 className="ei-prin-label text-xl md:text-2xl mt-3 mb-3 tracking-tight">

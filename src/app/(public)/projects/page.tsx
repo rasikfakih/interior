@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 import ProjectsClient from "./ProjectsClient";
@@ -45,7 +45,7 @@ export default async function ProjectsPage() {
     title: r.title,
     category: r.category || "Residential",
     location: r.location || "Maharashtra",
-    year: r.year || "—",
+    year: r.year || "â€”",
     scope: r.scope || r.category || "Residential",
     image: r.before_image || FALLBACK,
     has3D: Boolean(r.model_3d),
@@ -78,7 +78,7 @@ export default async function ProjectsPage() {
               The studio has not published any projects. Sign in to
               <Link
                 href="/admin/projects"
-                className="ml-2 text-warm border-b border-[var(--accent-warm-soft)]"
+                className="ml-2 text-ink border-b border-[var(--accent-soft)]"
               >
                 write one
               </Link>

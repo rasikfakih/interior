@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 
 type Mark = { type: string; attrs?: Record<string, any> };
 type TextNode = { type: "text"; text: string; marks?: Mark[] };
@@ -28,7 +28,7 @@ function renderMark(node: TextNode, key: string) {
               ? "noopener noreferrer"
               : undefined
           }
-          className="underline decoration-1 hairline-strong underline-offset-4 hover:text-warm"
+          className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
         >
           {el}
         </a>

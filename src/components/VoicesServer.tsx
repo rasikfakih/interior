@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
 type Row = {
@@ -41,7 +41,7 @@ export default async function VoicesServer({
             <p className="chrome-pill mb-3 inline-flex">Voices</p>
             <p className="text-ink-mute max-w-prose mx-auto">
               No client testimonials have been published yet. Sign in to
-              <Link href="/admin/testimonials" className="ml-2 text-warm border-b border-[var(--accent-warm-soft)]">
+              <Link href="/admin/testimonials" className="ml-2 text-ink border-b border-[var(--accent-soft)]">
                 write one
               </Link>
               .
@@ -70,7 +70,7 @@ export default async function VoicesServer({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {rows.map((q) => {
-            const initial = (q.name || "·").charAt(0).toUpperCase();
+            const initial = (q.name || "Â·").charAt(0).toUpperCase();
             const photo = q.photo && String(q.photo).trim();
             return (
               <article
@@ -79,9 +79,9 @@ export default async function VoicesServer({
               >
                 <span
                   aria-hidden
-                  className="font-mono text-5xl leading-none text-warm/50 select-none"
+                  className="font-mono text-5xl leading-none text-ink/50 select-none"
                 >
-                  “
+                  â€œ
                 </span>
                 <blockquote className="text-base md:text-lg leading-relaxed text-ink">
                   {q.quote}

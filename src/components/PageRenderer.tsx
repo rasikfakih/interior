@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import Reveal from "./Reveal";
 import Link from "next/link";
+import Image from "next/image";
 import ProcessStickyStack from "./ProcessStickyStack";
 import RichTextRenderer from "./RichTextRenderer";
 import SpatialWalkthroughs from "./SpatialWalkthroughs";
@@ -57,7 +58,7 @@ function BlockRenderer({ block }: { block: Block }) {
       return (
         <section className="py-8 container-page">
           <figure className={`relative w-full aspect-[${block.data?.aspect || "16/9"}] overflow-hidden rounded-[var(--radius-card)]`}>
-            <img src={block.data?.url} alt={block.data?.alt || ""} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+            <Image src={block.data?.url} alt={block.data?.alt || ""} fill sizes="(min-width: 768px) 1320px, 100vw" className="object-cover" loading="lazy" />
           </figure>
         </section>
       );
@@ -67,7 +68,7 @@ function BlockRenderer({ block }: { block: Block }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {(block.data?.images || []).map((img: any, i: number) => (
               <div key={i} className="aspect-[16/10] relative overflow-hidden rounded-[var(--radius-card)]">
-                <img src={img.url} alt={img.alt || ""} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <Image src={img.url} alt={img.alt || ""} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" loading="lazy" />
               </div>
             ))}
           </div>
@@ -110,7 +111,7 @@ function ServicesBlock({ data }: any) {
             <div className="md:col-span-7">
               <h2 className="text-4xl md:text-[3.5rem] tracking-tighter">
                 {title}{" "}
-                <em className="text-warm not-italic font-medium">{titleEm}</em>
+                <em className="text-ink not-italic font-medium">{titleEm}</em>
                 {data?.afterEm ? `, ${data.afterEm}` : "."}
               </h2>
             </div>
@@ -182,11 +183,13 @@ function ServicesTsxCells({ cells }: { cells: any[] }) {
         >
           <div className="absolute inset-0 overflow-hidden">
             <div className="ei-cap-photo absolute inset-0">
-              <img
+              <Image
                 src={c.photo}
                 alt={c.title}
                 loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               />
             </div>
           </div>

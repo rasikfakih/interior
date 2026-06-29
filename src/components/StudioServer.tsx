@@ -1,4 +1,4 @@
-import { ensureMigrated, pgMany } from "@/lib/pg";
+﻿import { ensureMigrated, pgMany } from "@/lib/pg";
 
 type Row = {
   id: number;
@@ -45,7 +45,7 @@ export default async function StudioServer() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
           {rows.map((m) => {
-            const initial = (m.name || "·").charAt(0).toUpperCase();
+            const initial = (m.name || "Â·").charAt(0).toUpperCase();
             const photo = m.photo && String(m.photo).trim();
             return (
               <article
@@ -64,8 +64,8 @@ export default async function StudioServer() {
                     aria-hidden
                     className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
                     style={{
-                      background: "var(--accent-warm-soft)",
-                      color: "var(--accent-warm)",
+                      background: "var(--accent-soft)",
+                      color: "var(--accent)",
                     }}
                   >
                     {initial}

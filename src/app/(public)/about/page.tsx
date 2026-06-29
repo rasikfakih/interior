@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default async function AboutPage() {
         <div className="container-page">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
             <div className="md:col-span-7">
-              <p className="chrome-pill mb-6 inline-flex">Studio · Since 2017</p>
+              <p className="chrome-pill mb-6 inline-flex">Studio Â· Since 2017</p>
               <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1]">
                 A small studio, working at the scale of{" "}
                 <em className="text-accent not-italic font-medium">one home at a time</em>.
@@ -57,7 +57,7 @@ export default async function AboutPage() {
         <div className="container-page">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             <div className="md:col-span-7">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
                 Method
               </p>
               <h2 className="text-3xl md:text-5xl mt-3 tracking-tighter">
@@ -88,7 +88,7 @@ export default async function AboutPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
               {team.map((m: any) => {
-                const initial = (m.name || "·").charAt(0).toUpperCase();
+                const initial = (m.name || "Â·").charAt(0).toUpperCase();
                 const photo =
                   m.photo && String(m.photo).trim() ? String(m.photo) : null;
                 return (
@@ -108,8 +108,8 @@ export default async function AboutPage() {
                         aria-hidden
                         className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
                         style={{
-                          background: "var(--accent-warm-soft)",
-                          color: "var(--accent-warm)",
+                          background: "var(--accent-soft)",
+                          color: "var(--accent)",
                         }}
                       >
                         {initial}

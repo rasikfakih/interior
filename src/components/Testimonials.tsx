@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import { gsap } from "gsap";
@@ -31,7 +31,7 @@ const defaultQuotes: Quote[] = [
     name: "Aravind K.",
     role: "Homeowner",
     location: "Nalanda House, Kalyan",
-    tone: "var(--accent-warm)",
+    tone: "var(--accent)",
   },
   {
     body:
@@ -39,12 +39,12 @@ const defaultQuotes: Quote[] = [
     name: "Mira S.",
     role: "Homeowner",
     location: "Salt Flats, Alibaug",
-    tone: "var(--accent-warm)",
+    tone: "var(--accent)",
   },
 ];
 
 function toneFor(i: number): string {
-  return i % 2 === 0 ? "var(--accent)" : "var(--accent-warm)";
+  return i % 2 === 0 ? "var(--accent)" : "var(--accent)";
 }
 
 function MonogramCircle({
@@ -73,7 +73,7 @@ export default function Testimonials({ data }: { data?: any }) {
   const quotes: Quote[] = (data?.items || defaultQuotes).map(
     (q: Quote, i: number) => ({
       ...q,
-      initial: q.initial ?? ((q.name?.charAt(0) || "·").toUpperCase()),
+      initial: q.initial ?? ((q.name?.charAt(0) || "Â·").toUpperCase()),
       tone: q.tone ?? toneFor(i),
     })
   );
@@ -165,9 +165,9 @@ export default function Testimonials({ data }: { data?: any }) {
             >
               <span
                 aria-hidden
-                className="font-mono text-5xl leading-none text-warm/50 select-none"
+                className="font-mono text-5xl leading-none text-ink/50 select-none"
               >
-                “
+                â€œ
               </span>
               <blockquote className="text-base md:text-lg leading-relaxed text-ink">
                 {q.body}
@@ -177,7 +177,7 @@ export default function Testimonials({ data }: { data?: any }) {
                 <div>
                   <p className="text-sm font-medium">{q.name}</p>
                   <p className="text-xs text-ink-mute font-mono uppercase tracking-[0.14em]">
-                    {q.role} · {q.location}
+                    {q.role} Â· {q.location}
                   </p>
                 </div>
               </figcaption>

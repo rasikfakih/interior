@@ -1,4 +1,4 @@
-type CheckResult =
+﻿type CheckResult =
   | { ok: true; license: any }
   | { ok: false; reason: string };
 
@@ -20,7 +20,7 @@ export default function SafeLicenseBanner({ check }: { check: CheckResult }) {
     >
       <div className="container-page py-3 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm mr-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink mr-3">
             {reasonText[check.reason] || "License issue"}
           </span>
           <a className="underline decoration-1 hairline-strong underline-offset-4" href="/admin/license">

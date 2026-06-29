@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
@@ -97,7 +97,7 @@ export default function ProcessStickyStack({ data }: { data?: any }) {
                 <div className="mt-10 space-y-2">
                   <div className="flex justify-between text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
                     <span>Deliverable</span>
-                    <span className="text-warm">{p.duration}</span>
+                    <span className="text-ink">{p.duration}</span>
                   </div>
                   <div className="chrome-rule" />
                   <p className="text-sm text-ink mt-3">{p.deliverable}</p>

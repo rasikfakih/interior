@@ -1,8 +1,11 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @theme {
   --font-sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
-  --font-display: var(--font-geist-sans), "Inter", system-ui, sans-serif;
+  --font-display: var(--font-cormorant), var(--font-geist-sans),
+    "Inter", system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), "Iowan Old Style", "Times New Roman",
+    serif;
   --font-mono: var(--font-geist-mono), "JetBrains Mono", monospace;
 
   --z-nav: 50;
@@ -10,45 +13,61 @@
   --z-modal: 80;
   --z-cursor: 90;
 
-  --radius-control: 6px;
-  --radius-card: 14px;
+  --radius-control: 2px;
+  --radius-card: 2px;
   --radius-pill: 9999px;
 }
 
 @layer base {
   :root {
-    --bg: #f6f1e8;
-    --bg-elev: #ece6d8;
-    --surface: rgba(48, 64, 48, 0.04);
-    --surface-strong: rgba(48, 64, 48, 0.08);
-    --ink: #1f2320;
-    --ink-mute: #5b6058;
-    --ink-soft: #8a8f86;
-    --line: rgba(48, 64, 48, 0.16);
-    --line-strong: rgba(48, 64, 48, 0.28);
-    --accent: #2c442d;
-    --accent-deep: #1c2e1d;
-    --accent-warm: #b8702a;
-    --accent-warm-soft: rgba(184, 112, 42, 0.18);
-    --chrome: linear-gradient(135deg, #cfd1cc 0%, #8a8d85 50%, #4a4d48 100%);
-    --shadow-ambient: 0 30px 60px -30px rgba(28, 46, 29, 0.25);
+    /* Editorial-manifesto palette.
+       Cold-luxury family: paper, ink, polished tungsten accent.
+       Not the AI-default warm-cream + brass + oxblood +
+       espresso family that the taste-skill flags in Section 4.2.
+       Rotation-driven: this brief sits in the same family
+       ring as the cold-luxury preset (silver-grey + chrome +
+       smoke) transposed to a paper background for editorial
+       legibility. Single accent across the whole page. */
+    --bg: #f4f1ec;
+    --bg-elev: #ece7df;
+    --surface: rgba(24, 27, 31, 0.04);
+    --surface-strong: rgba(24, 27, 31, 0.08);
+    --ink: #181b1f;
+    --ink-mute: #5b5e63;
+    --ink-soft: #8a8c8f;
+    --line: rgba(24, 27, 31, 0.14);
+    --line-strong: rgba(24, 27, 31, 0.28);
+    --accent: #6b6f76;
+    --accent-deep: #3a3d42;
+    --accent-soft: rgba(107, 111, 118, 0.16);
+    --chrome: linear-gradient(
+      135deg,
+      #d3d4d6 0%,
+      #8a8c8f 50%,
+      #3a3d42 100%
+    );
+    --shadow-ambient: 0 30px 60px -30px rgba(24, 27, 31, 0.25);
   }
 
   .dark {
-    --bg: #0e1311;
-    --bg-elev: #141b18;
-    --surface: rgba(220, 230, 218, 0.04);
-    --surface-strong: rgba(220, 230, 218, 0.08);
+    --bg: #0c0e10;
+    --bg-elev: #14171a;
+    --surface: rgba(220, 224, 230, 0.04);
+    --surface-strong: rgba(220, 224, 230, 0.08);
     --ink: #ece6d8;
-    --ink-mute: #a9aea2;
-    --ink-soft: #6b7068;
-    --line: rgba(220, 230, 218, 0.14);
-    --line-strong: rgba(220, 230, 218, 0.24);
-    --accent: #7fa87f;
-    --accent-deep: #aac4aa;
-    --accent-warm: #d68b3a;
-    --accent-warm-soft: rgba(214, 139, 58, 0.22);
-    --chrome: linear-gradient(135deg, #d8dad4 0%, #8a8e87 50%, #3c4040 100%);
+    --ink-mute: #a4a7ad;
+    --ink-soft: #6b6e73;
+    --line: rgba(220, 224, 230, 0.14);
+    --line-strong: rgba(220, 224, 230, 0.24);
+    --accent: #b8bcc3;
+    --accent-deep: #dadee3;
+    --accent-soft: rgba(220, 224, 230, 0.22);
+    --chrome: linear-gradient(
+      135deg,
+      #d8dad9 0%,
+      #8a8c8f 50%,
+      #3c4040 100%
+    );
     --shadow-ambient: 0 30px 60px -30px rgba(0, 0, 0, 0.55);
   }
 
@@ -67,14 +86,25 @@
   }
 
   ::selection {
-    background: var(--accent);
+    background: var(--ink);
     color: var(--bg);
   }
 
-  h1, h2, h3, h4 {
+  /* Display type uses the serif (Section 4.1 editorial-manifesto
+     exception). Body copy stays sans. The serif phrase 'not how
+     a catalogue looks' gets tighter tracking than the friendly
+     default the LLM reaches for. */
+  h1, h2 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
-    line-height: 1.02;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    font-weight: 500;
+  }
+
+  h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
     font-weight: 500;
   }
 
@@ -116,10 +146,6 @@
     color: var(--accent);
   }
 
-  .text-warm {
-    color: var(--accent-warm);
-  }
-
   .bg-canvas {
     background-color: var(--bg);
   }
@@ -144,31 +170,42 @@
   }
 
   .chrome-rule {
-    background: var(--chrome);
+    background: var(--ink);
     height: 1px;
     width: 100%;
-    opacity: 0.6;
+    opacity: 0.18;
   }
 
+  /* Editorial category-tap. Flat, hairline-bordered, no chrome
+     gradient. Used as a small uppercase label above section
+     headlines. Per Section 4.7 max 1 per 3 sections. */
   .chrome-pill {
-    background: var(--chrome);
-    color: #11140f;
-    padding: 0.25rem 0.65rem;
-    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    color: var(--ink);
+    padding: 0.18rem 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: none;
+    border-radius: 0;
+    background: none;
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.18em;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
   }
 
   .btn-primary {
-    background: var(--accent);
+    background: var(--ink);
     color: var(--bg);
     padding: 0.95rem 1.6rem;
     border-radius: var(--radius-control);
     font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: transform 160ms ease, background-color 160ms ease;
+    letter-spacing: 0.04em;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    font-size: 12px;
+    transition: transform 160ms ease, background-color 160ms ease,
+      color 160ms ease;
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
@@ -186,17 +223,22 @@
     background: transparent;
     color: var(--ink);
     padding: 0.95rem 1.6rem;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--ink);
     border-radius: var(--radius-control);
-    transition: background-color 160ms ease, border-color 160ms ease;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    font-size: 12px;
+    transition: background-color 160ms ease, color 160ms ease;
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
   }
 
   .btn-ghost:hover {
-    background: var(--surface-strong);
-    border-color: var(--accent);
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .input-line {
@@ -207,12 +249,13 @@
     padding: 0.85rem 0;
     width: 100%;
     font-size: 1rem;
+    font-family: var(--font-sans);
     transition: border-color 160ms ease;
   }
 
   .input-line:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--accent-deep);
   }
 
   .input-line::placeholder {

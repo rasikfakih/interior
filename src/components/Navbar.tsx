@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -67,7 +67,7 @@ export const Navbar = () => {
         className="absolute top-0 left-0 h-[2px] w-full origin-left"
         style={{
           background:
-            "linear-gradient(90deg, var(--accent) 0%, var(--accent-warm) 100%)",
+            "linear-gradient(90deg, var(--accent) 0%, var(--accent) 100%)",
           transform: "scaleX(0)",
         }}
       />
@@ -82,7 +82,7 @@ export const Navbar = () => {
           <Link
             href="/"
             className="flex items-center gap-2 group"
-            aria-label="Etihad Interiors — home"
+            aria-label="Etihad Interiors â€” home"
           >
             <span
               aria-hidden
@@ -102,7 +102,7 @@ export const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] tracking-[0.04em] text-ink hover:text-warm transition-colors"
+                className="text-[13px] tracking-[0.04em] text-ink hover:text-ink transition-colors"
               >
                 {link.label}
               </Link>

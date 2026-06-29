@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import { gsap } from "gsap";
@@ -18,7 +18,7 @@ const capabilities = [
   },
   {
     title: "Material specification",
-    body: "Stone, wood, textile, finish — sourced and specified against your brief.",
+    body: "Stone, wood, textile, finish â€” sourced and specified against your brief.",
     photo:
       "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
     span: "md:col-span-5",
@@ -105,7 +105,7 @@ export default function Services() {
           <div className="md:col-span-7">
             <h2 className="text-4xl md:text-[3.5rem] tracking-tighter">
               A studio that draws, specifies, and{" "}
-              <em className="text-warm not-italic font-medium">builds</em>.
+              <em className="text-ink not-italic font-medium">builds</em>.
             </h2>
           </div>
           <div className="md:col-span-5 md:pt-3">

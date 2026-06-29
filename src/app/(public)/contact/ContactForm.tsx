@@ -72,14 +72,14 @@ export default function ContactForm({
               questions about the site, the family, and the months ahead.
             </p>
             <p className="font-mono text-xs uppercase tracking-[0.18em]">
-              <a href={`mailto:${contactEmail}`} className="hover:text-warm">
+              <a href={`mailto:${contactEmail}`} className="hover:text-ink">
                 {contactEmail}
               </a>
             </p>
             <p className="font-mono text-xs uppercase tracking-[0.18em]">
               <a
                 href={`tel:${contactPhone.replace(/\s+/g, "")}`}
-                className="hover:text-warm"
+                className="hover:text-ink"
               >
                 {contactPhone}
               </a>
@@ -89,7 +89,7 @@ export default function ContactForm({
 
         {state === "success" ? (
           <div className="surface-elevated p-10 md:p-14 max-w-3xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
               Sent
             </p>
             <h2 className="text-3xl md:text-4xl tracking-tighter mt-3 mb-3">
@@ -99,14 +99,14 @@ export default function ContactForm({
               In the meantime, check the{" "}
               <a
                 href="/journal"
-                className="underline decoration-1 hairline-strong underline-offset-4 hover:text-warm"
+                className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
               >
                 journal
               </a>{" "}
               for our field notes, or{" "}
               <a
                 href="/projects"
-                className="underline decoration-1 hairline-strong underline-offset-4 hover:text-warm"
+                className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
               >
                 browse selected work
               </a>
@@ -207,7 +207,7 @@ export default function ContactForm({
                 className="text-xs font-mono tracking-[0.04em]"
                 style={{
                   color:
-                    state === "error" ? "var(--accent-warm)" : "transparent",
+                    state === "error" ? "var(--accent)" : "transparent",
                 }}
                 role="alert"
               >
