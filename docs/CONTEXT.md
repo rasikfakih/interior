@@ -1196,4 +1196,118 @@ learned:
 
 verify:deploy 19/19. smoke-api 16/16. Build green.
 
+### 2026-06-29 - media library + superadmin metrics + multi-select picker
+
+Three operator-reported bugs in one session. Plus a WordPress-grade
+editability ask: select multiple media items at once.
+
+**1. MediaGrid rendering stuck on skeleton**
+
+`MediaGrid.loadPage` was a Promise then.catch without a finally
+that ran when loadPage's internal fetch threw. On a credentials:
+"include" failure across the DNS boundary, the rejection
+bubbled past .then.catch because the body of the IIFE did
+setLoading(false) *after* the awaited fetch but did not wrap it
+with try/finally. SkeletonGrid never cleared -> grid looked empty
+forever. Fixed in `src/components/admin/MediaGrid.tsx` and
+`src/components/admin/MediaPicker.tsx`. Both now wrap the fetch
+in try/catch/finally with `setLoading(false)` in `finally`, and
+surface `list error: <message>` to the alert bar instead of
+swallowing.
+
+**2. Media upload returns 500 'SUPABASE_URL is not set'**
+
+The Phase 2 storage abstraction refused to operate when env vars
+were missing. Refactored `src/lib/storage.ts` into a discriminated
+union `StorageConfig { mode: local | supabase }`. Supabase path
+unchanged. Local path:
+
+  - PUT upload sink: `/api/media/upload/local?path=...&kind=...`
+    writes the bytes to `LOCAL_UPLOAD_ROOT/<...>` (default
+    `/tmp/etihad-uploads/media/<path>`). Required because Vercel's
+    root filesystem is read-only (`/public` cannot accept new
+    writes).
+  - GET serve path: `/api/uploads/local?path=...` streams the
+    file back via a new `src/app/api/uploads/local/route.ts`
+    that handles 4-byte mime sniffing.
+  - `signedGetUrl`/`head`/`remove` all branch on mode. Local-mode
+    `remove` cleans both `/tmp` and bundled `/public` paths.
+  - Row.url stored on local-mode rows = `/api/uploads/local?path=...`
+    so the admin library renders the bytes without a signed-URL
+    round-trip.
+
+**3. /superadmin/metrics returns 500**
+
+`getMetrics()` in `src/lib/operator-store.ts` already wraps its
+core in try/catch and returns zeros on failure (verified by the
+metrics API which returns 200 with full data). But the
+`src/app/superadmin/metrics/page.tsx` is a server component
+that calls `cookies()` + `getMetrics()` + `getAuditLog()`. In
+some env combos the page exits 500 even though data is correct
+and the body renders. Converted to a client component that
+fetches `/api/operator/metrics` on mount with cookie check,
+skeleton while loading, and a Refresh button.
+
+**4. Media picker - WordPress-grade multi-select**
+
+`src/components/admin/MediaPicker.tsx` grew a `multi` prop.
+When true, picking toggles a tile in local cart; "Use selection
+(N)" commits the array via a PickedItem[] callback.
+
+`src/components/admin/block-schemas.ts` got a new `mediaGallery`
+field kind. `src/components/admin/BlockEditor.tsx` renders this
+as a thumbnail grid with per-tile Remove, plus the multi-pick
+MediaPicker. Available on any block that opts in (currently
+none of the seed schemas set it, but adding is a one-liner).
+
+MediaPicker wired (single) into:
+  - `src/components/AdminProjectForm.tsx` (beforeImage, afterImage)
+  - `src/components/admin/AdminJournalForm.tsx` (coverImage)
+  - `src/components/admin/AdminTestimonialForm.tsx` (photo) - already
+  - `src/components/admin/AdminTeamForm.tsx` (photo) - already
+  - `src/components/admin/BlockEditor.tsx` (media field for hero,
+    image, image-grid, services cells, selected-work cover)
+
+**Smoke land**
+
+scripts/probe-media.mjs           - first ad-hoc probe
+scripts/smoke-media-e2e.mjs       - full upload round-trip
+scripts/smoke-admin-live.mjs      - admin+operator auth + CRUD
+                                   - 19/19 green
+scripts/smoke-routes.mjs           - 36/36 routes reachable
+
+Live probe after rebuild:
+
+  GET /                                                 200
+  /admin/media                          200 (3 rows visible)
+  POST /api/media/upload (intent)       200 (local URL)
+  PUT /api/media/upload/local?...        200 (writes /tmp)
+  GET  /api/uploads/local?path=...      200 (bytes stream)
+  /api/media/list after upload          contains the row, link
+                                       works
+  DELETE /api/media/<id>                200
+  /superadmin/metrics                    200 (client-fetched)
+  /api/operator/metrics                  200 (server-rendered
+                                              JSON; audit log
+                                              visible)
+
+verify:deploy 19/19. Build green. Graph refreshed via
+graphify update after commits landed.
+
+Carry-forward still unaddressed:
+  - /api/pages/[id] DELETE accepts any caller whose license is
+    valid (requireLicense('admin') is license-only, not
+    session-checked). /api/pages/[id]/blocks PUT/PATCH is the
+    same shape. The other entity routes already correctly 401
+    unauthenticated; the pages route is asymmetric. Flagged
+    in CONTEXT 2026-06-25 and earlier; not fixed in this
+    session because it's a security-policy call rather than a
+    render-bug.
+  - Vercel hot-copy SQLite still loses writes across cold
+    starts. Documented carry-over from v1.0.0; Supabase swap
+    remains the durable fix.  Local-mode media writes above
+    do persist via the writable `/tmp` because they don't
+    depend on a postgres connection for the bytes themselves -
+    only the metadata row uses Postgres.
+
 
