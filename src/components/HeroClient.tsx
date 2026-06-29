@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@/lib/use-gsap";
+import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,6 +25,7 @@ function normalizeTail(input: unknown): string {
 }
 
 export default function HeroClient({ data }: { data: HeroData }) {
+  const reduce = useReducedMotion();
   const root = useRef<HTMLElement | null>(null);
   const photoRef = useRef<HTMLDivElement | null>(null);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
@@ -33,6 +34,13 @@ export default function HeroClient({ data }: { data: HeroData }) {
   const statsRef = useRef<HTMLDivElement | null>(null);
   const ctaRef = useRef<HTMLDivElement | null>(null);
   const studioRef = useRef<HTMLDivElement | null>(null);
+
+  // Animations need an "invisible until entrance" initial; under
+  // reduced-motion the timeline never runs, so the markup must render
+  // visible at first paint. Without this gating, sub-paragraph and
+  // CTA row stay hidden for users with reduce-motion on (Section 6.B).
+  const initialHidden = { opacity: 0 };
+  const visibleAtRest = {};
 
   useGSAP(
     () => {
@@ -169,7 +177,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
             <span
               ref={eyebrowRef}
               className="chrome-pill inline-flex mb-6"
-              style={{ opacity: 0 }}
+              style={reduce ? visibleAtRest : initialHidden}
             >
               {data?.eyebrow || "Residential Studio"}
             </span>
@@ -200,7 +208,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
             <p
               ref={subRef}
               className="mt-6 max-w-[58ch] text-ink-mute text-base md:text-lg leading-relaxed"
-              style={{ opacity: 0 }}
+              style={reduce ? visibleAtRest : initialHidden}
             >
               {data?.subtext ||
                 "Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands."}
@@ -209,7 +217,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
             <div
               ref={ctaRef}
               className="mt-10 flex flex-wrap items-center gap-3"
-              style={{ opacity: 0 }}
+              style={reduce ? visibleAtRest : initialHidden}
             >
               <a href="/contact" className="btn-primary">
                 Start a project
@@ -245,7 +253,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
               <div
                 ref={studioRef}
                 className="absolute -bottom-6 -left-6 hidden md:block"
-                style={{ opacity: 0 }}
+                style={reduce ? visibleAtRest : initialHidden}
               >
                 <div className="surface-elevated px-5 py-4 max-w-[220px]">
                   <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">
@@ -264,7 +272,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
             className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {statsValid.map((s, i) => (
-              <div key={i} className="ei-stat" style={{ opacity: 0 }}>
+              <div key={i} className="ei-stat" style={reduce ? visibleAtRest : initialHidden}>
                 <div className="ei-stat-rule h-px bg-[var(--line-strong)] mb-4 origin-left" />
                 <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">
                   {s.label}
