@@ -81,16 +81,19 @@ const JPEG_BYTES = Buffer.from([
   console.log("PUT status:", put.status);
   console.log("PUT body:", (await put.text()).slice(0, 200));
 
-  console.log("\n=== GET public path ===");
-  const pub = "/uploads/media/" + ij.storagePath;
-  const r2 = await fetch(BASE + pub);
-  console.log(BASE + pub, "->", r2.status, "len=", (await r2.text()).length);
-
   console.log("\n=== /api/media/list after upload ===");
   const l2 = await fetch(BASE + "/api/media/list?limit=20", { headers: { Cookie: ck } });
   const j = await l2.json();
   const matched = (j.rows || []).find((r) => r.id === ij.id);
   console.log("rows:", j.rows?.length, "matched:", !!matched, "stored url:", matched?.url);
+
+  console.log("\n=== GET stored url ===");
+  const storedUrl = matched?.url ?? "";
+  console.log("stored url:", storedUrl);
+  if (storedUrl) {
+    const r2 = await fetch(BASE + storedUrl);
+    console.log(BASE + storedUrl, "->", r2.status, "len=", (await r2.text()).length);
+  }
 
   // Cleanup the test row
   console.log("\n=== DELETE ===");
