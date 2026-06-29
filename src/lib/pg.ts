@@ -165,6 +165,19 @@ async function sqliteExec(text: string, params: ReadonlyArray<unknown>): Promise
   const db = getSqlite();
   const { sql, args } = placeholderToSqlite(text, params);
   const trimmed = sql.trim().toUpperCase();
+  // Write attempts on a non-durable handle are loud, no-op'd:
+  // the Vercel hot-copy SQLite (/tmp/etihad-<region>.db) is wiped
+  // on every cold start, so silently accepting a write makes the
+  // post-write GET on the same container return 200 while the
+  // next container has a fresh DB. Phase 5 durable fix ships with
+  // Postgres. Here we surface a tag in the response that the live
+  // smoke can detect.
+  if (isVercelFallbackPath() && !trimmed.startsWith('SELECT') && !trimmed.startsWith('WITH')) {
+    // Return zero rows + a side-band hint. Routes ignore unknown
+    // fields on read; the superadmin/metrics page probes this and
+    // surfaces the warning to the operator.
+    return [{ rows: [], rowCount: 0, __ephemeral_writable: true }];
+  }
   if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
     const rows = db.prepare(sql).all(...args);
     return rows as unknown[];

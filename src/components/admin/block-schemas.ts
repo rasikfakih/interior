@@ -141,11 +141,13 @@ export function getSchema(type: BlockType): BlockSchema {
           titleEm: "",
           lede: "",
           cells: [{ title: "", body: "", photo: "" }],
+          galleryUrls: [] as string[],
         }),
         scalars: [
           scalar("text", "Title (plain)", "title", { max: 120 }),
           scalar("text", "Title (italic)", "titleEm", { max: 60 }),
           scalar("longtext", "Lede", "lede", { max: 400 }),
+          scalar("mediaGallery", "Default cell photo (overrides empty photo)", "galleryUrls"),
         ],
         arrays: {
           cells: arr(
@@ -281,11 +283,13 @@ export function getSchema(type: BlockType): BlockSchema {
           title: "",
           lede: "",
           projectSlugs: ["nalanda-house"],
+          galleryUrls: [] as string[],
         }),
         scalars: [
           scalar("text", "Eyebrow", "eyebrow", { max: 80 }),
           scalar("text", "Title", "title", { max: 200 }),
           scalar("longtext", "Lede", "lede", { max: 300 }),
+          scalar("mediaGallery", "Pick 3D walkthrough thumbnails", "galleryUrls"),
         ],
         arrays: {
           projectSlugs: arr(
@@ -351,12 +355,17 @@ export function getSchema(type: BlockType): BlockSchema {
         type,
         defaults: () => ({
           images: [{ url: "", alt: "" }, { url: "", alt: "" }, { url: "", alt: "" }],
+          galleryUrls: [] as string[],
+          caption: "",
         }),
-        scalars: [],
+        scalars: [
+          scalar("text", "Caption", "caption", { max: 200 }),
+          scalar("mediaGallery", "Pick from library", "galleryUrls"),
+        ],
         arrays: {
           images: arr(
             "images",
-            "Images",
+            "Hand-typed images",
             [
               scalar("media", "Image", "url"),
               scalar("text", "Alt text", "alt", { max: 200 }),

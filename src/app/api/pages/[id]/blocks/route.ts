@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
-import { requireLicense } from "@/lib/license-gate";
-
-async function gateOrFail(action: "mutate" | "admin" = "admin") {
-  const g = await requireLicense(action);
-  if (!g.ok) return NextResponse.json({ error: g.reason }, { status: g.code });
-  return null;
-}
+import { requireAdminSession } from "@/lib/license-gate";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const fail = await gateOrFail();
-    if (fail) return fail;
+    const failSong = await requireAdminSession();
+    if (!failSong.ok) return failSong.response;
     const { id } = await params;
     const pageId = Number(id);
     const d = await req.json();

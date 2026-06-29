@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, pgMany, pgOne, pgQuery } from "@/lib/pg";
-import { requireLicense } from "@/lib/license-gate";
+import { requireLicense, requireAdminSession } from "@/lib/license-gate";
 
-async function gateOrFail(action: "mutate" | "admin" | "read-public" = "admin") {
+async function gateOrFail(action: "mutate" | "admin" | "read-public" = "read-public") {
   const g = await requireLicense(action);
   if (!g.ok) return NextResponse.json({ error: g.reason }, { status: g.code });
+  return null;
+}
+
+async function adminOnlyOrFail() {
+  const r = await requireAdminSession();
+  if (!r.ok) return r.response;
   return null;
 }
 
@@ -36,7 +42,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const fail = await gateOrFail("admin");
+    const fail = await adminOnlyOrFail();
     if (fail) return fail;
     const { id } = await params;
     const d = await req.json();
@@ -98,7 +104,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const fail = await gateOrFail("admin");
+    const fail = await adminOnlyOrFail();
     if (fail) return fail;
     const { id } = await params;
     const numericId = Number(id);

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireLicense } from "@/lib/license-gate";
+import { requireLicense, requireAdminSession } from "@/lib/license-gate";
 import { ensureMigrated, pgMany, pgQuery } from "@/lib/pg";
 
-async function gateOrFail(action: "mutate" | "admin" | "read-public" = "admin") {
+async function gateOrFail(action: "mutate" | "admin" | "read-public" = "read-public") {
   const g = await requireLicense(action);
   if (!g.ok) return NextResponse.json({ error: g.reason }, { status: g.code });
   return null;
@@ -26,8 +26,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const fail = await gateOrFail("admin");
-    if (fail) return fail;
+    const failSong = await requireAdminSession();
+    if (!failSong.ok) return failSong.response;
     const d = await req.json();
     if (!d.slug || !d.title) {
       return NextResponse.json({ error: "slug and title required" }, { status: 400 });
