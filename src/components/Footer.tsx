@@ -103,7 +103,7 @@ export const Footer = async () => {
         </div>
 
         <div className="mt-16 pt-6 border-t hairline flex flex-col md:flex-row gap-3 justify-between text-xs font-mono uppercase tracking-[0.16em] text-ink-mute">
-          <p>Â© {currentYear} Etihad Interiors Â· All rights reserved</p>
+          <p>© {currentYear} Etihad Interiors · All rights reserved</p>
           <p>Designed + built in Kalyan, Maharashtra</p>
         </div>
       </div>

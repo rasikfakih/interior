@@ -70,7 +70,7 @@ export default async function VoicesServer({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {rows.map((q) => {
-            const initial = (q.name || "Â·").charAt(0).toUpperCase();
+            const initial = (q.name || "·").charAt(0).toUpperCase();
             const photo = q.photo && String(q.photo).trim();
             return (
               <article
@@ -81,7 +81,7 @@ export default async function VoicesServer({
                   aria-hidden
                   className="font-mono text-5xl leading-none text-ink/50 select-none"
                 >
-                  â€œ
+                  “
                 </span>
                 <blockquote className="text-base md:text-lg leading-relaxed text-ink">
                   {q.quote}

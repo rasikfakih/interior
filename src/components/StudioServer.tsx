@@ -45,7 +45,7 @@ export default async function StudioServer() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
           {rows.map((m) => {
-            const initial = (m.name || "Â·").charAt(0).toUpperCase();
+            const initial = (m.name || "·").charAt(0).toUpperCase();
             const photo = m.photo && String(m.photo).trim();
             return (
               <article

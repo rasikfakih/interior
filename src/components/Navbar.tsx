@@ -82,7 +82,7 @@ export const Navbar = () => {
           <Link
             href="/"
             className="flex items-center gap-2 group"
-            aria-label="Etihad Interiors â€” home"
+            aria-label="Etihad Interiors  home"
           >
             <span
               aria-hidden

@@ -70,7 +70,7 @@ export default function PagesAdmin() {
         <div>
           <h2 className="text-3xl md:text-4xl tracking-tighter">Pages</h2>
           <p className="text-ink-mute text-sm mt-1">
-            {pages.length} on record Â· drag-reorder block builder per page
+            {pages.length} on record · drag-reorder block builder per page
           </p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function PagesAdmin() {
 
       {loading ? (
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-          Loadingâ€¦
+          Loading…
         </p>
       ) : pages.length === 0 ? (
         <p className="text-ink-mute">No pages yet.</p>
@@ -134,7 +134,7 @@ export default function PagesAdmin() {
               <div className="md:col-span-7">
                 <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
                   /{p.slug}
-                  {p.is_front ? " Â· front" : ""}
+                  {p.is_front ? " · front" : ""}
                 </p>
                 <h3 className="text-lg mt-1">{p.title}</h3>
                 {p.published_at && (

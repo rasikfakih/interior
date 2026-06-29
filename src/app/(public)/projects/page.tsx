@@ -45,7 +45,7 @@ export default async function ProjectsPage() {
     title: r.title,
     category: r.category || "Residential",
     location: r.location || "Maharashtra",
-    year: r.year || "â€”",
+    year: r.year || "",
     scope: r.scope || r.category || "Residential",
     image: r.before_image || FALLBACK,
     has3D: Boolean(r.model_3d),

@@ -441,7 +441,7 @@ function MediaTile({
               {item.alt || item.original_name}
             </p>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute truncate">
-              {item.mime} Â· {formatBytes(item.size)}
+              {item.mime} · {formatBytes(item.size)}
             </p>
             <div className="flex gap-3 pt-1">
               <button

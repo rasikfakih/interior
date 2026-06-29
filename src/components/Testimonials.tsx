@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@/lib/use-gsap";
+import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,10 +43,6 @@ const defaultQuotes: Quote[] = [
   },
 ];
 
-function toneFor(i: number): string {
-  return i % 2 === 0 ? "var(--accent)" : "var(--accent)";
-}
-
 function MonogramCircle({
   initial,
   tone,
@@ -70,11 +66,17 @@ function MonogramCircle({
 }
 
 export default function Testimonials({ data }: { data?: any }) {
+  const reduce = useReducedMotion();
+  // Animations need "invisible until entrance" initial; under
+  // reduced-motion useGSAP short-circuits, so cards must render
+  // visible at first paint (Section 6.B + a11y).
+  const initialHidden = { opacity: 0 };
+  const visibleAtRest = {};
   const quotes: Quote[] = (data?.items || defaultQuotes).map(
     (q: Quote, i: number) => ({
       ...q,
-      initial: q.initial ?? ((q.name?.charAt(0) || "Â·").toUpperCase()),
-      tone: q.tone ?? toneFor(i),
+      initial: q.initial ?? ((q.name?.charAt(0) || "·").toUpperCase()),
+      tone: q.tone ?? "var(--accent)",
     })
   );
   const title = data?.title ?? "Words from the homes.";
@@ -161,13 +163,13 @@ export default function Testimonials({ data }: { data?: any }) {
             <figure
               key={q.name}
               className="ei-quote surface-tile p-7 md:p-8 flex flex-col gap-6"
-              style={{ opacity: 0 }}
+              style={reduce ? visibleAtRest : initialHidden}
             >
               <span
                 aria-hidden
                 className="font-mono text-5xl leading-none text-ink/50 select-none"
               >
-                â€œ
+                “
               </span>
               <blockquote className="text-base md:text-lg leading-relaxed text-ink">
                 {q.body}
@@ -177,7 +179,7 @@ export default function Testimonials({ data }: { data?: any }) {
                 <div>
                   <p className="text-sm font-medium">{q.name}</p>
                   <p className="text-xs text-ink-mute font-mono uppercase tracking-[0.14em]">
-                    {q.role} Â· {q.location}
+                    {q.role} · {q.location}
                   </p>
                 </div>
               </figcaption>

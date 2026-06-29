@@ -177,7 +177,7 @@ export default function AdminJournalForm({
         <RichTextEditor
           value={form.contentJson}
           onChange={(j) => setForm({ ...form, contentJson: j })}
-          placeholder="Tell the field storyâ€¦"
+          placeholder="Tell the field story…"
         />
         <label className="block mt-3">
           <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">

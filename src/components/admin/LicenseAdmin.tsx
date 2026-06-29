@@ -70,7 +70,7 @@ export default function LicenseAdmin() {
       <div>
         <h2 className="text-3xl md:text-4xl tracking-tighter">License</h2>
         <p className="text-ink-mute text-sm mt-1">
-          Envato purchase code Â· tier Â· domain. Public reads continue even when missing.
+          Envato purchase code · tier · domain. Public reads continue even when missing.
         </p>
       </div>
 
@@ -238,7 +238,7 @@ export default function LicenseAdmin() {
 
       {!server && (
         <p className="text-xs text-ink-mute font-mono uppercase tracking-[0.18em]">
-          License server: not configured â€” running offline-first.
+          License server: not configured  running offline-first.
         </p>
       )}
 
