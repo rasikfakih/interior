@@ -181,10 +181,7 @@ export async function signedGetUrl(
   const cfg = getStorageConfig();
   if (cfg.mode === "local") {
     return {
-      url: `${cfg.publicBase}/${storagePath}`.replace(/\/+/g, "/").replace(
-        /^\//,
-        "/"
-      ),
+      url: localPublicPath(storagePath),
       expiresIn: _ttlSeconds,
     };
   }
@@ -214,8 +211,14 @@ export async function signedGetUrl(
 export async function remove(storagePath: string): Promise<void> {
   const cfg = getStorageConfig();
   if (cfg.mode === "local") {
-    const target = path.join(process.cwd(), "public", "uploads", "media", storagePath);
-    await fs.rm(target, { force: true });
+    // Try local scratch + bundled /public fallthrough
+    const candidates = [
+      pathFor(storagePath),
+      path.join(process.cwd(), "public", "uploads", "media", storagePath),
+    ];
+    for (const p of candidates) {
+      await fs.rm(p, { force: true });
+    }
     return;
   }
   const url = `${cfg.baseUrl}/storage/v1/object/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
@@ -238,17 +241,22 @@ export type HeadResult =
 export async function head(storagePath: string): Promise<HeadResult> {
   const cfg = getStorageConfig();
   if (cfg.mode === "local") {
-    try {
-      const target = path.join(process.cwd(), "public", "uploads", "media", storagePath);
-      const stat = await fs.stat(target);
-      return {
-        ok: true,
-        contentType: "application/octet-stream",
-        contentLength: stat.size,
-      };
-    } catch {
-      return { ok: false };
+    for (const p of [
+      pathFor(storagePath),
+      path.join(process.cwd(), "public", "uploads", "media", storagePath),
+    ]) {
+      try {
+        const stat = await fs.stat(p);
+        return {
+          ok: true,
+          contentType: "application/octet-stream",
+          contentLength: stat.size,
+        };
+      } catch {
+        /* try next candidate */
+      }
     }
+    return { ok: false };
   }
   const url = `${cfg.baseUrl}/storage/v1/object/info/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
   const res = await fetch(url, {
@@ -269,12 +277,43 @@ export async function head(storagePath: string): Promise<HeadResult> {
 }
 
 /**
- * Local-mode upload sink. The route writes the bytes to disk and
- * returns a path mirror so the row in `media` carries the public
- * URL.
+ * Local-mode sink for Phase 2 media uploads. Writes to a
+ * writable scratch (default /tmp/etihad-uploads/media/<path>)
+ * because Vercel's root filesystem is read-only.
  */
 export async function localWrite(storagePath: string, body: Buffer): Promise<void> {
-  const target = path.join(process.cwd(), "public", "uploads", "media", storagePath);
+  const target = pathFor(storagePath);
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.writeFile(target, body);
+}
+
+function localRoot(): string {
+  return process.env.LOCAL_UPLOAD_ROOT || "/tmp/etihad-uploads";
+}
+
+function mediaRoot(): string {
+  return path.join(localRoot(), "media");
+}
+
+function pathFor(storagePath: string): string {
+  return path.join(mediaRoot(), storagePath);
+}
+
+/**
+ * Path on the URL the browser can use to stream the bytes
+ * back. Phase 2 mode in dev/test/local acceptance.
+ */
+export function localPublicPath(storagePath: string): string {
+  return `/api/uploads/local?path=${encodeURIComponent(storagePath)}`;
+}
+
+/**
+ * Variant used by {@link localPublicPath}-reading consumers that
+ * still expect `/uploads/media...`. Kept for back-compat with
+ * any caller that synthesises a URL row from public/ - routes
+ * through the same /api/uploads/local handler if a row says
+ * /uploads/media but the file isn't there.
+ */
+export function localFsPath(storagePath: string): string {
+  return pathFor(storagePath);
 }
