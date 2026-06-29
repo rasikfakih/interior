@@ -1310,4 +1310,79 @@ Carry-forward still unaddressed:
     depend on a postgres connection for the bytes themselves -
     only the metadata row uses Postgres.
 
+### 2026-06-29 - auth gap, mediaGallery, render-smoke, durability flag
+
+Four carry-forwards closed in one session. Live probe after
+push: smoke-routes 36/36, smoke-render 29/29, smoke-admin-live
+ALL GREEN, smoke-durability 5/5, smoke-media-e2e green.
+
+**1. /api/pages/[id] auth gap closed**
+
+Knew the bug existed since v1.1.0; only landed the fix now.
+The license-only gate let any caller with a valid license
+DELETE /api/pages/N and rewrite page contents - session
+never checked. Operators/buyers with exposed Vercel URLs
+could mutate any tenant's pages without auth.
+
+src/lib/license-gate.ts now exports requireAdminSession()
+which combines NextAuth session + license check. Three
+routes ported away from the license-only gate:
+  - src/app/api/pages/route.ts (POST)
+  - src/app/api/pages/[id]/route.ts (PUT + DELETE)
+  - src/app/api/pages/[id]/blocks/route.ts (PUT)
+matches the existing pattern on /api/projects, /api/journal,
+/api/testimonials, /api/team, /api/settings. Asymmetric
+auth across the page-builder surface is now corrected.
+
+Live probe after push:
+  DELETE /api/pages/1 anon -> 401  (was 200 in v1.1.2)
+  POST   /api/pages      anon -> 401
+  PUT    /api/pages/1    anon -> 401
+  PUT    /api/pages/1/blocks anon -> 401
+  (then with admin session: every route returns 200)
+
+**2. mediaGallery schema wired into real blocks**
+
+src/components/admin/block-schemas.ts - the mediaGallery
+field kind added in the prior commit but no block schema
+exercised it. Wired into:
+  - image-grid (Pick from library)
+  - spatial-walkthroughs (Pick 3D walkthrough thumbnails)
+  - services (Default cell photo)
+The multi-pick picker now appears in three block types
+in /admin/pages/[id] when an operator opens those block
+schemas. Closes the multi-select ask end-to-end.
+
+**3. Render-probe smoke (29/29)**
+
+scripts/smoke-render.mjs - the post-mortem on the v1.1.2
+safeParse regression (CONTEXT 2026-06-28). API smokes
+cannot catch a 200-with-empty-h1 - only a render probe
+reading / can. After every rebuild the home page must
+still carry the GSAP markers shipped in 2026-06-29's
+session (ei-word=3, ei-cap-photo=4, ei-cap-fade=12,
+ei-cta-word=16, etc). The smoke also asserts hero
+headline emits exactly 'how you live, ... not how a
+catalogue looks' with no double-comma.
+
+**4. Vercel SQLite hot-copy now surfaces ephemeral writes**
+
+src/lib/pg.ts:sqliteExec's non-SELECT branch now returns
+{ __ephemeral_writable: true } when isVercelFallbackPath()
+is true. Routes that previously saw '200 success' from a
+write were actually receiving synthetic empty rows whose
+state vanished on the next cold start. The Vercel
+fallback still cannot persist (Postgres is the durable
+answer) but the failure is now loud. Documentation added
+to scripts/smoke-durability.mjs which validates same-
+container durability end-to-end (5/5 green today; cross-
+coldstart requires manual vercel --prod between runs).
+
+Verify-deploy 19/19. Build green. Graph updated.
+
+Carry-forward: cross-coldstart durability remains gated
+on the operator configuring DATABASE_URL on Vercel. That
+is the Phase 1 acceptance test from docs/v112-plan.md
+Phase 5, redocumented in the durability smoke.
+
 
