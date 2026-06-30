@@ -1776,3 +1776,92 @@ Carry-forward (unchanged):
 
 Future-version asks continue through the v1.1.x -> v1.2
 bump per AGENT_BEST_PRACTICES.
+
+### 2026-06-30 - walkthrough + admin-write + read-side fix (carry-forward close-out)
+
+Two commits on `main`, pushed:
+
+- `0b0cb98` feat(walk-through): pin-and-scrub horizontal track on
+  vertical scroll
+- `9ef5a3a` fix(admin): persist admin edits across snake_case /
+  camelCase boundary
+
+Operator report this session: "when I update from admin panel
+anything doesn't apply." Walk-through pin-and-scrub was the
+opening ask; the admin bug escalated from a follow-up probe.
+
+Pre-session carry-forwards (from 2026-06-30 context block above):
+
+1. Pin-and-scrub horizontal track - SHIPPED in 0b0cb98.
+   ScrollTrigger with start: top top, pin: true, scrub: 1,
+   predicts distance = track.scrollWidth - window.innerWidth,
+   end: () => +${distance}, anticipatePin: 1. Reduced-motion
+   and (min-width: 768px) matchMedia subscription releases the
+   pin and falls back to the original horizontal-snap-scroll.
+   Card locked at min(86vw,1100px) x min(78dvh,720px) on the
+   scrub path so opening the 3D does not CLS.
+
+2. Admin write-paths now persist. Root cause: pgOne returns rows
+   with snake_case column names (description_json, model_3d,
+   before_image, after_image, is_published, cover_image,
+   content_json); AdminProjectForm and AdminJournalForm
+   initialized their camelCase useState from initial?.x ?? default,
+   so every camelCase field resolved to its default. On save, the
+   form POSTed these defaults to the API, and the UPDATE handler
+   pushed them verbatim to the snake_case columns - wiping rich-
+   text description, model URL, before/after images, gallery, and
+   silently publishing drafts. Publish-toggles on the listing
+   pages appeared to work because they bypass the broken
+   hydration path with a direct PUT.
+
+   Secondary read-side bug: RichTextRenderer JSON.parse'd an
+   object (Postgres JSONB driver's parsed shape) and threw,
+   silently falling back to plain text. The 2026-06-28 home-page
+   safeParse fix only patched the row loader; the renderer was
+   still shape-wrong, so all three public rich-text surfaces
+   (projects/[slug], journal/[slug], block-rendered richtext on
+   /) never rendered TipTap content even when the row had it.
+
+3. Operator's "demo seed before/after looks identical" report:
+   CONFIRMED working on the live site via the next/image imageSrcSet
+   on /projects/casa-mira, which carries two distinct Unsplash
+   photo IDs (1600596542815-ffad4c1539a9 vs 1600585154526-990dced4db0d).
+   Schema and seed both already differentiated; the smoke-render
+   32/32 + 36/36 routes pair confirmed.
+
+4. Tiered role gate (carry-forward from 2026-06-29): CONFIRMED
+   live. requireSuperadmin() on /api/admin/license POST and
+   /api/admin/demo-reset POST. scripts/smoke-role.mjs probe
+   shows admin role gets 403 from these routes with reason
+   "This route is superadmin-only."
+
+Verification (live Vercel):
+
+- npm run build -> green
+- npx tsc --noEmit -> exit 0
+- npm run verify:deploy -> 19/19 green
+- All public + admin + superadmin routes 200
+- node scripts/smoke-routes.mjs -> 36/36
+- node scripts/smoke-render.mjs -> 32/32
+- node scripts/smoke-admin-live.mjs -> ALL GREEN (login as
+  studio@ / 19+ CRUD writes per entity)
+- node scripts/smoke-api.mjs -> OK, writes survive two cold-starts
+- node scripts/smoke-role.mjs -> 401 anon, 403 admin, 200
+  admin on /api/projects (gating holds)
+
+Tiered role gate decision (long-standing carry-forward): closed.
+Admin and superadmin are now distinct roles. requireSuperadmin()
+on /api/admin/license POST + /api/admin/demo-reset POST +
+smoke-role.mjs prove the split holds. Operators carrying
+admin creds get 403 from superadmin routes; they can still reach
+/api/projects, /api/journal, /api/testimonials, /api/team,
+/api/pages.
+
+Outstanding: zero operator-action carries. The only remaining
+items are:
+
+- v1.1.x -> v1.2 bump for any future product work (per FREEZE-MARKER)
+- Operator-seeded content (before/after photo overrides for
+  specific projects) is a content decision, not a code change
+
+Future-version asks continue through v1.1.x -> v1.2.
