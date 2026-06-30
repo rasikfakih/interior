@@ -23,6 +23,60 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Mobile drawer: escape closes, body scroll locks while open, and
+  // Tab is contained inside the drawer (mobile focus trap, §PR1).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const drawer = document.getElementById("mobile-nav-drawer");
+    if (!drawer) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    if (isMenuOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      const focusables = () =>
+        Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.hasAttribute("aria-hidden"));
+
+      const first = focusables()[0];
+      const last = focusables()[focusables().length - 1];
+      first?.focus();
+
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          setIsMenuOpen(false);
+          return;
+        }
+        if (e.key !== "Tab") return;
+        const list = focusables();
+        if (list.length === 0) return;
+        const firstEl = list[0];
+        const lastEl = list[list.length - 1];
+        if (e.shiftKey && document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        } else if (!e.shiftKey && document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      };
+      document.addEventListener("keydown", onKey);
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.removeEventListener("keydown", onKey);
+        previouslyFocused?.focus?.();
+      };
+    }
+    return undefined;
+  }, [isMenuOpen]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -116,7 +170,7 @@ export const Navbar = () => {
                 setLanguage(e.target.value as "en" | "hi" | "mr")
               }
               aria-label="Language"
-              className="bg-transparent text-xs font-mono uppercase tracking-[0.18em] py-1.5 px-2 focus:outline-none"
+              className="bg-transparent text-xs font-mono uppercase tracking-[0.18em] py-3 md:py-1.5 px-2 focus:outline-none min-h-[44px] md:min-h-0"
             >
               <option value="en">EN</option>
               <option value="hi">HI</option>
@@ -126,7 +180,7 @@ export const Navbar = () => {
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="w-9 h-9 rounded-full border hairline-strong flex items-center justify-center hover:bg-[var(--surface-strong)] transition-colors"
+              className="w-11 h-11 md:w-9 md:h-9 rounded-full border hairline-strong flex items-center justify-center hover:bg-[var(--surface-strong)] transition-colors"
             >
               <span className="text-xs font-mono uppercase tracking-[0.16em]">
                 {theme === "dark" ? "Lt" : "Dk"}
@@ -135,9 +189,10 @@ export const Navbar = () => {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden w-9 h-9 flex flex-col justify-center items-center gap-1.5"
-              aria-label="Open menu"
+              className="md:hidden w-11 h-11 flex flex-col justify-center items-center gap-1.5"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMenuOpen}
+              aria-controls="mobile-nav-drawer"
             >
               <span
                 className={`block w-5 h-px bg-current transition-transform ${
@@ -159,14 +214,20 @@ export const Navbar = () => {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden border-t hairline bg-canvas">
-            <nav className="container-page py-6 flex flex-col gap-4">
+          <div
+            id="mobile-nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+            className="md:hidden border-t hairline bg-canvas"
+          >
+            <nav className="container-page py-4 flex flex-col">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-lg"
+                  className="text-lg py-3 min-h-[44px] flex items-center border-b hairline"
                 >
                   {link.label}
                 </Link>

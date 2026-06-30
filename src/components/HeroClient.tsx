@@ -168,15 +168,15 @@ export default function HeroClient({ data }: { data: HeroData }) {
   return (
     <section
       ref={root as any}
-      className="relative pt-24 md:pt-28 pb-16 md:pb-24"
+      className="relative pt-16 md:pt-28 pb-12 md:pb-24"
       aria-label="Hero"
     >
       <div className="container-page">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-end">
-          <div className="md:col-span-7">
+          <div className="md:col-span-7 md:order-2">
             <span
               ref={eyebrowRef}
-              className="chrome-pill inline-flex mb-6"
+              className="chrome-pill inline-flex mb-4 md:mb-6"
               style={reduce ? visibleAtRest : initialHidden}
             >
               {data?.eyebrow || "Residential Studio"}
@@ -184,7 +184,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
 
             <h1
               ref={headlineRef}
-              className="text-[clamp(2.4rem,6vw,5rem)] leading-[1.05] tracking-[-0.025em] pb-1"
+              className="text-[clamp(2rem,9vw,5rem)] md:text-[clamp(2.4rem,6vw,5rem)] leading-[1.05] tracking-[-0.025em] pb-1"
             >
               <span className="ei-word inline-block overflow-hidden align-bottom">
                 <span className="inline-block">{data?.headlinePlain || "Homes built around"}</span>
@@ -207,7 +207,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
 
             <p
               ref={subRef}
-              className="mt-6 max-w-[58ch] text-ink-mute text-base md:text-lg leading-relaxed"
+              className="mt-4 md:mt-6 max-w-[58ch] text-ink-mute text-base md:text-lg leading-relaxed"
               style={reduce ? visibleAtRest : initialHidden}
             >
               {data?.subtext ||
@@ -216,7 +216,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
 
             <div
               ref={ctaRef}
-              className="mt-10 flex flex-wrap items-center gap-3"
+              className="mt-6 md:mt-10 flex flex-wrap items-center gap-3"
               style={reduce ? visibleAtRest : initialHidden}
             >
               <a href="/contact" className="btn-primary">
@@ -229,7 +229,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
             </div>
           </div>
 
-          <div className="md:col-span-5 relative aspect-[4/5] w-full">
+          <div className="md:col-span-5 relative aspect-[4/5] md:aspect-[4/5] w-full md:order-1">
             <div
               ref={photoRef}
               className="absolute inset-0 overflow-hidden rounded-[var(--radius-card)]"
@@ -242,7 +242,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
                 alt="A residential interior in soft natural light"
                 fill
                 priority
-                sizes="(min-width: 768px) 40vw, 100vw"
+                sizes="(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
                 className="object-cover"
                 style={{ willChange: "transform" }}
               />
@@ -269,7 +269,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
         {statsValid.length > 0 && (
           <div
             ref={statsRef}
-            className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6"
+            className="mt-12 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {statsValid.map((s, i) => (
               <div key={i} className="ei-stat" style={reduce ? visibleAtRest : initialHidden}>
