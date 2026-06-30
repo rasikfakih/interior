@@ -1,4 +1,5 @@
 ﻿import type { Metadata } from "next";
+import Image from "next/image";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
 export const metadata: Metadata = {
@@ -97,11 +98,12 @@ export default async function AboutPage() {
                     className="surface-tile p-6 md:p-7 flex flex-col gap-3"
                   >
                     {photo ? (
-                      <img
+                      <Image
                         src={photo}
                         alt=""
+                        width={56}
+                        height={56}
                         className="w-14 h-14 rounded-full object-cover"
-                        loading="lazy"
                       />
                     ) : (
                       <div

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@/lib/use-gsap";
@@ -124,11 +125,12 @@ export default function Services() {
             >
               <div className={`relative ${c.aspect} w-full overflow-hidden`}>
                 <div className="ei-cap-photo absolute inset-0">
-                  <img
+                  <Image
                     src={c.photo}
                     alt={c.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />

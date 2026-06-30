@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -174,11 +175,12 @@ export default function SelectedWork({
                 href={`/projects/${p.slug}`}
                 className="ei-work-photo md:col-span-8 block overflow-hidden rounded-[var(--radius-card)] aspect-[16/10] relative md:[direction:ltr]"
               >
-                <img
+                <Image
                   src={p.image}
                   alt={p.title}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-[1.04]"
+                  fill
+                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  className="object-cover transition-transform duration-700 hover:scale-[1.04]"
                 />
               </Link>
               <div className="ei-work-meta md:col-span-4 md:[direction:ltr]">

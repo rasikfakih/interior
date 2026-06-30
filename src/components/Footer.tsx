@@ -88,7 +88,7 @@ export const Footer = async () => {
                 rel="noreferrer noopener"
                 className="hover:text-ink"
               >
-                Instagram â†—
+                Instagram →
               </a>
               <a
                 href="https://www.are.na"
@@ -96,7 +96,7 @@ export const Footer = async () => {
                 rel="noreferrer noopener"
                 className="hover:text-ink"
               >
-                Are.na â†—
+                Are.na →
               </a>
             </div>
           </div>

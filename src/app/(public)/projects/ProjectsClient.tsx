@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Model3DViewer from "@/components/Model3DViewer";
 
 type Item = {
@@ -28,11 +29,12 @@ export default function ProjectsClient({ items }: { items: Item[] }) {
               href={`/projects/${p.slug}`}
               className="group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/11]"
             >
-              <img
+              <Image
                 src={p.image}
                 alt={p.title}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
               />
               {p.has3D && (
                 <span className="absolute top-3 left-3 chrome-pill">

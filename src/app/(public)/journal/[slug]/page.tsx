@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import RichTextRenderer from "@/components/RichTextRenderer";
 
@@ -48,7 +49,7 @@ export default async function JournalEntryPage({
       <div className="container-page max-w-3xl">
         <Link
           href="/journal"
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-ink-mute hover:text-warm mb-10"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-ink-mute hover:text-accent mb-10"
         >
           <span aria-hidden>←</span> Back to journal
         </Link>
@@ -56,7 +57,7 @@ export default async function JournalEntryPage({
         <header className="mb-12">
           <div className="flex gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-4">
             <span>{dateLabel}</span>
-            <span className="text-warm">· {entry.category || "Note"}</span>
+            <span className="text-accent">· {entry.category || "Note"}</span>
             <span>· {entry.author_name || "Studio"}</span>
           </div>
           <h1 className="text-[clamp(2.2rem,5vw,4rem)] tracking-[-0.025em] leading-[1.05]">
@@ -65,12 +66,14 @@ export default async function JournalEntryPage({
         </header>
 
         {entry.cover_image && (
-          <div className="aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] mb-10">
-            <img
+          <div className="aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] mb-10 relative">
+            <Image
               src={entry.cover_image}
               alt={entry.title}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
+              fill
+              sizes="(min-width: 768px) 768px, 100vw"
+              className="object-cover"
+              priority
             />
           </div>
         )}

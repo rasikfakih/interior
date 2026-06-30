@@ -120,7 +120,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
               href={buttonHref}
               className="btn-primary w-fit"
             >
-              {buttonLabel} <span aria-hidden>â†—</span>
+              {buttonLabel} <span aria-hidden>→</span>
             </a>
           </div>
         </div>

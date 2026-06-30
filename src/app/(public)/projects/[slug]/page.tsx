@@ -66,8 +66,8 @@ export default async function ProjectDetailPage({
 
         <header className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-14">
           <div className="md:col-span-7">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-warm">
-              {row.year || "—"}
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
+              {row.year || "-"}
             </p>
             <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1] mt-3">
               {row.title}
@@ -92,9 +92,9 @@ export default async function ProjectDetailPage({
         {hasBefore && hasAfter ? (
           <BeforeAfterSlider
             beforeSrc={before}
-            beforeAlt={`${row.title} — before`}
+            beforeAlt={`${row.title} - before`}
             afterSrc={after}
-            afterAlt={`${row.title} — after`}
+            afterAlt={`${row.title} - after`}
             caption={`Before and after · ${row.title}`}
           />
         ) : (
