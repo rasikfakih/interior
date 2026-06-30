@@ -1,16 +1,16 @@
 # Graph Report - etihad-interiors-website  (2026-06-30)
 
 ## Corpus Check
-- 234 files · ~143,754 words
+- 235 files · ~144,909 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1270 nodes · 2026 edges · 107 communities (83 shown, 24 thin omitted)
+- 1279 nodes · 2036 edges · 110 communities (86 shown, 24 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 91 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `58d9d168`
+- Built from commit: `e78f619b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -67,6 +67,7 @@
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
 - [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
 - [[_COMMUNITY_Community 55|Community 55]]
@@ -101,12 +102,14 @@
 - [[_COMMUNITY_Community 94|Community 94]]
 - [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
 - [[_COMMUNITY_Community 101|Community 101]]
 - [[_COMMUNITY_Community 102|Community 102]]
 - [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
 - [[_COMMUNITY_Community 106|Community 106]]
 - [[_COMMUNITY_Community 108|Community 108]]
 - [[_COMMUNITY_Community 109|Community 109]]
@@ -119,7 +122,7 @@
 3. `pgMany()` - 32 edges
 4. `openDb()` - 31 edges
 5. `pgQuery()` - 27 edges
-6. `9. Last session log` - 24 edges
+6. `9. Last session log` - 25 edges
 7. `authOptions` - 23 edges
 8. `requireLicense()` - 23 edges
 9. `scripts` - 17 edges
@@ -128,35 +131,35 @@
 ## Surprising Connections (you probably didn't know these)
 - `NewTenantPage()` --calls--> `cookies`  [INFERRED]
   src/app/superadmin/tenants/new/page.tsx → scripts/probe-media.mjs
-- `SuperadminLayout()` --calls--> `cookies`  [INFERRED]
-  src/app/superadmin/layout.tsx → scripts/probe-media.mjs
 - `DELETE()` --calls--> `cookies`  [INFERRED]
   src/app/api/operator/login/route.ts → scripts/probe-media.mjs
 - `POST()` --calls--> `cookies`  [INFERRED]
   src/app/api/operator/login/route.ts → scripts/probe-media.mjs
+- `SuperadminLayout()` --calls--> `cookies`  [INFERRED]
+  src/app/superadmin/layout.tsx → scripts/probe-media.mjs
 - `TenantDetailPage()` --calls--> `cookies`  [INFERRED]
   src/app/superadmin/tenants/[id]/page.tsx → scripts/probe-media.mjs
 
 ## Import Cycles
 - None detected.
 
-## Communities (107 total, 24 thin omitted)
+## Communities (110 total, 24 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (33): ADMIN_NAV, AdminShell(), Tab, useToast(), LoginCard(), AdminPage(), metadata, safeCheckLicense() (+25 more)
+Cohesion: 0.11
+Nodes (19): LicenseBanner(), CheckResult, reasonText, SafeLicenseBanner(), InstallPage(), metadata, assertLicense(), canonicalBody() (+11 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (46): TenantDetailPage(), IssuePage(), metadata, POST(), getOperatorSession(), applyDistro(), createTenant(), getAuditLog() (+38 more)
+Cohesion: 0.05
+Nodes (50): TenantDetailPage(), IssuePage(), metadata, POST(), getOperatorSession(), applyDistro(), createTenant(), getAuditLog() (+42 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
 Nodes (31): cormorant, geist, geistMono, metadata, CalendlyEmbed(), CalendlyEmbedProps, CursorFollower(), Footer() (+23 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.10
-Nodes (15): Model3DViewerProps, Item, seed, openReadonlyDb(), FALLBACK, findTenant(), listTenants(), readBrandFor() (+7 more)
+Cohesion: 0.22
+Nodes (11): openReadonlyDb(), FALLBACK, findTenant(), listTenants(), readBrandFor(), readDefaultBrand(), TenantBrand, DbProjectRow (+3 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.07
@@ -179,8 +182,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.28
-Nodes (7): AboutPage(), getTeam(), metadata, teamMembers, GET(), isAuthorized(), POST()
+Cohesion: 0.15
+Nodes (4): ADMIN_NAV, AdminShell(), Tab, useToast()
 
 ### Community 10 - "Community 10"
 Cohesion: 0.80
@@ -196,7 +199,7 @@ Nodes (14): 10. Operator console: superadmin, 11. Curl smoke for operator, 12. D
 
 ### Community 13 - "Community 13"
 Cohesion: 0.06
-Nodes (33): 1. What this is, 2026-06-23 - mega-deploy v1.1.0, 2026-06-25 — final doc + graph refresh, 2026-06-25 — Graphify install + session protocol wiring, 2026-06-25 — migration plan drafted (v1.1.2 / Supabase swap), 2026-06-25 — Phase 1 connectivity landed + admin seed + abandoned CSRF chain, 2026-06-25 — post-deploy bugfix sweep (v1.1.0 follow-up), 2026-06-26 — diagnosis + probe hardening (no deploy) (+25 more)
+Nodes (34): 1. What this is, 2026-06-23 - mega-deploy v1.1.0, 2026-06-25 — final doc + graph refresh, 2026-06-25 — Graphify install + session protocol wiring, 2026-06-25 — migration plan drafted (v1.1.2 / Supabase swap), 2026-06-25 — Phase 1 connectivity landed + admin seed + abandoned CSRF chain, 2026-06-25 — post-deploy bugfix sweep (v1.1.0 follow-up), 2026-06-26 — diagnosis + probe hardening (no deploy) (+26 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.19
@@ -211,16 +214,16 @@ Cohesion: 0.29
 Nodes (3): __dirname, PROJECTS, repoRoot
 
 ### Community 17 - "Community 17"
-Cohesion: 0.38
-Nodes (5): findUserByEmailLegacy(), getVercelHotCopy(), isVercelSqlitePath(), UserRow, GET()
+Cohesion: 0.16
+Nodes (14): authOptions, findUserByEmailLegacy(), getVercelHotCopy(), isVercelSqlitePath(), UserRow, testimonials, handler, DELETE() (+6 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.20
-Nodes (16): COLUMN_MAP, db, pgQuery(), POST(), DELETE(), GET(), isAuthorized(), PUT() (+8 more)
+Cohesion: 0.23
+Nodes (14): COLUMN_MAP, pgQuery(), DELETE(), GET(), isAuthorized(), PUT(), DELETE(), GET() (+6 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.08
-Nodes (22): AdminJournalForm(), slugify(), FormState, arr(), ArraySchema, ArraySchemaKind, BlockSchema, FieldSchema (+14 more)
+Cohesion: 0.07
+Nodes (25): AdminJournalForm(), slugify(), AdminProjectForm(), FormState, arr(), ArraySchema, ArraySchemaKind, BlockSchema (+17 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -283,12 +286,12 @@ Cohesion: 0.20
 Nodes (8): aboutPage, blockCount, contactPage, DB_PATH, journal, pageRow, projectsPage, sqlite
 
 ### Community 35 - "Community 35"
-Cohesion: 0.13
-Nodes (15): PageEditor(), auditLog, media, menuItems, menus, pageBlocks, pages, revisions (+7 more)
+Cohesion: 0.09
+Nodes (23): AboutPage(), getTeam(), metadata, Props, PageEditor(), db, auditLog, journalPosts (+15 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.33
-Nodes (3): JournalPage(), Row, metadata
+Cohesion: 0.24
+Nodes (10): getDrizzle(), getSqliteDrizzle(), openDb(), BlockRow, getFrontPage(), getPageById(), getPageBySlug(), listPages() (+2 more)
 
 ### Community 37 - "Community 37"
 Cohesion: 0.22
@@ -311,8 +314,8 @@ Cohesion: 0.09
 Nodes (17): GLBThumbProps, formatBytes(), kindFromMime(), MAX_BYTES, MediaKind, MediaListResponse, MediaRow, MEDIATYPE_LABEL (+9 more)
 
 ### Community 45 - "Community 45"
-Cohesion: 0.70
-Nodes (4): DELETE(), GET(), isAuthorized(), PUT()
+Cohesion: 0.25
+Nodes (6): Mark, Node, renderBlock(), renderInline(), RichTextRendererProps, TextNode
 
 ### Community 46 - "Community 46"
 Cohesion: 0.53
@@ -323,20 +326,24 @@ Cohesion: 0.36
 Nodes (6): cookieHeader(), csrfAndCookie(), del(), get(), login(), post()
 
 ### Community 48 - "Community 48"
-Cohesion: 0.40
-Nodes (4): ITEMS, OperatorNav(), metadata, SuperadminLayout()
+Cohesion: 0.43
+Nodes (5): LoginCard(), AdminPage(), metadata, safeCheckLicense(), safeGetServerSession()
 
 ### Community 49 - "Community 49"
-Cohesion: 0.20
-Nodes (13): findUserByEmail(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath(), isLocalDevPath(), isVercel(), isVercelFallbackPath() (+5 more)
+Cohesion: 0.16
+Nodes (16): PUT(), GET(), findUserByEmail(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath(), isLocalDevPath() (+8 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.25
 Nodes (3): Row, Sort, metadata
 
+### Community 52 - "Community 52"
+Cohesion: 0.33
+Nodes (5): BASE_BY_SLUG, __dirname, imgURL(), repoRoot, run()
+
 ### Community 53 - "Community 53"
-Cohesion: 0.06
-Nodes (30): ClosingCTA(), HeroClient(), HeroData, normalizeTail(), defaultEntries, Entry, JournalPreview(), Block (+22 more)
+Cohesion: 0.05
+Nodes (29): ClosingCTA(), HeroClient(), HeroData, normalizeTail(), defaultEntries, Entry, JournalPreview(), Model3DViewerProps (+21 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.62
@@ -367,8 +374,8 @@ Cohesion: 0.20
 Nodes (5): __dirname, JSON_COLUMNS, main(), replayTable(), repoRoot
 
 ### Community 85 - "Community 85"
-Cohesion: 0.26
-Nodes (9): GET(), isAuthorized(), POST(), pgMany(), gateOrFail(), GET(), POST(), GET() (+1 more)
+Cohesion: 0.35
+Nodes (9): adminOnlyOrFail(), gateOrFail(), requireAdminSession(), gateOrFail(), GET(), POST(), DELETE(), GET() (+1 more)
 
 ### Community 86 - "Community 86"
 Cohesion: 0.40
@@ -379,8 +386,8 @@ Cohesion: 0.25
 Nodes (7): adm, dbPath, __dirname, env, envFile, rows, sqlite
 
 ### Community 90 - "Community 90"
-Cohesion: 0.07
-Nodes (41): GET(), PUT(), GET(), POST(), adminOnlyOrFail(), gateOrFail(), Action, gateAdmin() (+33 more)
+Cohesion: 0.18
+Nodes (15): POST(), Action, gateAdmin(), appendAudit(), Gate, GateResult, requireLicense(), requireSuperadmin() (+7 more)
 
 ### Community 91 - "Community 91"
 Cohesion: 0.15
@@ -391,8 +398,12 @@ Cohesion: 0.38
 Nodes (6): dumpTable(), main(), OUT_DIR, SOURCE, TABLES, todayStamp()
 
 ### Community 95 - "Community 95"
-Cohesion: 0.19
-Nodes (10): AdminProjectForm(), AdminJournalEditor(), AdminProjectEditor(), AdminTeamEditor(), AdminTestimonialEditor(), pgOne(), metadata, metadata (+2 more)
+Cohesion: 0.20
+Nodes (10): AdminJournalEditor(), AdminTeamEditor(), AdminTestimonialEditor(), pgOne(), GET(), isAuthorized(), POST(), metadata (+2 more)
+
+### Community 97 - "Community 97"
+Cohesion: 0.33
+Nodes (6): POST(), ALLOWED_FOLDERS, ALLOWED_IMAGE_MIME, ALLOWED_MODEL_MIME, EXT_BY_MIME, safeName()
 
 ### Community 98 - "Community 98"
 Cohesion: 0.29
@@ -414,6 +425,10 @@ Nodes (3): Row, Sort, metadata
 Cohesion: 0.29
 Nodes (3): Row, Sort, metadata
 
+### Community 104 - "Community 104"
+Cohesion: 0.83
+Nodes (3): canonicalBody(), signLicense(), testVerify()
+
 ### Community 106 - "Community 106"
 Cohesion: 0.20
 Nodes (10): devDependencies, eslint, eslint-config-next, tailwindcss, @tailwindcss/postcss, @types/better-sqlite3, @types/node, @types/react (+2 more)
@@ -423,31 +438,31 @@ Cohesion: 0.44
 Nodes (8): cookieHeader(), fail(), log(), login(), main(), mergeCookies(), rawFetch(), ts()
 
 ### Community 109 - "Community 109"
-Cohesion: 0.22
-Nodes (5): Row, StudioServer(), Row, VoicesServer(), metadata
+Cohesion: 0.11
+Nodes (20): GET(), Row, StudioServer(), Row, VoicesServer(), JournalPage(), Row, GET() (+12 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.15
-Nodes (14): metadata, NotFound(), Props, ensureMigrated(), journalPosts, projects, GET(), isAuthorized() (+6 more)
+Cohesion: 0.40
+Nodes (4): metadata, NotFound(), JournalEntryPage(), ProjectDetailPage()
 
 ### Community 114 - "Community 114"
 Cohesion: 0.50
 Nodes (3): name, private, version
 
 ## Knowledge Gaps
-- **500 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+495 more)
+- **504 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+499 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ensureMigrated()` connect `Community 110` to `Community 1`, `Community 35`, `Community 36`, `Community 3`, `Community 9`, `Community 109`, `Community 45`, `Community 17`, `Community 49`, `Community 18`, `Community 85`, `Community 23`, `Community 90`, `Community 95`?**
-  _High betweenness centrality (0.075) - this node is a cross-community bridge._
-- **Why does `pgOne()` connect `Community 95` to `Community 1`, `Community 35`, `Community 9`, `Community 45`, `Community 110`, `Community 17`, `Community 49`, `Community 18`, `Community 85`, `Community 23`, `Community 90`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `cookies` connect `Community 1` to `Community 48`, `Community 86`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `ensureMigrated()` connect `Community 109` to `Community 1`, `Community 35`, `Community 36`, `Community 3`, `Community 110`, `Community 49`, `Community 17`, `Community 19`, `Community 18`, `Community 85`, `Community 23`, `Community 90`, `Community 95`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+- **Why does `pgOne()` connect `Community 95` to `Community 1`, `Community 35`, `Community 36`, `Community 109`, `Community 17`, `Community 49`, `Community 19`, `Community 18`, `Community 85`, `Community 23`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `appendAudit()` connect `Community 90` to `Community 0`, `Community 35`, `Community 36`, `Community 109`, `Community 49`, `Community 18`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Are the 25 inferred relationships involving `ensureMigrated()` (e.g. with `AdminJournalEditor()` and `AdminProjectEditor()`) actually correct?**
   _`ensureMigrated()` has 25 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 12 inferred relationships involving `pgOne()` (e.g. with `AdminJournalEditor()` and `AdminProjectEditor()`) actually correct?**
@@ -455,4 +470,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 5 inferred relationships involving `openDb()` (e.g. with `appendAudit()` and `POST()`) actually correct?**
   _`openDb()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `plugin`, `eslintConfig` to the rest of the system?**
-  _500 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _504 weakly-connected nodes found - possible documentation gaps or missing edges._

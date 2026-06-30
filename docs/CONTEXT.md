@@ -1715,4 +1715,64 @@ Verification:
 Future-version asks continue through the v1.1.x -> v1.2
 bump per AGENT_BEST_PRACTICES.
 
+### 2026-06-30 - walk-through pin-and-scrub
 
+Operator request: "Walk through" should pin the 3D card deck and follow
+the user's vertical scroll, snapping horizontally as the user scrolls.
+
+One commit on `main`, pending push:
+
+- (this docs entry, pending)
+
+What landed:
+
+- src/components/SpatialWalkthroughs.tsx rewritten. New
+  WalkthroughDeck sub-component owns the scrub track. ScrollTrigger
+  pins the section, scrubs an inner horizontal track by translating
+  track.scrollWidth - window.innerWidth to -x as the user scrolls
+  vertically. Cleanup via gsap.context.revert on dep change.
+- Reduced-motion + matchMedia desktop gating: the component
+  subscribes to (prefers-reduced-motion: reduce) and (min-width:
+  768px) matchMedias. State-driven re-runs of the scrub
+  effect. Under reduced motion OR mobile viewport the section
+  falls back to the original horizontal-snap-scroll track.
+- Locked-width card on the scrub path (`min(86vw,1100px)` wide x
+  `min(78dvh,720px)` tall) so the layout doesn't shift as the
+  user triggers a card. The card width is supplied per-mode by
+  the WalkthroughDeck parent.
+- Section padding tuned per mode: scrub path uses py-12 / md:py-16
+  so the pinned h-[100dvh] track is the visual anchor; non-scrub
+  path keeps the original py-24 / md:py-32.
+- Lede sentence honoured: shows "Scroll down to walk through"
+  when scrubbed, "Scroll horizontally for the next" otherwise.
+- ProcessStickyStack pattern reused: React-state-driven
+  reduceMotion + matchMedia listener subscription with cleanup,
+  gsap.context scoped to sectionRef, deps include state values
+  so the effect re-runs cleanly when the user toggles their OS
+  reduce-motion preference or resizes the window across the
+  768px breakpoint.
+
+Mirrors taste-skill Section 5.B (Horizontal-Pan Canonical
+Skeleton): wrapper pinned, inner track scrubbed by ScrollTrigger,
+end = +${distance}. Anticipate pin = 1 to hide pin jitter.
+
+Operator pre-approval captured by question tool before touching
+src/components/SpatialWalkthroughs.tsx; the freeze marker
+otherwise blocks edit under src/components/**.
+
+Verification:
+
+- npm run verify:deploy -> 19/19 green
+- npm run graphify:update -> 1279 nodes / 2036 edges / 110
+  communities (was 1272 / 2034 / 110)
+- tsc --noEmit -> exit 0
+
+Carry-forward (unchanged):
+- DATABASE_URL on Vercel is configured; coldstart durability is
+  proven via smoke-coldstart.mjs.
+- Tiered admin / superadmin role gate is closed.
+- Operator-uploaded before/after image defaults for demo seed are
+  a content decision, not a code decision.
+
+Future-version asks continue through the v1.1.x -> v1.2
+bump per AGENT_BEST_PRACTICES.

@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "src/app/(public)/journal/[slug]/page.tsx": {
-    "mtime": 1782799344.1996088,
-    "ast_hash": "af99afba740568d614e84fdf5d38e689",
+    "mtime": 1782815624.610638,
+    "ast_hash": "d63696c88a170bcec11d4b8e797f66fa",
     "semantic_hash": ""
   },
   "src/app/(public)/journal/page.tsx": {
@@ -565,8 +565,8 @@
     "semantic_hash": ""
   },
   "src/components/SpatialWalkthroughs.tsx": {
-    "mtime": 1782741751.2591085,
-    "ast_hash": "2fe85d24b7d204c7fbd4b69252f092b3",
+    "mtime": 1782823639.08409,
+    "ast_hash": "b858f53fdaf831da6b402359134d3309",
     "semantic_hash": ""
   },
   "src/components/Testimonials.tsx": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1782759966.829011,
-    "ast_hash": "f6534e4d04b2ca9da08afaffca490ade",
+    "mtime": 1782818565.0943384,
+    "ast_hash": "dec5d5694b2ecef1e200b2059039b29f",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1270,8 +1270,8 @@
     "semantic_hash": ""
   },
   "scripts/smoke-render.mjs": {
-    "mtime": 1782759147.5455084,
-    "ast_hash": "6f26870c9d0035c216fa7e57e8a34f95",
+    "mtime": 1782817663.888883,
+    "ast_hash": "3d2a0bed878324f4c8ada074f4746699",
     "semantic_hash": ""
   },
   "scripts/smoke-routes.mjs": {
@@ -1312,6 +1312,11 @@
   "scripts/rerun-project-photos.mjs": {
     "mtime": 1782808321.6381028,
     "ast_hash": "e444db056f87872ac3a098dc13c77b5f",
+    "semantic_hash": ""
+  },
+  "scripts/rerun-journal-covers.mjs": {
+    "mtime": 1782817929.8579686,
+    "ast_hash": "208af9dca5bc1899af01f1e9d98dddc3",
     "semantic_hash": ""
   }
 }

@@ -1,9 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Model3DViewer from "./Model3DViewer";
 import Link from "next/link";
 import Image from "next/image";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type Item = {
   slug: string;
@@ -69,9 +73,79 @@ export default function SpatialWalkthroughs({
     );
   }
 
+  return <WalkthroughDeck items={items} eyebrow={eyebrow} title={title} lede={lede} compact={compact} />;
+}
+
+function WalkthroughDeck({
+  items,
+  eyebrow,
+  title,
+  lede,
+  compact,
+}: {
+  items: Item[];
+  eyebrow: string;
+  title: string;
+  lede: string;
+  compact: boolean;
+}) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const mqlMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mqlDesktop = window.matchMedia("(min-width: 768px)");
+    const sync = () => {
+      setReduceMotion(mqlMotion.matches);
+      setIsDesktop(mqlDesktop.matches);
+    };
+    sync();
+    mqlMotion.addEventListener("change", sync);
+    mqlDesktop.addEventListener("change", sync);
+    return () => {
+      mqlMotion.removeEventListener("change", sync);
+      mqlDesktop.removeEventListener("change", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || !isDesktop) return;
+    const wrap = sectionRef.current;
+    const track = trackRef.current;
+    if (!wrap || !track) return;
+
+    const ctx = gsap.context(() => {
+      const compute = () => track.scrollWidth - window.innerWidth;
+      gsap.to(track, {
+        x: () => -compute(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top top",
+          end: () => `+=${compute()}`,
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+          anticipatePin: 1,
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [items.length, reduceMotion, isDesktop]);
+
+  const useScrub = isDesktop && !reduceMotion;
+
   return (
     <section
-      className="py-24 md:py-32 bg-canvas relative"
+      ref={sectionRef}
+      className={
+        useScrub
+          ? "py-12 md:py-16 bg-canvas relative"
+          : "py-24 md:py-32 bg-canvas relative"
+      }
       aria-label="Spatial walkthroughs"
     >
       <div className="container-page">
@@ -85,36 +159,46 @@ export default function SpatialWalkthroughs({
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute leading-relaxed">{lede}</p>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mt-4">
-              Scroll horizontally for the next
+              {useScrub
+                ? "Scroll down to walk through"
+                : "Scroll horizontally for the next"}
             </p>
           </div>
         </div>
+      </div>
 
-        <div className="-mx-6 px-6 overflow-x-auto snap-x snap-mandatory flex gap-6 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {items.map((it, i) => (
-            <WalkthroughCard
-              key={it.slug}
-              item={it}
-              index={i}
-              compact={compact}
-            />
-          ))}
-        </div>
+      <div
+        ref={trackRef}
+        className={
+          useScrub
+            ? "px-[max(2rem,calc((100vw-1280px)/2+2rem))] flex h-[100dvh] items-center gap-8 will-change-transform"
+            : "-mx-6 px-6 overflow-x-auto snap-x snap-mandatory flex gap-6 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        }
+      >
+        {items.map((it, i) => (
+          <WalkthroughCard
+            key={it.slug}
+            item={it}
+            index={i}
+            compact={compact}
+            lockedWidth={useScrub}
+          />
+        ))}
+      </div>
 
-        <div className="mt-10 pt-6 border-t hairline">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-            <span aria-hidden className="inline-block mr-2">·</span>
-            Each model rebuilds on load from the corresponding project page.
-            See{" "}
-            <Link
-              href="/projects"
-              className="text-accent border-b border-[var(--accent-soft)] hover:text-accent-deep transition-colors"
-            >
-              Selected work
-            </Link>{" "}
-            for the full dossier.
-          </p>
-        </div>
+      <div className="container-page mt-10 pt-6 border-t hairline">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
+          <span aria-hidden className="inline-block mr-2">·</span>
+          Each model rebuilds on load from the corresponding project page.
+          See{" "}
+          <Link
+            href="/projects"
+            className="text-accent border-b border-[var(--accent-soft)] hover:text-accent-deep transition-colors"
+          >
+            Selected work
+          </Link>{" "}
+          for the full dossier.
+        </p>
       </div>
     </section>
   );
@@ -124,21 +208,23 @@ function WalkthroughCard({
   item,
   index,
   compact,
+  lockedWidth,
 }: {
   item: Item;
   index: number;
   compact: boolean;
+  lockedWidth: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  // Lock to a single card width so opening the model doesn't snap the
-  // layout to a second size (would create CLS). Section 6.D.
-  const cardWidth = "w-[88vw] md:w-[640px]";
+  const cardWidth = lockedWidth
+    ? "w-[min(86vw,1100px)] h-[min(78dvh,720px)]"
+    : "w-[88vw] md:w-[640px]";
 
   return (
     <article
-      className={`snap-start shrink-0 ${cardWidth} ${
+      className={`shrink-0 ${cardWidth} ${
         open ? "surface-elevated" : "surface-tile"
-      } overflow-hidden`}
+      } ${lockedWidth ? "snap-start" : "snap-start"} overflow-hidden`}
     >
       <div className="aspect-[16/10] relative">
         {open ? (
