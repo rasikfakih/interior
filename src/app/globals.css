@@ -209,6 +209,13 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
+    min-height: 44px;
+  }
+
+  @media (min-width: 768px) {
+    .btn-primary {
+      min-height: 0;
+    }
   }
 
   .btn-primary:hover {
@@ -234,6 +241,13 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
+    min-height: 44px;
+  }
+
+  @media (min-width: 768px) {
+    .btn-ghost {
+      min-height: 0;
+    }
   }
 
   .btn-ghost:hover {
@@ -246,11 +260,18 @@
     border: 0;
     border-bottom: 1px solid var(--line-strong);
     color: var(--ink);
-    padding: 0.85rem 0;
+    padding: 0.85rem 0.25rem;
     width: 100%;
     font-size: 1rem;
     font-family: var(--font-sans);
+    min-height: 44px;
     transition: border-color 160ms ease;
+  }
+
+  @media (min-width: 768px) {
+    .input-line {
+      min-height: 0;
+    }
   }
 
   .input-line:focus {

@@ -73,17 +73,20 @@ export default function BeforeAfterSlider({
             draggable={false}
           />
         </div>
-        <div className="pointer-events-none absolute inset-y-0" style={{ left: `${pos}%` }}>
+        <div
+          className="pointer-events-none absolute inset-y-0"
+          style={{ left: `${pos}%` }}
+        >
           <div className="absolute -translate-x-1/2 top-0 bottom-0 w-px bg-canvas shadow-[0_0_0_1px_rgba(0,0,0,0.35)]" />
           <span
             aria-hidden
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-canvas flex items-center justify-center font-mono text-sm"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 rounded-full bg-canvas flex items-center justify-center font-mono text-sm"
           >
             ||
           </span>
         </div>
-        <span className="absolute top-3 left-3 chrome-pill">Before</span>
-        <span className="absolute top-3 right-3 chrome-pill">After</span>
+        <span className="absolute top-3 left-3 chrome-pill pointer-events-none">Before</span>
+        <span className="absolute top-3 right-3 chrome-pill pointer-events-none">After</span>
       </div>
       {caption && (
         <figcaption className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute px-4 py-3">
