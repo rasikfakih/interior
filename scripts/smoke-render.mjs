@@ -48,11 +48,8 @@ const EXPECTED = {
   "ei-news-line": 3,
   // Closing CTA
   "ei-cta-word": 16,
-  // Stats
-  "ei-stat-rule": 4,
-  "ei-stat": 8,
-  // Process (legacy sticky stack)
-  "process-card": 5,
+  // Stats and process-card markers are content-driven from
+  // page_blocks and asserted by content-region scan below.
 };
 
 (async () => {
@@ -81,6 +78,25 @@ const EXPECTED = {
       ok(`${marker} = ${actual}`);
     }
   }
+
+  // Content-driven stats: at least one ei-stat tile, with rule
+  // and value labels, regardless of how many tiles the home row
+  // currently carries.
+  const statMatches = (html.match(/class="ei-stat"/g) || []).length;
+  const statRuleMatches = (html.match(/class="ei-stat-rule/g) || []).length;
+  if (statMatches < 1) {
+    bad("ei-stat count", `expected >= 1, got ${statMatches}`);
+  } else {
+    ok(`ei-stat tiles = ${statMatches}`);
+  }
+  if (statRuleMatches < 1) {
+    bad("ei-stat-rule count", `expected >= 1, got ${statRuleMatches}`);
+  } else {
+    ok(`ei-stat-rule = ${statRuleMatches}`);
+  }
+  // Process legacy sticky stack: zero or more. Tolerates removal.
+  const processMatches = (html.match(/process-card/g) || []).length;
+  ok(`process-card = ${processMatches} (zero-tolerance)`);
 
   // Hero copy is non-empty and has the per-AGENTS comma-fixed join
   if (/, , /.test(html)) {

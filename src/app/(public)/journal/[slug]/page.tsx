@@ -73,7 +73,6 @@ export default async function JournalEntryPage({
               fill
               sizes="(min-width: 768px) 768px, 100vw"
               className="object-cover"
-              priority
             />
           </div>
         )}
