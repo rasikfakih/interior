@@ -1,16 +1,16 @@
 # Graph Report - etihad-interiors-website  (2026-07-01)
 
 ## Corpus Check
-- 235 files · ~146,674 words
+- 236 files · ~147,746 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1289 nodes · 2049 edges · 104 communities (80 shown, 24 thin omitted)
+- 1299 nodes · 2063 edges · 107 communities (82 shown, 25 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 91 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `22de9969`
+- Built from commit: `84430849`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -60,8 +60,10 @@
 - [[_COMMUNITY_Community 42|Community 42]]
 - [[_COMMUNITY_Community 43|Community 43]]
 - [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
 - [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
@@ -89,6 +91,7 @@
 - [[_COMMUNITY_Community 76|Community 76]]
 - [[_COMMUNITY_Community 77|Community 77]]
 - [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
 - [[_COMMUNITY_Community 89|Community 89]]
@@ -97,8 +100,8 @@
 - [[_COMMUNITY_Community 92|Community 92]]
 - [[_COMMUNITY_Community 93|Community 93]]
 - [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 96|Community 96]]
-- [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 98|Community 98]]
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
@@ -119,33 +122,33 @@
 6. `pgQuery()` - 27 edges
 7. `authOptions` - 23 edges
 8. `requireLicense()` - 23 edges
-9. `scripts` - 17 edges
+9. `scripts` - 18 edges
 10. `db` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `NewTenantPage()` --calls--> `cookies`  [INFERRED]
-  src/app/superadmin/tenants/new/page.tsx → scripts/probe-media.mjs
+- `getOperatorSession()` --calls--> `cookies`  [INFERRED]
+  src/lib/operator-auth.ts → scripts/probe-media.mjs
 - `DELETE()` --calls--> `cookies`  [INFERRED]
   src/app/api/operator/login/route.ts → scripts/probe-media.mjs
 - `POST()` --calls--> `cookies`  [INFERRED]
   src/app/api/operator/login/route.ts → scripts/probe-media.mjs
+- `NewTenantPage()` --calls--> `cookies`  [INFERRED]
+  src/app/superadmin/tenants/new/page.tsx → scripts/probe-media.mjs
 - `SuperadminLayout()` --calls--> `cookies`  [INFERRED]
   src/app/superadmin/layout.tsx → scripts/probe-media.mjs
-- `TenantDetailPage()` --calls--> `cookies`  [INFERRED]
-  src/app/superadmin/tenants/[id]/page.tsx → scripts/probe-media.mjs
 
 ## Import Cycles
 - None detected.
 
-## Communities (104 total, 24 thin omitted)
+## Communities (107 total, 25 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
-Nodes (33): ADMIN_NAV, AdminShell(), Tab, useToast(), LoginCard(), AdminPage(), metadata, safeCheckLicense() (+25 more)
+Nodes (48): LoginCard(), AdminPage(), metadata, safeCheckLicense(), safeGetServerSession(), LicenseBanner(), CheckResult, reasonText (+40 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.05
-Nodes (50): TenantDetailPage(), IssuePage(), metadata, POST(), getOperatorSession(), applyDistro(), createTenant(), getAuditLog() (+42 more)
+Nodes (27): TenantDetailPage(), IssuePage(), metadata, DELETE(), POST(), metadata, NewTenantPage(), DistroForm() (+19 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
@@ -168,16 +171,16 @@ Cohesion: 0.34
 Nodes (12): authed(), cookieHeader(), del(), fail(), listBySlug(), log(), login(), main() (+4 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.12
-Nodes (17): scripts, build, db:inspect, dev, graphify:query, graphify:update, lint, migrate (+9 more)
+Cohesion: 0.11
+Nodes (18): scripts, build, db:inspect, dev, graphify:query, graphify:update, lint, migrate (+10 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.28
-Nodes (5): findUserByEmailLegacy(), getVercelHotCopy(), isVercelSqlitePath(), UserRow, handler
+Cohesion: 0.15
+Nodes (13): authOptions, findUserByEmailLegacy(), getVercelHotCopy(), isVercelSqlitePath(), UserRow, testimonials, handler, GET() (+5 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.80
@@ -208,16 +211,16 @@ Cohesion: 0.29
 Nodes (3): __dirname, PROJECTS, repoRoot
 
 ### Community 17 - "Community 17"
-Cohesion: 0.29
-Nodes (8): testimonials, DELETE(), GET(), isAuthorized(), PUT(), GET(), isAuthorized(), POST()
+Cohesion: 0.12
+Nodes (26): POST(), getOperatorSession(), applyDistro(), createTenant(), getAuditLog(), getMetrics(), getTenant(), License (+18 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.17
-Nodes (18): COLUMN_MAP, db, pgQuery(), POST(), GET(), POST(), DELETE(), GET() (+10 more)
+Cohesion: 0.14
+Nodes (22): COLUMN_MAP, db, pgQuery(), POST(), GET(), POST(), DELETE(), GET() (+14 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.07
-Nodes (25): AdminJournalForm(), slugify(), AdminProjectForm(), FormState, arr(), ArraySchema, ArraySchemaKind, BlockSchema (+17 more)
+Cohesion: 0.08
+Nodes (23): AdminJournalForm(), slugify(), AdminProjectForm(), FormState, arr(), ArraySchema, ArraySchemaKind, BlockSchema (+15 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -232,8 +235,8 @@ Cohesion: 0.24
 Nodes (11): columnsOf(), DB_PATH, ensureColumn(), run(), seedDefaultAdmin(), seedDefaultSettings(), seedMenus(), sid (+3 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.07
-Nodes (47): AdminJournalEditor(), AdminTeamEditor(), AdminTestimonialEditor(), DB_PATH, deleteMedia(), getMediaById(), insertMedia(), listMedia() (+39 more)
+Cohesion: 0.21
+Nodes (20): getStorageConfig(), head(), HeadResult, kindFromMime(), localFsPath(), localPublicPath(), localRoot(), localUploadToken() (+12 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.15
@@ -280,12 +283,12 @@ Cohesion: 0.20
 Nodes (8): aboutPage, blockCount, contactPage, DB_PATH, journal, pageRow, projectsPage, sqlite
 
 ### Community 35 - "Community 35"
-Cohesion: 0.13
-Nodes (15): AboutPage(), getTeam(), metadata, PageEditor(), auditLog, media, menuItems, menus (+7 more)
+Cohesion: 0.08
+Nodes (24): AboutPage(), getTeam(), metadata, metadata, NotFound(), PageEditor(), auditLog, journalPosts (+16 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.17
-Nodes (15): adminOnlyOrFail(), gateOrFail(), getDrizzle(), getSqliteDrizzle(), openDb(), BlockRow, getFrontPage(), getPageById() (+7 more)
+Cohesion: 0.25
+Nodes (12): POST(), adminOnlyOrFail(), gateOrFail(), getDrizzle(), getSqliteDrizzle(), openDb(), appendAudit(), requireSuperadmin() (+4 more)
 
 ### Community 37 - "Community 37"
 Cohesion: 0.22
@@ -307,6 +310,10 @@ Nodes (7): body, DB_LICENSE, expiresAt, installedAt, license, signature, VALID_D
 Cohesion: 0.09
 Nodes (17): GLBThumbProps, formatBytes(), kindFromMime(), MAX_BYTES, MediaKind, MediaListResponse, MediaRow, MEDIATYPE_LABEL (+9 more)
 
+### Community 45 - "Community 45"
+Cohesion: 0.14
+Nodes (16): DB_PATH, getMediaById(), insertMedia(), listMedia(), MediaItem, MediaKind, MediaListFilters, updateMediaAlt() (+8 more)
+
 ### Community 46 - "Community 46"
 Cohesion: 0.53
 Nodes (5): BlobAdapter, BlobUploadResult, getBlobAdapter(), makeLocalAdapter(), makeVercelAdapter()
@@ -315,9 +322,13 @@ Nodes (5): BlobAdapter, BlobUploadResult, getBlobAdapter(), makeLocalAdapter(), 
 Cohesion: 0.36
 Nodes (6): cookieHeader(), csrfAndCookie(), del(), get(), login(), post()
 
+### Community 48 - "Community 48"
+Cohesion: 0.15
+Nodes (4): ADMIN_NAV, AdminShell(), Tab, useToast()
+
 ### Community 49 - "Community 49"
-Cohesion: 0.17
-Nodes (15): GET(), findUserByEmail(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath(), isLocalDevPath(), isPostgres() (+7 more)
+Cohesion: 0.10
+Nodes (23): GET(), PUT(), Row, StudioServer(), Row, VoicesServer(), GET(), findUserByEmail() (+15 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.25
@@ -328,8 +339,8 @@ Cohesion: 0.33
 Nodes (5): BASE_BY_SLUG, __dirname, imgURL(), repoRoot, run()
 
 ### Community 53 - "Community 53"
-Cohesion: 0.05
-Nodes (33): ClosingCTA(), HeroClient(), HeroData, normalizeTail(), defaultEntries, Entry, JournalPreview(), Block (+25 more)
+Cohesion: 0.06
+Nodes (29): ClosingCTA(), HeroClient(), HeroData, normalizeTail(), defaultEntries, Entry, JournalPreview(), Block (+21 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.62
@@ -359,17 +370,21 @@ Nodes (5): expectStatus(), fail(), log(), main(), ts()
 Cohesion: 0.20
 Nodes (5): __dirname, JSON_COLUMNS, main(), replayTable(), repoRoot
 
+### Community 85 - "Community 85"
+Cohesion: 0.25
+Nodes (6): Mark, Node, renderBlock(), renderInline(), RichTextRendererProps, TextNode
+
 ### Community 86 - "Community 86"
-Cohesion: 0.40
-Nodes (3): metadata, NewTenantPage(), NewTenantForm()
+Cohesion: 0.31
+Nodes (8): fail(), failMessages, get(), HEADERS, mobileSensitiveClasses, pass(), probe(), screensToShots
 
 ### Community 89 - "Community 89"
 Cohesion: 0.25
 Nodes (7): adm, dbPath, __dirname, env, envFile, rows, sqlite
 
 ### Community 90 - "Community 90"
-Cohesion: 0.16
-Nodes (19): PUT(), POST(), Action, gateAdmin(), authOptions, appendAudit(), Gate, GateResult (+11 more)
+Cohesion: 0.33
+Nodes (3): JournalPage(), Row, metadata
 
 ### Community 91 - "Community 91"
 Cohesion: 0.15
@@ -378,10 +393,6 @@ Nodes (12): Frame, Phase 0 - export + plan doc (this session landing), Phase 1 -
 ### Community 94 - "Community 94"
 Cohesion: 0.38
 Nodes (6): dumpTable(), main(), OUT_DIR, SOURCE, TABLES, todayStamp()
-
-### Community 97 - "Community 97"
-Cohesion: 0.33
-Nodes (6): POST(), ALLOWED_FOLDERS, ALLOWED_IMAGE_MIME, ALLOWED_MODEL_MIME, EXT_BY_MIME, safeName()
 
 ### Community 98 - "Community 98"
 Cohesion: 0.29
@@ -412,27 +423,27 @@ Cohesion: 0.44
 Nodes (8): cookieHeader(), fail(), log(), login(), main(), mergeCookies(), rawFetch(), ts()
 
 ### Community 109 - "Community 109"
-Cohesion: 0.07
-Nodes (31): metadata, NotFound(), GET(), Props, Row, StudioServer(), Row, VoicesServer() (+23 more)
+Cohesion: 0.11
+Nodes (26): AdminJournalEditor(), AdminProjectEditor(), AdminTeamEditor(), AdminTestimonialEditor(), GET(), isAuthorized(), POST(), deleteMedia() (+18 more)
 
 ### Community 114 - "Community 114"
 Cohesion: 0.50
 Nodes (3): name, private, version
 
 ## Knowledge Gaps
-- **511 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+506 more)
+- **516 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+511 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ensureMigrated()` connect `Community 109` to `Community 1`, `Community 35`, `Community 36`, `Community 3`, `Community 9`, `Community 49`, `Community 18`, `Community 19`, `Community 17`, `Community 23`, `Community 90`?**
-  _High betweenness centrality (0.081) - this node is a cross-community bridge._
-- **Why does `pgOne()` connect `Community 23` to `Community 1`, `Community 35`, `Community 36`, `Community 9`, `Community 109`, `Community 49`, `Community 18`, `Community 19`, `Community 17`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `appendAudit()` connect `Community 90` to `Community 0`, `Community 36`, `Community 109`, `Community 49`, `Community 18`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `ensureMigrated()` connect `Community 109` to `Community 0`, `Community 35`, `Community 36`, `Community 3`, `Community 9`, `Community 49`, `Community 17`, `Community 18`, `Community 23`, `Community 90`?**
+  _High betweenness centrality (0.069) - this node is a cross-community bridge._
+- **Why does `openPostgres()` connect `Community 20` to `Community 36`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `cookies` connect `Community 1` to `Community 17`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Are the 25 inferred relationships involving `ensureMigrated()` (e.g. with `AdminJournalEditor()` and `AdminProjectEditor()`) actually correct?**
   _`ensureMigrated()` has 25 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 12 inferred relationships involving `pgOne()` (e.g. with `AdminJournalEditor()` and `AdminProjectEditor()`) actually correct?**
@@ -440,4 +451,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 5 inferred relationships involving `openDb()` (e.g. with `appendAudit()` and `POST()`) actually correct?**
   _`openDb()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `plugin`, `eslintConfig` to the rest of the system?**
-  _511 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _516 weakly-connected nodes found - possible documentation gaps or missing edges._
