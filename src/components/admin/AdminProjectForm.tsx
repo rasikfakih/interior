@@ -220,7 +220,7 @@ export default function AdminProjectForm({
         Published on the public site
       </label>
 
-      <div className="flex gap-3 pt-2">
+      <div className="sticky bottom-0 -mx-6 md:mx-0 px-6 md:px-0 pt-3 pb-3 md:pb-0 mt-2 flex gap-3 bg-canvas/95 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none border-t hairline md:border-0">
         <button type="submit" disabled={busy} className="btn-primary disabled:opacity-50">
           {busy ? "Saving" : initial?.id ? "Save changes" : "Create project"}
         </button>

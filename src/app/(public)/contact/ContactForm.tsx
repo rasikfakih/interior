@@ -202,7 +202,7 @@ export default function ContactForm({
               </label>
             </div>
 
-            <div className="md:col-span-12 flex items-center justify-between flex-wrap gap-4 pt-2">
+            <div className="md:col-span-12 sticky bottom-0 -mx-6 md:mx-0 px-6 md:px-0 pt-3 pb-3 md:pb-0 mt-2 flex items-center justify-between flex-wrap gap-4 bg-canvas/95 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none border-t hairline md:border-0">
               <p
                 className="text-xs font-mono tracking-[0.04em]"
                 style={{
