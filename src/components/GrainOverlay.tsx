@@ -1,4 +1,28 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function GrainOverlay() {
+  const [enabled, setEnabled] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const fineHover = window.matchMedia(
+      "(hover: hover) and (pointer: fine)"
+    );
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setEnabled(fineHover.matches && !reduce.matches);
+    sync();
+    fineHover.addEventListener("change", sync);
+    reduce.addEventListener("change", sync);
+    return () => {
+      fineHover.removeEventListener("change", sync);
+      reduce.removeEventListener("change", sync);
+    };
+  }, []);
+
+  if (!enabled) return null;
+
   return (
     <div
       aria-hidden

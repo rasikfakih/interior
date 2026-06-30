@@ -179,7 +179,7 @@ export default function SelectedWork({
                   src={p.image}
                   alt={p.title}
                   fill
-                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  sizes="(min-width: 1024px) 60vw, (min-width: 768px) 75vw, 100vw"
                   className="object-cover transition-transform duration-700 hover:scale-[1.04]"
                 />
               </Link>
