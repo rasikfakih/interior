@@ -3,13 +3,14 @@
 import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@/lib/use-gsap";
+import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ClosingCTA({ data }: { data?: any } = {}) {
   const ref = useRef<HTMLElement | null>(null);
   const btnRef = useRef<HTMLAnchorElement | null>(null);
+  const reduce = useReducedMotion();
 
   const text = data?.text || "A home you'll live in for twenty years. Let's start with a kitchen table conversation.";
   const em = data?.em || "twenty years";
@@ -33,6 +34,13 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
       }
       const btn = btnRef.current;
       if (btn) {
+        // Magnetic hover only when a fine pointer is present; skip
+        // touch / coarse pointers and reduced-motion users. Section 5.D.
+        if (reduce) return undefined;
+        const canHover = typeof window !== "undefined" &&
+          window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+        if (!canHover) return undefined;
+
         const onMove = (e: MouseEvent) => {
           const rect = btn.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
@@ -73,9 +81,10 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
           btn.removeEventListener("mouseleave", onLeave);
         };
       }
+      return undefined;
     },
     ref,
-    []
+    [reduce]
   );
 
   return (

@@ -80,21 +80,21 @@ export default function ProcessStickyStack({ data }: { data?: any }) {
         {phases.map((p, i) => (
           <article
             key={p.number}
-            className="process-card sticky top-0 min-h-[88dvh] flex items-center justify-center py-10"
+            className="process-card sticky top-0 min-h-[60dvh] md:min-h-[88dvh] flex items-center justify-center py-6 md:py-10"
             style={{ zIndex: i + 1 }}
           >
             <div className="surface-elevated w-full overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-0 rounded-[var(--radius-card)]">
-              <div className="md:col-span-5 p-8 md:p-12 flex flex-col justify-between">
+              <div className="md:col-span-5 p-6 md:p-12 flex flex-col justify-between">
                 <div>
                   <span className="font-mono text-xs tracking-[0.22em] uppercase text-ink-mute">
                     Phase {p.number}
                   </span>
-                  <h3 className="text-4xl md:text-5xl mt-4 mb-6">{p.title}</h3>
+                  <h3 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">{p.title}</h3>
                   <p className="text-ink-mute text-base md:text-lg leading-relaxed">
                     {p.body}
                   </p>
                 </div>
-                <div className="mt-10 space-y-2">
+                <div className="mt-8 md:mt-10 space-y-2">
                   <div className="flex justify-between text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
                     <span>Deliverable</span>
                     <span className="text-ink">{p.duration}</span>

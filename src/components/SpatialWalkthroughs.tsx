@@ -159,9 +159,7 @@ function WalkthroughDeck({
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute leading-relaxed">{lede}</p>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mt-4">
-              {useScrub
-                ? "Scroll down to walk through"
-                : "Scroll horizontally for the next"}
+              {useScrub ? "Walk through" : "Side by side"}
             </p>
           </div>
         </div>
