@@ -183,11 +183,33 @@ Production-grade persistence is the v1.2 scope (Supabase).
 
 ## 13. Going to v1.2
 
-- Postgres migration: implement `src/lib/tenant-db.ts` adapter
-  switching by `DATABASE_URL`. Existing `db.ts` becomes the SQLite
-  branch. Mirror audit_log, tenants, tenant_data into Postgres
-  tables with same shape.
-- Hosted license server: implement `/api/license/verify` HMAC-RSA
-  endpoint. Buyer installs point their `LICENSE_SERVER_URL` to it.
-- Multi-domain license auto-pin: extend `tenants.domain` to allow
-  N entries via a `tenant_domains` table. Tier-gated.
+Status: **SHIPPED 2026-06-30 as v1.2.0**. See
+`docs/CONTEXT.md` last-session log and `CHANGELOG.md` v1.2.0
+entry. The single-localhost SQLite path that shipped in v1.1.0
+is now the fallback when `DATABASE_URL` is unset; the
+Postgres-first path runs whenever that env is set.
+
+- Postgres migration: `src/lib/pg.ts` exposes `pgOne`,
+  `pgQuery`, `pgMany`, `withPgTx`, `ensureMigrated`. The legacy
+  `src/lib/db.ts` is a typed-any shim that throws at runtime
+  on access; prerender-critical pages were ported to the new
+  adapter during the v1.1.2 / v1.2.0 cutover. Mirror of
+  `audit_log`, `tenants`, `tenant_data` lives in
+  `supabase-bootstrap.sql` + `scripts/sqlite-fallback-ddl.ts`.
+- Hosted license server: still HMAC-signed offline per the
+  v1.0.0 contract. A `/api/license/verify` RSA endpoint is
+  opt-in for buyers who want a hosted license check. Buyers
+  who ship the offline path keep `LICENSE_SERVER_URL` and
+  `LICENSE_PUBLIC_KEY` blank.
+- Multi-domain license auto-pin: deferred. Single-domain
+  licenses remain the default. `tenant_domains` table is not
+  in the v1.2.0 schema; reach for it only when a buyer
+  specifically asks for N-domain per tenant.
+
+## 14. Going to v1.3 (when applicable)
+
+Future-version asks enter `docs/feature-decisions.md`. Three
+YES votes (counter rule in `AGENT_BEST_PRACTICES.md`) plus the
+4-week acceptance window since v1.0 ship elapses before a
+candidate enters v1.3 planning. If no YES has reached 3 votes
+at the 4-week mark, ship no v1.3 - the floor held.

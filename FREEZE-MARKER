@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.1.2 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.2.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.1.2. Until
+This file is the authoritative freeze marker for v1.2.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -47,6 +47,32 @@ What v1.1.2 adds, also frozen under the buyer contract:
   - `scripts/smoke-api.mjs` + `smoke-phase{2,5,6,7}.mjs` + the
     pre-existing `smoke.mjs`.
 
+## v1.2.0 increment
+
+What v1.2.0 adds on top of v1.1.2, also frozen:
+
+  - Admin write-path fixes: snake_case row hydration across
+    `description_json`, `before_image`, `after_image`,
+    `model_3d`, `is_published`, `cover_image`, `content_json`,
+    `author_name`. `AdminProjectForm` and `AdminJournalForm`
+    read both snake_case and camelCase source keys.
+  - Read-side fix: `RichTextRenderer` accepts string OR
+    record for `json`. Postgres JSONB path works without
+    JSON.parse-throw.
+  - Tiered role gate: `requireSuperadmin()` in
+    `src/lib/license-gate.ts`. Wired through
+    `/api/admin/license` POST and `/api/admin/demo-reset`
+    POST. `/api/admin/whoami` exposes role.
+  - Cross-coldstart durability: `scripts/smoke-coldstart.mjs`
+    proves writes survive a 90-second Vercel Hobby idle
+    window when `DATABASE_URL` is set.
+  - Spatial walkthrough pin-and-scrub: GSAP ScrollTrigger
+    with `pin: true` / `scrub: 1` on the desktop path,
+    matchMedia-driven reduced-motion fallback to the
+    original horizontal-snap-scroll.
+  - Demo seed differentiated before/after photo pairs across
+    the three seeded projects.
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -88,7 +114,9 @@ What this freeze **does not cover**:
 
 ## Why the carve-out exists
 
-v1.0.0 was sold as a buyer-complete artifact. v1.1.2 stacks on top of v1.1.0:
+v1.0.0 was sold as a buyer-complete artifact. v1.1.2 stacks on top of v1.1.0,
+and v1.2.0 layers the production-grade Postgres runtime, the tiered role
+gate, and the admin write-path persistence layer:
 
   - a superadmin console for the studio + Envato onboarding (v1.1.0)
   - a tenant model + theme.distro.json overlay (v1.1.0)
@@ -96,6 +124,8 @@ v1.0.0 was sold as a buyer-complete artifact. v1.1.2 stacks on top of v1.1.0:
   - Postgres-first runtime with bundled-SQLite fallback (v1.1.2)
   - WordPress-grade admin CRUD per entity (v1.1.2)
   - TipTap rich text + MediaPicker integration (v1.1.2)
+  - Production-durable writes + tiered admin/superadmin split (v1.2.0)
+  - Admin write-path persistence fix + rich-text reader fix (v1.2.0)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -103,21 +133,22 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-06-28 (rolled forward from v1.1.0 2026-06-23,
-    v1.0.0 2026-06-18)
-  - **Version**: 1.1.2
+  - **Frozen since**: 2026-06-30 (rolled forward from v1.1.2 2026-06-28,
+    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.2.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-06-28. Both runtime paths proven.
-    Postgres-first when DATABASE_URL is set, SQLite hot-copy
-    when not. 19/19 verify:deploy checks green. smoke-api
-    proves admin writes survive two cold-starts.
+  - **Status**: DEPLOYED 2026-06-30. Postgres-first when
+    DATABASE_URL is set, SQLite hot-copy when not. 19/19
+    verify:deploy checks green. smoke-api / smoke-routes /
+    smoke-render / smoke-admin-live / smoke-role all green.
+    Cross-coldstart durability proven via smoke-coldstart.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.1.X` to `1.2.0`
-  - Adding a v1.2 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.2.0` to `1.3.0`
+  - Adding a v1.3 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

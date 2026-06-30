@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782636773.0899737,
-    "ast_hash": "8abfecba637d8ee38869195985021677",
+    "mtime": 1782848201.01953,
+    "ast_hash": "39706bb8eea45f3466a3150710d5b94c",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "src/components/RichTextRenderer.tsx": {
-    "mtime": 1782739209.679326,
-    "ast_hash": "87d0aca3f407e88748d96e0c0ddec631",
+    "mtime": 1782834321.8323388,
+    "ast_hash": "fc43e1ed32a9abdf091466a68ddd3cb2",
     "semantic_hash": ""
   },
   "src/components/SelectedWork.tsx": {
@@ -580,13 +580,13 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminJournalForm.tsx": {
-    "mtime": 1782764676.7871718,
-    "ast_hash": "2770d81f305f8d3316a9a482a4af05eb",
+    "mtime": 1782834252.2163076,
+    "ast_hash": "95f41fcef1feabef5934fc58d6db5ea1",
     "semantic_hash": ""
   },
   "src/components/admin/AdminProjectForm.tsx": {
-    "mtime": 1781737544.2487173,
-    "ast_hash": "d349eb4a0abb7a172ce794d6ef3db311",
+    "mtime": 1782834057.2268624,
+    "ast_hash": "51245f76a2a24d2e9c5ab777a70cba22",
     "semantic_hash": ""
   },
   "src/components/admin/AdminShell.tsx": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1782637062.846251,
-    "ast_hash": "3182c2ac8fca7cae52861c458a89aabb",
+    "mtime": 1782848171.1024761,
+    "ast_hash": "0ba07f8e4991323d6620f8493d8b0b95",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -795,8 +795,8 @@
     "semantic_hash": ""
   },
   "OPERATOR.md": {
-    "mtime": 1782228882.2644763,
-    "ast_hash": "9ab3bd302855cd3d49d3a0c7e60bc4e9",
+    "mtime": 1782848308.5664365,
+    "ast_hash": "27693b96b4e044b12c774fc11e135b5a",
     "semantic_hash": ""
   },
   "README.md": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1782818565.0943384,
-    "ast_hash": "dec5d5694b2ecef1e200b2059039b29f",
+    "mtime": 1782848385.85393,
+    "ast_hash": "94a013a83e899d39cc544dfa6ada9e1d",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {

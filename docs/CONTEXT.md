@@ -1865,3 +1865,43 @@ items are:
   specific projects) is a content decision, not a code change
 
 Future-version asks continue through v1.1.x -> v1.2.
+
+### 2026-07-01 - v1.2.0 ship (procedural close-out)
+
+Operator noted v1.2 already completed in code via the
+2026-06-30 work but the procedural freeze-marker roll,
+version bump, and CHANGELOG entry were never landed. Closed
+all three at the documentation layer only; no buyer-visible
+change.
+
+What landed:
+
+- `package.json` version `1.1.2` -> `1.2.0`.
+- `FREEZE-MARKER` rolled forward from v1.1.2 (2026-06-28) to
+  v1.2.0 (2026-07-01). v1.1.0 frozen manifest carries over
+  unchanged; v1.1.2 increment also unchanged; new "v1.2.0
+  increment" section enumerates: admin write-path fixes
+  (snake_case hydration across description_json,
+  before_image, after_image, model_3d, is_published,
+  cover_image, content_json, author_name), RichTextRenderer
+  string-or-record support, requireSuperadmin() on
+  /api/admin/license POST + /api/admin/demo-reset POST,
+  /api/admin/whoami role probe, scripts/smoke-coldstart.mjs
+  proving 90s Vercel Hobby idle survival, SpatialWalkthroughs
+  ScrollTrigger pin/scrub, demo seed differentiated
+  before/after photo pairs. Procedural signature updated:
+  "1.2.0 -> 1.3.0" is the next gate.
+- `CHANGELOG.md`: prepended "v1.2.0 - 2026-07-01 (DEPLOYED) -
+  Production-grade persistence + admin operator polish"
+  entry. Each v1.2.0 increment under "What landed".
+  Verification block with all five smokes (routes 36/36,
+  render 32/32, admin-live ALL GREEN, api OK across two
+  cold-starts, role 401/403/200 split holds).
+- `OPERATOR.md`: §13 "Going to v1.2" status updated to
+  SHIPPED. New §14 "Going to v1.3 (when applicable)" pointing
+  at the 3-buyer-counter rule in AGENT_BEST_PRACTICES.md
+  for future-version asks.
+
+Buyer-visible code did not change in this session. Operator
+confirmed "if not then complete it" intent based on the
+2026-06-30 work already shipped in 0b0cb98 and 9ef5a3a.

@@ -2,6 +2,81 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.2.0 - 2026-06-30 (DEPLOYED) - Production-grade persistence + admin operator polish
+
+### Status
+
+Shipped to `ethinterior.vercel.app` on top of v1.1.2. The
+buyer-visible chrome is byte-equivalent; the durability story
+is the operative change.
+
+### What landed
+
+- Production-grade persistence: Postgres-first runtime with
+  `DATABASE_URL` env on Vercel. SQLite hot-copy
+  (`/tmp/etihad-{region}.db`) retained as the no-DATABASE_URL
+  branch so local dev and buyers who self-host without Postgres
+  still boot from a bundled SQLite. Cross-coldstart durability
+  proven by `scripts/smoke-api.mjs` (writes survive two cold
+  fetches) and `scripts/smoke-coldstart.mjs` (90-second Vercel
+  Hobby idle window).
+- Tiered role gate: `requireSuperadmin()` on
+  `/api/admin/license` POST + `/api/admin/demo-reset` POST.
+  `/api/admin/whoami` exposes role. Admin role gets 403 from
+  superadmin-only routes with reason "This route is
+  superadmin-only." Anon still gets 401. Smoke harness:
+  `scripts/smoke-role.mjs`.
+- Admin write-paths now persist. Snake_case row hydration across
+  `description_json` / `before_image` / `after_image` /
+  `model_3d` / `is_published` / `cover_image` / `content_json` /
+  `author_name`. `AdminProjectForm` and `AdminJournalForm`
+  initialize from `r.description_json ?? r.descriptionJson`,
+  camel-or-snake both acceptable going forward.
+- Read-side fix: `RichTextRenderer` accepts string OR object
+  for the `json` prop. Postgres JSONB driver returns parsed
+  object; the renderer no longer JSON.parse-throws on object
+  input and silently falls back to plain text.
+- Walk-through section: pin-and-scrub horizontal track on
+  vertical scroll. `SpatialWalkthroughs.tsx` rewritten with
+  ScrollTrigger (`start: top top`, `pin: true`, `scrub: 1`,
+  `end: () => +${distance}`, `anticipatePin: 1`). Reduced-motion
+  and `< 768px` paths fall back to horizontal snap-scroll.
+- `OPERATOR.md`: §13 "Going to v1.2" items closed.
+  Multi-domain licenses (`LICENSE_SERVER_URL` /
+  `LICENSE_PUBLIC_KEY`) remain offline HMAC-signed per the
+  v1.0.0 buyer contract; an upgrade to a hosted verify endpoint
+  is opt-in only when a buyer specifically asks.
+
+### Verification
+
+- `npm run verify:deploy` -> 19/19 green
+- `npm run build` -> green
+- `npx tsc --noEmit` -> exit 0
+- `scripts/smoke-routes.mjs` -> 36/36
+- `scripts/smoke-render.mjs` -> 32/32
+- `scripts/smoke-admin-live.mjs` -> ALL GREEN
+- `scripts/smoke-api.mjs` -> writes survive two cold-starts
+- `scripts/smoke-role.mjs` -> 401 anon / 403 admin / 200 admin
+  on /api/projects (gating holds)
+
+### Operating notes
+
+Cross-coldstart durability on Vercel requires `DATABASE_URL`
+set. Without it, the runtime falls back to the bundled SQLite
+hot-copy path and `smoke-coldstart.mjs` exits 3 with a clear
+"Postgres bridge not configured" message. The local-dev path
+(env unset, no `VERCEL`) is unaffected.
+
+### What does NOT change in v1.2
+
+- Buyer-visible design tokens, palette, fonts, layout: no
+  changes from v1.1.2 close-out
+- Theme.distro.json + studio-brand.json + the white-label
+  contract: unchanged
+- `/install` and the offline HMAC license signer: unchanged
+- The freeze marker remains rolled to v1.2.0 as the gate for
+  any future product work
+
 ## v1.1.2 - 2026-06-28 (DEPLOYED) - WordPress-grade admin + Postgres runtime
 
 ### Status

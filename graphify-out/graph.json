@@ -3432,7 +3432,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_public_journal_slug_page_tsx_slug_page",
-      "community": 35,
+      "community": 109,
       "norm_label": "page.tsx"
     },
     {
@@ -3442,7 +3442,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "slug_page_journalentrypage",
-      "community": 110,
+      "community": 109,
       "norm_label": "journalentrypage()"
     },
     {
@@ -3562,7 +3562,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "projects_projectsclient",
-      "community": 53,
+      "community": 3,
       "norm_label": "projectsclient.tsx"
     },
     {
@@ -3572,7 +3572,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "projects_projectsclient_item",
-      "community": 53,
+      "community": 3,
       "norm_label": "item"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "projects_projectsclient_projectsclient",
-      "community": 53,
+      "community": 3,
       "norm_label": "projectsclient()"
     },
     {
@@ -3592,7 +3592,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_public_projects_slug_page_tsx_slug_page",
-      "community": 35,
+      "community": 109,
       "norm_label": "page.tsx"
     },
     {
@@ -3602,7 +3602,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "slug_page_row",
-      "community": 35,
+      "community": 109,
       "norm_label": "row"
     },
     {
@@ -3612,7 +3612,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "slug_page_projectdetailpage",
-      "community": 110,
+      "community": 109,
       "norm_label": "projectdetailpage()"
     },
     {
@@ -3622,7 +3622,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "slug_page_voicesseed",
-      "community": 35,
+      "community": 109,
       "norm_label": "voicesseed()"
     },
     {
@@ -3712,7 +3712,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "admin_logincard",
-      "community": 48,
+      "community": 0,
       "norm_label": "logincard.tsx"
     },
     {
@@ -3722,7 +3722,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "admin_logincard_logincard",
-      "community": 48,
+      "community": 0,
       "norm_label": "logincard()"
     },
     {
@@ -3752,7 +3752,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_admin_journal_id_page_tsx_id_page",
-      "community": 95,
+      "community": 23,
       "norm_label": "page.tsx"
     },
     {
@@ -3762,7 +3762,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_app_admin_journal_id_page_tsx_id_page_metadata",
-      "community": 95,
+      "community": 23,
       "norm_label": "metadata"
     },
     {
@@ -3772,7 +3772,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "id_page_adminjournaleditor",
-      "community": 95,
+      "community": 23,
       "norm_label": "adminjournaleditor()"
     },
     {
@@ -3872,7 +3872,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "admin_page",
-      "community": 48,
+      "community": 0,
       "norm_label": "page.tsx"
     },
     {
@@ -3882,7 +3882,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "admin_page_metadata",
-      "community": 48,
+      "community": 0,
       "norm_label": "metadata"
     },
     {
@@ -3892,7 +3892,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "admin_page_safegetserversession",
-      "community": 48,
+      "community": 0,
       "norm_label": "safegetserversession()"
     },
     {
@@ -3902,7 +3902,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "admin_page_safechecklicense",
-      "community": 48,
+      "community": 0,
       "norm_label": "safechecklicense()"
     },
     {
@@ -3912,7 +3912,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "admin_page_adminpage",
-      "community": 48,
+      "community": 0,
       "norm_label": "adminpage()"
     },
     {
@@ -4042,7 +4042,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_admin_team_id_page_tsx_id_page",
-      "community": 95,
+      "community": 23,
       "norm_label": "page.tsx"
     },
     {
@@ -4052,7 +4052,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_app_admin_team_id_page_tsx_id_page_metadata",
-      "community": 95,
+      "community": 23,
       "norm_label": "metadata"
     },
     {
@@ -4062,7 +4062,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "id_page_adminteameditor",
-      "community": 95,
+      "community": 23,
       "norm_label": "adminteameditor()"
     },
     {
@@ -4102,7 +4102,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_admin_testimonials_id_page_tsx_id_page",
-      "community": 95,
+      "community": 23,
       "norm_label": "page.tsx"
     },
     {
@@ -4112,7 +4112,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_app_admin_testimonials_id_page_tsx_id_page_metadata",
-      "community": 95,
+      "community": 23,
       "norm_label": "metadata"
     },
     {
@@ -4122,7 +4122,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "id_page_admintestimonialeditor",
-      "community": 95,
+      "community": 23,
       "norm_label": "admintestimonialeditor()"
     },
     {
@@ -4232,7 +4232,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "whoami_route",
-      "community": 17,
+      "community": 9,
       "norm_label": "route.ts"
     },
     {
@@ -4242,7 +4242,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "whoami_route_get",
-      "community": 17,
+      "community": 9,
       "norm_label": "get()"
     },
     {
@@ -4252,7 +4252,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "nextauth_route",
-      "community": 17,
+      "community": 9,
       "norm_label": "route.ts"
     },
     {
@@ -4262,7 +4262,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "nextauth_route_handler",
-      "community": 17,
+      "community": 9,
       "norm_label": "handler"
     },
     {
@@ -4692,7 +4692,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "newsletter_route",
-      "community": 35,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -4702,7 +4702,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "newsletter_route_post",
-      "community": 35,
+      "community": 18,
       "norm_label": "post()"
     },
     {
@@ -4872,7 +4872,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "blocks_route",
-      "community": 49,
+      "community": 90,
       "norm_label": "route.ts"
     },
     {
@@ -4882,7 +4882,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "blocks_route_put",
-      "community": 49,
+      "community": 90,
       "norm_label": "put()"
     },
     {
@@ -4892,7 +4892,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_pages_id_route_ts_id_route",
-      "community": 85,
+      "community": 36,
       "norm_label": "route.ts"
     },
     {
@@ -4902,7 +4902,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "id_route_gateorfail",
-      "community": 85,
+      "community": 36,
       "norm_label": "gateorfail()"
     },
     {
@@ -4912,7 +4912,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "id_route_adminonlyorfail",
-      "community": 85,
+      "community": 36,
       "norm_label": "adminonlyorfail()"
     },
     {
@@ -4922,7 +4922,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_app_api_pages_id_route_ts_id_route_get",
-      "community": 85,
+      "community": 36,
       "norm_label": "get()"
     },
     {
@@ -4932,7 +4932,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_app_api_pages_id_route_ts_id_route_put",
-      "community": 85,
+      "community": 36,
       "norm_label": "put()"
     },
     {
@@ -4942,7 +4942,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "src_app_api_pages_id_route_ts_id_route_delete",
-      "community": 85,
+      "community": 36,
       "norm_label": "delete()"
     },
     {
@@ -4952,7 +4952,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pages_route",
-      "community": 85,
+      "community": 90,
       "norm_label": "route.ts"
     },
     {
@@ -4962,7 +4962,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "pages_route_gateorfail",
-      "community": 85,
+      "community": 90,
       "norm_label": "gateorfail()"
     },
     {
@@ -4972,7 +4972,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "pages_route_get",
-      "community": 85,
+      "community": 90,
       "norm_label": "get()"
     },
     {
@@ -4982,7 +4982,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "pages_route_post",
-      "community": 85,
+      "community": 90,
       "norm_label": "post()"
     },
     {
@@ -5052,7 +5052,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "projects_route",
-      "community": 95,
+      "community": 109,
       "norm_label": "route.ts"
     },
     {
@@ -5062,7 +5062,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "projects_route_isauthorized",
-      "community": 95,
+      "community": 109,
       "norm_label": "isauthorized()"
     },
     {
@@ -5072,7 +5072,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "projects_route_get",
-      "community": 95,
+      "community": 109,
       "norm_label": "get()"
     },
     {
@@ -5082,7 +5082,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "projects_route_post",
-      "community": 95,
+      "community": 109,
       "norm_label": "post()"
     },
     {
@@ -5092,7 +5092,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "settings_route",
-      "community": 109,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -5102,7 +5102,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "settings_route_get",
-      "community": 109,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -5112,7 +5112,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "settings_route_post",
-      "community": 109,
+      "community": 18,
       "norm_label": "post()"
     },
     {
@@ -5122,7 +5122,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "sitemap_route",
-      "community": 35,
+      "community": 109,
       "norm_label": "route.ts"
     },
     {
@@ -5132,7 +5132,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "sitemap_route_get",
-      "community": 35,
+      "community": 109,
       "norm_label": "get()"
     },
     {
@@ -5502,7 +5502,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_not_found",
-      "community": 110,
+      "community": 109,
       "norm_label": "not-found.tsx"
     },
     {
@@ -5512,7 +5512,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "app_not_found_metadata",
-      "community": 110,
+      "community": 109,
       "norm_label": "metadata"
     },
     {
@@ -5522,7 +5522,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_not_found_notfound",
-      "community": 110,
+      "community": 109,
       "norm_label": "notfound()"
     },
     {
@@ -5972,7 +5972,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_beforeafterslider",
-      "community": 35,
+      "community": 109,
       "norm_label": "beforeafterslider.tsx"
     },
     {
@@ -5982,7 +5982,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_beforeafterslider_props",
-      "community": 35,
+      "community": 109,
       "norm_label": "props"
     },
     {
@@ -5992,7 +5992,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_beforeafterslider_beforeafterslider",
-      "community": 35,
+      "community": 109,
       "norm_label": "beforeafterslider()"
     },
     {
@@ -6352,7 +6352,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_model3dviewer",
-      "community": 53,
+      "community": 3,
       "norm_label": "model3dviewer.tsx"
     },
     {
@@ -6362,7 +6362,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_model3dviewer_model3dviewerprops",
-      "community": 53,
+      "community": 3,
       "norm_label": "model3dviewerprops"
     },
     {
@@ -6372,7 +6372,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_model3dviewer_model3dviewer",
-      "community": 53,
+      "community": 3,
       "norm_label": "model3dviewer()"
     },
     {
@@ -6382,7 +6382,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "components_model3dviewer_lazycanvas",
-      "community": 53,
+      "community": 3,
       "norm_label": "lazycanvas()"
     },
     {
@@ -6682,7 +6682,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_richtextrenderer",
-      "community": 45,
+      "community": 53,
       "norm_label": "richtextrenderer.tsx"
     },
     {
@@ -6692,7 +6692,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "components_richtextrenderer_mark",
-      "community": 45,
+      "community": 53,
       "norm_label": "mark"
     },
     {
@@ -6702,7 +6702,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_richtextrenderer_textnode",
-      "community": 45,
+      "community": 53,
       "norm_label": "textnode"
     },
     {
@@ -6712,7 +6712,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_richtextrenderer_node",
-      "community": 45,
+      "community": 53,
       "norm_label": "node"
     },
     {
@@ -6722,7 +6722,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_richtextrenderer_rendermark",
-      "community": 45,
+      "community": 53,
       "norm_label": "rendermark()"
     },
     {
@@ -6732,7 +6732,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_richtextrenderer_renderinline",
-      "community": 45,
+      "community": 53,
       "norm_label": "renderinline()"
     },
     {
@@ -6742,7 +6742,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "components_richtextrenderer_renderblock",
-      "community": 45,
+      "community": 53,
       "norm_label": "renderblock()"
     },
     {
@@ -6752,7 +6752,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "components_richtextrenderer_richtextrendererprops",
-      "community": 45,
+      "community": 53,
       "norm_label": "richtextrendererprops"
     },
     {
@@ -6762,7 +6762,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "components_richtextrenderer_richtextrenderer",
-      "community": 45,
+      "community": 53,
       "norm_label": "richtextrenderer()"
     },
     {
@@ -7252,7 +7252,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "admin_adminshell",
-      "community": 9,
+      "community": 0,
       "norm_label": "adminshell.tsx"
     },
     {
@@ -7262,7 +7262,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "admin_adminshell_tab",
-      "community": 9,
+      "community": 0,
       "norm_label": "tab"
     },
     {
@@ -7272,7 +7272,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "admin_adminshell_admin_nav",
-      "community": 9,
+      "community": 0,
       "norm_label": "admin_nav"
     },
     {
@@ -7282,7 +7282,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "admin_adminshell_usetoast",
-      "community": 9,
+      "community": 0,
       "norm_label": "usetoast()"
     },
     {
@@ -7292,7 +7292,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "admin_adminshell_adminshell",
-      "community": 9,
+      "community": 0,
       "norm_label": "adminshell()"
     },
     {
@@ -7302,7 +7302,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "admin_adminshell_tabpanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "tabpanel()"
     },
     {
@@ -7312,7 +7312,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "admin_adminshell_testimonialsroutepanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "testimonialsroutepanel()"
     },
     {
@@ -7322,7 +7322,7 @@
       "source_location": "L170",
       "_origin": "ast",
       "id": "admin_adminshell_teamroutepanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "teamroutepanel()"
     },
     {
@@ -7332,7 +7332,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "admin_adminshell_journalroutepanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "journalroutepanel()"
     },
     {
@@ -7342,7 +7342,7 @@
       "source_location": "L262",
       "_origin": "ast",
       "id": "admin_adminshell_projectsroutepanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "projectsroutepanel()"
     },
     {
@@ -7352,7 +7352,7 @@
       "source_location": "L301",
       "_origin": "ast",
       "id": "admin_adminshell_pagespanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "pagespanel()"
     },
     {
@@ -7362,7 +7362,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "admin_adminshell_dynamic",
-      "community": 9,
+      "community": 0,
       "norm_label": "dynamic()"
     },
     {
@@ -7372,7 +7372,7 @@
       "source_location": "L327",
       "_origin": "ast",
       "id": "admin_adminshell_crudpanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "crudpanel()"
     },
     {
@@ -7382,7 +7382,7 @@
       "source_location": "L340",
       "_origin": "ast",
       "id": "admin_adminshell_settingspanel",
-      "community": 9,
+      "community": 0,
       "norm_label": "settingspanel()"
     },
     {
@@ -8342,7 +8342,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_auth",
-      "community": 17,
+      "community": 9,
       "norm_label": "auth.ts"
     },
     {
@@ -8352,7 +8352,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_auth_isvercelsqlitepath",
-      "community": 17,
+      "community": 9,
       "norm_label": "isvercelsqlitepath()"
     },
     {
@@ -8362,7 +8362,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_auth_getvercelhotcopy",
-      "community": 17,
+      "community": 9,
       "norm_label": "getvercelhotcopy()"
     },
     {
@@ -8372,7 +8372,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "lib_auth_userrow",
-      "community": 17,
+      "community": 9,
       "norm_label": "userrow"
     },
     {
@@ -8392,7 +8392,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "lib_auth_finduserbyemaillegacy",
-      "community": 17,
+      "community": 9,
       "norm_label": "finduserbyemaillegacy()"
     },
     {
@@ -8402,7 +8402,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "lib_auth_authoptions",
-      "community": 17,
+      "community": 90,
       "norm_label": "authoptions"
     },
     {
@@ -8672,7 +8672,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_db",
-      "community": 35,
+      "community": 36,
       "norm_label": "db.ts"
     },
     {
@@ -8682,7 +8682,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_db_ispostgres",
-      "community": 35,
+      "community": 36,
       "norm_label": "ispostgres()"
     },
     {
@@ -8732,7 +8732,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "lib_db_resetsqlitehandle",
-      "community": 35,
+      "community": 36,
       "norm_label": "resetsqlitehandle()"
     },
     {
@@ -8752,7 +8752,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "lib_db_db",
-      "community": 35,
+      "community": 18,
       "norm_label": "db"
     },
     {
@@ -8892,7 +8892,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_license_gate_requireadminsession",
-      "community": 85,
+      "community": 90,
       "norm_label": "requireadminsession()"
     },
     {
@@ -8932,7 +8932,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_license_key_test",
-      "community": 104,
+      "community": 0,
       "norm_label": "license-key.test.ts"
     },
     {
@@ -8942,7 +8942,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_license_key_test_testverify",
-      "community": 104,
+      "community": 0,
       "norm_label": "testverify()"
     },
     {
@@ -8952,7 +8952,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_license_key_test_canonicalbody",
-      "community": 104,
+      "community": 0,
       "norm_label": "canonicalbody()"
     },
     {
@@ -8962,7 +8962,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "lib_license_key_test_signlicense",
-      "community": 104,
+      "community": 0,
       "norm_label": "signlicense()"
     },
     {
@@ -8982,7 +8982,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_license_licensetier",
-      "community": 90,
+      "community": 0,
       "norm_label": "licensetier"
     },
     {
@@ -9022,7 +9022,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_license_tier_features",
-      "community": 90,
+      "community": 0,
       "norm_label": "tier_features"
     },
     {
@@ -9652,7 +9652,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "lib_pg_pgone",
-      "community": 95,
+      "community": 23,
       "norm_label": "pgone()"
     },
     {
@@ -9732,7 +9732,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_schema_projects",
-      "community": 35,
+      "community": 109,
       "norm_label": "projects"
     },
     {
@@ -9762,7 +9762,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "lib_schema_journalposts",
-      "community": 35,
+      "community": 109,
       "norm_label": "journalposts"
     },
     {
@@ -10696,14 +10696,14 @@
       "norm_label": "etihad interiors theme - built for sale + resell"
     },
     {
-      "label": "v1.1.2 - 2026-06-28 (DEPLOYED) - WordPress-grade admin + Postgres runtime",
+      "label": "v1.2.0 - 2026-06-30 (DEPLOYED) - Production-grade persistence + admin operator polish",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
       "source_location": "L5",
       "_origin": "ast",
-      "id": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "id": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
       "community": 4,
-      "norm_label": "v1.1.2 - 2026-06-28 (deployed) - wordpress-grade admin + postgres runtime"
+      "norm_label": "v1.2.0 - 2026-06-30 (deployed) - production-grade persistence + admin operator polish"
     },
     {
       "label": "Status",
@@ -10719,7 +10719,7 @@
       "label": "What landed",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L18",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "changelog_what_landed",
       "community": 4,
@@ -10729,9 +10729,69 @@
       "label": "Verification",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L133",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "changelog_verification",
+      "community": 4,
+      "norm_label": "verification"
+    },
+    {
+      "label": "Operating notes",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "changelog_operating_notes",
+      "community": 4,
+      "norm_label": "operating notes"
+    },
+    {
+      "label": "What does NOT change in v1.2",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "changelog_what_does_not_change_in_v1_2",
+      "community": 4,
+      "norm_label": "what does not change in v1.2"
+    },
+    {
+      "label": "v1.1.2 - 2026-06-28 (DEPLOYED) - WordPress-grade admin + Postgres runtime",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "community": 4,
+      "norm_label": "v1.1.2 - 2026-06-28 (deployed) - wordpress-grade admin + postgres runtime"
+    },
+    {
+      "label": "Status",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "changelog_status_82",
+      "community": 4,
+      "norm_label": "status"
+    },
+    {
+      "label": "What landed",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "changelog_what_landed_93",
+      "community": 4,
+      "norm_label": "what landed"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L208",
+      "_origin": "ast",
+      "id": "changelog_verification_208",
       "community": 4,
       "norm_label": "verification"
     },
@@ -10739,7 +10799,7 @@
       "label": "Removed / replaced",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L146",
+      "source_location": "L221",
       "_origin": "ast",
       "id": "changelog_removed_replaced",
       "community": 4,
@@ -10749,7 +10809,7 @@
       "label": "Carry-forward",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L152",
+      "source_location": "L227",
       "_origin": "ast",
       "id": "changelog_carry_forward",
       "community": 4,
@@ -10759,7 +10819,7 @@
       "label": "v1.1.2 - 2026-06-25 (Phase 1 connectivity - infra only, not yet shipped to runtime)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L160",
+      "source_location": "L235",
       "_origin": "ast",
       "id": "changelog_v1_1_2_2026_06_25_phase_1_connectivity_infra_only_not_yet_shipped_to_runtime",
       "community": 4,
@@ -10769,9 +10829,9 @@
       "label": "Status",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L162",
+      "source_location": "L237",
       "_origin": "ast",
-      "id": "changelog_status_162",
+      "id": "changelog_status_237",
       "community": 4,
       "norm_label": "status"
     },
@@ -10779,7 +10839,7 @@
       "label": "What landed in this series",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L172",
+      "source_location": "L247",
       "_origin": "ast",
       "id": "changelog_what_landed_in_this_series",
       "community": 4,
@@ -10789,7 +10849,7 @@
       "label": "What is NOT yet fixed",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L217",
+      "source_location": "L292",
       "_origin": "ast",
       "id": "changelog_what_is_not_yet_fixed",
       "community": 4,
@@ -10799,7 +10859,7 @@
       "label": "Public runtime impact",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L242",
+      "source_location": "L317",
       "_origin": "ast",
       "id": "changelog_public_runtime_impact",
       "community": 4,
@@ -10809,7 +10869,7 @@
       "label": "v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L251",
+      "source_location": "L326",
       "_origin": "ast",
       "id": "changelog_v1_1_1_2026_06_25_v1_1_0_post_deploy_hotfix",
       "community": 4,
@@ -10819,7 +10879,7 @@
       "label": "Fixes",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L253",
+      "source_location": "L328",
       "_origin": "ast",
       "id": "changelog_fixes",
       "community": 4,
@@ -10829,9 +10889,9 @@
       "label": "Public runtime impact",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L292",
+      "source_location": "L367",
       "_origin": "ast",
-      "id": "changelog_public_runtime_impact_292",
+      "id": "changelog_public_runtime_impact_367",
       "community": 4,
       "norm_label": "public runtime impact"
     },
@@ -10839,7 +10899,7 @@
       "label": "Important caveat",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L301",
+      "source_location": "L376",
       "_origin": "ast",
       "id": "changelog_important_caveat",
       "community": 4,
@@ -10849,7 +10909,7 @@
       "label": "v1.1.0 - 2026-06-23 (current shipped release on runtime)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L313",
+      "source_location": "L388",
       "_origin": "ast",
       "id": "changelog_v1_1_0_2026_06_23_current_shipped_release_on_runtime",
       "community": 4,
@@ -10859,7 +10919,7 @@
       "label": "What changed",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L315",
+      "source_location": "L390",
       "_origin": "ast",
       "id": "changelog_what_changed",
       "community": 4,
@@ -10869,7 +10929,7 @@
       "label": "New surfaces (operator-only - not visible to buyers)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L323",
+      "source_location": "L398",
       "_origin": "ast",
       "id": "changelog_new_surfaces_operator_only_not_visible_to_buyers",
       "community": 4,
@@ -10879,7 +10939,7 @@
       "label": "Tenant model",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L346",
+      "source_location": "L421",
       "_origin": "ast",
       "id": "changelog_tenant_model",
       "community": 4,
@@ -10889,7 +10949,7 @@
       "label": "White-label pass (studio demo neutralised)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L355",
+      "source_location": "L430",
       "_origin": "ast",
       "id": "changelog_white_label_pass_studio_demo_neutralised",
       "community": 4,
@@ -10899,9 +10959,9 @@
       "label": "Public runtime impact",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L373",
+      "source_location": "L448",
       "_origin": "ast",
-      "id": "changelog_public_runtime_impact_373",
+      "id": "changelog_public_runtime_impact_448",
       "community": 4,
       "norm_label": "public runtime impact"
     },
@@ -10909,7 +10969,7 @@
       "label": "Session continuity",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L380",
+      "source_location": "L455",
       "_origin": "ast",
       "id": "changelog_session_continuity",
       "community": 4,
@@ -10919,7 +10979,7 @@
       "label": "Verify-deploy gate additions (`scripts/verify-deploy.mjs`)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L387",
+      "source_location": "L462",
       "_origin": "ast",
       "id": "changelog_verify_deploy_gate_additions_scripts_verify_deploy_mjs",
       "community": 4,
@@ -10929,7 +10989,7 @@
       "label": "Lifecycle roll-forward",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L394",
+      "source_location": "L469",
       "_origin": "ast",
       "id": "changelog_lifecycle_roll_forward",
       "community": 4,
@@ -10939,7 +10999,7 @@
       "label": "Post-deploy checklist (operator fills in)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L408",
+      "source_location": "L483",
       "_origin": "ast",
       "id": "changelog_post_deploy_checklist_operator_fills_in",
       "community": 4,
@@ -10949,9 +11009,9 @@
       "label": "Status",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L420",
+      "source_location": "L495",
       "_origin": "ast",
-      "id": "changelog_status_420",
+      "id": "changelog_status_495",
       "community": 4,
       "norm_label": "status"
     },
@@ -10959,7 +11019,7 @@
       "label": "v1.0.0 - 2026-06-18 (historic)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L429",
+      "source_location": "L504",
       "_origin": "ast",
       "id": "changelog_v1_0_0_2026_06_18_historic",
       "community": 4,
@@ -10969,7 +11029,7 @@
       "label": "Scope freeze",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L431",
+      "source_location": "L506",
       "_origin": "ast",
       "id": "changelog_scope_freeze",
       "community": 4,
@@ -10979,7 +11039,7 @@
       "label": "Public runtime (v1.0.0)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L445",
+      "source_location": "L520",
       "_origin": "ast",
       "id": "changelog_public_runtime_v1_0_0",
       "community": 4,
@@ -10989,7 +11049,7 @@
       "label": "Migration hooks (v1.0.0)",
       "file_type": "document",
       "source_file": "CHANGELOG.md",
-      "source_location": "L459",
+      "source_location": "L534",
       "_origin": "ast",
       "id": "changelog_migration_hooks_v1_0_0",
       "community": 4,
@@ -11464,6 +11524,16 @@
       "id": "operator_13_going_to_v1_2",
       "community": 12,
       "norm_label": "13. going to v1.2"
+    },
+    {
+      "label": "14. Going to v1.3 (when applicable)",
+      "file_type": "document",
+      "source_file": "OPERATOR.md",
+      "source_location": "L209",
+      "_origin": "ast",
+      "id": "operator_14_going_to_v1_3_when_applicable",
+      "community": 12,
+      "norm_label": "14. going to v1.3 (when applicable)"
     },
     {
       "label": "README.md",
@@ -12184,6 +12254,36 @@
       "id": "docs_context_2026_06_30_spatial_walk_throughs_redesign_journal_cover_data_fix",
       "community": 13,
       "norm_label": "2026-06-30 - spatial walk-throughs redesign + journal cover data fix"
+    },
+    {
+      "label": "2026-06-30 - walk-through pin-and-scrub",
+      "file_type": "document",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1718",
+      "_origin": "ast",
+      "id": "docs_context_2026_06_30_walk_through_pin_and_scrub",
+      "community": 13,
+      "norm_label": "2026-06-30 - walk-through pin-and-scrub"
+    },
+    {
+      "label": "2026-06-30 - walkthrough + admin-write + read-side fix (carry-forward close-out)",
+      "file_type": "document",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1780",
+      "_origin": "ast",
+      "id": "docs_context_2026_06_30_walkthrough_admin_write_read_side_fix_carry_forward_close_out",
+      "community": 13,
+      "norm_label": "2026-06-30 - walkthrough + admin-write + read-side fix (carry-forward close-out)"
+    },
+    {
+      "label": "2026-07-01 - v1.2.0 ship (procedural close-out)",
+      "file_type": "document",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1869",
+      "_origin": "ast",
+      "id": "docs_context_2026_07_01_v1_2_0_ship_procedural_close_out",
+      "community": 13,
+      "norm_label": "2026-07-01 - v1.2.0 ship (procedural close-out)"
     },
     {
       "label": "OPERATOR_QUICKREF.md",
@@ -14670,9 +14770,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_base_by_slug",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_base_by_slug"
     },
     {
       "relation": "contains",
@@ -14680,9 +14780,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_dirname",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_dirname"
     },
     {
       "relation": "contains",
@@ -14690,9 +14790,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_imgurl",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_imgurl"
     },
     {
       "relation": "contains",
@@ -14700,9 +14800,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_loadenvlocal",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_loadenvlocal"
     },
     {
       "relation": "contains",
@@ -14710,9 +14810,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_reporoot",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_reporoot"
     },
     {
       "relation": "contains",
@@ -14720,9 +14820,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers",
-      "target": "scripts_rerun_journal_covers_run",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_run"
     },
     {
       "relation": "calls",
@@ -14731,9 +14831,9 @@
       "source_file": "scripts/rerun-journal-covers.mjs",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_rerun_journal_covers_run",
-      "target": "scripts_rerun_journal_covers_imgurl",
-      "confidence_score": 1.0
+      "target": "scripts_rerun_journal_covers_imgurl"
     },
     {
       "relation": "contains",
@@ -26181,9 +26281,9 @@
       "source_file": "src/components/PageRenderer.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_pagerenderer",
-      "target": "components_spatialwalkthroughs_spatialwalkthroughs",
-      "confidence_score": 1.0
+      "target": "components_spatialwalkthroughs_spatialwalkthroughs"
     },
     {
       "relation": "imports_from",
@@ -26639,9 +26739,9 @@
       "source_file": "src/components/SpatialWalkthroughs.tsx",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_spatialwalkthroughs",
-      "target": "components_spatialwalkthroughs_walkthroughdeck",
-      "confidence_score": 1.0
+      "target": "components_spatialwalkthroughs_walkthroughdeck"
     },
     {
       "relation": "contains",
@@ -32272,21 +32372,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L152",
+      "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
-      "target": "changelog_carry_forward"
+      "source": "changelog_etihad_interiors_theme_built_for_sale_resell",
+      "target": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L146",
+      "source_location": "L62",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
-      "target": "changelog_removed_replaced"
+      "source": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "target": "changelog_operating_notes",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32294,29 +32394,39 @@
       "source_file": "CHANGELOG.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
-      "target": "changelog_status"
+      "source": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "target": "changelog_status",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L133",
+      "source_location": "L50",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
-      "target": "changelog_verification"
+      "source": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "target": "changelog_verification",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L18",
+      "source_location": "L70",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
-      "target": "changelog_what_landed"
+      "source": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "target": "changelog_what_does_not_change_in_v1_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "changelog_v1_2_0_2026_06_30_deployed_production_grade_persistence_admin_operator_polish",
+      "target": "changelog_what_landed",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32342,6 +32452,86 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_status"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_what_landed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L133",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_verification"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L152",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_carry_forward"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L146",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_removed_replaced"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_status_82",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_verification_208",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "changelog_v1_1_2_2026_06_28_deployed_wordpress_grade_admin_postgres_runtime",
+      "target": "changelog_what_landed_93",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CHANGELOG.md",
       "source_location": "L87",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32352,11 +32542,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L162",
+      "source_location": "L237",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "changelog_v1_1_2_2026_06_25_phase_1_connectivity_infra_only_not_yet_shipped_to_runtime",
-      "target": "changelog_status_162"
+      "target": "changelog_status_237",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32402,11 +32592,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L292",
+      "source_location": "L367",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "changelog_v1_1_1_2026_06_25_v1_1_0_post_deploy_hotfix",
-      "target": "changelog_public_runtime_impact_292"
+      "target": "changelog_public_runtime_impact_367",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32422,11 +32612,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L373",
+      "source_location": "L448",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "changelog_v1_1_0_2026_06_23_current_shipped_release_on_runtime",
-      "target": "changelog_public_runtime_impact_373"
+      "target": "changelog_public_runtime_impact_448",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32482,11 +32672,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CHANGELOG.md",
-      "source_location": "L420",
+      "source_location": "L495",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "changelog_post_deploy_checklist_operator_fills_in",
-      "target": "changelog_status_420"
+      "target": "changelog_status_495",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -32847,6 +33037,16 @@
       "confidence_score": 1.0,
       "source": "operator_operator_crib_sheet_vercel_deploy_studio_operator_console",
       "target": "operator_13_going_to_v1_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "OPERATOR.md",
+      "source_location": "L209",
+      "weight": 1.0,
+      "source": "operator_operator_crib_sheet_vercel_deploy_studio_operator_console",
+      "target": "operator_14_going_to_v1_3_when_applicable",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33614,8 +33814,38 @@
       "source_file": "docs/CONTEXT.md",
       "source_location": "L1658",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_context_9_last_session_log",
-      "target": "docs_context_2026_06_30_spatial_walk_throughs_redesign_journal_cover_data_fix",
+      "target": "docs_context_2026_06_30_spatial_walk_throughs_redesign_journal_cover_data_fix"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1718",
+      "weight": 1.0,
+      "source": "docs_context_9_last_session_log",
+      "target": "docs_context_2026_06_30_walk_through_pin_and_scrub",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1780",
+      "weight": 1.0,
+      "source": "docs_context_9_last_session_log",
+      "target": "docs_context_2026_06_30_walkthrough_admin_write_read_side_fix_carry_forward_close_out",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L1869",
+      "weight": 1.0,
+      "source": "docs_context_9_last_session_log",
+      "target": "docs_context_2026_07_01_v1_2_0_ship_procedural_close_out",
       "confidence_score": 1.0
     },
     {
@@ -34170,5 +34400,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e78f619bc6a04e7f1136704c0a5ac6aa77b27275"
+  "built_at_commit": "22de9969a92428ff27ad91ec178c38c1e0da879b"
 }
