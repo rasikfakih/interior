@@ -18,6 +18,7 @@
     "graphify:update": "graphify update .",
     "graphify:query": "graphify query",
     "stamp:demo": "node scripts/stamp-demo-license.mjs",
+    "smoke:mobile": "node scripts/smoke-mobile.mjs",
     "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs"
   },
   "dependencies": {
