@@ -140,7 +140,7 @@ function renderBlock(node: Node, key: string): React.ReactNode {
 }
 
 export type RichTextRendererProps = {
-  json: string | null | undefined;
+  json: string | Record<string, any> | null | undefined;
   fallbackText?: string | null;
 };
 
@@ -148,16 +148,20 @@ export default function RichTextRenderer({
   json,
   fallbackText,
 }: RichTextRendererProps) {
-  if (!json) {
+  if (json == null) {
     if (fallbackText)
       return <p className="leading-relaxed">{fallbackText}</p>;
     return null;
   }
   let doc: Node | null = null;
-  try {
-    doc = JSON.parse(json) as Node;
-  } catch {
-    return <p className="leading-relaxed">{fallbackText || ""}</p>;
+  if (typeof json === "object") {
+    doc = json as Node;
+  } else {
+    try {
+      doc = JSON.parse(json) as Node;
+    } catch {
+      return <p className="leading-relaxed">{fallbackText || ""}</p>;
+    }
   }
   if (!doc || !doc.content) {
     return <p className="leading-relaxed">{fallbackText || ""}</p>;

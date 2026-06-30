@@ -22,17 +22,25 @@ export default function AdminJournalForm({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState(() => ({
-    title: initial?.title ?? "",
-    slug: initial?.slug ?? "",
-    excerpt: initial?.excerpt ?? "",
-    category: initial?.category ?? "Materials",
-    authorName: initial?.authorName ?? "Studio",
-    coverImage: initial?.coverImage ?? "",
-    content: initial?.content ?? "",
-    contentJson: initial?.contentJson ?? null,
-    isPublished: initial?.isPublished ?? true,
-  }));
+  const [form, setForm] = useState(() => {
+    const r = (initial ?? {}) as any;
+    return {
+      title: r.title ?? "",
+      slug: r.slug ?? "",
+      excerpt: r.excerpt ?? "",
+      category: r.category ?? "Materials",
+      authorName: r.author_name ?? r.authorName ?? "Studio",
+      coverImage: r.cover_image ?? r.coverImage ?? "",
+      content: r.content ?? "",
+      contentJson: r.content_json ?? r.contentJson ?? null,
+      isPublished:
+        typeof r.is_published === "boolean"
+          ? r.is_published
+          : typeof r.isPublished === "boolean"
+          ? r.isPublished
+          : true,
+    };
+  });
 
   const slugFromTitle = useMemo(() => slugify(form.title || ""), [form.title]);
   const dirtyTitleSlug =

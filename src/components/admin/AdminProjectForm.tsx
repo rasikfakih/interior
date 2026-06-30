@@ -29,23 +29,35 @@ export default function AdminProjectForm({
   onSaved?: () => void;
 }) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(() => ({
-    title: initial?.title ?? "",
-    slug: initial?.slug ?? "",
-    category: initial?.category ?? "Apartment",
-    location: initial?.location ?? "",
-    year: initial?.year ?? "",
-    scope: initial?.scope ?? "",
-    description: initial?.description ?? "",
-    descriptionJson: initial?.descriptionJson ?? null,
-    beforeImage: initial?.beforeImage ?? "",
-    afterImage: initial?.afterImage ?? "",
-    posterMediaId: initial?.posterMediaId ?? null,
-    galleryMediaIds: initial?.galleryMediaIds ?? [],
-    model3d: initial?.model3d ?? "",
-    isPublished: initial?.isPublished ?? true,
-  }));
   const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState<FormState>(() => {
+    const r = (initial ?? {}) as any;
+    return {
+      title: r.title ?? "",
+      slug: r.slug ?? "",
+      category: r.category ?? "Apartment",
+      location: r.location ?? "",
+      year: r.year ?? "",
+      scope: r.scope ?? "",
+      description: r.description ?? "",
+      descriptionJson: r.description_json ?? r.descriptionJson ?? null,
+      beforeImage: r.before_image ?? r.beforeImage ?? "",
+      afterImage: r.after_image ?? r.afterImage ?? "",
+      posterMediaId: r.poster_media_id ?? r.posterMediaId ?? null,
+      galleryMediaIds: Array.isArray(r.gallery_media_ids)
+        ? r.gallery_media_ids
+        : Array.isArray(r.galleryMediaIds)
+        ? r.galleryMediaIds
+        : [],
+      model3d: r.model_3d ?? r.model3d ?? "",
+      isPublished:
+        typeof r.is_published === "boolean"
+          ? r.is_published
+          : typeof r.isPublished === "boolean"
+          ? r.isPublished
+          : true,
+    };
+  });
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
