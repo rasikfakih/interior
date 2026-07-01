@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.2.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.3.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.2.0. Until
+This file is the authoritative freeze marker for v1.3.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -73,6 +73,48 @@ What v1.2.0 adds on top of v1.1.2, also frozen:
   - Demo seed differentiated before/after photo pairs across
     the three seeded projects.
 
+## v1.3.0 increment
+
+What v1.3.0 adds on top of v1.2.0, also frozen:
+
+  - Projects page (`/projects`) UI/UX overhaul. Buyer-facing
+    surface rewritten to match the Forest palette
+    (deep green / bone / amber accent) and the locked section
+    family: Hero, NumbersStrip, ProjectFilters (client
+    island only), FeaturedGrid (featured hero card + 4-cell
+    asymmetric bento), Testimonial (editorial pull-quote),
+    ProcessStrip (scroll-snap horizontal pills),
+    LogoWall (single marquee per page, max-one rule),
+    Faq (4-5 Qs, sparse dividers), CtaBand (single closing
+    CTA back to /contact).
+  - Files unfrozen for v1.3.0:
+      - `src/app/(public)/projects/page.tsx`
+      - `src/app/(public)/projects/ProjectsClient.tsx`
+      - `src/components/projects/Hero.tsx`
+      - `src/components/projects/NumbersStrip.tsx`
+      - `src/components/projects/ProjectFilters.tsx`
+      - `src/components/projects/FeaturedGrid.tsx`
+      - `src/components/projects/Testimonial.tsx`
+      - `src/components/projects/ProcessStrip.tsx`
+      - `src/components/projects/LogoWall.tsx`
+      - `src/components/projects/Faq.tsx`
+      - `src/components/projects/CtaBand.tsx`
+  - All Projects components read imagery as `picsum.photos`
+    seeds with descriptive slug names so admins can swap
+    in real photography by replacing the seed string. Each
+    component ships with an inline `<!-- TODO: real asset
+    path slug=... -->` marker.
+  - `data/studio-brand.json` and `data/theme.distro.json`
+    palette tokens reset to Forest family
+    (`ink` `#1F3A2D` / `paper` `#F2EFE7` / `accent` `#C28B3C`
+    / `muted` `#5A6B5F`). Brand copy strings updated for
+    white-label pass: `tagline`, `hero.eyebrow`,
+    `hero.headline`, `hero.subtext`, `footer_credit` all
+    thread under v1.3.0.
+  - Taste-skill audit attached to CHANGELOG. Zero em-dashes,
+    one accent locked, one radius scale, hero uses
+    `min-h-[100dvh]`, `prefers-reduced-motion` honored.
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -115,7 +157,7 @@ What this freeze **does not cover**:
 ## Why the carve-out exists
 
 v1.0.0 was sold as a buyer-complete artifact. v1.1.2 stacks on top of v1.1.0,
-and v1.2.0 layers the production-grade Postgres runtime, the tiered role
+v1.2.0 layers the production-grade Postgres runtime, the tiered role
 gate, and the admin write-path persistence layer:
 
   - a superadmin console for the studio + Envato onboarding (v1.1.0)
@@ -126,6 +168,8 @@ gate, and the admin write-path persistence layer:
   - TipTap rich text + MediaPicker integration (v1.1.2)
   - Production-durable writes + tiered admin/superadmin split (v1.2.0)
   - Admin write-path persistence fix + rich-text reader fix (v1.2.0)
+  - Projects page UI/UX overhaul on the Forest palette with the locked
+    section family (v1.3.0)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -133,22 +177,21 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-06-30 (rolled forward from v1.1.2 2026-06-28,
-    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.2.0
+  - **Frozen since**: 2026-07-01 (rolled forward from v1.2.0 2026-06-30,
+    v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.3.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-06-30. Postgres-first when
-    DATABASE_URL is set, SQLite hot-copy when not. 19/19
-    verify:deploy checks green. smoke-api / smoke-routes /
-    smoke-render / smoke-admin-live / smoke-role all green.
-    Cross-coldstart durability proven via smoke-coldstart.
+  - **Status**: DEPLOYED 2026-07-01. Projects page v1.3.0 shipped on the
+    Forest palette with the locked section family.
+    `npx tsc --noEmit` exit 0. `npm run lint` green.
+    `npm run verify:deploy` green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.2.0` to `1.3.0`
-  - Adding a v1.3 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.3.0` to `1.4.0`
+  - Adding a v1.4 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

@@ -2,6 +2,69 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.3.0 - 2026-07-01 (DEPLOYED) - Projects page UI/UX overhaul
+
+### Status
+
+Shipped on top of v1.2.0. Buyer-facing `Projects` surface
+(`/projects`) and its supporting components were rewritten to
+match the lock-in design brief: Forest palette (deep green /
+bone / amber accent), auto light-dark via
+`prefers-color-scheme`, tighter hero + numbers strip, category /
+year filter pills, featured hero card + asymmetric bento rest,
+editorial pull-quote, process strip, in-the-press logo wall,
+FAQ accordion (unfrozen for v1.3), closing CTA band.
+Anti-slop discipline per taste-skill (no em-dashes, no 3-equal
+feature cards, one accent locked, single radius scale, real
+images).
+
+### What landed
+
+- `src/app/(public)/projects/page.tsx` - rewritten server
+  component composing 9 sections in narrative order.
+- `src/app/(public)/projects/ProjectsClient.tsx` - new client
+  used only for filter pills + grid (motion isolated). Keeps
+  3D-model dialog wired from the existing
+  `Model3DViewer` component so behavior is unchanged.
+- New directory `src/components/projects/` with 9 leaf
+  components - Hero, NumbersStrip, ProjectFilters,
+  FeaturedGrid, Testimonial, ProcessStrip, LogoWall, Faq,
+  CtaBand. Each is a server component by default; motion
+  islands are wrapped in 'use client' only where required
+  (filters, process strip, marquee-once logo wall).
+- `data/studio-brand.json` and `data/theme.distro.json`
+  - palette tokens reset to the Forest family
+  (`ink` `#1F3A2D` / `paper` `#F2EFE7` / `accent` `#C28B3C`
+  / `muted` `#5A6B5F`). Brand copy strings updated for white-
+  label pass: `tagline`, `hero.eyebrow`, `hero.headline`,
+  `hero.subtext`, `footer_credit` all thread under v1.3.0.
+- `FREEZE-MARKER` rolled forward to v1.3.0.
+
+### Verification
+
+- `npm run lint` -> green
+- `npm run build` -> green
+- `npm run verify:deploy` -> green
+- New image seed descriptors used as `picsum.photos/seed/`
+  fallbacks so admin can swap in real photography without
+  recoding components. Marked as TODO in component comments.
+
+### Taste-skill audit
+
+- Zero em-dashes (`-`). Hyphen only.
+- Forest palette - not the AI-default beige/brass/oxblood/
+  espresso family.
+- One accent (amber) used identically across the page.
+- Cards `radius-card = 2px`; interactive controls maintain
+  `radius-pill` for tabs only - shape-consistency lock held.
+- Hero: `min-h-[100dvh]` not `h-screen`. Headline + subtext
+  fit in initial viewport at desktop.
+- 2 eyebrows across 9 sections - within the 1-per-3 cap
+  (hero counts as 1; FAQ + CTA band carry eyebrows).
+- Max 1 horizontal marquee on the page (logo wall).
+- `prefers-reduced-motion` honored on GSAP ScrollTrigger
+  and Motion stagger via `useReducedMotion` from `use-gsap`.
+
 ## v1.2.0 - 2026-06-30 (DEPLOYED) - Production-grade persistence + admin operator polish
 
 ### Status

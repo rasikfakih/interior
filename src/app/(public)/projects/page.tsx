@@ -1,7 +1,16 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
+import { getStudioBrand } from "@/lib/studio-brand";
+import Hero from "@/components/projects/Hero";
+import NumbersStrip from "@/components/projects/NumbersStrip";
 import ProjectsClient from "./ProjectsClient";
+import FeaturedGrid from "@/components/projects/FeaturedGrid";
+import ProjectsTestimonial from "@/components/projects/Testimonial";
+import ProcessStrip from "@/components/projects/ProcessStrip";
+import LogoWall from "@/components/projects/LogoWall";
+import ProjectsFaq from "@/components/projects/Faq";
+import CtaBand from "@/components/projects/CtaBand";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -53,42 +62,67 @@ export default async function ProjectsPage() {
     posterUrl: r.before_image || null,
   }));
 
-  return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
-          <div className="md:col-span-7">
-            <p className="chrome-pill mb-6 inline-flex">Selected work</p>
-            <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1]">
-              Homes drawn, built, and lived in.
-            </h1>
-          </div>
-          <div className="md:col-span-5 md:pt-3">
-            <p className="text-ink-mute">
-              {items.length} residences on public record. Walk through any
-              that carry a 3D model straight from this page.
-            </p>
-          </div>
-        </div>
+  const categories = Array.from(
+    new Set(items.map((i) => i.category).filter(Boolean))
+  );
+  const years = Array.from(new Set(items.map((i) => i.year).filter(Boolean)))
+    .sort()
+    .reverse();
+  const brand = getStudioBrand();
 
-        {items.length === 0 ? (
-          <div className="surface-tile p-10 text-center">
-            <p className="chrome-pill mb-3 inline-flex">No projects yet</p>
-            <p className="text-ink-mute max-w-prose mx-auto">
-              The studio has not published any projects. Sign in to
-              <Link
-                href="/admin/projects"
-                className="ml-2 text-ink border-b border-[var(--accent-soft)]"
-              >
-                write one
-              </Link>
-              .
-            </p>
+  return (
+    <main>
+      {items.length === 0 ? (
+        <Hero count={0} />
+      ) : (
+        <Hero count={items.length} />
+      )}
+
+      <NumbersStrip projectCount={items.length} />
+
+      {items.length === 0 ? (
+        <section className="py-16 md:py-24 bg-canvas">
+          <div className="container-page">
+            <div className="surface-tile p-10 text-center">
+              <p className="chrome-pill mb-3 inline-flex">No projects yet</p>
+              <p className="text-ink-mute max-w-prose mx-auto">
+                The studio has not published any projects. Sign in to
+                <Link
+                  href="/admin/projects"
+                  className="ml-2 text-ink border-b border-[var(--accent-soft)]"
+                >
+                  write one
+                </Link>
+                .
+              </p>
+            </div>
           </div>
-        ) : (
-          <ProjectsClient items={items} />
-        )}
-      </div>
-    </section>
+        </section>
+      ) : (
+        <section className="py-16 md:py-24 bg-canvas">
+          <div className="container-page">
+            <ProjectsClient
+              items={items}
+              categories={categories}
+              years={years}
+            />
+          </div>
+        </section>
+      )}
+
+      <FeaturedGrid items={items} />
+      <ProjectsTestimonial />
+      <ProcessStrip />
+      <LogoWall />
+      <ProjectsFaq />
+      <CtaBand />
+
+      <footer className="py-8 border-t hairline bg-canvas">
+        <div className="container-page flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
+          <span>{brand.footer_credit}</span>
+          <span>{brand.studio_address}</span>
+        </div>
+      </footer>
+    </main>
   );
 }

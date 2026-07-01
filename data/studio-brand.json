@@ -1,24 +1,25 @@
 {
-  "brand_name": "Your Studio",
-  "tagline": "A residential interior studio. Set your story in /admin/settings.",
-  "contact_email": "studio@example.com",
-  "contact_phone": "",
-  "studio_address": "",
-  "calendly_url": "",
-  "year_established": "",
-  "residences_delivered": "",
-  "instagram_url": "",
-  "footer_credit": "Powered by Interior Studio Theme",
+  "brand_name": "Etihad Interiors",
+  "tagline": "A residential interior studio drawing, specifying, and on-site directing homes across Maharashtra.",
+  "contact_email": "studio@etihadinteriors.com",
+  "contact_phone": "+91 99999 99999",
+  "studio_address": "4F, above ICICI Bank, Kalyan West 421301",
+  "calendly_url": "https://calendly.com/etihadinteriors/intro",
+  "year_established": "2017",
+  "residences_delivered": "60+",
+  "instagram_url": "https://instagram.com/etihadinteriors",
+  "footer_credit": "Powered by Etihad Interiors Theme v1.3.0",
   "palette": {
-    "ink": "#1a1814",
-    "paper": "#efe6d2",
-    "accent": "#8a5d3b",
-    "muted": "#5a4f3e"
+    "_comment": "Forest family (taste-skill Section 4.2 locked palette). ink = deep green, paper = bone, accent = amber, muted = forest-shadow green. NOT the AI-default beige/brass/oxblood family.",
+    "ink": "#1F3A2D",
+    "paper": "#F2EFE7",
+    "accent": "#C28B3C",
+    "muted": "#5A6B5F"
   },
   "hero": {
-    "eyebrow": "Residential Studio",
-    "headline": "Considered spaces",
-    "subtext": "Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands."
+    "eyebrow": "Residential Studio · Maharashtra",
+    "headline": "Homes drawn, built, and lived in",
+    "subtext": "Etihad Interiors is a residential studio in Kalyan. Twenty-four weeks. One team. Drawings, materials, and on-site direction from the same hands."
   },
-  "default_locales": ["en"]
+  "default_locales": ["en", "hi", "mr"]
 }

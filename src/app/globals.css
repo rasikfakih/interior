@@ -20,55 +20,53 @@
 
 @layer base {
   :root {
-    /* Editorial-manifesto palette.
-       Cold-luxury family: paper, ink, polished tungsten accent.
-       Not the AI-default warm-cream + brass + oxblood +
-       espresso family that the taste-skill flags in Section 4.2.
-       Rotation-driven: this brief sits in the same family
-       ring as the cold-luxury preset (silver-grey + chrome +
-       smoke) transposed to a paper background for editorial
-       legibility. Single accent across the whole page. */
-    --bg: #f4f1ec;
-    --bg-elev: #ece7df;
-    --surface: rgba(24, 27, 31, 0.04);
-    --surface-strong: rgba(24, 27, 31, 0.08);
-    --ink: #181b1f;
-    --ink-mute: #5b5e63;
-    --ink-soft: #8a8c8f;
-    --line: rgba(24, 27, 31, 0.14);
-    --line-strong: rgba(24, 27, 31, 0.28);
-    --accent: #6b6f76;
-    --accent-deep: #3a3d42;
-    --accent-soft: rgba(107, 111, 118, 0.16);
+    /* Forest family per v1.3.0 freeze manifest.
+       Deep green ink on bone paper, amber accent, forest-shadow
+       muted. NOT the AI-default beige/brass/oxblood/espresso
+       family that the taste-skill flags in Section 4.2. Single
+       accent across the whole page. light is default by
+       prefers-color-scheme (no auto-flip yet). */
+    --bg: #f2efe7;
+    --bg-elev: #e8e3d6;
+    --surface: rgba(31, 58, 45, 0.04);
+    --surface-strong: rgba(31, 58, 45, 0.08);
+    --ink: #1f3a2d;
+    --ink-mute: #5a6b5f;
+    --ink-soft: #8a9690;
+    --line: rgba(31, 58, 45, 0.16);
+    --line-strong: rgba(31, 58, 45, 0.32);
+    --accent: #c28b3c;
+    --accent-deep: #8a5f28;
+    --accent-soft: rgba(194, 139, 60, 0.18);
     --chrome: linear-gradient(
       135deg,
-      #d3d4d6 0%,
-      #8a8c8f 50%,
-      #3a3d42 100%
+      #d5c7a8 0%,
+      #c28b3c 50%,
+      #8a5f28 100%
     );
-    --shadow-ambient: 0 30px 60px -30px rgba(24, 27, 31, 0.25);
+    --shadow-ambient: 0 30px 60px -30px rgba(31, 58, 45, 0.28);
   }
 
   .dark {
-    --bg: #0c0e10;
-    --bg-elev: #14171a;
-    --surface: rgba(220, 224, 230, 0.04);
-    --surface-strong: rgba(220, 224, 230, 0.08);
+    --bg: #101613;
+    --bg-elev: #161d18;
+    --surface: rgba(232, 227, 214, 0.04);
+    --surface-strong: rgba(232, 227, 214, 0.08);
     --ink: #ece6d8;
-    --ink-mute: #a4a7ad;
-    --ink-soft: #6b6e73;
-    --line: rgba(220, 224, 230, 0.14);
-    --line-strong: rgba(220, 224, 230, 0.24);
-    --accent: #b8bcc3;
-    --accent-deep: #dadee3;
-    --accent-soft: rgba(220, 224, 230, 0.22);
+    --ink-mute: #a8b3a9;
+    --ink-soft: #6b756b;
+    --line: rgba(232, 227, 214, 0.16);
+    --line-strong: rgba(232, 227, 214, 0.28);
+    --accent: #d8a560;
+    --accent-deep: #e8c082;
+    --accent-soft: rgba(216, 165, 96, 0.22);
     --chrome: linear-gradient(
       135deg,
-      #d8dad9 0%,
-      #8a8c8f 50%,
-      #3c4040 100%
+      #d8a560 0%,
+      #b0853f 50%,
+      #6e4f23 100%
     );
-    --shadow-ambient: 0 30px 60px -30px rgba(0, 0, 0, 0.55);
+    --shadow-ambient: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
   }
 
   html {

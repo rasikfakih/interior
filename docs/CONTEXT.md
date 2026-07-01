@@ -1905,3 +1905,102 @@ What landed:
 Buyer-visible code did not change in this session. Operator
 confirmed "if not then complete it" intent based on the
 2026-06-30 work already shipped in 0b0cb98 and 9ef5a3a.
+
+### 2026-07-01 - v1.3.0 build (Projects page UI/UX overhaul - landed)
+
+Operator instructed full build execution after free-form spec
+dump referenced the v1.3.0 freeze manifest content from
+2026-07-01 procedural close-out. Operator asked 4 clarifying
+questions:
+
+  - v1.3.0 next features (confirmed)
+  - palette: editorial-manifesto / cold-luxury (held over
+    from v1.2.0)
+  - motion budget: stay at 4-7
+  - block library: skipped
+
+Then operator delivered a free-form spec that contradicted
+the answers (Forest palette + motion 6-7 + block library
+iteration). I prioritized the spec because it ships a
+specific buyer-visible surface to a specific brief.
+
+What landed:
+
+- globals.css :root palette flipped from cold-luxury to
+  the Forest family: paper #F2EFE7 (also the bg token),
+  ink #1F3A2D, polished tungsten accent swapped for amber
+  #C28B3C with #8A5F28 as accent-deep. Forest-shadow
+  green #5A6B5F for muted. Single accent across the whole
+  page. .dark block carries the same family in reverse
+  (off-black bg, lightened ink).
+- New reader: src/lib/studio-brand.ts (server-only) parses
+  data/studio-brand.json at module scope with a DEFAULTS
+  fallback. Cached after first read. Year-established,
+  residences-delivered, headline, subtext, address, footer
+  credit all come through this reader so the white-label pass
+  stays surgical.
+- src/components/projects/Hero.tsx: kept the 7/5
+  asymmetric split from spec, swapped the settings call to
+  getStudioBrand().
+- src/components/projects/NumbersStrip.tsx: same approach -
+  studio-brand reader for year + residences; 24 weeks + 1
+  team principles baked. Hairline dividers between tiles,
+  font-mono for numerals (taste-skill density rule).
+- src/components/projects/ProjectFilters.tsx (the v1
+  draft shipped previously): replaced the imperative DOM
+  mutation in the original draft with a state-paired
+  useMemo filter on a controlled array. Avoids hydration
+  mismatch risk; preserves the client-island shape.
+- New: src/components/projects/FeaturedGrid.tsx, server
+  component, featured hero tile (8/12 col) + 4-cell
+  asymmetric bento (4/5/7/12 col spread - never equal).
+  Real images via picsum.photos/seed/ fallbacks with
+  descriptive slug names so admins swap to real
+  photography by replacing the seed string. Each component
+  ships an inline TODO marker for the slug.
+- New: src/components/projects/Testimonial.tsx, server,
+  editorial pull-quote on bg-elev, attribution via plain
+  hyphen (no em-dash per taste-skill), italic display serif
+  draws the eye without manufacturing a marketing phrase.
+- New: src/components/projects/ProcessStrip.tsx, client
+  island, 4 stages labelled verb-only (Draw / Specify /
+  Build / Live in) per taste-skill ban on Stage 1/Stage 2
+  copy. GSAP reveals gated on prefers-reduced-motion;
+  reduced-motion falls back to a plain scroll-snap rail.
+- New: src/components/projects/LogoWall.tsx, client
+  island, single infinite marquee (max-1-per-page rule);
+  reduced-motion stops the tween instantly. Words render as
+  plain text wordmarks - no industry labels below per taste-
+  skill logowall discipline.
+- New: src/components/projects/Faq.tsx, client island,
+  sparse divider accordion (only bottom-border between rows
+  per Section 9.F ban). One of only two eyebrows on the
+  page (FAQ + CTA = 2 of 9, within 1-per-3 cap).
+- New: src/components/projects/CtaBand.tsx, server,
+  single closing CTA back to /contact (no duplicate CTA
+  intent per ban). Carries the second eyebrow.
+- src/app/(public)/projects/ProjectsClient.tsx: rewrote
+  the previously-shipped client island to use the new
+  ProjectsItem import path and a controlled useMemo filter
+  on category + year. Dropped the imperative DOM mutation.
+- src/app/(public)/projects/page.tsx: composes all 9
+  sections in narrative order, footer credit at bottom
+  reads from studio-brand.footer_credit which says
+  "Powered by Etihad Interiors Theme v1.3.0".
+
+Verification:
+
+- 
+px tsc --noEmit -> exit 0
+- 
+pm run lint -> pre-existing schema/settings/use-gsap
+  errors only. New projects/* and studio-brand.ts lint
+  clean (zero findings on the new code).
+- 
+pm run build -> green. 36 pages prerender. /projects
+  and /projects/[slug] build unchanged in shape.
+- 
+pm run verify:deploy -> 19/19 green.
+
+Operator asks continuing through v1.3 / v1.4 per the FREEZE
+marker. v1.3.0 ships green.
