@@ -1606,7 +1606,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_media",
-      "community": 110,
+      "community": 95,
       "norm_label": "probe-media.mjs"
     },
     {
@@ -1616,7 +1616,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "scripts_probe_media_cookies",
-      "community": 110,
+      "community": 95,
       "norm_label": "cookies"
     },
     {
@@ -1626,7 +1626,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "scripts_probe_media_login",
-      "community": 110,
+      "community": 95,
       "norm_label": "login()"
     },
     {
@@ -1636,7 +1636,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "scripts_probe_media_cookieheader",
-      "community": 110,
+      "community": 95,
       "norm_label": "cookieheader()"
     },
     {
@@ -3942,7 +3942,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "slug_page_voicesseed",
-      "community": 35,
+      "community": 9,
       "norm_label": "voicesseed()"
     },
     {
@@ -4302,7 +4302,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_admin_projects_id_page_tsx_id_page",
-      "community": 19,
+      "community": 109,
       "norm_label": "page.tsx"
     },
     {
@@ -4312,7 +4312,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_app_admin_projects_id_page_tsx_id_page_metadata",
-      "community": 19,
+      "community": 109,
       "norm_label": "metadata"
     },
     {
@@ -4322,7 +4322,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "id_page_adminprojecteditor",
-      "community": 19,
+      "community": 109,
       "norm_label": "adminprojecteditor()"
     },
     {
@@ -4502,7 +4502,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "demo_reset_route",
-      "community": 17,
+      "community": 49,
       "norm_label": "route.ts"
     },
     {
@@ -4512,7 +4512,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "demo_reset_route_post",
-      "community": 17,
+      "community": 49,
       "norm_label": "post()"
     },
     {
@@ -4522,7 +4522,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_admin_license_route_ts_license_route",
-      "community": 17,
+      "community": 0,
       "norm_label": "route.ts"
     },
     {
@@ -4532,7 +4532,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "src_app_api_admin_license_route_ts_license_route_get",
-      "community": 17,
+      "community": 0,
       "norm_label": "get()"
     },
     {
@@ -4542,7 +4542,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "src_app_api_admin_license_route_ts_license_route_post",
-      "community": 17,
+      "community": 0,
       "norm_label": "post()"
     },
     {
@@ -4742,7 +4742,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "journal_route",
-      "community": 9,
+      "community": 35,
       "norm_label": "route.ts"
     },
     {
@@ -4752,7 +4752,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "journal_route_isauthorized",
-      "community": 9,
+      "community": 35,
       "norm_label": "isauthorized()"
     },
     {
@@ -4772,7 +4772,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "journal_route_post",
-      "community": 9,
+      "community": 35,
       "norm_label": "post()"
     },
     {
@@ -4782,7 +4782,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_license_route_ts_license_route",
-      "community": 17,
+      "community": 0,
       "norm_label": "route.ts"
     },
     {
@@ -4792,7 +4792,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "src_app_api_license_route_ts_license_route_get",
-      "community": 17,
+      "community": 0,
       "norm_label": "get()"
     },
     {
@@ -4802,7 +4802,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_app_api_license_route_ts_license_route_post",
-      "community": 17,
+      "community": 0,
       "norm_label": "post()"
     },
     {
@@ -5012,7 +5012,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "newsletter_route",
-      "community": 35,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -5022,7 +5022,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "newsletter_route_post",
-      "community": 35,
+      "community": 18,
       "norm_label": "post()"
     },
     {
@@ -5052,7 +5052,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "login_route",
-      "community": 110,
+      "community": 95,
       "norm_label": "route.ts"
     },
     {
@@ -5062,7 +5062,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "login_route_post",
-      "community": 110,
+      "community": 95,
       "norm_label": "post()"
     },
     {
@@ -5072,7 +5072,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "login_route_delete",
-      "community": 110,
+      "community": 95,
       "norm_label": "delete()"
     },
     {
@@ -5162,7 +5162,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tenants_route",
-      "community": 115,
+      "community": 1,
       "norm_label": "route.ts"
     },
     {
@@ -5172,7 +5172,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "tenants_route_get",
-      "community": 115,
+      "community": 1,
       "norm_label": "get()"
     },
     {
@@ -5182,7 +5182,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "tenants_route_post",
-      "community": 115,
+      "community": 1,
       "norm_label": "post()"
     },
     {
@@ -5192,7 +5192,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "blocks_route",
-      "community": 17,
+      "community": 49,
       "norm_label": "route.ts"
     },
     {
@@ -5202,7 +5202,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "blocks_route_put",
-      "community": 17,
+      "community": 49,
       "norm_label": "put()"
     },
     {
@@ -5272,7 +5272,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "pages_route",
-      "community": 17,
+      "community": 0,
       "norm_label": "route.ts"
     },
     {
@@ -5282,7 +5282,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "pages_route_gateorfail",
-      "community": 17,
+      "community": 0,
       "norm_label": "gateorfail()"
     },
     {
@@ -5292,7 +5292,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "pages_route_get",
-      "community": 17,
+      "community": 0,
       "norm_label": "get()"
     },
     {
@@ -5302,7 +5302,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "pages_route_post",
-      "community": 17,
+      "community": 0,
       "norm_label": "post()"
     },
     {
@@ -5312,7 +5312,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_projects_id_route_ts_id_route",
-      "community": 18,
+      "community": 17,
       "norm_label": "route.ts"
     },
     {
@@ -5322,7 +5322,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "src_app_api_projects_id_route_ts_id_route_isauthorized",
-      "community": 18,
+      "community": 17,
       "norm_label": "isauthorized()"
     },
     {
@@ -5332,7 +5332,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "id_route_column_map",
-      "community": 18,
+      "community": 17,
       "norm_label": "column_map"
     },
     {
@@ -5342,7 +5342,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "src_app_api_projects_id_route_ts_id_route_get",
-      "community": 18,
+      "community": 17,
       "norm_label": "get()"
     },
     {
@@ -5352,7 +5352,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "src_app_api_projects_id_route_ts_id_route_put",
-      "community": 18,
+      "community": 17,
       "norm_label": "put()"
     },
     {
@@ -5362,7 +5362,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "src_app_api_projects_id_route_ts_id_route_delete",
-      "community": 18,
+      "community": 17,
       "norm_label": "delete()"
     },
     {
@@ -5552,7 +5552,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_testimonials_id_route_ts_id_route",
-      "community": 109,
+      "community": 18,
       "norm_label": "route.ts"
     },
     {
@@ -5562,7 +5562,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "src_app_api_testimonials_id_route_ts_id_route_isauthorized",
-      "community": 109,
+      "community": 18,
       "norm_label": "isauthorized()"
     },
     {
@@ -5572,7 +5572,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_app_api_testimonials_id_route_ts_id_route_get",
-      "community": 109,
+      "community": 18,
       "norm_label": "get()"
     },
     {
@@ -5582,7 +5582,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "src_app_api_testimonials_id_route_ts_id_route_put",
-      "community": 109,
+      "community": 18,
       "norm_label": "put()"
     },
     {
@@ -5592,7 +5592,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "src_app_api_testimonials_id_route_ts_id_route_delete",
-      "community": 109,
+      "community": 18,
       "norm_label": "delete()"
     },
     {
@@ -5602,7 +5602,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "testimonials_route",
-      "community": 109,
+      "community": 122,
       "norm_label": "route.ts"
     },
     {
@@ -5612,7 +5612,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "testimonials_route_isauthorized",
-      "community": 109,
+      "community": 122,
       "norm_label": "isauthorized()"
     },
     {
@@ -5622,7 +5622,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "testimonials_route_get",
-      "community": 109,
+      "community": 122,
       "norm_label": "get()"
     },
     {
@@ -5632,7 +5632,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "testimonials_route_post",
-      "community": 109,
+      "community": 122,
       "norm_label": "post()"
     },
     {
@@ -5642,7 +5642,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_upload_route_ts_upload_route",
-      "community": 105,
+      "community": 0,
       "norm_label": "route.ts"
     },
     {
@@ -5652,7 +5652,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "upload_route_allowed_folders",
-      "community": 105,
+      "community": 0,
       "norm_label": "allowed_folders"
     },
     {
@@ -5662,7 +5662,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "upload_route_allowed_image_mime",
-      "community": 105,
+      "community": 0,
       "norm_label": "allowed_image_mime"
     },
     {
@@ -5672,7 +5672,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "upload_route_allowed_model_mime",
-      "community": 105,
+      "community": 0,
       "norm_label": "allowed_model_mime"
     },
     {
@@ -5682,7 +5682,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "upload_route_ext_by_mime",
-      "community": 105,
+      "community": 0,
       "norm_label": "ext_by_mime"
     },
     {
@@ -5692,7 +5692,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "upload_route_safename",
-      "community": 105,
+      "community": 0,
       "norm_label": "safename()"
     },
     {
@@ -5702,7 +5702,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "src_app_api_upload_route_ts_upload_route_post",
-      "community": 105,
+      "community": 0,
       "norm_label": "post()"
     },
     {
@@ -5912,7 +5912,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "issue_page",
-      "community": 118,
+      "community": 95,
       "norm_label": "page.tsx"
     },
     {
@@ -5922,7 +5922,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "issue_page_metadata",
-      "community": 118,
+      "community": 95,
       "norm_label": "metadata"
     },
     {
@@ -5932,7 +5932,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "issue_page_issuepage",
-      "community": 118,
+      "community": 95,
       "norm_label": "issuepage()"
     },
     {
@@ -7572,7 +7572,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "admin_adminshell",
-      "community": 0,
+      "community": 105,
       "norm_label": "adminshell.tsx"
     },
     {
@@ -7582,7 +7582,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "admin_adminshell_tab",
-      "community": 0,
+      "community": 105,
       "norm_label": "tab"
     },
     {
@@ -7592,7 +7592,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "admin_adminshell_admin_nav",
-      "community": 0,
+      "community": 105,
       "norm_label": "admin_nav"
     },
     {
@@ -7602,7 +7602,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "admin_adminshell_usetoast",
-      "community": 0,
+      "community": 105,
       "norm_label": "usetoast()"
     },
     {
@@ -7612,7 +7612,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "admin_adminshell_adminshell",
-      "community": 0,
+      "community": 105,
       "norm_label": "adminshell()"
     },
     {
@@ -7622,7 +7622,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "admin_adminshell_tabpanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "tabpanel()"
     },
     {
@@ -7632,7 +7632,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "admin_adminshell_testimonialsroutepanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "testimonialsroutepanel()"
     },
     {
@@ -7642,7 +7642,7 @@
       "source_location": "L170",
       "_origin": "ast",
       "id": "admin_adminshell_teamroutepanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "teamroutepanel()"
     },
     {
@@ -7652,7 +7652,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "admin_adminshell_journalroutepanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "journalroutepanel()"
     },
     {
@@ -7662,7 +7662,7 @@
       "source_location": "L262",
       "_origin": "ast",
       "id": "admin_adminshell_projectsroutepanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "projectsroutepanel()"
     },
     {
@@ -7672,7 +7672,7 @@
       "source_location": "L301",
       "_origin": "ast",
       "id": "admin_adminshell_pagespanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "pagespanel()"
     },
     {
@@ -7682,7 +7682,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "admin_adminshell_dynamic",
-      "community": 0,
+      "community": 105,
       "norm_label": "dynamic()"
     },
     {
@@ -7692,7 +7692,7 @@
       "source_location": "L327",
       "_origin": "ast",
       "id": "admin_adminshell_crudpanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "crudpanel()"
     },
     {
@@ -7702,7 +7702,7 @@
       "source_location": "L340",
       "_origin": "ast",
       "id": "admin_adminshell_settingspanel",
-      "community": 0,
+      "community": 105,
       "norm_label": "settingspanel()"
     },
     {
@@ -8452,7 +8452,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "operator_issueform",
-      "community": 118,
+      "community": 95,
       "norm_label": "issueform.tsx"
     },
     {
@@ -8462,7 +8462,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "operator_issueform_issueform",
-      "community": 118,
+      "community": 95,
       "norm_label": "issueform()"
     },
     {
@@ -9202,7 +9202,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_api_guard",
-      "community": 17,
+      "community": 0,
       "norm_label": "api-guard.ts"
     },
     {
@@ -9212,7 +9212,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_api_guard_action",
-      "community": 17,
+      "community": 0,
       "norm_label": "action"
     },
     {
@@ -9222,7 +9222,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_api_guard_gateadmin",
-      "community": 17,
+      "community": 0,
       "norm_label": "gateadmin()"
     },
     {
@@ -9752,7 +9752,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_license_gate",
-      "community": 17,
+      "community": 0,
       "norm_label": "license-gate.ts"
     },
     {
@@ -9762,7 +9762,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_license_gate_gate",
-      "community": 17,
+      "community": 0,
       "norm_label": "gate"
     },
     {
@@ -9772,7 +9772,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_license_gate_gateresult",
-      "community": 17,
+      "community": 0,
       "norm_label": "gateresult"
     },
     {
@@ -9782,7 +9782,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_license_gate_requireadminsession",
-      "community": 17,
+      "community": 0,
       "norm_label": "requireadminsession()"
     },
     {
@@ -9792,7 +9792,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "lib_license_gate_requiresuperadmin",
-      "community": 17,
+      "community": 0,
       "norm_label": "requiresuperadmin()"
     },
     {
@@ -9802,7 +9802,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "lib_license_gate_requirelicense",
-      "community": 17,
+      "community": 0,
       "norm_label": "requirelicense()"
     },
     {
@@ -9812,7 +9812,7 @@
       "source_location": "L146",
       "_origin": "ast",
       "id": "lib_license_gate_missingcount",
-      "community": 17,
+      "community": 0,
       "norm_label": "missingcount()"
     },
     {
@@ -9922,7 +9922,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_license_readlicense",
-      "community": 17,
+      "community": 0,
       "norm_label": "readlicense()"
     },
     {
@@ -10042,7 +10042,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "lib_license_appendaudit",
-      "community": 17,
+      "community": 18,
       "norm_label": "appendaudit()"
     },
     {
@@ -10632,7 +10632,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "lib_schema_testimonials",
-      "community": 109,
+      "community": 122,
       "norm_label": "testimonials"
     },
     {
@@ -10662,7 +10662,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "lib_schema_settings",
-      "community": 2,
+      "community": 35,
       "norm_label": "settings"
     },
     {
@@ -11499,7 +11499,7 @@
       "label": "graphify",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L17",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "agents_graphify",
       "community": 59,
@@ -13276,6 +13276,26 @@
       "norm_label": "2026-07-01 - v1.3.0 build (projects page ui/ux overhaul - landed)"
     },
     {
+      "label": "2026-07-02 - /projects-v2 ship (audit-resolved route, /projects untouched)",
+      "file_type": "document",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L2010",
+      "_origin": "ast",
+      "id": "docs_context_2026_07_02_projects_v2_ship_audit_resolved_route_projects_untouched",
+      "community": 13,
+      "norm_label": "2026-07-02 - /projects-v2 ship (audit-resolved route, /projects untouched)"
+    },
+    {
+      "label": "2026-07-02 - Session-todo gate (TS-ID governance)",
+      "file_type": "document",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L2156",
+      "_origin": "ast",
+      "id": "docs_context_2026_07_02_session_todo_gate_ts_id_governance",
+      "community": 13,
+      "norm_label": "2026-07-02 - session-todo gate (ts-id governance)"
+    },
+    {
       "label": "OPERATOR_QUICKREF.md",
       "file_type": "document",
       "source_file": "docs/OPERATOR_QUICKREF.md",
@@ -13844,6 +13864,126 @@
       "id": "docs_sales_notes_studio_pain_points_to_highlight_in_the_listing",
       "community": 21,
       "norm_label": "studio pain points to highlight in the listing"
+    },
+    {
+      "label": "SESSION-TODO.md",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_session_todo",
+      "community": 118,
+      "norm_label": "session-todo.md"
+    },
+    {
+      "label": "Session Todo State",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_session_todo_session_todo_state",
+      "community": 118,
+      "norm_label": "session todo state"
+    },
+    {
+      "label": "Active todos",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "docs_session_todo_active_todos",
+      "community": 118,
+      "norm_label": "active todos"
+    },
+    {
+      "label": "TS-ID-005 - Create this document",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_005_create_this_document",
+      "community": 118,
+      "norm_label": "ts-id-005 - create this document"
+    },
+    {
+      "label": "TS-ID-004 - Live verify /projects-v2 post-deploy",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_004_live_verify_projects_v2_post_deploy",
+      "community": 118,
+      "norm_label": "ts-id-004 - live verify /projects-v2 post-deploy"
+    },
+    {
+      "label": "TS-ID-001 - Drop dead ProjectFilters.tsx",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_001_drop_dead_projectfilters_tsx",
+      "community": 118,
+      "norm_label": "ts-id-001 - drop dead projectfilters.tsx"
+    },
+    {
+      "label": "TS-ID-002 - Drop invented press names in LogoWall",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_002_drop_invented_press_names_in_logowall",
+      "community": 118,
+      "norm_label": "ts-id-002 - drop invented press names in logowall"
+    },
+    {
+      "label": "TS-ID-003 - Resolve `statutes.ts` Migration import",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_003_resolve_statutes_ts_migration_import",
+      "community": 118,
+      "norm_label": "ts-id-003 - resolve `statutes.ts` migration import"
+    },
+    {
+      "label": "TS-ID-006 - Make-everything-editable admin scope",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_006_make_everything_editable_admin_scope",
+      "community": 118,
+      "norm_label": "ts-id-006 - make-everything-editable admin scope"
+    },
+    {
+      "label": "Closed todos",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L108",
+      "_origin": "ast",
+      "id": "docs_session_todo_closed_todos",
+      "community": 118,
+      "norm_label": "closed todos"
+    },
+    {
+      "label": "TS-ID-005 - Create this document",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L116",
+      "_origin": "ast",
+      "id": "docs_session_todo_ts_id_005_create_this_document_116",
+      "community": 118,
+      "norm_label": "ts-id-005 - create this document"
+    },
+    {
+      "label": "Pending escalation",
+      "file_type": "document",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L127",
+      "_origin": "ast",
+      "id": "docs_session_todo_pending_escalation",
+      "community": 118,
+      "norm_label": "pending escalation"
     },
     {
       "label": "envato-sales-brief.md",
@@ -18042,9 +18182,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_base_url",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_base_url"
     },
     {
       "relation": "contains",
@@ -18052,9 +18192,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_check",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_check"
     },
     {
       "relation": "contains",
@@ -18062,9 +18202,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_checks",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_checks"
     },
     {
       "relation": "contains",
@@ -18072,9 +18212,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_ctah2",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_ctah2"
     },
     {
       "relation": "contains",
@@ -18082,9 +18222,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_dbimagemarkers",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_dbimagemarkers"
     },
     {
       "relation": "contains",
@@ -18092,9 +18232,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_eyebrowinfeatured",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_eyebrowinfeatured"
     },
     {
       "relation": "contains",
@@ -18102,9 +18242,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_eyebrowinhero",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_eyebrowinhero"
     },
     {
       "relation": "contains",
@@ -18112,9 +18252,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_eyebrowinnumbers",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_eyebrowinnumbers"
     },
     {
       "relation": "contains",
@@ -18122,9 +18262,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_eyebrowinprocess",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_eyebrowinprocess"
     },
     {
       "relation": "contains",
@@ -18132,9 +18272,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_featuresh2",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_featuresh2"
     },
     {
       "relation": "contains",
@@ -18142,9 +18282,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_get",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_get"
     },
     {
       "relation": "contains",
@@ -18152,9 +18292,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_hero",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_hero"
     },
     {
       "relation": "contains",
@@ -18162,9 +18302,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L87",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_herocontactonly",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_herocontactonly"
     },
     {
       "relation": "contains",
@@ -18172,9 +18312,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_lines",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_lines"
     },
     {
       "relation": "contains",
@@ -18182,9 +18322,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_processok",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_processok"
     },
     {
       "relation": "contains",
@@ -18192,9 +18332,9 @@
       "source_file": "scripts/smoke-projects-v2.mjs",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_smoke_projects_v2",
-      "target": "scripts_smoke_projects_v2_taglineisempty",
-      "confidence_score": 1.0
+      "target": "scripts_smoke_projects_v2_taglineisempty"
     },
     {
       "relation": "contains",
@@ -19459,9 +19599,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "lib_pg",
-      "confidence_score": 1.0
+      "target": "lib_pg"
     },
     {
       "relation": "imports",
@@ -19470,9 +19610,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "lib_pg_ensuremigrated",
-      "confidence_score": 1.0
+      "target": "lib_pg_ensuremigrated"
     },
     {
       "relation": "imports",
@@ -19481,9 +19621,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "lib_pg_pgmany",
-      "confidence_score": 1.0
+      "target": "lib_pg_pgmany"
     },
     {
       "relation": "imports_from",
@@ -19492,9 +19632,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "lib_studio_brand",
-      "confidence_score": 1.0
+      "target": "lib_studio_brand"
     },
     {
       "relation": "imports",
@@ -19503,9 +19643,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "lib_studio_brand_getstudiobrand",
-      "confidence_score": 1.0
+      "target": "lib_studio_brand_getstudiobrand"
     },
     {
       "relation": "imports_from",
@@ -19514,9 +19654,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_ctaband",
-      "confidence_score": 1.0
+      "target": "projects_v2_ctaband"
     },
     {
       "relation": "imports",
@@ -19525,9 +19665,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_ctaband_ctabandv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_ctaband_ctabandv2"
     },
     {
       "relation": "imports_from",
@@ -19536,9 +19676,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_faq",
-      "confidence_score": 1.0
+      "target": "projects_v2_faq"
     },
     {
       "relation": "imports_from",
@@ -19547,9 +19687,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_featuredgrid",
-      "confidence_score": 1.0
+      "target": "projects_v2_featuredgrid"
     },
     {
       "relation": "imports_from",
@@ -19558,9 +19698,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_hero",
-      "confidence_score": 1.0
+      "target": "projects_v2_hero"
     },
     {
       "relation": "imports",
@@ -19569,9 +19709,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_hero_projectsherov2",
-      "confidence_score": 1.0
+      "target": "projects_v2_hero_projectsherov2"
     },
     {
       "relation": "imports_from",
@@ -19580,9 +19720,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_numbersstrip",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip"
     },
     {
       "relation": "imports",
@@ -19591,9 +19731,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_numbersstrip_numbersstripv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip_numbersstripv2"
     },
     {
       "relation": "contains",
@@ -19601,9 +19741,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_page_dbprojectrow",
-      "confidence_score": 1.0
+      "target": "projects_v2_page_dbprojectrow"
     },
     {
       "relation": "contains",
@@ -19611,9 +19751,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_page_getdbprojects",
-      "confidence_score": 1.0
+      "target": "projects_v2_page_getdbprojects"
     },
     {
       "relation": "contains",
@@ -19621,9 +19761,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_page_metadata",
-      "confidence_score": 1.0
+      "target": "projects_v2_page_metadata"
     },
     {
       "relation": "contains",
@@ -19631,9 +19771,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_page_projectsv2page",
-      "confidence_score": 1.0
+      "target": "projects_v2_page_projectsv2page"
     },
     {
       "relation": "imports_from",
@@ -19642,9 +19782,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_processstrip",
-      "confidence_score": 1.0
+      "target": "projects_v2_processstrip"
     },
     {
       "relation": "imports_from",
@@ -19653,9 +19793,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_projectsclient",
-      "confidence_score": 1.0
+      "target": "projects_v2_projectsclient"
     },
     {
       "relation": "imports_from",
@@ -19664,9 +19804,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_testimonial",
-      "confidence_score": 1.0
+      "target": "projects_v2_testimonial"
     },
     {
       "relation": "imports",
@@ -19675,9 +19815,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page",
-      "target": "projects_v2_testimonial_projectstestimonialv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_testimonial_projectstestimonialv2"
     },
     {
       "relation": "calls",
@@ -19686,9 +19826,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page_getdbprojects",
-      "target": "lib_pg_ensuremigrated",
-      "confidence_score": 1.0
+      "target": "lib_pg_ensuremigrated"
     },
     {
       "relation": "calls",
@@ -19697,9 +19837,9 @@
       "source_file": "src/app/(public)/projects-v2/page.tsx",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_page_projectsv2page",
-      "target": "projects_v2_page_getdbprojects",
-      "confidence_score": 1.0
+      "target": "projects_v2_page_getdbprojects"
     },
     {
       "relation": "calls",
@@ -28092,9 +28232,9 @@
       "source_file": "src/components/projects-v2/ProjectsClient.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_projectsclient",
-      "target": "components_model3dviewer",
-      "confidence_score": 1.0
+      "target": "components_model3dviewer"
     },
     {
       "relation": "contains",
@@ -30542,9 +30682,9 @@
       "source_file": "src/components/projects-v2/CtaBand.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_ctaband",
-      "target": "projects_v2_ctaband_ctabandv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_ctaband_ctabandv2"
     },
     {
       "relation": "contains",
@@ -30552,9 +30692,9 @@
       "source_file": "src/components/projects-v2/Faq.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_faq",
-      "target": "projects_v2_faq_faqs",
-      "confidence_score": 1.0
+      "target": "projects_v2_faq_faqs"
     },
     {
       "relation": "contains",
@@ -30562,9 +30702,9 @@
       "source_file": "src/components/projects-v2/Faq.tsx",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_faq",
-      "target": "projects_v2_faq_faqv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_faq_faqv2"
     },
     {
       "relation": "contains",
@@ -30572,9 +30712,9 @@
       "source_file": "src/components/projects-v2/FeaturedGrid.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_featuredgrid",
-      "target": "projects_v2_featuredgrid_featuredgridv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_featuredgrid_featuredgridv2"
     },
     {
       "relation": "contains",
@@ -30582,9 +30722,9 @@
       "source_file": "src/components/projects-v2/FeaturedGrid.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_featuredgrid",
-      "target": "projects_v2_featuredgrid_props",
-      "confidence_score": 1.0
+      "target": "projects_v2_featuredgrid_props"
     },
     {
       "relation": "imports_from",
@@ -30593,9 +30733,9 @@
       "source_file": "src/components/projects-v2/FeaturedGrid.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_featuredgrid",
-      "target": "projects_v2_types",
-      "confidence_score": 1.0
+      "target": "projects_v2_types"
     },
     {
       "relation": "imports",
@@ -30604,9 +30744,9 @@
       "source_file": "src/components/projects-v2/FeaturedGrid.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_featuredgrid",
-      "target": "projects_v2_types_projectitemv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_types_projectitemv2"
     },
     {
       "relation": "contains",
@@ -30614,9 +30754,9 @@
       "source_file": "src/components/projects-v2/Hero.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_hero",
-      "target": "projects_v2_hero_projectsherov2",
-      "confidence_score": 1.0
+      "target": "projects_v2_hero_projectsherov2"
     },
     {
       "relation": "contains",
@@ -30624,9 +30764,9 @@
       "source_file": "src/components/projects-v2/Hero.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_hero",
-      "target": "projects_v2_hero_props",
-      "confidence_score": 1.0
+      "target": "projects_v2_hero_props"
     },
     {
       "relation": "imports_from",
@@ -30635,9 +30775,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "lib_studio_brand",
-      "confidence_score": 1.0
+      "target": "lib_studio_brand"
     },
     {
       "relation": "imports",
@@ -30646,9 +30786,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "lib_studio_brand_getstudiobrand",
-      "confidence_score": 1.0
+      "target": "lib_studio_brand_getstudiobrand"
     },
     {
       "relation": "contains",
@@ -30656,9 +30796,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "projects_v2_numbersstrip_computeyears",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip_computeyears"
     },
     {
       "relation": "contains",
@@ -30666,9 +30806,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "projects_v2_numbersstrip_numbersstripv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip_numbersstripv2"
     },
     {
       "relation": "contains",
@@ -30676,9 +30816,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "projects_v2_numbersstrip_props",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip_props"
     },
     {
       "relation": "contains",
@@ -30686,9 +30826,9 @@
       "source_file": "src/components/projects-v2/NumbersStrip.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_numbersstrip",
-      "target": "projects_v2_numbersstrip_stats",
-      "confidence_score": 1.0
+      "target": "projects_v2_numbersstrip_stats"
     },
     {
       "relation": "calls",
@@ -30707,9 +30847,9 @@
       "source_file": "src/components/projects-v2/ProcessStrip.tsx",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_processstrip",
-      "target": "projects_v2_processstrip_processstripv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_processstrip_processstripv2"
     },
     {
       "relation": "contains",
@@ -30717,9 +30857,9 @@
       "source_file": "src/components/projects-v2/ProcessStrip.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_processstrip",
-      "target": "projects_v2_processstrip_stages",
-      "confidence_score": 1.0
+      "target": "projects_v2_processstrip_stages"
     },
     {
       "relation": "contains",
@@ -30727,9 +30867,9 @@
       "source_file": "src/components/projects-v2/ProjectsClient.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_projectsclient",
-      "target": "projects_v2_projectsclient_projectsclientv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_projectsclient_projectsclientv2"
     },
     {
       "relation": "contains",
@@ -30737,9 +30877,9 @@
       "source_file": "src/components/projects-v2/ProjectsClient.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_projectsclient",
-      "target": "projects_v2_projectsclient_props",
-      "confidence_score": 1.0
+      "target": "projects_v2_projectsclient_props"
     },
     {
       "relation": "imports_from",
@@ -30748,9 +30888,9 @@
       "source_file": "src/components/projects-v2/ProjectsClient.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_projectsclient",
-      "target": "projects_v2_types",
-      "confidence_score": 1.0
+      "target": "projects_v2_types"
     },
     {
       "relation": "imports",
@@ -30759,9 +30899,9 @@
       "source_file": "src/components/projects-v2/ProjectsClient.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_projectsclient",
-      "target": "projects_v2_types_projectitemv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_types_projectitemv2"
     },
     {
       "relation": "imports_from",
@@ -30770,9 +30910,9 @@
       "source_file": "src/components/projects-v2/Testimonial.tsx",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_testimonial",
-      "target": "lib_pg",
-      "confidence_score": 1.0
+      "target": "lib_pg"
     },
     {
       "relation": "imports",
@@ -30781,9 +30921,9 @@
       "source_file": "src/components/projects-v2/Testimonial.tsx",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_testimonial",
-      "target": "lib_pg_ensuremigrated",
-      "confidence_score": 1.0
+      "target": "lib_pg_ensuremigrated"
     },
     {
       "relation": "imports",
@@ -30792,9 +30932,9 @@
       "source_file": "src/components/projects-v2/Testimonial.tsx",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_testimonial",
-      "target": "lib_pg_pgmany",
-      "confidence_score": 1.0
+      "target": "lib_pg_pgmany"
     },
     {
       "relation": "contains",
@@ -30802,9 +30942,9 @@
       "source_file": "src/components/projects-v2/Testimonial.tsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_testimonial",
-      "target": "projects_v2_testimonial_projectstestimonialv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_testimonial_projectstestimonialv2"
     },
     {
       "relation": "contains",
@@ -30812,9 +30952,9 @@
       "source_file": "src/components/projects-v2/Testimonial.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_testimonial",
-      "target": "projects_v2_testimonial_row",
-      "confidence_score": 1.0
+      "target": "projects_v2_testimonial_row"
     },
     {
       "relation": "calls",
@@ -30833,9 +30973,9 @@
       "source_file": "src/components/projects-v2/types.ts",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_types",
-      "target": "projects_v2_types_projectimage",
-      "confidence_score": 1.0
+      "target": "projects_v2_types_projectimage"
     },
     {
       "relation": "contains",
@@ -30843,9 +30983,9 @@
       "source_file": "src/components/projects-v2/types.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "projects_v2_types",
-      "target": "projects_v2_types_projectitemv2",
-      "confidence_score": 1.0
+      "target": "projects_v2_types_projectitemv2"
     },
     {
       "relation": "contains",
@@ -36696,6 +36836,26 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L2010",
+      "weight": 1.0,
+      "source": "docs_context_9_last_session_log",
+      "target": "docs_context_2026_07_02_projects_v2_ship_audit_resolved_route_projects_untouched",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/CONTEXT.md",
+      "source_location": "L2156",
+      "weight": 1.0,
+      "source": "docs_context_9_last_session_log",
+      "target": "docs_context_2026_07_02_session_todo_gate_ts_id_governance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/OPERATOR_QUICKREF.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -36789,9 +36949,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2",
-      "target": "docs_plan_projects_v2_projects_v2_plan",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_projects_v2_plan"
     },
     {
       "relation": "contains",
@@ -36799,9 +36959,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_files_this_session_creates",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_files_this_session_creates"
     },
     {
       "relation": "contains",
@@ -36809,9 +36969,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_files_this_session_does_not_touch",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_files_this_session_does_not_touch"
     },
     {
       "relation": "contains",
@@ -36819,9 +36979,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L168",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_rollout",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_rollout"
     },
     {
       "relation": "contains",
@@ -36829,9 +36989,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_scope",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_scope"
     },
     {
       "relation": "contains",
@@ -36839,9 +36999,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_sections_8",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_sections_8"
     },
     {
       "relation": "contains",
@@ -36849,9 +37009,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_ship",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_ship"
     },
     {
       "relation": "contains",
@@ -36859,9 +37019,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_taste_skill_enforcement_re_audit",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_taste_skill_enforcement_re_audit"
     },
     {
       "relation": "contains",
@@ -36869,9 +37029,9 @@
       "source_file": "docs/PLAN-PROJECTS-V2.md",
       "source_location": "L136",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_plan_projects_v2_projects_v2_plan",
-      "target": "docs_plan_projects_v2_verification",
-      "confidence_score": 1.0
+      "target": "docs_plan_projects_v2_verification"
     },
     {
       "relation": "contains",
@@ -36879,9 +37039,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit",
-      "target": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_projects_issue_inventory_audit_before_v2"
     },
     {
       "relation": "contains",
@@ -36889,9 +37049,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_a_blockers_ship_block",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_a_blockers_ship_block"
     },
     {
       "relation": "contains",
@@ -36899,9 +37059,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_b_taste_skill_violations",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b_taste_skill_violations"
     },
     {
       "relation": "contains",
@@ -36909,9 +37069,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_c_live_html_findings",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_c_live_html_findings"
     },
     {
       "relation": "contains",
@@ -36919,9 +37079,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_d_schema_copy",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_d_schema_copy"
     },
     {
       "relation": "contains",
@@ -36929,9 +37089,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_e_carry_forward_out_of_scope_here",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_e_carry_forward_out_of_scope_here"
     },
     {
       "relation": "contains",
@@ -36939,9 +37099,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_projects_issue_inventory_audit_before_v2",
-      "target": "docs_projects_audit_f_resolution",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_f_resolution"
     },
     {
       "relation": "contains",
@@ -36949,9 +37109,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_a_blockers_ship_block",
-      "target": "docs_projects_audit_a1_featuredgrid_ignores_real_db_image",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_a1_featuredgrid_ignores_real_db_image"
     },
     {
       "relation": "contains",
@@ -36959,9 +37119,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_a_blockers_ship_block",
-      "target": "docs_projects_audit_a2_bento_empty_cell_at_n_5",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_a2_bento_empty_cell_at_n_5"
     },
     {
       "relation": "contains",
@@ -36969,9 +37129,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_a_blockers_ship_block",
-      "target": "docs_projects_audit_a3_testimonial_ignores_db",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_a3_testimonial_ignores_db"
     },
     {
       "relation": "contains",
@@ -36979,9 +37139,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b1_three_ctas_sharing_contact_intent",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b1_three_ctas_sharing_contact_intent"
     },
     {
       "relation": "contains",
@@ -36989,9 +37149,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b2_eyebrow_budget_overrun",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b2_eyebrow_budget_overrun"
     },
     {
       "relation": "contains",
@@ -36999,9 +37159,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b3_numbered_process_strip_cherry_picks_one_fabricated_stat",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b3_numbered_process_strip_cherry_picks_one_fabricated_stat"
     },
     {
       "relation": "contains",
@@ -37009,9 +37169,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b4_press_wordmarks_invented",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b4_press_wordmarks_invented"
     },
     {
       "relation": "contains",
@@ -37019,9 +37179,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b5_picsum_fallbacks_carry_todo_markers",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b5_picsum_fallbacks_carry_todo_markers"
     },
     {
       "relation": "contains",
@@ -37029,9 +37189,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b6_dead_component_exists",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b6_dead_component_exists"
     },
     {
       "relation": "contains",
@@ -37039,9 +37199,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_b_taste_skill_violations",
-      "target": "docs_projects_audit_b7_hero_uses_min_h_100dvh_with_limited_content",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_b7_hero_uses_min_h_100dvh_with_limited_content"
     },
     {
       "relation": "contains",
@@ -37049,9 +37209,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_c_live_html_findings",
-      "target": "docs_projects_audit_c1_on_bench_strip_missing_for_n_3",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_c1_on_bench_strip_missing_for_n_3"
     },
     {
       "relation": "contains",
@@ -37059,9 +37219,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_c_live_html_findings",
-      "target": "docs_projects_audit_c2_truncate_failure_on_tld_titles",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_c2_truncate_failure_on_tld_titles"
     },
     {
       "relation": "contains",
@@ -37069,9 +37229,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_c_live_html_findings",
-      "target": "docs_projects_audit_c3_marquee_tracks_twelve_entries_duplicated_no_reduced_motion_audit",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_c3_marquee_tracks_twelve_entries_duplicated_no_reduced_motion_audit"
     },
     {
       "relation": "contains",
@@ -37079,9 +37239,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_c_live_html_findings",
-      "target": "docs_projects_audit_c4_3d_badge_rendering",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_c4_3d_badge_rendering"
     },
     {
       "relation": "contains",
@@ -37089,9 +37249,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_d_schema_copy",
-      "target": "docs_projects_audit_d1_testimonial_uses_homeowner_generic",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_d1_testimonial_uses_homeowner_generic"
     },
     {
       "relation": "contains",
@@ -37099,9 +37259,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_d_schema_copy",
-      "target": "docs_projects_audit_d2_house_on_public_record_ends_with_a_period",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_d2_house_on_public_record_ends_with_a_period"
     },
     {
       "relation": "contains",
@@ -37109,9 +37269,9 @@
       "source_file": "docs/PROJECTS-AUDIT.md",
       "source_location": "L107",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_projects_audit_d_schema_copy",
-      "target": "docs_projects_audit_d3_hero_address_line_is_duplicated",
-      "confidence_score": 1.0
+      "target": "docs_projects_audit_d3_hero_address_line_is_duplicated"
     },
     {
       "relation": "contains",
@@ -37222,6 +37382,116 @@
       "confidence_score": 1.0,
       "source": "docs_sales_notes_sales_notes",
       "target": "docs_sales_notes_who_buys_it"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_session_todo",
+      "target": "docs_session_todo_session_todo_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "docs_session_todo_session_todo_state",
+      "target": "docs_session_todo_active_todos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "docs_session_todo_session_todo_state",
+      "target": "docs_session_todo_closed_todos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "docs_session_todo_session_todo_state",
+      "target": "docs_session_todo_pending_escalation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_001_drop_dead_projectfilters_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_002_drop_invented_press_names_in_logowall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_003_resolve_statutes_ts_migration_import",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_004_live_verify_projects_v2_post_deploy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_005_create_this_document",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "docs_session_todo_active_todos",
+      "target": "docs_session_todo_ts_id_006_make_everything_editable_admin_scope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SESSION-TODO.md",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "docs_session_todo_closed_todos",
+      "target": "docs_session_todo_ts_id_005_create_this_document_116",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -37575,5 +37845,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "08face00e74e4182cef210ba58e77d6a486e3c87"
+  "built_at_commit": "f36af2f6868e820ba5f7a61b0a727d2d3a184b2f"
 }

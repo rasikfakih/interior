@@ -2150,3 +2150,51 @@ Carry-forward (unchanged):
   canonical /projects surface from v1.3.0 until a v1.3.x patch
   swap.
 
+
+
+
+### 2026-07-02 - Session-todo gate (TS-ID governance)
+
+One commit on `main`, pending push per session protocol:
+
+- `docs(SESSION-TODO.md)` (new): the structured gate that
+  AGENTS.md session-protocol step 5c enforces. Six TS-IDs
+  seeded: TS-001 through TS-005 lifted from the live
+  carry-forwards in the 2026-07-02 audit + CONTEXT close-out
+  comments; TS-006 tracks the operator ask `make everything
+  editable from admin panel`. Format: per-entry header
+  (TS-ID, short title), Status (one of @todo, @inprogress,
+  @blocked, @done, @cancelled), Severity (ship-block,
+  carry-forward, follow-up, nice-to-have), Opened (date +
+  source commit), Owner (operator or opencode), Files
+  (paths or NA), Acceptance (green-test bullet), Closes on
+  (commit hash on close or NA). Closed list is append-only.
+  Pending escalation list holds operator-blocked entries.
+- `AGENTS.md` step 5c appended (read SESSION-TODO at start,
+  update + append at end; trace every ship back to a TS-ID
+  or active-block justification; CONTEXT keeps the prose).
+- `docs/CONTEXT.md` §9 gets this entry (narrative),
+  `docs/SESSION-TODO.md` carries the structured state.
+
+No code changed this session. verify:deploy / lint / build
+untouched. graphify:update `git status --short` will only
+flag the three .md files; graphify-out/ untouched because
+no AST churn (graphify still rebuilt because the docs
+import chain is irrelevant - skip the rebuild for this
+session; next code change will rebuild).
+
+When the operator runs `execute`, the next session sees
+the gate at start: GT-ID-001 ... 005 stand as audit-trace
++ post-deploy-verification todos, TS-006 is the open
+plan-write ask for editable-admin. Plan mode is the
+right entry point for TS-006 (must draft
+`docs/PLAN-EDITABLE.md` and confirm scope before any
+edit ships). TS-ID-004 needs a Vercel rebuild to close;
+smoke-projects-v2.mjs runs against the live URL.
+
+Carry-forward lives in SESSION-TODO. Looking back at the
+2026-07-01 ship log, the operator flagged
+`statutes.ts` Migration import as an unclosed item - that
+is now TS-003 documented. Next session history begins
+from this gate.
+

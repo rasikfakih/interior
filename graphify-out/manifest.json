@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1782471648.2680004,
-    "ast_hash": "73b0339d7f3594db6746d08f26b678db",
+    "mtime": 1782991262.536832,
+    "ast_hash": "7b37cb435de4e7e5fa92a4907e2fe3c5",
     "semantic_hash": ""
   },
   "AGENT_BEST_PRACTICES.md": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1782881000.4858232,
-    "ast_hash": "1792bc3db98721099d797e798ab76300",
+    "mtime": 1782991490.7628145,
+    "ast_hash": "e3587602fa3fdc45ce635c8645fa01c5",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1447,6 +1447,11 @@
   "docs/audit-projects-live.html": {
     "mtime": 1782937954.2975993,
     "ast_hash": "ec5e1c795f0c96b0bc10cc7f0bce2d11",
+    "semantic_hash": ""
+  },
+  "docs/SESSION-TODO.md": {
+    "mtime": 1782991127.0698142,
+    "ast_hash": "d2d78d05be58a7c069cb29a3101f5f9f",
     "semantic_hash": ""
   }
 }
