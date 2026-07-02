@@ -86,7 +86,7 @@ flip one line at a time.)
 - Acceptance met: yes.
 
 ### TS-ID-003 - Resolve `statutes.ts` Migration import
-- Status: @done 2026-07-02 commit=<tbd>
+- Status: @done 2026-07-02 commit=88ce2af
 - Severity: follow-up (phantom)
 - Opened: 2026-07-01 (CONTEXT close-out comment)
 - Owner: opencode
@@ -95,7 +95,7 @@ flip one line at a time.)
   `statutes.ts` import in the bundle; no render
   regression on the scripts covered by smoke-admin-live
   and smoke-durability.
-- Closes on: tbd
+- Closes on: 88ce2af
 - Outcome: phantom carry-forward. The original 2026-07-01
   close-out comment paraphrased a note about
   `statutes.ts` Migration import; on
