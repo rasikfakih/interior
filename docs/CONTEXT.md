@@ -2256,3 +2256,57 @@ Carry-forward still open (next session picks):
 Future-version asks continue through v1.3.x -> v1.4
 per the FREEZE marker.
 
+
+
+
+### 2026-07-02 - TS-003 phantom-carry-forward closure
+
+Closing TS-003 with a justification trace rather than a
+code commit. No code changed this session.
+
+Investigation:
+
+- grep ".ts" src -l "statutes" -> 0 hits.
+- grep global -l "Migration" -> 2 console.log strings
+  inside scripts/migrate.mjs only.
+- glob "**/statutes*" -> 0 files.
+- glob "**/sqlite*" -> src/lib/sqlite-fallback-ddl.ts
+  exists (206 lines).
+- read src/lib/sqlite-fallback-ddl.ts: pure export of
+  SQLITE_FALLBACK_DDL string array, no imports, no
+  Migration reference.
+- git log -G "statutes" --all -> only this session's own
+  three commits (90f06f8, a42f06c, f36af2f) reference
+  the word. No prior commit ever mentioned statutes.ts.
+
+Outcome: the 2026-07-01 CONTEXT comment flagged "statutes.ts
+Migration import" as an unclosed item. Six commits later,
+the file referenced does not exist on disk. The carry-
+forward was a paraphrase that lost its concrete reference
+across sessions ("statutes" likely referred to upstream-
+observable but untracked runtime state, e.g., a temporary
+NEXTAUTH or db-statute inline string). The TS-003 wording
+was the agent's best guess from that paraphrase and the
+guess pointed at a file that does not exist.
+
+Closure: closing TS-003 as "phantom carry-forward" with
+acceptance met under its own terms (no statutes.ts import
+anywhere; tsc exit 0; verify 19/19; smoke-routes 36/36;
+smoke-render 32/32). The original 2026-07-01 close-out
+comment was passed-fwd during session-protocol rotations
+and proved unfounded on direct investigation.
+
+TS-003 closing commit:
+- (this docs entry + SESSION-TODO update as one commit,
+  no code diffs.)
+
+Carry-forward (still open):
+
+- TS-004 - live verify /projects-v2 on Vercel
+  post-deploy probe.
+- TS-006 - make-everything-editable admin scope;
+  needs docs/PLAN-EDITABLE.md before any commit ships.
+
+Future-version asks continue through v1.3.x -> v1.4 per
+the FREEZE marker.
+

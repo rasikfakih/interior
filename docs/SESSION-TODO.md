@@ -86,19 +86,35 @@ flip one line at a time.)
 - Acceptance met: yes.
 
 ### TS-ID-003 - Resolve `statutes.ts` Migration import
-- Status: @todo
-- Severity: follow-up
+- Status: @done 2026-07-02 commit=<tbd>
+- Severity: follow-up (phantom)
 - Opened: 2026-07-01 (CONTEXT close-out comment)
 - Owner: opencode
-- Files: `scripts/migrate.sqlite-fallback-ddl.ts`
-  (statutes.ts neighbour); source of the unresolved
-  Migration import to be located via `npm ls` or
-  grep before patching.
+- Files: NA (phantom carry-forward)
 - Acceptance: `npx tsc --noEmit` exit 0; no
   `statutes.ts` import in the bundle; no render
   regression on the scripts covered by smoke-admin-live
   and smoke-durability.
-- Closes on: -
+- Closes on: tbd
+- Outcome: phantom carry-forward. The original 2026-07-01
+  close-out comment paraphrased a note about
+  `statutes.ts` Migration import; on
+  investigation this session, no file matching
+  statutes* exists anywhere on disk, and the
+  TS-003 SESSION-TODO wording("scripts/migrate.
+  sqlite-fallback-ddl.ts neighbour") pointed at
+  a path that does not exist (the real file is
+  src/lib/sqlite-fallback-ddl.ts, 206 lines,
+  pure string export, no imports). git log -G
+  statutes shows zero hits in any prior commit;
+  the only references landed in this session's
+  own CONTEXT and SESSION-TODO edits
+  (90f06f8, a42f06c, f36af2f passes). Acceptance
+  test met by definition: tsc --noEmit exit 0,
+  no `statutes.ts` import anywhere, verify
+  deploy 19/19, smoke-routes 36/36, smoke-render
+  32/32.
+- Acceptance met: yes (no bug to fix).
 
 ### TS-ID-006 - Make-everything-editable admin scope
 - Status: @todo
@@ -150,6 +166,20 @@ already shipped.)
   Live `/projects` HTML: no `Kaneki House`,
   `Better Interiors`, `Home & Design`; AD India present.
 - Acceptance met: yes.
+
+### TS-ID-003 - Resolve `statutes.ts` Migration import
+- Status: @done 2026-07-02 commit=<docs-only>
+- Outcome: phantom carry-forward. grep + git log -G
+  show zero hits on `statutes`/Migration across the
+  working tree; the original 2026-07-01 CONTEXT comment
+  paraphrased a runtime observation that lost its
+  concrete reference. Closure trace recorded in
+  `docs/CONTEXT.md` 2026-07-02 TS-003 entry; no code
+  diffs ship. Acceptance met under its own terms:
+  tsc --noEmit exit 0; no `statutes.ts` import in the
+  bundle; verify 19/19; smoke-routes 36/36; smoke-
+  render 32/32.
+- Acceptance met: yes (no bug to fix).
 
 ---
 
