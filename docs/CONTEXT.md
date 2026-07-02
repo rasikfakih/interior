@@ -2004,3 +2004,149 @@ pm run verify:deploy -> 19/19 green.
 
 Operator asks continuing through v1.3 / v1.4 per the FREEZE
 marker. v1.3.0 ships green.
+
+
+
+### 2026-07-02 - /projects-v2 ship (audit-resolved route, /projects untouched)
+
+One commit on `main`, pending push: future-version ask works through
+v1.3.x -> v1.4 bump per the freeze marker.
+
+Pre-session state from CONTEXT-2026-07-01 v1.3.0 closeout + the audit
+doc carried over from the previous session: docs/PROJECTS-AUDIT.md
+listed 8 blockers + 6 taste-skill violations + 4 FAQ-findings
+against the live /projects route. Four half-shipped v2 stub
+components sat in src/components/projects-v2/ (types, Hero,
+NumbersStrip, ProjectsClient) with no route, no plan file, and six
+missing components. Operator chose Complete v2 route via the
+question tool.
+
+What landed:
+
+- docs/PLAN-PROJECTS-V2.md (new): the operator-required spec for
+  this ship. Eight sections, scope split (v1 untouched, v2 ships as
+  new route), files-touched list, taste-skill re-audit, smoke
+  strategy, rollout note. Sources: AGENTS.md session protocol (read
+  CONTEXT first, run verify:deploy before any deploy, no
+  emojis/em-dashes, append CONTEXT, graphify update) and the
+  taste-skill (Section 4.8 real company logos for social proof - or
+  drop press entirely).
+
+- src/components/projects-v2/Hero.tsx (revised): dropped
+  brand.studio_address in the hero (D3 dedupe), dropped v1 second
+  View archive CTA (B1 closure), and switched to min-h-[85dvh]
+  when DB has <5 rows (B7 hero-empty-overwhelm). Single primary
+  CTA Begin a project to /contact. State-machine copy: Nothing on
+  public record yet / One residence on public record / N residences
+  on public record.
+
+- src/components/projects-v2/FeaturedGrid.tsx (new): reads DB row
+  before_image (A1 fix - no picsum, no TODO comments - B5 fix).
+  Bento geometry adapts to live item count so n<5 never renders an
+  empty col-span-12 cell (A2 fix): n=1 -> col-span-12 16:6; n=2 ->
+  7/5 split; n=3 -> 4/5/3 spread (asymmetric via aspect ratios);
+  n>=4 -> 4/5/7/12 spread. No chrome-pill eyebrow on this section
+  (B2 fix). H2 Houses on public record without terminal period
+  (D2 fix).
+
+- src/components/projects-v2/Testimonial.tsx (new): server
+  component that reads the first published testimonial via pgMany
+  SELECT ... ORDER BY id ASC LIMIT 1. When no row exists it falls
+  back to a taste-skill-approved generic line (Plan, section,
+  elevation. The drawings turned up on the same days the materials
+  did.) with a Studio standby attribution. Footer attribution is
+  ${name} - ${role} (DB-shaped) or just ${name} when role is null
+  (A3 + D1 fix).
+
+- src/components/projects-v2/ProcessStrip.tsx (new): copy of v1
+  with one audit carry-forward (E) closed - the reduced-motion
+  matchMedia is now *subscribed* via addEventListener('change'),
+  not a one-shot at mount. State-driven re-tween: if the OS-level
+  setting flips mid-session the GSAP context re-applies
+  immediately. No chrome-pill eyebrow on this section.
+
+- src/components/projects-v2/Faq.tsx (new): copy of v1 with the
+  chrome-pill eyebrow at the section head dropped (B2) and the
+  terminal period on the H2 dropped (D2). Native button-driven
+  detail expansion kept. Sparse hairline divider accordion
+  retained per skill 9.F rule.
+
+- src/components/projects-v2/CtaBand.tsx (new): copy of v1 with
+  the chrome-pill eyebrow dropped (B2) and H2 Ready when the
+  house is without terminal period (D2). Single btn-primary to
+  /contact. The v1 /projects CtaBand remains untouched.
+
+- src/components/projects-v2/LogoWall.tsx NOT created. The audit
+  B4 listed three invented press names (Kaneki House, Better
+  Interiors, Home & Design). Taste-skill Section 4.8 reads
+  real company logos for social proof - or drop press
+  entirely. The brand has no real press block in seed-content,
+  so v2 drops the section. Page is 8 sections now, not 9. The
+  marquee one-per-page rule becomes moot. v1 LogoWall component
+  file is left in /components/projects/LogoWall.tsx because
+  /projects (v1) still mounts it - v1 untouched per the plan
+  split.
+
+- src/components/projects/ProjectFilters.tsx NOT deleted. Audit E
+  carry-forward named this as a dead client island. v2 does not
+  import it, so the file is dead from this commit. Cleanup is a
+  v1.3.x carry-forward (not blocking the v2 route); logged here
+  so the next pass can sweep it.
+
+- src/app/(public)/projects-v2/page.tsx (new): server component,
+  dynamic=true (reads DB), mirrors the v1 route shape but imports
+  the v2 component library. Reads brand.footer_credit and
+  brand.studio_address into the footer band at the bottom of the
+  page; the hero no longer prints the address itself. No project
+  exists yet: page still renders with empty-state surface-tile
+  body substitute under NumbersStrip (same surface-tile shape v1
+  uses).
+
+- scripts/smoke-projects-v2.mjs (new): /projects-v2 probe with
+  18 assertions covering: hero headline, no View archive CTA,
+  chrome-pill eyebrow absence on each numbered section, the
+  FeaturedGrid uses real DB rows (no picsum, no TODO markers),
+  the Testimonial dropped Homeowner - 2024 commission, the FAQ
+  + CtaBand H2s lack terminal periods, the Hero carries exactly
+  one btn-primary, no studio_address renders in the Hero, and the
+  Testimonial echoes either the DB row name or Studio line
+  generic.
+
+Verification (local SQLite fallback by env absence):
+
+- npm run verify:deploy -> 19/19 green.
+- npm run build -> green. /projects-v2 listed as route f
+  (dynamic; reads DB). 38 prerendered routes unchanged.
+- npm run lint -> pre-existing schema/settings/use-gsap errors
+  only. New projects-v2/* + page.tsx lint clean (zero findings
+  on the new code).
+- npx tsc --noEmit -> exit 0.
+- npm run graphify:update -> 1279 -> 1423 nodes, 2036 -> 2226
+  edges, 110 -> 122 communities. Delta corresponds to the eight
+  new projects-v2 files, the route entry, and the smoke probe.
+- node scripts/smoke-routes.mjs -> 36/36 pass (v1 untouched).
+- node scripts/smoke-render.mjs -> 32/32 pass (v1 untouched).
+- node scripts/smoke-projects-v2.mjs -> 18/18 pass. (1 process
+  spawn SIGKILL rubbish on Windows from libuv async.c, but the
+  script ran fully and printed all greens before the kill.)
+- Local proc of `next start` rendered /projects-v2 at 64,680
+  bytes with 200 status; the smoke probe verified the rendered
+  HTML against all 18 assertions.
+
+Live URL: `/projects-v2` ships at ethinterior.vercel.app/projects-v2
+once operator deploys. /projects remains live and unchanged.
+
+Carry-forward (unchanged):
+- v1 carry-forwards from 2026-07-01 still open:
+  - statutes.ts Migration import. (CONTEXT 2026-07-01 close-out
+    comment.)
+  - src/components/projects/ProjectFilters.tsx dead client
+    island cleanup (audit E; not v2-blocking).
+  - src/components/projects/LogoWall.tsx invented press names
+    cleanup (audit B4; v1 patch only - the v2 ship cuts the
+    section entirely).
+- Future-version asks continue through v1.3.x -> v1.4 bump per
+  the FREEZE marker. v2 is a route addition; v1 remains the
+  canonical /projects surface from v1.3.0 until a v1.3.x patch
+  swap.
+

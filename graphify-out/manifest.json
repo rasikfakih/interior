@@ -10,13 +10,13 @@
     "semantic_hash": ""
   },
   "data/studio-brand.json": {
-    "mtime": 1782227861.6096966,
-    "ast_hash": "918a7c320b769320f85f0ffbb4f4be58",
+    "mtime": 1782854975.997314,
+    "ast_hash": "87a5da92729ebb7d3f6e6bca29960a82",
     "semantic_hash": ""
   },
   "data/theme.distro.json": {
-    "mtime": 1782227861.6096966,
-    "ast_hash": "0aa7f828babc1e66d2a1afac5b7088f8",
+    "mtime": 1782855131.2562802,
+    "ast_hash": "b410ab8966e7dc6db0ba328bf5f1c257",
     "semantic_hash": ""
   },
   "docs/theme-distro.example.json": {
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1782852744.34173,
-    "ast_hash": "726ddb0b922dba771fec376e1dfc530e",
+    "mtime": 1782854725.7330117,
+    "ast_hash": "bec8fab55bbc78cbddb1da5e65a9f8f5",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "src/app/(public)/projects/ProjectsClient.tsx": {
-    "mtime": 1782799280.8379824,
-    "ast_hash": "fc6a45f7984c5acaa592e22bfa8206dd",
+    "mtime": 1782880545.9483986,
+    "ast_hash": "654930fa7823bd941850dd46c9d0030c",
     "semantic_hash": ""
   },
   "src/app/(public)/projects/[slug]/page.tsx": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "src/app/(public)/projects/page.tsx": {
-    "mtime": 1782764675.773405,
-    "ast_hash": "a8ade5cc7193d5d160b5bb778c6e4512",
+    "mtime": 1782880455.1077583,
+    "ast_hash": "42fa9d5ac86c1718197c4855e40aca5b",
     "semantic_hash": ""
   },
   "src/app/admin/LoginCard.tsx": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1782848171.1024761,
-    "ast_hash": "0ba07f8e4991323d6620f8493d8b0b95",
+    "mtime": 1782854766.6380236,
+    "ast_hash": "17a8537c643b7e2014b07dd570d50ef5",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1782848385.85393,
-    "ast_hash": "94a013a83e899d39cc544dfa6ada9e1d",
+    "mtime": 1782881000.4858232,
+    "ast_hash": "1792bc3db98721099d797e798ab76300",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1322,6 +1322,131 @@
   "scripts/smoke-mobile.mjs": {
     "mtime": 1782852678.7455387,
     "ast_hash": "ab3501fed0ac9e2cb13c60a2ce275b44",
+    "semantic_hash": ""
+  },
+  "src/components/projects/CtaBand.tsx": {
+    "mtime": 1782880299.471079,
+    "ast_hash": "20dbf52a44793cde6090461c44c2faf4",
+    "semantic_hash": ""
+  },
+  "src/components/projects/Faq.tsx": {
+    "mtime": 1782880239.2364194,
+    "ast_hash": "dd3eb4ca8ed99ce606a8b6ffde81f1f3",
+    "semantic_hash": ""
+  },
+  "src/components/projects/FeaturedGrid.tsx": {
+    "mtime": 1782880032.563076,
+    "ast_hash": "e27403e9cbee0c4a86efd63f3d071514",
+    "semantic_hash": ""
+  },
+  "src/components/projects/Hero.tsx": {
+    "mtime": 1782879845.1579049,
+    "ast_hash": "b211e567339897e4354f3169d4b64229",
+    "semantic_hash": ""
+  },
+  "src/components/projects/LogoWall.tsx": {
+    "mtime": 1782880187.2961388,
+    "ast_hash": "df0812359f689fb71ac54fe1ec90b217",
+    "semantic_hash": ""
+  },
+  "src/components/projects/NumbersStrip.tsx": {
+    "mtime": 1782879884.9111106,
+    "ast_hash": "14f3879e40b39ee3436686e1f34b3286",
+    "semantic_hash": ""
+  },
+  "src/components/projects/ProcessStrip.tsx": {
+    "mtime": 1782880136.8902512,
+    "ast_hash": "a5e3fdeed5b94a4876d2eb5c5ec47371",
+    "semantic_hash": ""
+  },
+  "src/components/projects/ProjectFilters.tsx": {
+    "mtime": 1782855336.5754695,
+    "ast_hash": "889af8a64fe3e58b02cd1c7e4e83bc3c",
+    "semantic_hash": ""
+  },
+  "src/components/projects/Testimonial.tsx": {
+    "mtime": 1782880056.4323297,
+    "ast_hash": "09539a22b74048cb809abf463c18db95",
+    "semantic_hash": ""
+  },
+  "src/components/projects/types.ts": {
+    "mtime": 1782855336.5754695,
+    "ast_hash": "0884cf660914b89a2b5ae7c1a27d66dc",
+    "semantic_hash": ""
+  },
+  "src/lib/studio-brand.ts": {
+    "mtime": 1782879750.0650804,
+    "ast_hash": "8603ee0835fe26a1d179cee74b6ebf00",
+    "semantic_hash": ""
+  },
+  "scripts/smoke-projects-v2.mjs": {
+    "mtime": 1782963185.775308,
+    "ast_hash": "8b2ca4a7ae0dad8cad7c1b86a465bd6f",
+    "semantic_hash": ""
+  },
+  "src/app/(public)/projects-v2/page.tsx": {
+    "mtime": 1782963053.3048162,
+    "ast_hash": "7ad6cb9d05d50a9ddc6899e8bc16e33e",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/CtaBand.tsx": {
+    "mtime": 1782962998.5264812,
+    "ast_hash": "a49d1b9aaca05bc9a644bf94a5e09ec6",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/Faq.tsx": {
+    "mtime": 1782962983.5892463,
+    "ast_hash": "9d5501d97099bb97f8b2cd3b8bb80d8d",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/FeaturedGrid.tsx": {
+    "mtime": 1782942234.540405,
+    "ast_hash": "41116b9c7c2d380e0687f59ccd88df97",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/Hero.tsx": {
+    "mtime": 1782941948.8377213,
+    "ast_hash": "9590ab2805d4c2a3eb159b5833a81018",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/NumbersStrip.tsx": {
+    "mtime": 1782939511.714255,
+    "ast_hash": "8337a79d5a0e11d7f49c4fdc0354ea79",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/ProcessStrip.tsx": {
+    "mtime": 1782942429.5026648,
+    "ast_hash": "1b9b37da0c8476d55586620c1b1a3f02",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/ProjectsClient.tsx": {
+    "mtime": 1782939589.8702598,
+    "ast_hash": "f1771284aaefc7dbc55e5aaa17e3c15b",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/Testimonial.tsx": {
+    "mtime": 1782942370.3290043,
+    "ast_hash": "fdf4fdcd6b25a7090e683c4e3a3f1d02",
+    "semantic_hash": ""
+  },
+  "src/components/projects-v2/types.ts": {
+    "mtime": 1782939511.713257,
+    "ast_hash": "b72670e2ac63f13fea02e195bb5d4cf8",
+    "semantic_hash": ""
+  },
+  "docs/PLAN-PROJECTS-V2.md": {
+    "mtime": 1782962955.9020054,
+    "ast_hash": "33e21c92793048bdca1af672d35e5567",
+    "semantic_hash": ""
+  },
+  "docs/PROJECTS-AUDIT.md": {
+    "mtime": 1782939422.1443865,
+    "ast_hash": "760009d341b1842e39f0850b3909db74",
+    "semantic_hash": ""
+  },
+  "docs/audit-projects-live.html": {
+    "mtime": 1782937954.2975993,
+    "ast_hash": "ec5e1c795f0c96b0bc10cc7f0bce2d11",
     "semantic_hash": ""
   }
 }
