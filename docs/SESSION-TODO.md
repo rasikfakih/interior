@@ -51,7 +51,7 @@ flip one line at a time.)
 - Closes on: -
 
 ### TS-ID-001 - Drop dead ProjectFilters.tsx
-- Status: @done 2026-07-02 commit=<tbd>
+- Status: @done 2026-07-02 commit=90f06f8
 - Severity: follow-up
 - Opened: 2026-06-30 (PROJECTS-AUDIT.md §E)
 - Owner: opencode
@@ -60,14 +60,14 @@ flip one line at a time.)
   regressions on importers; smoke-routes 36/36 and
   smoke-render 32/32 still pass on `/projects`; verify
   deploy 19/19.
-- Closes on: tbd
+- Closes on: 90f06f8
 - Outcome: deleted; FeaturedGrid doc-comment reference
   re-pointed at ProjectsClient; tsc exit 0; verify 19/19;
   routes 36/36; render 32/32.
 - Acceptance met: yes.
 
 ### TS-ID-002 - Drop invented press names in LogoWall
-- Status: @done 2026-07-02 commit=<tbd>
+- Status: @done 2026-07-02 commit=90f06f8
 - Severity: follow-up
 - Opened: 2026-06-30 (PROJECTS-AUDIT.md §B / §E)
 - Owner: opencode
@@ -77,7 +77,7 @@ flip one line at a time.)
   `Better Interiors`, or `Home & Design` in the live
   HTML; smoke-renders shows no invented names on
   `/projects`.
-- Closes on: tbd
+- Closes on: 90f06f8
 - Outcome: PRESS filtered to `AD India`, `Elle Decor`,
   `Surface Magazine` (verified-real). Empty-array codepath
   added so future empty list renders null. Live HTML on
@@ -130,6 +130,25 @@ already shipped.)
   backfilled; AGENTS.md session-protocol step 5c
   appended; CONTEXT close-out log appended; one commit
   on `main` and push confirmed.
+- Acceptance met: yes.
+
+### TS-ID-001 - Drop dead ProjectFilters.tsx
+- Status: @done 2026-07-02 commit=90f06f8
+- Outcome: deleted file; `src/components/projects/
+  FeaturedGrid.tsx` doc-comment re-pointed to
+  `ProjectsClient`. tsc exit 0; verify 19/19; smoke-routes
+  36/36; smoke-render 32/32; no `never used` lint
+  regressions.
+- Acceptance met: yes.
+
+### TS-ID-002 - Drop invented press names in LogoWall
+- Status: @done 2026-07-02 commit=90f06f8
+- Outcome: `src/components/projects/LogoWall.tsx`
+  `PRESS` filtered to `AD India`, `Elle Decor`,
+  `Surface Magazine` (verified-real). Empty-array
+  codepath added so a future empty list renders null.
+  Live `/projects` HTML: no `Kaneki House`,
+  `Better Interiors`, `Home & Design`; AD India present.
 - Acceptance met: yes.
 
 ---
