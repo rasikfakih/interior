@@ -2370,3 +2370,86 @@ Active SESSION-TODO after this session:
 Future-version asks continue through v1.3.x -> v1.4 per
 the FREEZE marker.
 
+### 2026-07-02 - TS-006 plan drafted (editable-admin scope spec gate)
+
+Pre-session state from the 2026-07-02 CONTEXT close-out:
+
+- TS-001 through TS-005 closed across f36af2f, 90f06f8,
+  88ce2af, f51828a, a42f06c. Working tree clean.
+- TS-006 (Make-everything-editable admin scope) the
+  only open item at session-todo gate. Operator
+  intent: every read-only field in /admin becomes
+  editable; every data row that currently lives in
+  seed-only has CRUD in /admin. Tier-gate preserved.
+
+Audit of editable surface (covered matrix):
+
+- 12 entity classes audited. Pages / Projects /
+  Journal / Testimonials / Team / Media / License /
+  Tenant-distro / Theme-distro are editable already.
+- 4 gaps worth shipping as TS-006 phases:
+  - Phase A: settings editor (rows in `settings`
+    table only have a one-key-per-call POST).
+    Two-pane key/value editor in /admin/settings.
+    New /api/settings/[key] GET/PUT/DELETE.
+  - Phase B: site-identity editor (entire row in
+    `site_identity` is read-only via /api/health/db
+    or direct pg; needs /api/site-identity GET/PUT
+    and /admin/site-identity).
+  - Phase C: newsletter subscribers viewer
+    (write-only from public form; need /admin/newsletter
+    + /api/newsletter-subscribers). Soft-delete via
+    is_active flag.
+  - Phase D: install metadata viewer (no admin
+    surface; need /admin/install + PUT on
+    /api/install/stamp). Admin read-with-advance;
+    superadmin rotate-hmac stays.
+
+Drafted docs/PLAN-EDITABLE.md. Eight numbered
+sections:
+  1. What "editable from admin" means.
+  2. Current coverage matrix (12-row table).
+  3. Phased scope A through F.
+  4. Operator pre-confirmations (8 numbered).
+  5. Acceptance contract per-phase (verify 19/19,
+     tsc exit 0, build green, all prior smokes still
+     pass, new smoke per phase, live probe with role
+     hierarchy).
+  6. Out-of-scope (block-editor enhancements,
+     bulk import/export, multi-user concurrent-edit
+     lock, image-crop/video-trim/GLB-edit, audit-log
+     viewer redesign, 2FA).
+  7. Ship sequencing (recommended A->F default,
+     optionally collapsed into v1.4.0 single release
+     if operator pre-confirms all phases).
+  8. Decision-ledger entry placeholder.
+
+Eight operator open-questions captured in
+PLAN-EDITABLE.md §8. Answers are the kick to the
+next session's TS-006-A and TS-006-A..D child rows
+in docs/SESSION-TODO.md.
+
+Pre-confirm-not-changed: the superadmin split on
+license POST, HMAC rotate, demo reset, distro apply
+stays. The plan preserves the 2026-06-29 tier-gate
+decision.
+
+Verification:
+
+- npm run verify:deploy -> 19/19 (run before draft)
+- npx tsc --noEmit NOT run (no code touched)
+- npm run graphify:update skipped (no AST churn; plan
+  doc-only)
+- git status --short clean after the docs/PLAN-EDITABLE.md
+  write (one untracked file pre-commit)
+
+Carry-forward (operator to address):
+
+- TS-006-A through TS-006-F child rows land in
+  SESSION-TODO after operator answers the eight
+  pre-confirmations.
+- Working tree dirty until commit + push lands.
+
+Future-version asks continue through v1.3.x -> v1.4
+per the FREEZE marker.
+

@@ -132,10 +132,11 @@ flip one line at a time.)
 - Acceptance met: yes (no bug to fix).
 
 ### TS-ID-006 - Make-everything-editable admin scope
-- Status: @todo
+- Status: @inprogress 2026-07-02 commit=<docs(plan-editable)>
 - Severity: ship-block (operator ask 2026-07-02)
+- Opened: 2026-07-02
 - Owner: opencode
-- Files: TBD after `docs/PLAN-EDITABLE.md` drafted
+- Files: `docs/PLAN-EDITABLE.md`
 - Acceptance: phase-1 of `PLAN-EDITABLE.md` ships; the
   rest of the work is tracked as child TS-IDs. No commits
   ship on the editable workstream until the plan exists
@@ -143,6 +144,21 @@ flip one line at a time.)
 - Closes on: -
 - Blocks: future TS-IDs 0x0..0xF (children created when
   the plan exposes phases).
+- Outcome this session: `docs/PLAN-EDITABLE.md` drafted
+  with the spec gate for the editable-admin workstream.
+  Four phases (A=settings editor, B=site-identity editor,
+  C=newsletter viewer, D=install metadata viewer), then
+  E=consolidation cold-start smoke + F=stamp. Eight
+  operator pre-confirmations captured in plan §4.
+  Acceptance contract §5. Out-of-scope §6. Ship
+  sequencing §7. Tier-gate preserved throughout. No code
+  churn. Status @todo -> @inprogress (operator-confirm
+  pending). TS-006-A through TS-006-F child rows slot
+  into the queue once operator answers the eight
+  pre-confirmations.
+- Follow-up noted: docs/SESSION-TODO.md gains one closed
+  row for TS-006 once operator-confirms the pre-confirm
+  and at least one Phase (A-D) ships.
 
 ---
 
