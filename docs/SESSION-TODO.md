@@ -35,7 +35,7 @@ flip one line at a time.)
 - Closes on: docs(governance)
 
 ### TS-ID-004 - Live verify /projects-v2 post-deploy
-- Status: @done 2026-07-02 commit=<tbd>
+- Status: @done 2026-07-02 commit=f51828a
 - Severity: ship-block
 - Opened: 2026-07-02
 - Owner: opencode
@@ -48,7 +48,7 @@ flip one line at a time.)
   post-deploy pass is required because Vercel hot-copies
   the SQLite bundle on first cold-start with a different
   node version than the local probe.
-- Closes on: tbd
+- Closes on: f51828a
 - Outcome: live probe against
   ethinterior.vercel.app/projects-v2 -> 200, body
   length 63,254 bytes. smoke-projects-v2.mjs 18/18
@@ -197,7 +197,7 @@ already shipped.)
 - Acceptance met: yes (no bug to fix).
 
 ### TS-ID-004 - Live verify /projects-v2 post-deploy
-- Status: @done 2026-07-02 commit=<docs-only>
+- Status: @done 2026-07-02 commit=f51828a
 - Outcome: live probe against
   ethinterior.vercel.app/projects-v2 -> 200 (63,254
   bytes). smoke-projects-v2.mjs 18/18 PASS against
