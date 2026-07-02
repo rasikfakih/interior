@@ -2198,3 +2198,61 @@ Carry-forward lives in SESSION-TODO. Looking back at the
 is now TS-003 documented. Next session history begins
 from this gate.
 
+
+
+
+### 2026-07-02 - v1 cleanup sweep (TS-001 + TS-002 closed)
+
+One commit on `main`, pending push per session protocol:
+
+Closed:
+
+- TS-001 - drop dead `ProjectFilters.tsx`. The file
+  was an unreferenced client island with imperative
+  DOM mutation; `ProjectsClient.tsx` carries the live
+  filter logic. Grep confirmed zero importers.
+  Deleted file. Re-pointed the inline doc-comment on
+  `FeaturedGrid.tsx` that referenced ProjectFilters
+  at ProjectsClient instead. tsc exit 0, verify
+  19/19, routes 36/36, render 32/32.
+
+- TS-002 - drop invented press names from `LogoWall.tsx`.
+  The audit B4 listed Better Interiors / Home & Design
+  / Kaneki House as unverifiable; taste-skill Section
+  4.8b reads "real company logos for social proof - or
+  drop press entirely." We keep marquee shape (single-
+  infinite-loop-rule still applies) but with only the
+  three real publications: AD India, Elle Decor,
+  Surface Magazine. Empty-array codepath added so a
+  future empty list renders null cleanly. Live HTML
+  on `/projects` confirmed no invented-name presence
+  (Kaneki House / Better Interiors / Home & Design
+  all FALSE); AD India rendered (real publication).
+  routes 36/36, render 32/32, build green.
+
+Verification:
+
+- npm run verify:deploy -> 19/19.
+- npx tsc --noEmit -> exit 0.
+- npm run build -> green.
+- npm run lint -> pre-existing schema/settings/use-gsap
+  errors unchanged. New LogoWall + FeaturedGrid clean.
+- npm run graphify:update -> 1434 nodes / 2235 edges /
+  123 communities (was 1423 / 2226 / 122 at the v2
+  ship).
+- Live /projects probe: no invented-name strings in
+  body; AD India present; build/render smokes green.
+
+Carry-forward still open (next session picks):
+
+- TS-003 - statutes.ts Migration import (unresolved
+  since 2026-07-01).
+- TS-004 - live verify /projects-v2 on Vercel rebuild
+  once operator confirms deploy.
+- TS-006 - make-everything-editable admin scope; needs
+  docs/PLAN-EDITABLE.md before any commit ships on
+  that workstream.
+
+Future-version asks continue through v1.3.x -> v1.4
+per the FREEZE marker.
+

@@ -22,7 +22,7 @@ entry below is one row of structured state. Updates
 flip one line at a time.)
 
 ### TS-ID-005 - Create this document
-- Status: @inprogress
+- Status: @done 2026-07-02 commit=<docs(governance)>
 - Severity: ship-block
 - Opened: 2026-07-02
 - Owner: opencode
@@ -32,7 +32,7 @@ flip one line at a time.)
   seed of 5 carry-forwards backfilled; one commit on
   `main` (`docs(governance): session todo gate + AGENTS.md
   step 5c`); git push confirmed.
-- Closes on: -
+- Closes on: docs(governance)
 
 ### TS-ID-004 - Live verify /projects-v2 post-deploy
 - Status: @todo
@@ -51,7 +51,7 @@ flip one line at a time.)
 - Closes on: -
 
 ### TS-ID-001 - Drop dead ProjectFilters.tsx
-- Status: @todo
+- Status: @done 2026-07-02 commit=<tbd>
 - Severity: follow-up
 - Opened: 2026-06-30 (PROJECTS-AUDIT.md §E)
 - Owner: opencode
@@ -60,10 +60,14 @@ flip one line at a time.)
   regressions on importers; smoke-routes 36/36 and
   smoke-render 32/32 still pass on `/projects`; verify
   deploy 19/19.
-- Closes on: -
+- Closes on: tbd
+- Outcome: deleted; FeaturedGrid doc-comment reference
+  re-pointed at ProjectsClient; tsc exit 0; verify 19/19;
+  routes 36/36; render 32/32.
+- Acceptance met: yes.
 
 ### TS-ID-002 - Drop invented press names in LogoWall
-- Status: @todo
+- Status: @done 2026-07-02 commit=<tbd>
 - Severity: follow-up
 - Opened: 2026-06-30 (PROJECTS-AUDIT.md §B / §E)
 - Owner: opencode
@@ -73,7 +77,13 @@ flip one line at a time.)
   `Better Interiors`, or `Home & Design` in the live
   HTML; smoke-renders shows no invented names on
   `/projects`.
-- Closes on: -
+- Closes on: tbd
+- Outcome: PRESS filtered to `AD India`, `Elle Decor`,
+  `Surface Magazine` (verified-real). Empty-array codepath
+  added so future empty list renders null. Live HTML on
+  `/projects` shows no invented names; AD India confirms.
+  routes 36/36, render 32/32, build green.
+- Acceptance met: yes.
 
 ### TS-ID-003 - Resolve `statutes.ts` Migration import
 - Status: @todo

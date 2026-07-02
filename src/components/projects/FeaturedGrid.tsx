@@ -16,8 +16,8 @@ type Props = {
  *   - Real images via picsum.photos fallbacks with descriptive
  *     slug seeds so admins can swap to real photography later.
  *   - data-tile / data-cat / data-year attributes are wired so
- *     the ProjectFilters pill row above can toggle a CSS hide
- *     without re-rendering the array.
+ *     the filter pill row above (ProjectsClient) can toggle a CSS
+ *     hide without re-rendering the array.
  */
 export default function FeaturedGrid({ items }: Props) {
   if (!items.length) return null;

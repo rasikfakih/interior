@@ -1335,8 +1335,8 @@
     "semantic_hash": ""
   },
   "src/components/projects/FeaturedGrid.tsx": {
-    "mtime": 1782880032.563076,
-    "ast_hash": "e27403e9cbee0c4a86efd63f3d071514",
+    "mtime": 1782992576.0597415,
+    "ast_hash": "3f5d9919fdaf0769016c447075f3c298",
     "semantic_hash": ""
   },
   "src/components/projects/Hero.tsx": {
@@ -1345,8 +1345,8 @@
     "semantic_hash": ""
   },
   "src/components/projects/LogoWall.tsx": {
-    "mtime": 1782880187.2961388,
-    "ast_hash": "df0812359f689fb71ac54fe1ec90b217",
+    "mtime": 1782992459.2548532,
+    "ast_hash": "7529a9c641f88775f8510eaf77634e5f",
     "semantic_hash": ""
   },
   "src/components/projects/NumbersStrip.tsx": {
@@ -1357,11 +1357,6 @@
   "src/components/projects/ProcessStrip.tsx": {
     "mtime": 1782880136.8902512,
     "ast_hash": "a5e3fdeed5b94a4876d2eb5c5ec47371",
-    "semantic_hash": ""
-  },
-  "src/components/projects/ProjectFilters.tsx": {
-    "mtime": 1782855336.5754695,
-    "ast_hash": "889af8a64fe3e58b02cd1c7e4e83bc3c",
     "semantic_hash": ""
   },
   "src/components/projects/Testimonial.tsx": {
@@ -1450,8 +1445,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1782991127.0698142,
-    "ast_hash": "d2d78d05be58a7c069cb29a3101f5f9f",
+    "mtime": 1782993349.1730826,
+    "ast_hash": "c4508f7f3f438d22b6f628d67f67e033",
     "semantic_hash": ""
   }
 }

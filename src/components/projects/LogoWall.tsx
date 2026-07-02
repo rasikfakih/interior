@@ -3,15 +3,6 @@
 import { gsap } from "gsap";
 import { useEffect, useRef } from "react";
 
-const PRESS: { name: string; type: string }[] = [
-  { name: "AD India", type: "Architectural Digest" },
-  { name: "Elle Decor", type: "Interior design monthly" },
-  { name: "Better Interiors", type: "Trade quarterly" },
-  { name: "Home & Design", type: "Residential feature" },
-  { name: "Surface Magazine", type: "Materials journal" },
-  { name: "Kaneki House", type: "Field study archive" },
-];
-
 /**
  * LogoWall - single horizontal infinite marquee, the only marquee
  * on the Projects page (taste-skill Section 5 max-one-per-page).
@@ -23,7 +14,20 @@ const PRESS: { name: string; type: string }[] = [
  *     as honest names. Strip carries no fake version label.
  *   - No status dots, no industry / category printed below each
  *     name.
+ *
+ * Press list is filtered at module scope so only verifiable
+ * publications ship. Per taste-skill Section 4.8 (real company
+ * logos for social proof - or drop press entirely), names
+ * lacking market verification (Better Interiors, Home & Design,
+ * Kaneki House) are removed; a future update with verified
+ * real press can add rows here.
  */
+const PRESS: { name: string }[] = [
+  { name: "AD India" },
+  { name: "Elle Decor" },
+  { name: "Surface Magazine" },
+];
+
 export default function LogoWall() {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +49,8 @@ export default function LogoWall() {
       tween.kill();
     };
   }, []);
+
+  if (PRESS.length === 0) return null;
 
   return (
     <section
