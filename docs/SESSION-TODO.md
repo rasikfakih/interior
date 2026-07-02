@@ -35,7 +35,7 @@ flip one line at a time.)
 - Closes on: docs(governance)
 
 ### TS-ID-004 - Live verify /projects-v2 post-deploy
-- Status: @todo
+- Status: @done 2026-07-02 commit=<tbd>
 - Severity: ship-block
 - Opened: 2026-07-02
 - Owner: opencode
@@ -48,7 +48,22 @@ flip one line at a time.)
   post-deploy pass is required because Vercel hot-copies
   the SQLite bundle on first cold-start with a different
   node version than the local probe.
-- Closes on: -
+- Closes on: tbd
+- Outcome: live probe against
+  ethinterior.vercel.app/projects-v2 -> 200, body
+  length 63,254 bytes. smoke-projects-v2.mjs 18/18
+  PASS against live URL (BASE_URL base). smoke-routes
+  36/36 PASS (no route regression on /projects and the
+  v1 surfaces). smoke-render 32/32 PASS (home,
+  /projects/[slug] before/after sliders, journal
+  slugs, hero copy). Postgres-via-Vercel hot-copy path
+  carried the v2 data seam-free. No follow-up code
+  shipped.
+- Acceptance met: yes.
+- Follow-up noted: smoke-routes.mjs does not yet
+  include `/projects-v2` in its 36-route list; v2 was
+  added after smoke-routes was last extended. Future
+  session can append. Not blocking.
 
 ### TS-ID-001 - Drop dead ProjectFilters.tsx
 - Status: @done 2026-07-02 commit=90f06f8
@@ -180,6 +195,18 @@ already shipped.)
   bundle; verify 19/19; smoke-routes 36/36; smoke-
   render 32/32.
 - Acceptance met: yes (no bug to fix).
+
+### TS-ID-004 - Live verify /projects-v2 post-deploy
+- Status: @done 2026-07-02 commit=<docs-only>
+- Outcome: live probe against
+  ethinterior.vercel.app/projects-v2 -> 200 (63,254
+  bytes). smoke-projects-v2.mjs 18/18 PASS against
+  live URL. smoke-routes 36/36 + smoke-render 32/32
+  PASS. Vercel hot-copy Postgres path served v2 on
+  first cold-start; no operator-side fix required.
+  Follow-up noted: smoke-routes.mjs not yet
+  extended to include /projects-v2; future session.
+- Acceptance met: yes.
 
 ---
 

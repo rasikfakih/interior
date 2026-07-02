@@ -2310,3 +2310,63 @@ Carry-forward (still open):
 Future-version asks continue through v1.3.x -> v1.4 per
 the FREEZE marker.
 
+
+
+
+### 2026-07-02 - TS-004 live verify /projects-v2 (no code ship)
+
+Closing TS-004 with documentation-only commit. No code
+changed this session - just a live probe.
+
+Live probes against ethinterior.vercel.app:
+
+- GET /projects-v2 -> 200, body length 63,254 bytes.
+- GET /projects    -> 200, body length 64,372 bytes
+  (v1 unchanged at the surface level).
+
+Smokes (BASE_URL=ethinterior.vercel.app):
+
+- node scripts/smoke-projects-v2.mjs:
+  18/18 PASS. The hero headline reads, no picsum, no
+  // TODO markers, no chrome-pill eyebrows on the four
+  numbered sections, no terminal periods on FeaturedGrid
+  / Faq / CtaBand H2s, exactly one btn-primary on hero,
+  no Hero address print, Testimonial echoes DB row or
+  generic Studio line.
+
+- node scripts/smoke-routes.mjs:
+  36/36 PASS. Public + admin + operator routes all
+  reachable; /projects and /projects/[slug] still 200;
+  admin writes 401-when-anon, 200-when-authed; operator
+  surfaces all reachable with the operator@ creds
+  supplied through SMOKE_OPERATOR_AUTH.
+
+- node scripts/smoke-render.mjs:
+  32/32 PASS. Home GSAP markers intact (ei-word=3,
+  ei-cap-photo=4, ei-stat tiles=3, ei-cta-word=16); hero
+  headline has the 'how you live ... not how a catalogue
+  looks' shape with no double-comma; /projects/casa-mira
+  + nalanda-house + salt-flats render before/after
+  slider; journal slugs 200.
+
+Conclusion: TS-004 acceptance met. Vercel hot-copy
+Postgres path served the v2 route on first cold-start,
+no operator-side fix required.
+
+Carry-forward noted but not blocking:
+
+- smoke-routes.mjs does not yet include /projects-v2
+  in its 36-route list. The /projects-v2 probe is run
+  by smoke-projects-v2.mjs. Future session can extend
+  smoke-routes to cover the new path.
+
+Active SESSION-TODO after this session:
+
+- TS-006 (Make-everything-editable admin scope) -
+  remains open at session-todo gate. Plan-only item;
+  needs docs/PLAN-EDITABLE.md before any commit ships
+  on that workstream.
+
+Future-version asks continue through v1.3.x -> v1.4 per
+the FREEZE marker.
+
