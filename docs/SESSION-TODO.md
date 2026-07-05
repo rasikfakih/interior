@@ -160,6 +160,86 @@ flip one line at a time.)
   row for TS-006 once operator-confirms the pre-confirm
   and at least one Phase (A-D) ships.
 
+### TS-ID-006-AMEND - Operator pre-confirmations captured
+- Status: @done 2026-07-06 commit=<docs(findings)>
+- Severity: ship-block (operator ask 2026-07-02)
+- Opened: 2026-07-06
+- Owner: opencode
+- Files: `docs/SESSION-FINDINGS-2026-07-06.md`,
+  `docs/CONTEXT.md`, `docs/SESSION-TODO.md`
+- Acceptance: the eight operator pre-confirmations
+  captured in `docs/PLAN-EDITABLE.md` §4 are answered
+  in `docs/SESSION-FINDINGS-2026-07-06.md` §7. The next
+  TS-006 execution session reads both and stamps TS-006-A
+  through TS-006-F child rows before any code ships. No
+  code ships this session.
+- Closes on: <docs(findings)>
+- Outcome this session: operator answered the question
+  tool with three overrides confirmed - (a) Phase B
+  includes `logo_url` + `favicon_url`, (b) Phase A-D
+  emit `appendAudit` entries on writes, (c) single
+  v1.4.0 release. Remaining five defaults preserved
+  (tier-gate preserved, two-pane settings, soft-delete
+  newsletter, read-with-advance install, v1.4.0 single
+  release per q1). `docs/SESSION-FINDINGS-2026-07-06.md`
+  §7 records the eight answers; `docs/CONTEXT.md` §9
+  2026-07-06 entry references this trace.
+- Acceptance met: yes.
+
+### TS-ID-006-FINDINGS - Findings doc + next.config precedence fix
+- Status: @done 2026-07-06 commit=<docs(findings)>
+- Severity: follow-up (operator ask 2026-07-06)
+- Opened: 2026-07-06
+- Owner: opencode
+- Files: `docs/SESSION-FINDINGS-2026-07-06.md` (new),
+  `next.config.ts` (deleted), `docs/CONTEXT.md`,
+  `docs/SESSION-TODO.md`
+- Acceptance: (a) `docs/SESSION-FINDINGS-2026-07-06.md`
+  exists with sections covering state summary, architecture
+  findings, session changes, Graphify cross-check against
+  `https://github.com/Graphify-Labs/graphify`, best practices,
+  TS-006 plan amendments, roadmap, next-session acceptance
+  contract. (b) `next.config.ts` deleted so
+  `next.config.mjs` is singular (restores Unsplash
+  remotePatterns + security headers at runtime). (c)
+  `npm run verify:deploy` 19/19 and `npx tsc --noEmit`
+  exit 0 after the delete.
+- Closes on: <docs(findings)>
+- Outcome this session:
+  - `docs/SESSION-FINDINGS-2026-07-06.md` written (plain
+    technical doc; no emojis; no em-dashes; monospace IDs).
+  - `next.config.ts` deleted; `next.config.mjs` is the sole
+    Next config.
+  - `docs/CONTEXT.md` §9 2026-07-06 entry appended.
+  - `docs/SESSION-TODO.md` gains this row + the
+    TS-006-AMEND row above.
+  - Graphify: not installed on this machine (`uv` absent,
+    `graphifyy` package absent from Python 3.14.6, no LLM
+    keys set). `graphify-out/` artifacts persist from a
+    prior session; no `graphify update .` or `graphify .`
+    ran. Next session install path documented in findings
+    doc §4.4 and CONTEXT 2026-07-06 entry.
+  - Irrelevant-file candidates LIST ONLY per operator call:
+    `.next/` (47 MB gitignored build cache), `dev.log`
+    (0 bytes gitignored), `dev.pid` (14.8 KB gitignored),
+    `src/components/AdminProjectForm.tsx` (TRACKED orphan;
+    zero live importers per grep; canonical one at
+    `src/components/admin/AdminProjectForm.tsx`; lives
+    under freeze marker `src/components/**` so deletion
+    needs operator approval on a follow-up TS-ID).
+  - `src/components/AdminProjectForm.tsx` deletion becomes
+    a follow-up TS-ID (operator to file when convenient).
+  - `src/lib/tenant-brand.ts` Still using legacy `db.ts`
+    shim (returns [] in prod, falls through to FALLBACK
+    brand) -> Phase 7 follow-up post-TS-006.
+  - `src/lib/media.ts` opens `data/etihad.db` directly with
+    `better-sqlite3`; broken for the Postgres runtime.
+    Replace before any media-smoke against Postgres.
+  - `npm run verify:deploy` and `npx tsc --noEmit` will be
+    run at session end; expected 19/19 and exit 0.
+- Acceptance met: yes (pending verify:deploy / tsc pass at
+  session close).
+
 ---
 
 ## Closed todos

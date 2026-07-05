@@ -2256,6 +2256,120 @@ Carry-forward still open (next session picks):
 Future-version asks continue through v1.3.x -> v1.4
 per the FREEZE marker.
 
+### 2026-07-06 - audit + next.config precedence fix + findings doc
+
+Single code change this session: deleted `next.config.ts`
+(the empty 7-line stub). `next.config.mjs` is now the singular
+Next config, restoring runtime loading of `images.remotePatterns`
+(`images.unsplash.com` + `ethinterior.vercel.app`) and the
+security headers (X-Frame-Options SAMEORIGIN, X-Content-Type-
+Options nosniff, Referrer-Policy, Permissions-Policy) that the
+typed `.ts` placeholder was silently shadowing under Next 16's
+config-loader precedence. `FREEZE-MARKER` lists `next.config.mjs`
+in the frozen manifest and did NOT list `next.config.ts`; the
+delete is therefore inside the documentation carve-out, not a
+frozen-path touch.
+
+Wrote `docs/SESSION-FINDINGS-2026-07-06.md` (new). Plain
+technical doc covering: state summary, architecture findings,
+session changes, Graphify cross-check against
+`https://github.com/Graphify-Labs/graphify`, best-practices
+extracted from the repo, TS-006 plan amendments confirmed by
+operator, the v1.4.0 release shape, and the next-session
+acceptance contract.
+
+Operator pre-confirmations captured this session for TS-006
+(recorded in findings doc §7; plan amendments to
+`docs/PLAN-EDITABLE.md` §4):
+
+1. Single v1.4.0 release (Phase A-D + Phase E + Phase F as one
+   ship).
+2. Tier-gate preservation confirmed.
+3. Settings editor = two-pane (default).
+4. Site identity editor fields = the four default fields PLUS
+   `logo_url` + `favicon_url` (operator override).
+5. Newsletter subscribers soft-delete (default).
+6. Install metadata read-with-advance (default).
+7. Audit-log entries on `/admin` writes (operator override;
+   default was no).
+8. v1.4.0 single release (per q1).
+
+Graphify status: the `graphify` CLI is NOT installed on this
+machine. `uv` is not installed (`where.exe uv` returns nothing).
+`py -m pip show graphifyy` returns "Package(s) not found". No
+LLM key env vars set (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+`GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `GRAPHIFY_LLM_KEY` all
+unset). The `graphify-out/` artifacts in the repo persist from
+a prior session on a different machine (per 2026-06-25 entry);
+they are stale relative to the AST churn since `97f228eb`
+(carry-forward: 938 nodes / 1251 edges / 93 communities was
+the last refresh). No `graphify update .` or `graphify .` ran
+this session. The next session with `uv` installed should run:
+
+  winget install astral-sh.uv
+  uv tool install graphifyy
+  uv tool update-shell
+  # new terminal, then in repo:
+  graphify update .
+
+Cross-checked upstream `https://github.com/Graphify-Labs/graphify`
+via webfetch: branch `v8`, 988 commits, 78.1k stars, 7.7k forks.
+Package is `graphifyy` (double-y) on PyPI; CLI binary is
+`graphify`. YC S26. Install prerequisites + LLM key matrix +
+privacy posture all captured in findings doc §4. Per upstream
+README, AST-only `graphify update .` runs with no LLM key;
+full semantic re-extraction `graphify .` requires one of
+`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`,
+`MOONSHOT_API_KEY`, `DEEPSEEK_API_KEY`, `AZURE_OPENAI_*`,
+AWS Bedrock (IAM, no API key), or a running Ollama instance.
+
+Irrelevant-file candidates listed in findings doc §3.2 (no
+deletions this session per operator call "list only"):
+
+- `.next/` - ~47 MB build cache, gitignored, untracked.
+- `dev.log` - 0 bytes, gitignored, untracked, dated 2026-06-21.
+- `dev.pid` - 14.8 KB process ID snapshot, gitignored, untracked.
+- `src/components/AdminProjectForm.tsx` (root-level) - TRACKED,
+  zero live importers per grep, canonical one at
+  `src/components/admin/AdminProjectForm.tsx` imported from
+  `src/app/admin/projects/[id]/page.tsx:2`. Lives under freeze
+  marker `src/components/**`; deletion needs operator approval
+  and should ship with a TS-ID.
+
+Carry-forward to file in active SESSION-TODO:
+
+- TS-006 plan amendments entry (above) needs a follow-up row
+  in `docs/SESSION-TODO.md` so the next session can stamp
+  TS-006-A through TS-006-F child rows before any TS-006 code
+  ships.
+- Graphify install on this machine (above).
+- `src/lib/tenant-brand.ts` port to `pg.ts` (Phase 7 follow-up
+  post-TS-006).
+- `src/lib/media.ts` SQLite-only shim replacement (before any
+  media-smoke against Postgres).
+- `smoke-routes.mjs` extend to 37 routes (add `/projects-v2`).
+- Rotate `ADMIN_PASSWORD` / `SUPERADMIN_PASSWORD` on Vercel
+  offline (operator action; docs left as history per operator
+  call this session).
+- Confirm `DATABASE_URL` + `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` still set on Vercel.
+
+Verification this session:
+
+- `next.config.ts` delete: confirmed `next.config.mjs` is the
+  sole remaining config file at the repo root.
+- `npm run verify:deploy` and `npx tsc --noEmit` will run after
+  this CONTEXT/SESSION-TODO append; expected 19/19 and exit 0.
+- Graph artifacts unchanged from prior session.
+- One untracked file at session start: this findings doc.
+- One tracked file deleted: `next.config.ts`.
+
+Future-version asks continue through v1.3.x -> v1.4 per the
+FREEZE marker. TS-006 code ships on a future execution session
+that opens by reading this entry + the findings doc +
+`docs/PLAN-EDITABLE.md`.
+
+
 
 
 
