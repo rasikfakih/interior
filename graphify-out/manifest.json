@@ -44,11 +44,6 @@
     "ast_hash": "57417f3b9650f785dfbaf00978428600",
     "semantic_hash": ""
   },
-  "next.config.ts": {
-    "mtime": 1781626655.208225,
-    "ast_hash": "9b77af189a21a7a64e4bd7a426f64176",
-    "semantic_hash": ""
-  },
   "package.json": {
     "mtime": 1782854725.7330117,
     "ast_hash": "bec8fab55bbc78cbddb1da5e65a9f8f5",
@@ -815,8 +810,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1782998905.7755208,
-    "ast_hash": "19c436b24bc47c35810e53e5bf9e2276",
+    "mtime": 1783280971.0467057,
+    "ast_hash": "849aeb5e792e4a3062c6ea4f9bfc37e8",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1445,8 +1440,23 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1783001761.3100047,
-    "ast_hash": "131d79f8bec01bcfbad1bf6a8ac16107",
+    "mtime": 1783280993.425699,
+    "ast_hash": "84289271473ebdaf881126557b6d142b",
+    "semantic_hash": ""
+  },
+  "src/app/api/settings/[key]/route.ts": {
+    "mtime": 1783284244.9664435,
+    "ast_hash": "5009bd8bc6c671d861927ae353628d7f",
+    "semantic_hash": ""
+  },
+  "docs/PLAN-EDITABLE.md": {
+    "mtime": 1783005946.7066348,
+    "ast_hash": "9a1507e1e3c4916258d9c1bcded001da",
+    "semantic_hash": ""
+  },
+  "docs/SESSION-FINDINGS-2026-07-06.md": {
+    "mtime": 1783280914.502399,
+    "ast_hash": "ffbd64ff54a1f3b7ee0bfcbe126197de",
     "semantic_hash": ""
   }
 }

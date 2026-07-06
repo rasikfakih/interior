@@ -2369,7 +2369,77 @@ FREEZE marker. TS-006 code ships on a future execution session
 that opens by reading this entry + the findings doc +
 `docs/PLAN-EDITABLE.md`.
 
+### 2026-07-06 - Graphify install + AST refresh
 
+Operator installed the Graphify CLI on this machine and ran
+`graphify update .` from the repo root. This closes the gap
+documented in the 2026-07-06 findings doc §4.4 (uv and
+graphifyy were absent at the prior session start).
+
+What shipped this session:
+
+- `uv` installed via `winget install astral-sh.uv`.
+- `graphifyy` (double-y, upstream PyPI package per
+  https://github.com/Graphify-Labs/graphify) installed via
+  `uv tool install graphifyy`. PATH refreshed via
+  `uv tool update-shell`. `graphify` binary now on PATH.
+- `graphify update .` ran from the repo root. AST-only
+  rebuild (no LLM key needed; no API cost). Final graph:
+  1515 nodes, 2217 edges, 135 communities. Previous
+  graphify-out/ artifacts were stale from a prior session
+  on a different machine at commit `97f228eb` (938 nodes /
+  1251 edges / 93 communities per the 2026-06-26 CONTEXT
+  entry). Delta reflects every commit between `97f228eb`
+  and HEAD `38cacd6`.
+- 9 source files produced zero nodes and are absent from
+  the graph: `demo-media.json`, `etihad-backup-2026-06-27.
+  json`, `license-template.json`, `studio-brand.json`,
+  `theme.distro.json` (plus 4 more). All are JSON data
+  files; AST-only extraction skips non-code. A full
+  semantic re-extraction via `graphify .` (opt-in, requires
+  one of ANTHROPIC_API_KEY / OPENAI_API_KEY /
+  GEMINI_API_KEY / MOONSHOT_API_KEY / DEEPSEEK_API_KEY /
+  AZURE_OPENAI_* / AWS Bedrock IAM / OLLAMA_BASE_URL)
+  would carry them; not run this session per findings doc
+  §4.4. Re-run will retry the empties (no longer cached).
+- `graphify-out/graph.json`, `graph.html`, `GRAPH_REPORT.md`,
+  `manifest.json`, `.graphify_labels.json` updated on disk
+  via the rebuild.
+
+TS-006 status unchanged: plan drafted at
+`docs/PLAN-EDITABLE.md`, operator pre-confirmations
+captured at `docs/SESSION-FINDINGS-2026-07-06.md` §7.
+No TS-006 code committed this session. The untracked
+`src/app/api/settings/[key]/route.ts` drafted in a prior
+session remains untracked and untouched (per operator
+call: keep, plan Phase A).
+
+Verification this session:
+
+- `npm run verify:deploy` not re-run; no code change
+  shipped (graphify-out/ is tooling output + checked-in
+  artifacts; the AST rebuild is not a code change).
+- `npx tsc --noEmit` not re-run; same reason.
+- `git status --short` shows dirty graphify-out/ files
+  + the one untracked TS-006 Phase A directory from a
+  prior session.
+
+Session-close protocol per AGENTS.md step 5a: the
+`graphify update .` call IS the step-5a refresh.
+
+Carry-forward (unchanged):
+
+- TS-006-A through TS-006-F child rows land in
+  SESSION-TODO when the next execution session begins
+  the Phase A ship (finish AdminSettings.tsx +
+  /admin/settings/page.tsx + scripts/smoke-settings.mjs;
+  stamp TS-006-A).
+- Full semantic re-extraction (`graphify .`) remains
+  opt-in for a future operator-driven session that
+  sets an LLM key.
+
+Future-version asks continue through v1.3.x -> v1.4
+per the FREEZE marker.
 
 
 

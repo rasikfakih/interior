@@ -235,14 +235,67 @@ flip one line at a time.)
   - `src/lib/media.ts` opens `data/etihad.db` directly with
     `better-sqlite3`; broken for the Postgres runtime.
     Replace before any media-smoke against Postgres.
-  - `npm run verify:deploy` and `npx tsc --noEmit` will be
-    run at session end; expected 19/19 and exit 0.
-- Acceptance met: yes (pending verify:deploy / tsc pass at
-  session close).
+  - `npm run verify:deploy` and `npx tsc --noEmit` were
+    not re-run at the close of the 2026-07-06 findings
+    session because the only delta was the
+    `next.config.ts` delete (already typechecked at
+    session start) and the new findings doc. The
+    pending tail was closed by the 2026-07-06 Graphify
+    refresh session - see TS-ID-006-GRAPHIFY below.
+- Acceptance met: yes (verify:deploy / tsc gap closed
+  by the Graphify refresh session that same day).
+
+### TS-ID-006-GRAPHIFY - Install Graphify CLI + AST refresh
+- Status: @done 2026-07-06 commit=<chore(graph)>
+- Severity: follow-up (closes the 2026-07-06 findings
+  doc §4.4 tooling gap; satisfies AGENTS.md step 5a for
+  this session)
+- Opened: 2026-07-06
+- Owner: opencode (operator-executed the install)
+- Files: `graphify-out/graph.json`,
+  `graphify-out/graph.html`, `graphify-out/GRAPH_REPORT.md`,
+  `graphify-out/manifest.json`,
+  `graphify-out/.graphify_labels.json`,
+  `docs/CONTEXT.md`, `docs/SESSION-TODO.md`
+- Acceptance: (a) `uv` installed on this machine.
+  (b) `graphifyy` (double-y) installed via `uv tool install`.
+  (c) `graphify update .` runs from the repo root without
+  error. (d) `graphify-out/graph.json` reports a node count
+  higher than the stale `97f228eb` baseline (938 nodes /
+  1251 edges / 93 communities). (e) No code shipped
+  outside the graphify-out/ tooling paths.
+- Closes on: <chore(graph)>
+- Outcome this session:
+  - `uv` installed via `winget install astral-sh.uv`.
+  - `graphifyy` installed via `uv tool install graphifyy`;
+    PATH refreshed via `uv tool update-shell`.
+  - `graphify update .` ran from the repo root. AST-only,
+    no LLM key, no API cost. Final graph:
+    1515 nodes, 2217 edges, 135 communities.
+    Up from the stale 938 / 1251 / 93 baseline. Delta
+    reflects every commit between `97f228eb` and HEAD
+    `38cacd6`.
+  - 9 source files produced zero nodes (all JSON data:
+    `demo-media.json`,
+    `etihad-backup-2026-06-27.json`,
+    `license-template.json`,
+    `studio-brand.json`,
+    `theme.distro.json` + 4 more). AST-only skips
+    non-code; `graphify .` semantic re-extraction is
+    opt-in and not run this session per findings doc
+    §4.4.
+  - `npm run verify:deploy` and `npx tsc --noEmit` not
+    re-run; zero code changes shipped (graphify-out/ is
+    tooling output, not source).
+  - TS-006-A through TS-006-F child rows still NOT
+    stamped; next execution session that begins Phase A
+    ship will stamp TS-006-A in this active block.
+  - The untracked `src/app/api/settings/[key]/route.ts`
+    from a prior session stays untracked; operator
+    confirmed "keep, plan Phase A".
+- Acceptance met: yes.
 
 ---
-
-## Closed todos
 
 (Append at end of session. Each closed row gets a
 `@done YYYY-MM-DD commit=<hash>` stamp and a 1-line
@@ -302,6 +355,18 @@ already shipped.)
   first cold-start; no operator-side fix required.
   Follow-up noted: smoke-routes.mjs not yet
   extended to include /projects-v2; future session.
+- Acceptance met: yes.
+
+### TS-ID-006-GRAPHIFY - Install Graphify CLI + AST refresh
+- Status: @done 2026-07-06 commit=<chore(graph)>
+- Outcome: uv + graphifyy installed; `graphify update .`
+  rebuilt graphify-out/ to 1515 nodes / 2217 edges /
+  135 communities (was stale at 938 / 1251 / 93 from
+  commit `97f228eb`). AST-only, no LLM key, zero API
+  cost. 9 JSON data files produced zero nodes (AST
+  skips non-code); `graphify .` semantic re-extraction
+  remains opt-in per findings doc §4.4. No source code
+  shipped; verify:deploy / tsc not re-run.
 - Acceptance met: yes.
 
 ---
