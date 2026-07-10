@@ -12,7 +12,10 @@ type Tab =
   | "journal"
   | "testimonials"
   | "team"
-  | "settings";
+  | "settings"
+  | "site-identity"
+  | "newsletter"
+  | "install";
 
 const ADMIN_NAV: { key: Tab; label: string; sub: string }[] = [
   { key: "pages", label: "Pages", sub: "Block builder, drag-reorder" },
@@ -22,6 +25,9 @@ const ADMIN_NAV: { key: Tab; label: string; sub: string }[] = [
   { key: "testimonials", label: "Testimonials", sub: "Client voices" },
   { key: "team", label: "Team", sub: "Studio members" },
   { key: "settings", label: "Settings", sub: "Site & contact" },
+  { key: "site-identity", label: "Site identity", sub: "Brand & accent" },
+  { key: "newsletter", label: "Newsletter", sub: "Subscriber viewer" },
+  { key: "install", label: "Install", sub: "Stamp & HMAC" },
   { key: "license", label: "License", sub: "Envato key" },
 ];
 
@@ -116,8 +122,202 @@ function TabPanel({ tab }: { tab: Tab }) {
   if (tab === "journal") return <JournalRoutePanel />;
   if (tab === "testimonials") return <TestimonialsRoutePanel />;
   if (tab === "team") return <TeamRoutePanel />;
-  if (tab === "settings") return <SettingsPanel />;
+  if (tab === "settings") return <SettingsRoutePanel />;
+  if (tab === "site-identity") return <SiteIdentityRoutePanel />;
+  if (tab === "newsletter") return <NewsletterRoutePanel />;
+  if (tab === "install") return <InstallRoutePanel />;
   return null;
+}
+
+// SiteIdentityRoutePanel: probe /api/site-identity; on 200 push
+// to /admin/site-identity which mounts AdminSiteIdentity.
+function SiteIdentityRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/site-identity", {
+          credentials: "include",
+        });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/site-identity");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Site identity</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/site-identity." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/site-identity")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+// NewsletterRoutePanel: probe /api/newsletter-subscribers; on
+// 200 push to /admin/newsletter which mounts AdminNewsletterList.
+function NewsletterRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/newsletter-subscribers", {
+          credentials: "include",
+        });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/newsletter");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Newsletter</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/newsletter-subscribers." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/newsletter")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+// InstallRoutePanel: probe /api/install/stamp; on 200 push to
+// /admin/install which mounts AdminInstallView.
+function InstallRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/install/stamp", {
+          credentials: "include",
+        });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/install");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Install</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/install/stamp." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/install")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+// SettingsRoutePanel mirrors the projects/journal/testimonials/team
+// probe-then-push pattern. The Editor lives at /admin/settings, which
+// is a server-prerendered passthrough mounting AdminSettings.
+function SettingsRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/settings", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/settings");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Settings</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/settings." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/settings")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
 }
 
 // TestimonialsRoutePanel mirrors the projects/journal probe-then-push
@@ -275,6 +475,7 @@ function ProjectsRoutePanel() {
         setBusy(false);
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBusy(true);
     probe();
   }, [router]);
@@ -337,31 +538,8 @@ function CrudPanel({ kind }: { kind: string }) {
   );
 }
 
-function SettingsPanel() {
-  const rows = [
-    { label: "Studio note", default: "Every project supervised on-site. No remote hand-offs." },
-    { label: "Studio base", default: "Kalyan, MH" },
-    { label: "CALENDLY_URL", default: "https://calendly.com/etihadinteriors/intro" },
-    { label: "CONTACT_PHONE", default: "+91 99999 99999" },
-    { label: "CONTACT_EMAIL", default: "studio@etihadinteriors.com" },
-  ];
-  return (
-    <div className="surface-tile p-6 rounded-[var(--radius-card)]">
-      <p className="chrome-pill mb-3 inline-flex">Settings</p>
-      <p className="text-ink-mute text-sm mb-4">
-        Edit these in <code className="font-mono text-xs">/admin</code> via the live API,
-        or use <code className="font-mono text-xs">/.env.local</code> for env-tied keys.
-      </p>
-      <div className="divide-y hairline">
-        {rows.map((r: any) => (
-          <div key={r.label} className="py-3 grid grid-cols-1 md:grid-cols-12 gap-2">
-            <p className="md:col-span-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-              {r.label}
-            </p>
-            <p className="md:col-span-9 text-sm">{r.default}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+// SettingsPanel was the original static diagnostic surface listing a
+// hard-coded contact block; superseded by SettingsRoutePanel which
+// pushes the operator into /admin/settings -> AdminSettings editor.
+// Removed in TS-006-A.
+

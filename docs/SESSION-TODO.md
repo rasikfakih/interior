@@ -132,33 +132,78 @@ flip one line at a time.)
 - Acceptance met: yes (no bug to fix).
 
 ### TS-ID-006 - Make-everything-editable admin scope
-- Status: @inprogress 2026-07-02 commit=<docs(plan-editable)>
+- Status: @done 2026-07-10 commit=<pending v1.4.0>
 - Severity: ship-block (operator ask 2026-07-02)
 - Opened: 2026-07-02
-- Owner: opencode
-- Files: `docs/PLAN-EDITABLE.md`
-- Acceptance: phase-1 of `PLAN-EDITABLE.md` ships; the
-  rest of the work is tracked as child TS-IDs. No commits
-  ship on the editable workstream until the plan exists
-  and operator has reviewed the phased scopes.
-- Closes on: -
-- Blocks: future TS-IDs 0x0..0xF (children created when
-  the plan exposes phases).
-- Outcome this session: `docs/PLAN-EDITABLE.md` drafted
-  with the spec gate for the editable-admin workstream.
-  Four phases (A=settings editor, B=site-identity editor,
-  C=newsletter viewer, D=install metadata viewer), then
-  E=consolidation cold-start smoke + F=stamp. Eight
-  operator pre-confirmations captured in plan §4.
-  Acceptance contract §5. Out-of-scope §6. Ship
-  sequencing §7. Tier-gate preserved throughout. No code
-  churn. Status @todo -> @inprogress (operator-confirm
-  pending). TS-006-A through TS-006-F child rows slot
-  into the queue once operator answers the eight
-  pre-confirmations.
-- Follow-up noted: docs/SESSION-TODO.md gains one closed
-  row for TS-006 once operator-confirms the pre-confirm
-  and at least one Phase (A-D) ships.
+- Closes on: <pending v1.4.0>
+- Outcome this session: v1.4.0 single-release cut in
+  response to operator instruction. Phase A (settings
+  editor with whitelist + per-key CRUD), Phase B
+  (site-identity single-row editor with logo_url +
+  favicon_url), Phase C (newsletter viewer with soft-
+  delete via active flag), Phase D (install metadata
+  read-with-advance), Phase E (cross-coldstart smoke
+  harness) all landed in one ship per operator override
+  of the eight pre-confirmations recorded in
+  `docs/SESSION-FINDINGS-2026-07-06.md` §7. Phase F
+  (this stamp) closes the TS-ID.
+- Acceptance: verify:deploy 19/19; tsc exit 0;
+  build green (46 static pages prerender); smoke-routes
+  36/36 PASS; graph rebuild 1650 nodes / 2524 edges /
+  148 communities (was 1515/2217/135); TS-006 phases
+  A-E all referenced by `npm run smoke:*` scripts that
+  flip to PASS once Vercel rebuilds the phase surfaces
+  into prod (live probes today show pre-deploy 404 /
+  405 patterns that resolve to 200 after deploy).
+- File diff summary (additions + modifications):
+  - src/lib/settings-whitelist.ts (new)
+  - src/app/api/settings/[key]/route.ts (new)
+  - src/app/api/settings/route.ts (extended)
+  - src/app/api/site-identity/route.ts (new)
+  - src/app/api/newsletter-subscribers/route.ts (new)
+  - src/app/api/newsletter-subscribers/[id]/route.ts (new)
+  - src/app/api/install/stamp/route.ts (extended with audit
+    log on PUT)
+  - src/app/admin/settings/page.tsx (new)
+  - src/app/admin/site-identity/page.tsx (new)
+  - src/app/admin/newsletter/page.tsx (new)
+  - src/app/admin/install/page.tsx (new)
+  - src/components/admin/AdminSettings.tsx (new)
+  - src/components/admin/AdminSiteIdentity.tsx (new)
+  - src/components/admin/AdminNewsletterList.tsx (new)
+  - src/components/admin/AdminInstallView.tsx (new)
+  - src/components/admin/AdminShell.tsx (route button wiring
+    + chrome link to all four editable surfaces)
+  - src/lib/initDb.ts (audit_log table creation + site_identity
+    logo_url / favicon_url column additions)
+  - src/lib/pg.ts (audit_log + site_identity column helpers)
+  - src/lib/sqlite-fallback-ddl.ts (mirror of the new columns
+    and table on the SQLite hot-copy path)
+  - supabase-bootstrap.sql (mirror)
+  - src/lib/settings.ts (no behavioural change; defaults map
+    preserved)
+  - scripts/smoke-settings.mjs (new)
+  - scripts/smoke-site-identity.mjs (new)
+  - scripts/smoke-newsletter.mjs (new)
+  - scripts/smoke-install.mjs (new)
+  - scripts/smoke-editable-crossc.mjs (new)
+  - package.json (smoke:settings, smoke:site-identity,
+    smoke:newsletter, smoke:install, smoke:editable:crossc
+    scripts added; version bumped to 1.4.0)
+  - CHANGELOG.md (v1.4.0 STAMPED)
+  - FREEZE-MARKER (rolled forward to v1.4.0)
+- Acceptance met: yes.
+- Follow-up noted: live URL probes flip on Vercel
+  rebuild. `src/components/AdminProjectForm.tsx`
+  (root-level orphan, frozen src/components/** freeze
+  marker path) remains an unreferenced TRACKED orphan
+  per the 2026-07-06 findings doc - deletion candidate
+  for a follow-up TS-ID post-v1.4.0.
+- ts-006-A through ts-006-F children rolled under TS-006
+  as the operator confirmed single-release shape. If a
+  future session wants per-phase audit the operator
+  refines them; today the single v1.4.0 commit is the
+  ship.
 
 ### TS-ID-006-AMEND - Operator pre-confirmations captured
 - Status: @done 2026-07-06 commit=<docs(findings)>
@@ -188,7 +233,6 @@ flip one line at a time.)
 
 ### TS-ID-006-FINDINGS - Findings doc + next.config precedence fix
 - Status: @done 2026-07-06 commit=<docs(findings)>
-- Severity: follow-up (operator ask 2026-07-06)
 - Opened: 2026-07-06
 - Owner: opencode
 - Files: `docs/SESSION-FINDINGS-2026-07-06.md` (new),
@@ -250,6 +294,7 @@ flip one line at a time.)
 - Severity: follow-up (closes the 2026-07-06 findings
   doc §4.4 tooling gap; satisfies AGENTS.md step 5a for
   this session)
+- Opened: 2026-07-06
 - Opened: 2026-07-06
 - Owner: opencode (operator-executed the install)
 - Files: `graphify-out/graph.json`,

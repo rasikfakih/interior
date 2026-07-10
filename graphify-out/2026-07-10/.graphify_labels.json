@@ -133,18 +133,5 @@
   "131": "Community 131",
   "132": "Community 132",
   "133": "i18n.ts",
-  "134": "LICENSE_SERVER_URL",
-  "135": "smoke-install.mjs",
-  "136": "smoke-newsletter.mjs",
-  "137": "smoke-site-identity.mjs",
-  "138": "page.tsx",
-  "139": "page.tsx",
-  "140": "route.ts",
-  "141": "AdminInstallView.tsx",
-  "142": "route.ts",
-  "143": "LicenseBanner.tsx",
-  "144": "page.tsx",
-  "145": "AdminSiteIdentity.tsx",
-  "146": "license-key.test.ts",
-  "147": "Faq.tsx"
+  "134": "LICENSE_SERVER_URL"
 }

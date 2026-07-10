@@ -170,6 +170,8 @@ ensureTable(
     tagline TEXT,
     logo_media_id INTEGER,
     favicon_media_id INTEGER,
+    logo_url TEXT,
+    favicon_url TEXT,
     accent_mode TEXT DEFAULT 'auto',
     footer_credit TEXT
   );
@@ -239,6 +241,16 @@ ensureColumn("journal_posts", "cover_media_id", "INTEGER");
 ensureColumn("journal_posts", "gallery_media_ids", "TEXT");
 ensureColumn("journal_posts", "category", "TEXT");
 ensureColumn("journal_posts", "author_name", "TEXT");
+
+// TS-006 Phase B additive: site_identity logo_url + favicon_url.
+// SQLite hot-copy writes ALTER TABLE ADD COLUMN once per cold container
+// because the columns are missing on legacy seeds.
+ensureColumn("site_identity", "logo_url", "TEXT");
+ensureColumn("site_identity", "favicon_url", "TEXT");
+
+// TS-006 Phase C additive: newsletter_subscribers.soft-delete via
+// `active` flag, defaulting to 1 (true).
+ensureColumn("newsletter_subscribers", "active", "INTEGER DEFAULT 1");
 
 // FTS5 virtual table for admin cmd+k search
 sqlite.exec(`

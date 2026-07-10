@@ -142,7 +142,45 @@ function getSqlite(): Database.Database {
     }
   }
   _sqlite = db;
+  applyFallbackAdditiveMigrations(db);
   return db;
+}
+
+// TS-006 additive migrations for the SQLite fallback path. The
+// SQLITE_FALLBACK_DDL only adds columns to tables that don't yet
+// exist; older SQLite seeds miss the TS-006 columns so this loop
+// inspects each table's existing columns and ALTER TABLE ADD COLUMN
+// only when missing. Idempotent.
+function applyFallbackAdditiveMigrations(db: Database.Database) {
+  const ADDS: Array<{
+    table: string;
+    column: string;
+    def: string;
+  }> = [
+    { table: "site_identity", column: "logo_url", def: "TEXT" },
+    { table: "site_identity", column: "favicon_url", def: "TEXT" },
+    { table: "newsletter_subscribers", column: "active", def: "INTEGER DEFAULT 1" },
+  ];
+  for (const a of ADDS) {
+    try {
+      const cols = db
+        .prepare(`PRAGMA table_info(${a.table})`)
+        .all() as Array<{ name: string }>;
+      if (!cols.find((c) => c.name === a.column)) {
+        db.exec(
+          `ALTER TABLE ${a.table} ADD COLUMN ${a.column} ${a.def}`
+        );
+      }
+    } catch (e: any) {
+      // best-effort; missing table means the DDL pass hasn't run for
+      // this row yet (e.g. cold-start race), in which case the next
+      // open will retry.
+      console.error(
+        `[pg.ts] additive migration ${a.table}.${a.column} error:`,
+        e?.message ?? String(e)
+      );
+    }
+  }
 }
 
 function placeholderToSqlite(text: string, params: ReadonlyArray<unknown>): {

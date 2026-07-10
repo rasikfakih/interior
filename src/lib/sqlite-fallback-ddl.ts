@@ -145,6 +145,8 @@ export const SQLITE_FALLBACK_DDL = [
     tagline TEXT,
     logo_media_id INTEGER,
     favicon_media_id INTEGER,
+    logo_url TEXT,
+    favicon_url TEXT,
     accent_mode TEXT DEFAULT 'auto',
     footer_credit TEXT
   )`,

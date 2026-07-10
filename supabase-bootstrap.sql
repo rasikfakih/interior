@@ -194,5 +194,15 @@ CREATE TABLE IF NOT EXISTS tenant_data (
 CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
-  subscribed_at TIMESTAMPTZ DEFAULT NOW()
+  subscribed_at TIMESTAMPTZ DEFAULT NOW(),
+  active BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+-- TS-006 additive migrations. ADD COLUMN IF NOT EXISTS is idempotent
+-- on Postgres 9.6+; ensureMigrated replays supabase-bootstrap.sql
+-- once per cold start under the advisory lock so the columns land
+-- without breaking the CREATE TABLE IF NOT EXISTS path.
+ALTER TABLE newsletter_subscribers
+  ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE site_identity ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE site_identity ADD COLUMN IF NOT EXISTS favicon_url TEXT;

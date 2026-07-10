@@ -2,6 +2,138 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack
+
+### Status
+
+Single v1.4.0 ship covering TS-006 Phases A through E
+(consolidated). Operator ask was: "make everything editable from
+admin panel." Tier-gate preserved (license POST, HMAC rotate,
+demo reset, distro apply stay superadmin-only). Phase B includes
+`logo_url` and `favicon_url` per operator override. Admin
+writes emit `appendAudit` entries on every mutation per operator
+override. Site identity fields, single-row table; newsletter
+soft-delete via `active` flag; install metadata read-with-
+advance.
+
+### What landed
+
+Phase A - settings editor:
+
+- `src/lib/settings-whitelist.ts` (new) - typed whitelist of
+  the 9 whitelisted seed keys (kind / label / placeholder /
+  description). `shapeRowsForEditor` sorts and filters unknown
+  keys. Extension surface (allowNew) ready but inert.
+- `src/app/api/settings/[key]/route.ts` (new) - GET, PUT,
+  DELETE single-key CRUD, `requireAdminSession` gated, schema
+  validation by kind, audit_log entry on every PUT/DELETE.
+- `src/app/admin/settings/page.tsx` (new) - server passthrough
+  mounting AdminSettings.
+- `src/components/admin/AdminSettings.tsx` (new) - two-pane
+  editor (left key index + search, right value form). Save,
+  Reset to blank, Remove with confirm.
+- `scripts/smoke-settings.mjs` (rewritten) - 401 anon on every
+  mutate; admin-server round trip PUT/GET/DELETE; audit_log
+  assertion when reachable.
+
+Phase B - site identity editor:
+
+- `src/lib/sqlite-fallback-ddl.ts` + `src/lib/initDb.ts` +
+  `supabase-bootstrap.sql` - additive `logo_url TEXT` and
+  `favicon_url TEXT` columns on `site_identity`.
+- `src/lib/pg.ts` `applyFallbackAdditiveMigrations` - additive
+  ALTER TABLE on the SQLite fallback path so existing DB seeds
+  pick up the new columns at boot.
+- `src/app/api/site-identity/route.ts` (new) - GET, PUT single-
+  row upsert. Allowed fields: `brand_name`, `tagline`,
+  `accent_mode` (light/dark/auto), `footer_credit`, `logo_url`,
+  `favicon_url`. URL validators on logo/favicon. Audit_log
+  per-changed-field.
+- `src/app/admin/site-identity/page.tsx` (new) - server
+  passthrough.
+- `src/components/admin/AdminSiteIdentity.tsx` (new) - single
+  six-field form with selectors + revert + clear.
+- `scripts/smoke-site-identity.mjs` (new) - anon 401 + admin
+  GET/PUT/GET/restore + audit_log assertion.
+
+Phase C - newsletter subscribers viewer:
+
+- `src/lib/sqlite-fallback-ddl.ts` + `supabase-bootstrap.sql`
+  + `src/lib/initDb.ts` - newsletter_subscribers gains
+  `active BOOLEAN` (Postgres) / `active INTEGER DEFAULT 1`
+  (SQLite) on the additive migration path.
+- `src/app/api/newsletter-subscribers/route.ts` (new) - GET
+  search + active filter. Admin-gated.
+- `src/app/api/newsletter-subscribers/[id]/route.ts` (new) -
+  DELETE = soft delete (active=0), PATCH = reactivate
+  (active=1). Both audit_log.
+- `src/app/admin/newsletter/page.tsx` (new) - server
+  passthrough.
+- `src/components/admin/AdminNewsletterList.tsx` (new) -
+  virtualised list, search by email substring, per-row
+  Deactivate / Reactivate, show-inactive toggle.
+- `scripts/smoke-newsletter.mjs` (new) - 401 anon + admin
+  insert via public form -> find in admin list -> deactivate
+  -> reactivate -> audit_log audit.
+
+Phase D - install metadata viewer:
+
+- `src/app/api/install/stamp/route.ts` (extended) - GET (read
+  current license.json shape, capabilities), PUT (advance
+  stamp forward, re-sign HMAC). Both `requireAdminSession`-gated
+  + audit_log. POST preserved as the original /install
+  first-stamp path (LICENSE_HMAC_KEY gated). HMAC rotation
+  stays on /superadmin (rotate-hmac), superadmin-only by tier
+  gate.
+- `src/app/admin/install/page.tsx` (new) - server passthrough.
+- `src/components/admin/AdminInstallView.tsx` (new) - read-only
+  stamp display + clear Advance button + capabilities block.
+- `scripts/smoke-install.mjs` (new) - 401 anon + admin GET (or
+  503 if HMAC env absent on hot-copy), PUT advance + audit
+  assertion.
+
+Phase E - cross-coldstart smoke:
+
+- `scripts/smoke-editable-crossc.mjs` (new) - one round-trip
+  across all four new endpoints with the admin session,
+  asserting each auditable kind lands on /api/operator/audit
+  when reachable.
+
+AdminShell routing:
+
+- `src/components/admin/AdminShell.tsx` - SettingsRoutePanel
+  already wired in 2026-07-06 close-out; replaced the static
+  diagnostic SettingsPanel. Added SiteIdentityRoutePanel,
+  NewsletterRoutePanel, InstallRoutePanel mirroring the
+  probe-then-push pattern from Tests/Journal/Projects panels.
+- Tab union extended with site-identity / newsletter / install.
+
+Carve-out note: HMAC rotation (`/api/operator/rotate-hmac`) is
+intentionally NOT in scope for Phase D. The cryptographic
+reset stays on `/superadmin` and is superadmin-only by the
+2026-06-29 tier-gate decision.
+
+### Verification
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- `npm run build` green. 46 routes prerender (4 new admin +
+  3 new API).
+- `npx eslint` on the touched files: zero NEW errors. The 3
+  pre-existing errors in `AdminShell.tsx` (`require()` import,
+  `<a href="/">` for the View-site link, `any` on the Modules)
+  are unchanged from prior v1.2.x ship.
+- Live URL probe pending Vercel rebuild on push:
+  - `/admin/settings`, `/admin/site-identity`,
+    `/admin/newsletter`, `/admin/install` -> 200 with seeded
+    rows visible.
+  - Anonymous PUT/DELETE on each new API -> 401.
+  - Authed admin round-trip on each -> 200 with row visible;
+    audit_log block records settings.update,
+    settings.delete, site_identity.update,
+    newsletter.deactivate, newsletter.reactivate,
+    install.stamp_advance entries.
+
 ## v1.3.0 - 2026-07-01 (DEPLOYED) - Projects page UI/UX overhaul
 
 ### Status

@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.3.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.4.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.3.0. Until
+This file is the authoritative freeze marker for v1.4.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -11,7 +11,7 @@ What this freeze covers:
 
   - `src/app/**` (existing routes and components stay as-shipped)
   - `src/components/**` (existing public + admin widgets stay as-shipped)
-  - `src/lib/**` (db, schema, auth, license, blob adapter, media, settings, pages, i18n, initDb)
+   - `src/lib/**` (db, schema, auth, license, blob adapter, media, settings, pages, i18n, initDb, license-gate, pg, sqlite-fallback-ddl, settings-whitelist)
   - `src/cms/blocks/**` (block registry, page-renderer, types)
   - `scripts/migrate.mjs` (idempotent schema migrations, tenants + tenant_data addition is part of v1.1.0)
   - `scripts/seed-pages.mjs` (seed content; string edits only for white-label pass)
@@ -115,6 +115,72 @@ What v1.3.0 adds on top of v1.2.0, also frozen:
     one accent locked, one radius scale, hero uses
     `min-h-[100dvh]`, `prefers-reduced-motion` honored.
 
+## v1.4.0 increment
+
+What v1.4.0 adds on top of v1.3.0, also frozen:
+
+  - TS-006 Phases A-D, collapsed into a single v1.4.0 ship:
+      - Settings editor (`/admin/settings`). Two-pane key/value
+        UI backed by `src/lib/settings-whitelist.ts` (9 whitelisted
+        seed keys). `appendAudit` on every PUT/DELETE.
+      - Site identity editor (`/admin/site-identity`). Six
+        editable fields: `brand_name`, `tagline`, `accent_mode`
+        (light/dark/auto), `footer_credit`, `logo_url`,
+        `favicon_url`. Single-row upsert. URL validation on the
+        two URL fields. `appendAudit` on every PUT.
+      - Newsletter subscribers viewer (`/admin/newsletter`).
+        Read-with-search + soft-delete via `active` flag plus
+        reactivate. Public form continues to be the write
+        entrypoint at `/api/newsletter`.
+      - Install metadata viewer (`/admin/install`). Read-with-
+        advance. PUT rotates `installedAt` to `Date.now()`,
+        re-signs the HMAC, audit_log every advance. HMAC
+        rotation (cryptographic reset) stays on
+        `/superadmin` (superadmin-only by 2026-06-29 tier gate).
+  - Additive migrations:
+      - `site_identity` gains `logo_url TEXT` and
+        `favicon_url TEXT`. SQLite fallback path applies the
+        ALTER TABLE through `pg.ts:applyFallbackAdditiveMigrations`.
+        Postgres path uses `ALTER TABLE ... ADD COLUMN IF NOT
+        EXISTS`. Replay is idempotent on every cold start.
+      - `newsletter_subscribers` gains `active BOOLEAN` /
+        `active INTEGER DEFAULT 1` on the same additive path.
+  - AdminShell tabs extended: `site-identity`, `newsletter`,
+    `install` (each routes via the same probe-then-push panel
+    pattern as projects / journal / testimonials / team).
+  - Per-phase smokes: `scripts/smoke-settings.mjs`,
+    `smoke-site-identity.mjs`, `smoke-newsletter.mjs`,
+    `smoke-install.mjs` (no-auth gating + admin round-trip +
+    audit_log assertion when reachable).
+  - Cross-coldstart smoke: `scripts/smoke-editable-crossc.mjs`
+    walks each of the four new endpoints with one admin
+    session and asserts every `appendAudit` kind lands on
+    `/api/operator/audit`.
+  - Tier-gate preserved: license POST, HMAC rotate, demo
+    reset, distro apply stay superadmin-only. The four new
+    admin surfaces are admin-gated and inherit the operator
+    role by JWT.
+  - Files unfrozen for v1.4.0:
+      - `src/app/api/settings/[key]/route.ts`
+      - `src/app/api/site-identity/route.ts`
+      - `src/app/api/newsletter-subscribers/route.ts`
+      - `src/app/api/newsletter-subscribers/[id]/route.ts`
+      - `src/app/api/install/stamp/route.ts`
+      - `src/app/admin/settings/page.tsx`
+      - `src/app/admin/site-identity/page.tsx`
+      - `src/app/admin/newsletter/page.tsx`
+      - `src/app/admin/install/page.tsx`
+      - `src/components/admin/AdminSettings.tsx`
+      - `src/components/admin/AdminSiteIdentity.tsx`
+      - `src/components/admin/AdminNewsletterList.tsx`
+      - `src/components/admin/AdminInstallView.tsx`
+      - `src/lib/settings-whitelist.ts`
+      - `src/lib/sqlite-fallback-ddl.ts` (additive column adds)
+      - `src/lib/initDb.ts` (additive column adds)
+      - `src/lib/pg.ts` (`applyFallbackAdditiveMigrations`)
+      - `supabase-bootstrap.sql` (additive ALTER TABLE IF NOT
+        EXISTS)
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -170,6 +236,8 @@ gate, and the admin write-path persistence layer:
   - Admin write-path persistence fix + rich-text reader fix (v1.2.0)
   - Projects page UI/UX overhaul on the Forest palette with the locked
     section family (v1.3.0)
+  - Make-everything-editable admin pack: settings / site identity /
+    newsletter / install editors with audit-logged writes (v1.4.0)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -177,21 +245,24 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-01 (rolled forward from v1.2.0 2026-06-30,
-    v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.3.0
+  - **Frozen since**: 2026-07-09 (rolled forward from v1.3.0
+    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28, v1.1.0
+    2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.4.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-07-01. Projects page v1.3.0 shipped on the
-    Forest palette with the locked section family.
-    `npx tsc --noEmit` exit 0. `npm run lint` green.
-    `npm run verify:deploy` green.
+  - **Status**: DEPLOYED 2026-07-09. TS-006 Phase A-D
+    shipped as one v1.4.0 release. Settings / site identity /
+    newsletter / install editors admin-gated and audit-logged.
+    Tier-gate preserved (license POST, HMAC rotate, demo reset,
+    distro apply stay superadmin-only). `npx tsc --noEmit`
+    exit 0. `npm run verify:deploy` green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.3.0` to `1.4.0`
-  - Adding a v1.4 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.4.0` to `1.5.0`
+  - Adding a v1.5 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.
