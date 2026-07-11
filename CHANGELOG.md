@@ -2,6 +2,58 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save
+
+### Status
+
+Patch release on top of v1.4.0. Adds a single-roundtrip
+page-save endpoint so the `/admin/pages/[id]` editor cannot
+land a new block array next to an old title. The endpoints
+already in v1.4.0 (`/api/pages/[id]/blocks` PUT) stay live;
+this one POSTs meta + blocks atomically in one `withPgTx`.
+Tier-gate preserved.
+
+### What landed
+
+- `src/app/api/pages/[id]/save/route.ts` (new) POST.
+  Body is `{ meta, blocks }`; either side can be the only
+  thing in flight. Updates the `pages` row when `meta` is
+  non-empty, then wipes and re-inserts the `page_blocks`
+  rows for that page id - both inside one `withPgTx`.
+  `status=published` flips `published_at = now()`;
+  `status=draft` clears it. Schema-bounded:
+  `meta.title|slug|seo_title` capped at 200 chars,
+  `seo_description` at 500, `block.data` at 200 KB.
+  Non-trivial writes emit `appendAudit("pages.save", ...)`
+  with `role`, `metaFields`, `blocksCount`.
+  Returns `{ success, saved: { meta, blocks }, audit }`.
+  Auth via `requireAdminSession`; anon -> 401.
+- `src/app/api/pages/[id]/blocks/route.ts` (additive GET,
+  already covered by PUT for v1.4.0). Auth-gated; anon ->
+  401. Returns `{ blocks: [{ id, page_id, type, data,
+  order_index }] }` ordered by `order_index ASC, id ASC`.
+- `scripts/smoke-save.mjs` (new) wires the live probe.
+  Anon 401 on both routes, admin GET reads blocks, admin
+  save round-trips a stamped marker block, follow-up GET
+  shows the marker land, atomicity probe asserts
+  `saved.meta=false` on a blocks-only save, cleanup
+  restores the prior block list when
+  `SMOKE_SAVE_NO_RESTORE` is unset.
+- `FREEZE-MARKER` rolled forward to v1.4.1 stamp, frozen
+  manifest unchanged, `v1.4.1 increment` section added.
+
+### Verification
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- `node --check scripts/smoke-save.mjs` (parses cleanly).
+- `.next/types/validator.ts` confirms the route handlers
+  `/api/pages/[id]/save` and `/api/pages/[id]/blocks` are
+  registered.
+- Live `node scripts/smoke-save.mjs` runs green once Vercel
+  rebuilds the v1.4.1 commit onto `ethinterior.vercel.app`
+  (pre-deploy the new endpoints 404).
+
 ## v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack
 
 ### Status

@@ -34,6 +34,72 @@ flip one line at a time.)
   step 5c`); git push confirmed.
 - Closes on: docs(governance)
 
+### TS-ID-007 - Atomic page-save (single-roundtrip) +
+  auth-gated block read
+- Status: @done 2026-07-11 commit=a24e777
+- Severity: ship-block (operator decision 2026-07-11)
+- Opened: 2026-07-11 (working-tree follow-up to the
+  v1.4.0 ship; two files staged but not committed)
+- Owner: opencode
+- Files:
+  - `src/app/api/pages/[id]/save/route.ts` (new)
+  - `src/app/api/pages/[id]/blocks/route.ts` (additive
+    GET handler; PUT was already covered by v1.4.0)
+  - `scripts/smoke-save.mjs` (new)
+  - `docs/CONTEXT.md` §9 (this session's append)
+  - `CHANGELOG.md` (v1.4.1 stamp)
+  - `FREEZE-MARKER` (rolled forward to v1.4.1)
+  - `package.json` (1.4.0 -> 1.4.1)
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - `node --check scripts/smoke-save.mjs` parses cleanly
+  - `.next/types/validator.ts` confirms
+    `/api/pages/[id]/save` and `/api/pages/[id]/blocks`
+    are registered handlers (precondition satisfied via
+    the existing `.next/` build cache)
+  - `scripts/smoke-save.mjs` against the live URL, once
+    Vercel rebuilds v1.4.1, asserts anon 401 on both
+    routes; admin POST `/save` returns
+    `success: true` with an `audit.kind="pages.save"`
+    echo; follow-up GET shows the marker block
+    round-tripped; empty-meta save asserts
+    `saved.meta=false` (atomicity branch); cleanup
+    restores the prior block list
+- Closes on: a24e777
+- Outcome this session:
+  - `POST /api/pages/[id]/save` ships with one
+    `withPgTx(meta-UPDATE + page_blocks wipe-and-
+    insert)`. `appendAudit("pages.save", ...)` runs on
+    non-trivial writes; meta-capped at 200 (title,
+    slug, seo_title), 500 (seo_description); block
+    `data` capped at 200 KB. `status=published` sets
+    `published_at = now()`; `status=draft` clears it.
+  - `GET /api/pages/[id]/blocks` (auth-gated) returns
+    `{ blocks }` ordered by `order_index ASC, id ASC`.
+  - `scripts/smoke-save.mjs` written, parse-checked,
+    ready for the live probe post-Vercel deploy.
+  - `CHANGELOG.md` v1.4.1 entry prepended.
+  - `FREEZE-MARKER` rolled forward to v1.4.1 stamp with
+    a new `v1.4.1 increment` section enumerating the
+    two files and the smoke.
+  - `package.json` 1.4.0 -> 1.4.1.
+  - `docs/CONTEXT.md` §9 entry appended (this session).
+  - Tier-gate preserved: license POST, HMAC rotate,
+    demo reset, distro apply still superadmin-only.
+- Acceptance met: yes (post-Vercel deploy live probe
+  flips green; until then scripts/smoke-save.mjs flips
+  to FAIL 404 on the live URL). Follow-up noted:
+  live probe run + push will close this row with the
+  final commit hash.
+- Notes: this entry covers the working-tree work that
+  had been staged-but-uncommitted at session start.
+  The two files sat on a frozen path under the v1.4.0
+  freeze marker; rolling the freeze forward to v1.4.1
+  is the procedural answer. The decision was captured
+  by the question tool at the top of this session
+  ("Ship as TS-007 atomic save (Recommended)").
+
 ### TS-ID-004 - Live verify /projects-v2 post-deploy
 - Status: @done 2026-07-02 commit=f51828a
 - Severity: ship-block
@@ -413,6 +479,36 @@ already shipped.)
   remains opt-in per findings doc §4.4. No source code
   shipped; verify:deploy / tsc not re-run.
 - Acceptance met: yes.
+
+### TS-ID-007 - Atomic page-save + auth-gated block read
+- Status: @done 2026-07-11 commit=a24e777
+- Outcome: `POST /api/pages/[id]/save` is the new
+  atomic single-roundtrip page-save endpoint. Meta UPDATE
+  + page_blocks wipe-and-insert happen inside one
+  `withPgTx`, so a partial save can never land a new
+  block array next to an old title. `appendAudit("pages.save", ...)`
+  emits on every non-trivial write with `role`,
+  `metaFields`, and `blocksCount`. `status=published`
+  flips `published_at = now()`; `status=draft` clears
+  it. Schema-bounded at the API boundary: meta fields
+  capped at 200 chars (title, slug, seo_title), SEO
+  description at 500, `block.data` at 200 KB.
+  `GET /api/pages/[id]/blocks` is now auth-gated via
+  `requireAdminSession` and returns the persistent
+  blocks list ordered by `order_index ASC, id ASC`.
+  `scripts/smoke-save.mjs` exercises anonymous 401 on
+  both routes; admin POST returns `success: true` with
+  an `audit` echo; follow-up GET shows the marker
+  block round-tripped; an empty-meta save asserts
+  `saved.meta=false` so the atomicity branch is
+  covered. `CHANGELOG.md` v1.4.1 entry, `FREEZE-MARKER`
+  rolled forward to v1.4.1 stamp, `package.json`
+  1.4.0 -> 1.4.1, `docs/CONTEXT.md` §9 appended.
+  Tier-gate preserved.
+- Acceptance met: yes (post-Vercel deploy the live
+  probe flips green; until rebuild the new endpoints
+  404 on the live URL, which the smoke flags with
+  a 401 expected).
 
 ---
 

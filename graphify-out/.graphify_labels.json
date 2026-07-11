@@ -146,5 +146,12 @@
   "144": "page.tsx",
   "145": "AdminSiteIdentity.tsx",
   "146": "license-key.test.ts",
-  "147": "Faq.tsx"
+  "147": "Faq.tsx",
+  "148": "page.tsx",
+  "149": "route.ts",
+  "150": "NumbersStrip.tsx",
+  "151": "v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)",
+  "152": "v1.0.0 - 2026-06-18 (historic)",
+  "153": "v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save",
+  "154": "v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack"
 }

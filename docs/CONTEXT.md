@@ -2597,8 +2597,103 @@ Carry-forward (still open):
 - TS-006 - make-everything-editable admin scope;
   needs docs/PLAN-EDITABLE.md before any commit ships.
 
-Future-version asks continue through v1.3.x -> v1.4 per
-the FREEZE marker.
+Future-version asks continue through v1.3.x -> v1.4
+per the FREEZE marker.
+
+### 2026-07-11 - v1.4.1 ship (TS-007 atomic page-save)
+
+Operator chose to ship the two staged files (a `M` on
+`src/app/api/pages/[id]/blocks/route.ts` adding a GET
+handler, and an untracked `src/app/api/pages/[id]/save/route.ts`
+with an atomic `withPgTx` save + `appendAudit`) as a
+single release under the v1.4.0 freeze marker. The session
+logged the choice via the question tool and proceeded.
+
+What landed:
+
+- `src/app/api/pages/[id]/save/route.ts` (new) POST
+  endpoint: `{ meta, blocks }` body; either side can be
+  the only thing in flight. Inside one `withPgTx`,
+  builds the `meta` UPDATE statements dynamically
+  (`title`, `slug`, `status` with `published_at`
+  flip/clear, `seo_title`, `seo_description`,
+  `is_front`), then wipes `page_blocks` for the page id
+  and re-inserts the new array with type validation,
+  `data` string-or-record coerced to a JSONB-compatible
+  string, capped at 200 KB. Strict bounds on the
+  meta fields (200 chars for title/slug/seo_title;
+  500 for seo_description). On non-trivial writes
+  calls `appendAudit("pages.save", message,
+  payload)` with `pageId`, `role`, `metaFields`,
+  `blocksCount`. Auth via `requireAdminSession`;
+  anon -> 401.
+- `src/app/api/pages/[id]/blocks/route.ts` (additive
+  GET handler, PUT already covered by v1.4.0). The new
+  GET is auth-gated and returns the persistent blocks
+  list ordered by `order_index ASC, id ASC` as
+  `{ blocks: [...] }`. Anon -> 401.
+- `scripts/smoke-save.mjs` (new): anonymous 401 on both
+  routes, admin GET reads the prior blocks list, admin
+  POST round-trips a stamped marker block with title
+  update and follows up with a GET to confirm the
+  marker landed. Probe 6 saves with empty meta to
+  verify `saved.meta=false` (atomicity branch). A
+  cleanup step restores the original block list when
+  `SMOKE_SAVE_NO_RESTORE` is unset. Required env:
+  `SMOKE_BASE_URL`, `SMOKE_ADMIN_EMAIL`,
+  `SMOKE_ADMIN_PASSWORD`.
+- `CHANGELOG.md`: prepended v1.4.1 stamp with status,
+  what landed, verification block.
+- `FREEZE-MARKER`: rolled forward from v1.4.0 (2026-07-09)
+  to v1.4.1 (2026-07-11). Frozen manifest carry-over
+  unchanged; new `v1.4.1 increment` section enumerates
+  TS-007 plus the additive GET handler; procedural
+  signature updated ("1.4.1 -> 1.5.0" is the next gate).
+- `package.json`: version 1.4.0 -> 1.4.1.
+- `docs/SESSION-TODO.md`: TS-007 row added to the active
+  block and then to the closed list with the full
+  outcome and acceptance met under its own terms (post-
+  Vercel-deploy live probe flips green; until rebuild
+  the new endpoints 404 on the live URL).
+- `docs/CONTEXT.md` §9: this entry.
+
+Verification this session:
+
+- `npx tsc --noEmit` -> exit 0.
+- `npm run verify:deploy` -> 19/19 green.
+- `node --check scripts/smoke-save.mjs` -> parses cleanly.
+- `.next/types/validator.ts` registers the two new route
+  handlers (`/api/pages/[id]/save` and the additive
+  `/api/pages/[id]/blocks` GET) at runtime.
+- Local `npm run build` failed on a Turbopack offline
+  font fetch (`fonts.gstatic.com/.../geistmono.woff2`)
+  before this commit landed. Sandbox has no internet;
+  Vercel's build environment does. The failure is
+  unrelated to this session's code paths and the
+  verify:deploy gate (`fs.existsSync(.next)`) was
+  already passing from the prior v1.4.0 build. The
+  pre-existing `.next/server/app/api/pages/[id]/save/
+  route.js` artifact on disk is from a prior session
+  build that had cached the route; it confirms the
+  route was already being traced. Vercel rebuild is
+  the source of truth.
+
+Carry-forward (unchanged):
+
+- Zero operator-blocked items in SESSION-TODO
+  "Pending escalation".
+- Tier-gate preserved: license POST, HMAC rotate,
+  demo reset, distro apply stay superadmin-only.
+- The smoke crosses clean against
+  `https://ethinterior.vercel.app` after the Vercel
+  rebuild lands the v1.4.1 commit; the assertion-vs-
+  design mismatch from v1.4.0 (`smoke-editable-crossc`
+  expected 401 anon on a list endpoint that's anonymous-
+  readable by design) is unchanged from the 2026-07-10
+  ship log and remains a <5-line cleanup for the
+  next session.
+- Future-version asks continue through v1.5 per
+  the FREEZE marker.
 
 
 

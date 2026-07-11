@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.4.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.4.1 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.4.0. Until
+This file is the authoritative freeze marker for v1.4.1. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -181,6 +181,37 @@ What v1.4.0 adds on top of v1.3.0, also frozen:
       - `supabase-bootstrap.sql` (additive ALTER TABLE IF NOT
         EXISTS)
 
+## v1.4.1 increment
+
+What v1.4.1 adds on top of v1.4.0, also frozen:
+
+  - TS-007 atomic page-save: a single-roundtrip endpoint so
+    `/admin/pages/[id]` cannot land a new block array plus an
+    old title. `POST /api/pages/[id]/save` accepts
+    `{ meta, blocks }` and writes both inside one
+    `withPgTx`. `status=published` flips
+    `published_at = now()`; `status=draft` clears it. Each
+    payload is schema-bounded (`meta.title|slug|seoTitle`
+    200 chars, `seo_description` 500 chars, `block.data`
+    200 KB). Non-trivial writes call `appendAudit("pages.save",
+    ...)`.
+  - `GET /api/pages/[id]/blocks` (new handler, admin-gated
+    via `requireAdminSession`). Reads `page_blocks` ordered by
+    `order_index ASC, id ASC`. Useful both as a smoke target
+    and for clients that want to fetch the block array
+    without round-tripping through the full page row.
+  - `scripts/smoke-save.mjs` (new) - anon 401 on both routes,
+    admin save returns `success: true` and an `audit` echo,
+    follow-up GET shows the marker block round-tripped,
+    atomicity probe (empty-meta save lands `saved.meta=false`),
+    cleanup restores the prior block list when
+    `SMOKE_SAVE_NO_RESTORE` is unset.
+  - Files unfrozen for v1.4.1:
+      - `src/app/api/pages/[id]/save/route.ts` (new)
+      - `src/app/api/pages/[id]/blocks/route.ts` (additive
+        GET handler)
+      - `scripts/smoke-save.mjs` (new)
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -238,6 +269,7 @@ gate, and the admin write-path persistence layer:
     section family (v1.3.0)
   - Make-everything-editable admin pack: settings / site identity /
     newsletter / install editors with audit-logged writes (v1.4.0)
+  - Atomic single-roundtrip page-save + auth-gated blocks read (v1.4.1)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -245,23 +277,25 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-09 (rolled forward from v1.3.0
-    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28, v1.1.0
-    2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.4.0
+  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.0
+    2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30, v1.1.2
+    2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.4.1
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-07-09. TS-006 Phase A-D
-    shipped as one v1.4.0 release. Settings / site identity /
-    newsletter / install editors admin-gated and audit-logged.
-    Tier-gate preserved (license POST, HMAC rotate, demo reset,
-    distro apply stay superadmin-only). `npx tsc --noEmit`
+  - **Status**: DEPLOYED 2026-07-11. TS-007 atomic page-save
+    shipped as a v1.4.1 patch on top of the v1.4.0 admin
+    editor pack. `POST /api/pages/[id]/save` carries meta
+    + blocks in one `withPgTx`; `GET /api/pages/[id]/blocks`
+    is auth-gated and exists for parity with the existing
+    PUT; both write surfaces emit `appendAudit("pages.save", ...)`
+    entries. Tier-gate preserved. `npx tsc --noEmit`
     exit 0. `npm run verify:deploy` green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.4.0` to `1.5.0`
+  - Bumping `package.json` version from `1.4.1` to `1.5.0`
   - Adding a v1.5 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
