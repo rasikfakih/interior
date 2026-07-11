@@ -2708,7 +2708,7 @@ detail route under the v1.4.x freeze carve-out, compiled
 from seven dedicated v2 components that honor every taste-
 skill §4.1-§4.10 rule. v1 detail untouched.
 
-What landed (1 commit, v1.4.3 stamp):
+What landed (1 commit, v1.4.3 stamp, hash 066fd48):
 
 1. Seven new components under `src/components/projects-v2/`:
    - `ProjectHeader.tsx` (server). 7/5 asymmetric split.

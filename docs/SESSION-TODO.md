@@ -22,7 +22,7 @@ entry below is one row of structured state. Updates
 flip one line at a time.)
 
 ### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
-- Status: @done 2026-07-11 commit=TS-009
+- Status: @done 2026-07-11 commit=066fd48
 - Severity: ship-block (operator ask 2026-07-11)
 - Opened: 2026-07-11
 - Owner: opencode
@@ -678,7 +678,7 @@ already shipped.)
 ---
 
 ### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
-- Status: @done 2026-07-11 commit=TS-009
+- Status: @done 2026-07-11 commit=066fd48
 - Severe: ship-block (operator ask 2026-07-11)
 - Outcome: seven new components under
   `src/components/projects-v2/` plus
