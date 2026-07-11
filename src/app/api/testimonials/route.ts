@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
         Boolean(d.isPublished !== false),
       ]
     );
+    bump({ kind: "testimonials" });
     return NextResponse.json({ success: true, item: inserted });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Insert failed" }, { status: 400 });

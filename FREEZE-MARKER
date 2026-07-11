@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.4.1 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.4.2 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.4.1. Until
+This file is the authoritative freeze marker for v1.4.2. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -212,6 +212,50 @@ What v1.4.1 adds on top of v1.4.0, also frozen:
         GET handler)
       - `scripts/smoke-save.mjs` (new)
 
+## v1.4.2 increment
+
+What v1.4.2 adds on top of v1.4.1, also frozen:
+
+  - WordPress-grade live update. The standing bug
+    "admin edits do not appear on the public side
+    until the next cold start" is closed.
+  - `src/lib/revalidate.ts` (new): `bump({ kind, slug?,
+    pageSlug? })` + `bumpAll()`. Maps the entity that
+    just changed to the public URLs that depend on it,
+    calls `revalidatePath` for each. Tolerant - throws
+    from revalidatePath are caught so the save flow
+    never breaks.
+  - All public pages that depend on admin data flipped
+    to `dynamic = "force-dynamic"`. Replaces the prior
+    pattern of `export const revalidate = 60` on the
+    home page (60s ISR window) and the implicit
+    build-time prerender on /about, /voices, /install,
+    /contact. Vercel's static prerender beat every admin
+    write; this removes the static caching layer.
+  - `bump(...)` calls appended to every admin / operator
+    write route inside the happy path. The list is in
+    `src/lib/revalidate.ts` switch; every new API write
+    route must terminally call `bump(...)` with the right
+    entity, operator-observable in this one file.
+  - `scripts/smoke-live-revalidate.mjs` (new): end-to-end
+    probe that POSTs a marker block via
+    `/api/pages/1/save`, waits the grace window, anon
+    GETs `/`, asserts the marker stamp shows up in the
+    rendered HTML. The smoke fails loudly when the
+    revalidate wiring is missing. Cleanup restores the
+    prior block list unless `SMOKE_LIVE_NO_RESTORE=1`.
+  - Files unfrozen for v1.4.2:
+      - `src/lib/revalidate.ts` (new)
+      - `src/app/(public)/page.tsx` (revalidate=60 dropped)
+      - `src/app/(public)/about/page.tsx` (force-dynamic)
+      - `src/app/(public)/voices/page.tsx` (force-dynamic)
+      - `src/app/(public)/install/page.tsx` (force-dynamic)
+      - `src/app/(public)/contact/page.tsx` (force-dynamic)
+      - All write-API routes under `src/app/api/**` with
+        an appended `bump(...)` tail - listed in
+        `CHANGELOG.md` v1.4.2 entry.
+      - `scripts/smoke-live-revalidate.mjs` (new)
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -270,6 +314,8 @@ gate, and the admin write-path persistence layer:
   - Make-everything-editable admin pack: settings / site identity /
     newsletter / install editors with audit-logged writes (v1.4.0)
   - Atomic single-roundtrip page-save + auth-gated blocks read (v1.4.1)
+  - WordPress-grade live-update wiring - admin writes reflect on
+    the public front end within the same grace window (v1.4.2)
 
 The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
 `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -277,25 +323,29 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.0
-    2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30, v1.1.2
-    2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.4.1
+  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.1
+    2026-07-11, v1.4.0 2026-07-09, v1.3.0 2026-07-01,
+    v1.2.0 2026-06-30, v1.1.2 2026-06-28, v1.1.0 2026-06-23,
+    v1.0.0 2026-06-18)
+  - **Version**: 1.4.2
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-07-11. TS-007 atomic page-save
-    shipped as a v1.4.1 patch on top of the v1.4.0 admin
-    editor pack. `POST /api/pages/[id]/save` carries meta
-    + blocks in one `withPgTx`; `GET /api/pages/[id]/blocks`
-    is auth-gated and exists for parity with the existing
-    PUT; both write surfaces emit `appendAudit("pages.save", ...)`
-    entries. Tier-gate preserved. `npx tsc --noEmit`
-    exit 0. `npm run verify:deploy` green.
+  - **Status**: DEPLOYED 2026-07-11. TS-008 live-update
+    wiring added on top of v1.4.1. Every public page that
+    depends on admin-edited data now uses
+    `dynamic = "force-dynamic"`, and every admin write
+    route calls `bump(...)` from the new
+    `src/lib/revalidate.ts` helper so the next anon
+    public GET reflects the new state. TS-008 closes the
+    standing "admin edits do not propagate to the public
+    side" carry-forward. Tier-gate preserved.
+    `npx tsc --noEmit` exit 0. `npm run verify:deploy`
+    green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.4.1` to `1.5.0`
+  - Bumping `package.json` version from `1.4.2` to `1.5.0`
   - Adding a v1.5 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 

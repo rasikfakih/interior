@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, pgQuery, withPgTx } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
+import { bump } from "@/lib/revalidate";
 
 /**
  * Single-roundtrip save endpoint for /admin/pages/[id].
@@ -131,6 +132,17 @@ export async function POST(
         metaFields: Object.keys(meta),
         blocksCount: blocksSaved,
       });
+    }
+
+    try {
+      const { pgOne } = await import("@/lib/pg");
+      const pageRow = await pgOne<{ slug: string }>(
+        `SELECT slug FROM pages WHERE id = $1`,
+        [numericId]
+      );
+      bump({ kind: "pages", pageSlug: pageRow?.slug, slug: pageRow?.slug });
+    } catch {
+      bump({ kind: "pages" });
     }
 
     return NextResponse.json({

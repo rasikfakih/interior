@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSuperadmin } from "@/lib/license-gate";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
+import { bumpAll } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
   const gate = await requireSuperadmin();
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
       await client.query(`DELETE FROM team_members`);
       await client.query(`DELETE FROM revisions`);
     });
+    bumpAll();
     return NextResponse.json({
       success: true,
       message: "Demo data reset. Pages, media, blocks cleared.",

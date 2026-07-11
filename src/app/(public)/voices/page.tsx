@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     "Three voices from clients. The studio team that draws, specifies, and supervises on-site.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function VoicesPage() {
   return (
     <section className="pt-24 md:pt-28 pb-24">

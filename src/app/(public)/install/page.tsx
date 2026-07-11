@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function InstallPage() {
   const check = await checkLicense();
   if (check.ok) redirect("/admin");

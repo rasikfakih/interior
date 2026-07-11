@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { ensureMigrated, pgOne } from '@/lib/pg';
 import { remove as storageRemove } from '@/lib/storage';
+import { bump } from '@/lib/revalidate';
 
 /**
  * Phase 2 - PATCH /api/media/[id]
@@ -58,6 +59,7 @@ export async function PATCH(
     if (!q) {
       return NextResponse.json({ error: 'not found' }, { status: 404 });
     }
+    bump({ kind: "media" });
     return NextResponse.json({ success: true, row: q });
   } catch (e: any) {
     return NextResponse.json(
@@ -107,6 +109,7 @@ export async function DELETE(
       `DELETE FROM media WHERE id = $1`,
       [numericId]
     );
+    bump({ kind: "media" });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json(

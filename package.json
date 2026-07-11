@@ -1,6 +1,6 @@
 {
   "name": "etihad-interiors-website",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -24,6 +24,7 @@
     "smoke:newsletter": "node scripts/smoke-newsletter.mjs",
     "smoke:install": "node scripts/smoke-install.mjs",
     "smoke:editable:crossc": "node scripts/smoke-editable-crossc.mjs",
+    "smoke:live": "node scripts/smoke-live-revalidate.mjs",
     "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs"
   },
   "dependencies": {

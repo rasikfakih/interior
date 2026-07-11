@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
 import { ensureMigrated, pgOne, pgQuery } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 /**
  * TS-006 Phase C - soft-delete a newsletter subscriber.
@@ -52,6 +53,7 @@ export async function DELETE(
       role: gate.role,
     }
   );
+  bump({ kind: "settings" });
   return NextResponse.json({ success: true, id: numId, active: 0 });
 }
 
@@ -89,5 +91,6 @@ export async function PATCH(
       role: gate.role,
     }
   );
+  bump({ kind: "settings" });
   return NextResponse.json({ success: true, id: numId, active: 1 });
 }

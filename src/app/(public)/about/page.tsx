@@ -8,6 +8,9 @@ export const metadata: Metadata = {
     "A studio that draws, specifies, and supervises on-site. Founded in 2017 in Kalyan, Maharashtra.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getTeam() {
   try {
     await ensureMigrated();

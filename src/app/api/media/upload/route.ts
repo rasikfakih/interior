@@ -10,6 +10,7 @@ import {
   signedPutUrl,
   type StorageKind,
 } from '@/lib/storage';
+import { bump } from '@/lib/revalidate';
 
 /**
  * Phase 2 - POST /api/media/upload
@@ -107,6 +108,7 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+    bump({ kind: "media" });
     return NextResponse.json({
       id: row.id,
       storagePath: row.storage_path,

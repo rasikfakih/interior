@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
+import { bump } from "@/lib/revalidate";
 
 export async function GET(
   _req: NextRequest,
@@ -56,6 +57,16 @@ export async function PUT(
         ]);
       }
     });
+    try {
+      const { pgOne } = await import("@/lib/pg");
+      const pageRow = await pgOne<{ slug: string }>(
+        `SELECT slug FROM pages WHERE id = $1`,
+        [pageId]
+      );
+      bump({ kind: "pages", pageSlug: pageRow?.slug, slug: pageRow?.slug });
+    } catch {
+      bump({ kind: "pages" });
+    }
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "db error" }, { status: 400 });

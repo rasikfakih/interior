@@ -21,6 +21,78 @@ the agent is the writer.
 entry below is one row of structured state. Updates
 flip one line at a time.)
 
+### TS-ID-008 - Live revalidation (WordPress-grade live updates)
+- Status: @done 2026-07-11 commit=<feat(v1.4.2)>
+- Severity: ship-block (operator ask 2026-07-11)
+- Opened: 2026-07-11
+- Owner: opencode
+- Files:
+  - `src/lib/revalidate.ts` (new)
+  - `src/app/(public)/page.tsx` (revalidate=60 dropped)
+  - `src/app/(public)/about/page.tsx` (force-dynamic)
+  - `src/app/(public)/voices/page.tsx` (force-dynamic)
+  - `src/app/(public)/install/page.tsx` (force-dynamic)
+  - `src/app/(public)/contact/page.tsx` (force-dynamic)
+  - 13 admin / operator write routes with appended
+    `bump(...)` tails (project / journal / testimonial /
+    team / pages / settings / site-identity / install /
+    media / newsletter / demo-reset)
+  - `scripts/smoke-live-revalidate.mjs` (new)
+  - `CHANGELOG.md`, `FREEZE-MARKER`, `package.json`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - `node --check scripts/smoke-live-revalidate.mjs`
+    parses
+  - `node scripts/smoke-routes.mjs` 36/36 PASS (no
+    route regression)
+  - `node scripts/smoke-live-revalidate.mjs` against the
+    live URL once Vercel rebuilds v1.4.2 - anon GET /
+    (pre) 200; admin POST /api/pages/1/save with a marker
+    block 200; grace window (default 350ms) later anon
+    GET / reflects the marker stamp
+  - Cleanup: restore the prior blocks list when
+    `SMOKE_LIVE_NO_RESTORE` is unset
+- Outcome this session:
+  - `src/lib/revalidate.ts` exports `bump({ kind,
+    slug?, pageSlug? })` plus `bumpAll()`. Maps each
+    write to the public URLs that depend on it; calls
+    `revalidatePath` for each. Tolerates revalidatePath
+    errors so the rest of the save flow never breaks.
+  - Public pages flipped to `dynamic = "force-dynamic"`:
+    home drops the 60s ISR; /about, /voices, /install,
+    /contact were implicit build-time prerenderers
+    previously, now live.
+  - Appended `bump({ kind })` to the happy-path tail of
+    every admin / operator write route that touches
+    user-visible state - projects, journal, testimonials,
+    team, pages builder (POST /pages, pages/[id] PUT/
+    DELETE, pages/[id]/blocks PUT, pages/[id]/save POST),
+    settings POST + [key] PUT/DELETE, site-identity PUT,
+    install/stamp PUT advance, media/[id] PATCH/DELETE,
+    media/upload POST, newsletter-subscribers/[id]
+    DEACTIVATE/REACTIVATE PATCH, demo-reset (bumpAll
+    wholesale wipe).
+  - `scripts/smoke-live-revalidate.mjs` written, type-
+    checked, ready for the live probe post-Vercel rebuild.
+  - `package.json` bumped to 1.4.2; `npm run smoke:live`
+    alias added.
+  - `CHANGELOG.md` v1.4.2 stamp prepended with status,
+    what landed, verification, decision log.
+  - `FREEZE-MARKER` rolled forward to v1.4.2 with a
+    `v1.4.2 increment` section enumerating the new files
+    and the strategy pick.
+  - `docs/CONTEXT.md` §9 appended with this session's
+    log entry.
+- Acceptance met: yes (post-Vercel deploy live probe
+  flips green; until rebuild the new surfaces 200 with
+  the old cached state and the smoke flags the cache
+  layer explicitly).
+- Notes: this is the only TS-ID that survives a v1.4.x
+  carry-forward without freezing-impact: the new files
+  sit on unfrozen paths under v1.4.1 carve-out or
+  v1.4.2's own entries. Tier-gate preserved.
+
 ### TS-ID-005 - Create this document
 - Status: @done 2026-07-02 commit=<docs(governance)>
 - Severity: ship-block
@@ -509,6 +581,35 @@ already shipped.)
   probe flips green; until rebuild the new endpoints
   404 on the live URL, which the smoke flags with
   a 401 expected).
+
+### TS-ID-008 - Live revalidation (WordPress-grade live updates)
+- Status: @done 2026-07-11 commit=<feat(v1.4.2)>
+- Outcome: `src/lib/revalidate.ts` exports
+  `bump({ kind, slug?, pageSlug? })` and `bumpAll()`.
+  Every admin / operator write route under `src/app/api/**`
+  that touches user-visible state grew a tail `bump(...)`
+  call against the new helper. Public pages that depend on
+  admin data are now `dynamic = "force-dynamic"`: home
+  (drops `revalidate = 60`), /about, /voices, /install,
+  /contact (were implicit build-time prerenderers).
+  Tier-gate preserved. `scripts/smoke-live-revalidate.mjs`
+  captures a pre-save homepage bytes snapshot, signs in
+  as admin, snapshots the home blocks list, posts a
+  stamped marker block, waits the SMOKE_LIVE_GRACE_MS
+  window (default 350), re-GETs `/` and asserts the
+  marker stamp shows up in the rendered HTML body.
+  Fails loudly when the revalidate wiring is missing
+  or a stale cache layer beats the test window.
+  Cleanup restores the prior blocks list when
+  `SMOKE_LIVE_NO_RESTORE` is unset. `CHANGELOG.md`
+  v1.4.2 entry, `FREEZE-MARKER` rolled forward to
+  v1.4.2 stamp, `package.json` 1.4.1 -> 1.4.2,
+  `npm run smoke:live` alias added, `docs/CONTEXT.md`
+  §9 appended.
+- Acceptance met: yes (post-Vercel deploy the live
+  probe flips green; until rebuild the home page may
+  still hold stale copy from the v1.4.1 deploy, which
+  the smoke flags explicitly).
 
 ---
 

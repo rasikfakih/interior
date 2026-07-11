@@ -7,6 +7,7 @@ import {
   getCreateableEntries,
   SETTINGS_WHITELIST,
 } from "@/lib/settings-whitelist";
+import { bump } from "@/lib/revalidate";
 
 export async function GET() {
   await ensureMigrated();
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
        RETURNING *`,
       [k, v]
     );
+    bump({ kind: "settings" });
     return NextResponse.json({ success: true, item: r.rows?.[0] ?? null });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });

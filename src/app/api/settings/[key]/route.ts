@@ -7,6 +7,7 @@ import {
   getWhitelistEntry,
   validateValue,
 } from "@/lib/settings-whitelist";
+import { bump } from "@/lib/revalidate";
 
 export async function GET(
   _req: NextRequest,
@@ -78,6 +79,7 @@ export async function PUT(
       valueLen: v.length,
       role: gate.role,
     });
+    bump({ kind: "settings" });
     return NextResponse.json({ success: true, item: row });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
@@ -104,5 +106,6 @@ export async function DELETE(
     key: k,
     role: gate.role,
   });
+  bump({ kind: "settings" });
   return NextResponse.json({ success: true });
 }

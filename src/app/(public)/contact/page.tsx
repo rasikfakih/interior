@@ -6,6 +6,9 @@ export const metadata = {
   description: "Start at the kitchen table. We'll bring plans, not catalogues.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ContactPage() {
   const settings = await getSiteSettings();
   return (

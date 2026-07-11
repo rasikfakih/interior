@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, pgMany, pgOne, pgQuery } from "@/lib/pg";
 import { requireLicense, requireAdminSession } from "@/lib/license-gate";
+import { bump } from "@/lib/revalidate";
 
 async function gateOrFail(action: "mutate" | "admin" | "read-public" = "read-public") {
   const g = await requireLicense(action);
@@ -93,6 +94,11 @@ export async function PUT(
     if (!r.rowCount) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    const pageSlug = await pgOne<{ slug: string }>(
+      `SELECT slug FROM pages WHERE id = $1`,
+      [numericId]
+    );
+    bump({ kind: "pages", pageSlug: pageSlug?.slug ?? null, slug: pageSlug?.slug ?? null });
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });
@@ -117,6 +123,7 @@ export async function DELETE(
     if (!r.rowCount) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    bump({ kind: "pages" });
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });

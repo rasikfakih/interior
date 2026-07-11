@@ -2838,3 +2838,136 @@ Carry-forward (operator to address):
 Future-version asks continue through v1.3.x -> v1.4
 per the FREEZE marker.
 
+### 2026-07-11 - v1.4.2 ship (TS-008 live-update wiring)
+
+Operator reported: "still not changing anything when I
+update something from backend admin panel. It should be
+in realtime when I change something from admin panel to
+frontend or add anything or delete etc. Like WordPress
+admin panel." The root cause was the cache layer between
+admin writes and public reads. Audit this session:
+
+- `src/app/(public)/page.tsx` had `export const revalidate = 60`,
+  a 60s ISR window on the home page. Admin writes commit but
+  the next anon GET hit a still-warm cache.
+- `/about`, `/voices`, `/install`, `/contact` had no
+  `export const dynamic` directive. Next 16 default is to
+  prerender at build time. Admin writes never reached them.
+- Every API write route (projects, journal, testimonials,
+  team, pages, settings, site-identity, install/stamp, media,
+  newsletter-subscribers) committed the SQL but never called
+  `revalidatePath` / `revalidateTag`. The Next Route Cache
+  held the prior render until something cleared it.
+
+What landed:
+
+- `src/lib/revalidate.ts` (new). `bump({ kind, slug?, pageSlug? })`
+  maps the entity that just changed to the public URLs that
+  depend on it; `revalidatePath` for each; `bumpAll()` for
+  wholesale wipes. Switch covers `projects`, `journal`,
+  `testimonials`, `team`, `media`, `pages`, `settings`,
+  `site-identity`, `install`. Tolerant - revalidatePath
+  errors are caught so a single bad shape never breaks the
+  save flow.
+- Public-side dynamic flipping. `src/app/(public)/page.tsx`:
+  `export const revalidate = 60` dropped, `export const
+  dynamic = "force-dynamic"` added. `src/app/(public)/about/page.tsx`,
+  `src/app/(public)/voices/page.tsx`, `src/app/(public)/install/page.tsx`,
+  `src/app/(public)/contact/page.tsx`: `dynamic = "force-dynamic"`.
+  Every page that ever displays an admin-edited string now
+  reads live. The other public pages (`/projects`,
+  `/projects/[slug]`, `/journal`, `/journal/[slug]`,
+  `/projects-v2`) were already `force-dynamic` per the v1.1.x
+  and v1.3.x ships.
+- API write routes gained `bump(...)` tails:
+  - projects: POST `/api/projects`, PUT/DELETE `/api/projects/[id]`
+  - journal: POST/PUT/DELETE on `/api/journal*`
+  - testimonials: POST/PUT/DELETE on `/api/testimonials*`
+  - team: POST/PUT/DELETE on `/api/team*`
+  - pages: POST `/api/pages`, PUT/DELETE `/api/pages/[id]`,
+    `[id]/blocks` PUT, `[id]/save` POST (atomic save from
+    v1.4.1)
+  - settings: POST on `/api/settings`; PUT/DELETE on
+    `/api/settings/[key]`
+  - site-identity: PUT on `/api/site-identity`
+  - install/stamp: PUT (advance) on `/api/install/stamp`
+  - media: POST `/api/media/upload`, PATCH/DELETE
+    `/api/media/[id]`
+  - newsletter-subscribers: DEACTIVATE/REACTIVATE PATCH
+    on `/api/newsletter-subscribers/[id]`
+  - admin/demo-reset: wholesale via `bumpAll()` since the
+    database wipe earlier short-circuits every individual
+    page's render.
+- `scripts/smoke-live-revalidate.mjs` (new) proves the
+  end-to-end live propagation. Anon GET /, login as admin,
+  GET the prior blocks list for the home page, POST a
+  stamped marker block in via `/api/pages/1/save`, wait
+  the SMOKE_LIVE_GRACE_MS window (default 350ms), re-GET /
+  anon, assert the marker stamp shows up in the rendered
+  HTML body. Cleanup restores the prior blocks list when
+  `SMOKE_LIVE_NO_RESTORE` is unset. Required env:
+  `SMOKE_BASE_URL`, `SMOKE_ADMIN_EMAIL`, `SMOKE_ADMIN_PASSWORD`.
+  Pre-deploy the home may serve old copy from cache; the
+  smoke fails loudly when that happens.
+- `CHANGELOG.md`: v1.4.2 stamp prepended.
+- `FREEZE-MARKER`: rolled forward from v1.4.1 to v1.4.2
+  with a fresh `v1.4.2 increment` section; procedural
+  signature updated ("1.4.2 -> 1.5.0" is the next gate).
+- `package.json`: 1.4.1 -> 1.4.2. `npm run smoke:live`
+  alias added.
+- `docs/SESSION-TODO.md`: TS-008 row added (active +
+  closed list).
+- `docs/CONTEXT.md`: §9 this entry.
+
+Strategy pick recorded:
+
+- Rejected `unstable_cache` + `revalidateTag`: surgical
+  but misses each new fetch/consumer; brittle across
+  the data loader. Rejected the `tag`-based pattern as
+  miss-by-one waiting to happen.
+- Chosen: `force-dynamic` everywhere admin data is
+  shown, `revalidatePath` on every admin write via the
+  one typed `bump(...)` switch. Easy to audit (one file:
+  `src/lib/revalidate.ts` lists every entity-to-URL
+  mapping), easy to extend (one new case).
+
+Verification:
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- `node --check scripts/smoke-live-revalidate.mjs`
+  parses cleanly.
+- `node scripts/smoke-routes.mjs` 36/36 PASS (no route
+  regression).
+- Graph rebuilt: 1674 -> 1697 nodes, 2577 -> 2689 edges,
+  155 -> 151 communities. Delta corresponds to
+  `src/lib/revalidate.ts`, the five public-page flips,
+  the 13 API write routes that grew `bump(...)` tails,
+  and the new smoke harness.
+- Live `node scripts/smoke-live-revalidate.mjs` runs
+  green once Vercel rebuilds the v1.4.2 commit onto
+  ethinterior.vercel.app (pre-deploy the home may still
+  hold stale copy from the v1.4.1 deploy, in which case
+  the smoke flags the cache layer explicitly).
+
+Carry-forward (unchanged):
+
+- Tier-gate preserved: license POST, HMAC rotate, demo
+  reset, distro apply still superadmin/operator-only.
+- `smoke-editable-crossc.mjs` still has the assertion-
+  vs-design mismatch from v1.4.0 (expects 401 anon on
+  the settings list endpoint that is anonymous-readable
+  by design). The <5-line cleanup flagged in the
+  2026-07-10 CONTEXT entry remains a follow-up.
+- `src/components/AdminProjectForm.tsx` root-level
+  orphan (v1.4.0 carry-forward) still TRACKED but
+  zero live importers; deletion candidate for a
+  follow-up TS-ID.
+- Cross-coldstart durability on Vercel gated on
+  operator-side `DATABASE_URL` configuration.
+- `graphify .` (semantic re-extraction with LLM)
+  remains opt-in; AST-only `graphify update .` ran this
+  session.
+- Future-version asks continue through v1.5 per
+  the FREEZE marker.
+

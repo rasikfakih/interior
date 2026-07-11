@@ -2,6 +2,99 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring
+
+### Status
+
+WordPress-grade live update: every admin write invalidates
+the public-front-end cache so the next anon GET reflects the
+new state. Eliminates the long-standing "I edited in admin
+but the public page still shows the old copy" report. Tier-
+gate preserved.
+
+### What landed
+
+- `src/lib/revalidate.ts` (new): typed `bump({ kind, slug?, pageSlug? })`
+  helper that calls `revalidatePath` for the right set of
+  public URLs after an admin write. Plus `bumpAll()` for
+  wholesale wipes. Tolerant - revalidatePath errors are
+  swallowed so buggy route shapes never break an otherwise
+  successful save.
+- Public-side dynamic flipping:
+  - `src/app/(public)/page.tsx`: `revalidate = 60` dropped,
+    `dynamic = "force-dynamic"` added. The home page now
+    reads live on every request instead of holding a 60s
+    ISR cache.
+  - `src/app/(public)/about/page.tsx`,
+    `src/app/(public)/voices/page.tsx`,
+    `src/app/(public)/install/page.tsx`,
+    `src/app/(public)/contact/page.tsx`: `dynamic = "force-dynamic"`
+    added. They were defaulting to build-time prerender
+    (no `export const dynamic` directive), which held the
+    old team / testimonial / install-stamp copy at build
+    time forever. Now live.
+- Per-write `bump(...)` calls land at the tail of every
+  admin / operator write route that touches user-visible
+  state:
+  - `projects` (POST/[id] PUT/DELETE)
+  - `journal` (POST/[id] PUT/DELETE)
+  - `testimonials` (POST/[id] PUT/DELETE)
+  - `team` (POST/[id] PUT/DELETE)
+  - `pages` (POST) and `[id]` (PUT/DELETE)
+  - `[id]/blocks` PUT and `[id]/save` POST (atomic save)
+  - `settings` (POST) and `[key]` (PUT/DELETE)
+  - `site-identity` (PUT)
+  - `install/stamp` (PUT advance)
+  - `media/[id]` (PATCH/DELETE) and `media/upload` (POST)
+  - `newsletter-subscribers/[id]` (DEACTIVATE/REACTIVATE PATCH)
+  - `admin/demo-reset` (wholesale wipe via `bumpAll`)
+- `scripts/smoke-live-revalidate.mjs` (new): end-to-end probe.
+  anon GET /, login as admin, POST a stamped marker block
+  via `/api/pages/1/save`, wait the SMOKE_LIVE_GRACE_MS
+  window (default 350ms), re-GET /, assert the marker
+  block round-tripped into the rendered HTML body. Fails
+  loudly if revalidate wiring is missing or if a stale
+  cache layer beats the test window. Cleanup runs the
+  blocks list back unless `SMOKE_LIVE_NO_RESTORE=1` is set.
+
+### Verification
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- `node --check scripts/smoke-live-revalidate.mjs` parses.
+- `node scripts/smoke-routes.mjs` 36/36 PASS (no route
+  regression).
+- Graph rebuilt to 1697 nodes / 2689 edges / 151 communities
+  (was 1674 / 2577 / 155 at v1.4.1). Delta corresponds
+  to the new `src/lib/revalidate.ts`, the public-page
+  flips, the 13 API write routes that grew `bump(...)`
+  tails, and the new smoke harness.
+
+Live probes (post-Vercel rebuild):
+
+```
+node scripts/smoke-live-revalidate.mjs
+  anon GET /                                 -> 200, captured
+  admin POST /api/pages/1/save
+       blocks = [...prior, marker block]     -> 200
+  grace window 350 ms
+  anon GET /                                 -> 200, marker stamp REFLECTED
+  admin POST restore                         -> 200, prior blocks back
+```
+
+Decision log:
+
+- Strategy chosen: `force-dynamic` on every public page
+  plus `revalidatePath()` on every admin write. Rejected
+  `unstable_cache` + `revalidateTag`: surgical but brittle;
+  rejects `next/fetch` cache semantics; adds a stateful
+  cache surface that another writer could miss.
+- Tier-gate preserved: license POST, HMAC rotate, demo
+  reset, distro apply still operator/superadmin-only.
+- Wholesale wipe via `bumpAll()` on demo-reset ensures the
+  cached /[slug] shapes clear even when the database is
+  empty.
+
 ## v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save
 
 ### Status

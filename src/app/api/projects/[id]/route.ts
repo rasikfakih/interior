@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { ensureMigrated, pgOne, pgQuery } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
@@ -93,6 +94,7 @@ export async function PUT(
     if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    bump({ kind: "projects", slug: row?.slug ?? null });
     return NextResponse.json({ success: true, project: row });
   } catch (err: any) {
     return NextResponse.json(
@@ -112,6 +114,7 @@ export async function DELETE(
   const { id } = await params;
   await ensureMigrated();
   await pgQuery(`DELETE FROM projects WHERE id = $1`, [Number(id)]);
+  bump({ kind: "projects" });
   return NextResponse.json({ success: true });
 }
 

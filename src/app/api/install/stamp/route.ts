@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
+import { bump } from "@/lib/revalidate";
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
@@ -141,6 +142,8 @@ export async function PUT() {
       role: gate.role,
     }
   );
+
+  bump({ kind: "install" });
 
   return NextResponse.json({ success: true, license: signed });
 }

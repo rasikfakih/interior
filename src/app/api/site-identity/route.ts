@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
 import { ensureMigrated, pgOne, pgQuery } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 /**
  * TS-006 Phase B - site-identity editor.
@@ -268,6 +269,8 @@ export async function PUT(req: NextRequest) {
       role: gate.role,
     }
   );
+
+  bump({ kind: "site-identity" });
 
   return NextResponse.json({ success: true, item: row ? shape(row) : null });
 }

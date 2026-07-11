@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { ensureMigrated, pgOne, pgQuery } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
@@ -85,6 +86,7 @@ export async function PUT(
     );
     const row = q.rows?.[0];
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    bump({ kind: "journal", slug: row?.slug ?? null });
     return NextResponse.json({ success: true, item: row });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
@@ -104,5 +106,6 @@ export async function DELETE(
     `DELETE FROM journal_posts WHERE id = $1`,
     [Number(id)]
   );
+  bump({ kind: "journal" });
   return NextResponse.json({ success: true });
 }

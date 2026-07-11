@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLicense, requireAdminSession } from "@/lib/license-gate";
 import { ensureMigrated, pgMany, pgQuery } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 async function gateOrFail(action: "mutate" | "admin" | "read-public" = "read-public") {
   const g = await requireLicense(action);
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
       ]
     );
     const id = r.rows?.[0]?.id ?? null;
+    bump({ kind: "pages", pageSlug: d.slug, slug: d.slug });
     return NextResponse.json({ success: true, id });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });
