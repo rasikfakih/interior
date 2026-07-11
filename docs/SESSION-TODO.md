@@ -22,7 +22,7 @@ entry below is one row of structured state. Updates
 flip one line at a time.)
 
 ### TS-ID-008 - Live revalidation (WordPress-grade live updates)
-- Status: @done 2026-07-11 commit=<feat(v1.4.2)>
+- Status: @done 2026-07-11 commit=846ba16
 - Severity: ship-block (operator ask 2026-07-11)
 - Opened: 2026-07-11
 - Owner: opencode
@@ -583,7 +583,9 @@ already shipped.)
   a 401 expected).
 
 ### TS-ID-008 - Live revalidation (WordPress-grade live updates)
-- Status: @done 2026-07-11 commit=<feat(v1.4.2)>
+- Status: @done 2026-07-11 commit=846ba16
+- Severity: ship-block (operator ask 2026-07-11)
+- Opened: 2026-07-11
 - Outcome: `src/lib/revalidate.ts` exports
   `bump({ kind, slug?, pageSlug? })` and `bumpAll()`.
   Every admin / operator write route under `src/app/api/**`
