@@ -36,7 +36,7 @@ flip one line at a time.)
 
 ### TS-ID-007 - Atomic page-save (single-roundtrip) +
   auth-gated block read
-- Status: @done 2026-07-11 commit=a24e777
+- Status: @done 2026-07-11 commit=1a24534
 - Severity: ship-block (operator decision 2026-07-11)
 - Opened: 2026-07-11 (working-tree follow-up to the
   v1.4.0 ship; two files staged but not committed)
@@ -66,7 +66,7 @@ flip one line at a time.)
     round-tripped; empty-meta save asserts
     `saved.meta=false` (atomicity branch); cleanup
     restores the prior block list
-- Closes on: a24e777
+- Closes on: 1a24534
 - Outcome this session:
   - `POST /api/pages/[id]/save` ships with one
     `withPgTx(meta-UPDATE + page_blocks wipe-and-
@@ -481,7 +481,7 @@ already shipped.)
 - Acceptance met: yes.
 
 ### TS-ID-007 - Atomic page-save + auth-gated block read
-- Status: @done 2026-07-11 commit=a24e777
+- Status: @done 2026-07-11 commit=1a24534
 - Outcome: `POST /api/pages/[id]/save` is the new
   atomic single-roundtrip page-save endpoint. Meta UPDATE
   + page_blocks wipe-and-insert happen inside one
