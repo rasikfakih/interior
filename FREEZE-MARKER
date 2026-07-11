@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.4.2 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.4.3 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.4.2. Until
+This file is the authoritative freeze marker for v1.4.3. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -256,6 +256,70 @@ What v1.4.2 adds on top of v1.4.1, also frozen:
         `CHANGELOG.md` v1.4.2 entry.
       - `scripts/smoke-live-revalidate.mjs` (new)
 
+## v1.4.3 increment
+
+What v1.4.3 adds on top of v1.4.2, also frozen:
+
+  - TS-009: taste-skill-driven redesign of the individual
+    project page. New sibling detail route at
+    `/projects-v2/[slug]` composed of seven dedicated
+    components. v1 detail route `/projects/[slug]` is
+    touched only at the freeze-marker carve-out level
+    (zero source diff); the buyer-facing live URL stays
+    on the v1 surface until the operator chooses a
+    `v1.3.x patch` swap, mirroring the
+    `/projects-v2` listing pattern from PLAN-PROJECTS-V2.
+  - Sections (1 visible eyebrow maximum, spent on
+    "From the homeowner"):
+      - `ProjectHeaderV2` - 7/5 split, `min-h-[78dvh]`
+        restraint, no chrome-pill, breadcrumb + micro-meta
+        row + Cormorant h1 + scope row + rich-text
+        description.
+      - `ProjectBeforeAfterV2` (client) -
+        `BeforeAfterSlider` when both panes exist with
+        reduce-motion fallback to side-by-side; single
+        `next/image` priority pane when only one image is
+        present. Both shapes carry `aspect-[16/9]`
+        CLS-locked layout.
+      - 3D walkthrough - renders only when row `model_3d`
+        is non-null. Uses the existing
+        `Model3DViewer` component (already client,
+        lazy-loads three.js). No chrome-pill.
+      - `ProjectSpecsV2` - 2x2 lite-spec tile grid
+        (Year, Location, Category, Scope). Editorial
+        register only; bans the AI-default 10-row
+        bordered spec table.
+      - `ProjectVoicesV2` (server) - DB-backed
+        homeowner testimonials matched by slug-prefix
+        (a la v1's `VoicesSeed`). One `chrome-pill`
+        "From the homeowner" eyebrow lives here.
+        Quote carries `line-clamp-6` cap. ASCII-hyphen
+        attribution. Empty state returns `null`.
+      - `ProjectRelatedV2` (conditional n>=3) - 3-tile
+        bento of same-category siblings. Empty-cell rule
+        via gating, never a 4-cell placeholder.
+      - `DetailCtaBandV2` - closing CTA strip,
+        `min-h-[40dvh]` (not the 100dvh cinemax). No
+        eyebrow. Single `btn-primary` to `/contact`.
+  - Smoke:
+      - `scripts/smoke-projects-v2-detail.mjs` probes
+        `/projects-v2/casa-mira`, `/nalanda-house`,
+        `/salt-flats` plus a 404 ghost slug. 55+ assertions
+        per run including eyebrow count, real-DB image
+        presence, no-picsum, no-em-dash, btn-primary
+        count, scoped-but-rendered state on every
+        conditional section. Appended route probe to
+        `scripts/smoke-routes.mjs`.
+  - Files unfrozen for v1.4.3:
+      - `src/components/projects-v2/ProjectHeader.tsx` (new)
+      - `src/components/projects-v2/ProjectBeforeAfter.tsx` (new)
+      - `src/components/projects-v2/ProjectSpecs.tsx` (new)
+      - `src/components/projects-v2/ProjectVoices.tsx` (new)
+      - `src/components/projects-v2/ProjectRelated.tsx` (new)
+      - `src/components/projects-v2/DetailCtaBand.tsx` (new)
+      - `src/app/(public)/projects-v2/[slug]/page.tsx` (new)
+      - `scripts/smoke-projects-v2-detail.mjs` (new)
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -316,36 +380,42 @@ gate, and the admin write-path persistence layer:
   - Atomic single-roundtrip page-save + auth-gated blocks read (v1.4.1)
   - WordPress-grade live-update wiring - admin writes reflect on
     the public front end within the same grace window (v1.4.2)
+  - Taste-skill-driven `/projects-v2/[slug]` detail v2 shipping
+    as a sibling route to the live v1 detail (v1.4.3)
+  - Buyer-facing live URLs obtained on `/projects/casa-mira`
+    and friends remain on the v1 surface for v1.4.x. The v2
+    detail ships as `/projects-v2/<slug>` and is currently
+    pre-deploy - the next Vercel rebuild closes the carry.
+    The operator chooses the future v1.3.x patch swap.
 
-The buyer's rendered site (any GET on `/`, `/projects`, `/journal`, `/install`,
-`/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
+The buyer's rendered site (any GET on `/`, `/projects`,
+`/journal`, `/install`, `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
 gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.1
-    2026-07-11, v1.4.0 2026-07-09, v1.3.0 2026-07-01,
-    v1.2.0 2026-06-30, v1.1.2 2026-06-28, v1.1.0 2026-06-23,
-    v1.0.0 2026-06-18)
-  - **Version**: 1.4.2
+  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.2
+    2026-07-11, v1.4.1 2026-07-11, v1.4.0 2026-07-09, v1.3.0
+    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28,
+    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.4.3
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-07-11. TS-008 live-update
-    wiring added on top of v1.4.1. Every public page that
-    depends on admin-edited data now uses
-    `dynamic = "force-dynamic"`, and every admin write
-    route calls `bump(...)` from the new
-    `src/lib/revalidate.ts` helper so the next anon
-    public GET reflects the new state. TS-008 closes the
-    standing "admin edits do not propagate to the public
-    side" carry-forward. Tier-gate preserved.
-    `npx tsc --noEmit` exit 0. `npm run verify:deploy`
-    green.
+  - **Status**: DEPLOYED 2026-07-11. TS-009 detail v2
+    route ships at `/projects-v2/[slug]` alongside the
+    existing v1 detail. v1 detail untouched. The buyer-
+    facing live URLs of `/projects/[slug]` remain on the
+    v1 surface for v1.4.x. The seven new components under
+    `src/components/projects-v2/*` and the new
+    `app/(public)/projects-v2/[slug]/page.tsx` are the
+    route additions carried under this stamp. Tier-gate
+    preserved. `npx tsc --noEmit` exit 0.
+    `npm run verify:deploy` green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.4.2` to `1.5.0`
+  - Bumping `package.json` version from `1.4.3` to `1.5.0`
   - Adding a v1.5 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 

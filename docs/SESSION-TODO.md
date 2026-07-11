@@ -21,6 +21,68 @@ the agent is the writer.
 entry below is one row of structured state. Updates
 flip one line at a time.)
 
+### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
+- Status: @done 2026-07-11 commit=TS-009
+- Severity: ship-block (operator ask 2026-07-11)
+- Opened: 2026-07-11
+- Owner: opencode
+- Files:
+  - `src/components/projects-v2/ProjectHeader.tsx` (new)
+  - `src/components/projects-v2/ProjectBeforeAfter.tsx` (new)
+  - `src/components/projects-v2/ProjectSpecs.tsx` (new)
+  - `src/components/projects-v2/ProjectVoices.tsx` (new)
+  - `src/components/projects-v2/ProjectRelated.tsx` (new)
+  - `src/components/projects-v2/DetailCtaBand.tsx` (new)
+  - `src/app/(public)/projects-v2/[slug]/page.tsx` (new)
+  - `scripts/smoke-projects-v2-detail.mjs` (new)
+  - `docs/PROJECTS-AUDIT.md`, `docs/PLAN-PROJECTS-V2.md` (append)
+  - `CHANGELOG.md`, `FREEZE-MARKER`, `package.json`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - `node --check scripts/smoke-projects-v2-detail.mjs` parses
+  - `node scripts/smoke-projects-v2-detail.mjs` against local
+    `next start` (port 3030) returns pass=55 fail=0. Ghost
+    slug `no-such-slug-12345-<epoch>` returns 404.
+  - `npm run build` green, `/projects-v2/[slug]` listed as
+    `f` dynamic in the build manifest.
+  - `node scripts/smoke-routes.mjs` includes the new 4
+    routes (1 listing + 3 seed-detail pages); fail=3 on the
+    live URL pre-deploy (v1.4.3 commit not yet on Vercel),
+    fail=0 once Vercel rebuilds.
+  - `node scripts/smoke-render.mjs` 32/32 stays green.
+  - `node scripts/smoke-projects-v2.mjs` 18/18 stays green.
+- Outcome this session:
+  - Sibling route at `/projects-v2/[slug]` ships at v1.4.3.
+    v1 detail untouched (zero source diff in
+    `src/app/(public)/projects/[slug]/page.tsx`).
+  - Seven new components under `src/components/projects-v2/`.
+    Header at `min-h-[78dvh]`, `BeforeAfterSlider` with
+    reduce-motion side-by-side fallback, 2x2 spec tile grid
+    (no bordered spec table), DB-backed homeowner quotes
+    with `line-clamp-6` cap, conditional 3-tile related
+    bento gated on n>=3, closing CTA strip with
+    `min-h-[40dvh]` restraint.
+  - Eyebrow budget: 1 spent (From-the-homeowner). Hero /
+    numbers-strip / specs / before-after / 3D / related /
+    CTA all read without chrome-pill eyebrows.
+  - CHANGELOG v1.4.3 stamp prepended. FREEZE-MARKER rolled
+    forward with the v1.4.3 increment section enumerating
+    the seven files + smoke. package.json 1.4.2 -> 1.4.3.
+    SESSION-TODO TS-009 row flipped to @done. CONTEXT.md
+    §9 entry appended. PROJECTS-AUDIT.md §F detail-v2
+    section added. PLAN-PROJECTS-V2.md "Detail v2" section
+    appended.
+  - Tier-gate preserved.
+  - scripts/smoke-routes.mjs extended with the four new
+    routes.
+- Notes: ships as v1.4.3 sub-bump under the v1.4.0 freeze
+  carve-out. v1 detail `/projects/[slug]` untouched.
+  Sibling routing strategy mirrors PLAN-PROJECTS-V2 (v1
+  untouched, v2 ships new). Pre-deploy the 3 new detail
+  routes fail at the live URL until Vercel rebuild lands;
+  smoke is forward-looking on that axis.
+
 ### TS-ID-008 - Live revalidation (WordPress-grade live updates)
 - Status: @done 2026-07-11 commit=846ba16
 - Severity: ship-block (operator ask 2026-07-11)
@@ -612,6 +674,40 @@ already shipped.)
   probe flips green; until rebuild the home page may
   still hold stale copy from the v1.4.1 deploy, which
   the smoke flags explicitly).
+
+---
+
+### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
+- Status: @done 2026-07-11 commit=TS-009
+- Severe: ship-block (operator ask 2026-07-11)
+- Outcome: seven new components under
+  `src/components/projects-v2/` plus
+  `src/app/(public)/projects-v2/[slug]/page.tsx` ship
+  the individual project detail page as a sibling to the
+  live v1 surface. Header `min-h-[78dvh]`, 7/5 split, zero
+  chrome-pill. `BeforeAfterSlider` wrapped with
+  `useReducedMotion()` side-by-side fallback. Spec tile
+  grid (2x2) instead of the AI-default 10-row bordered
+  spec table. DB-backed homeowner quotes with
+  `line-clamp-6` cap. Conditional 3-tile related bento
+  gated on `n>=3`. Bottom CTA strip with `min-h-[40dvh]`
+  restraint. `scripts/smoke-projects-v2-detail.mjs`
+  passes 55/55 against the local `next start` server;
+  ghost slug returns 404. `smoke-routes.mjs` extended
+  to include the four new routes (live URL probe fails
+  pre-deploy, flips green on Vercel rebuild). TS-009 is
+  the only TS-ID that survives a v1.4.x carry-forward
+  without freezing-impact: the new files sit on unfrozen
+  paths under the v1.4.3 carve-out or v1.4.2 freeze
+  margins. v1 detail untouched. `CHANGELOG.md`
+  v1.4.3 stamp, `FREEZE-MARKER` rolled forward, 
+  `package.json` 1.4.2 -> 1.4.3,
+  `docs/SESSION-TODO.md` flipped to @done,
+  `docs/CONTEXT.md` +09 entry appended.
+- Acceptance met: yes (post-Vercel deploy the live
+  probe flips green; until rebuild the new surfaces
+  404 on the live URL, which the smoke flags with
+  a 404-on-the-new-path report).
 
 ---
 

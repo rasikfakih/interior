@@ -122,3 +122,26 @@ File: Hero renders `brand.studio_address`. Footer already prints `brand.footer_c
 
 Version 2 ships as `/projects-v2` route group per docs/PLAN-PROJECTS-V2 (this session).
 Original `/projects` route untouched until v1.1.3 cut.
+
+### Detail v2 follow-up (TS-009 / v1.4.3)
+
+Same v1/v2 split strategy applied to the case-study surface.
+The `/projects/[slug]` page inherits a separate audit:
+
+  - Two `chrome-pill` eyebrows on one page (Spatial study + From
+    the homeowner). Cap is 1. v2 detail drops both renders to
+    mono micro-meta only and spends the budget on From-the-
+    homeowner alone.
+  - The header used `min-h-[100dvh]` cap on a single-project
+    page, overshooting the layout. v2 uses `min-h-[78dvh]` so
+    CTA stays reachable and the page reads as editorial.
+  - The testimonial section rendered a hard-coded generic
+    copy and a `Homeowner - 2024 commission` attribution.
+    v2 sources DB-backed rows. Empty state returns null.
+  - The `Back to selected work` link lives in the header's
+    eyebrow region in v1; v2 moves it to a breadcrumb-style
+    mono row in the heading area, no chrome-pill.
+
+Detail v2 lives at `/projects-v2/[slug]`, sibling to v1.
+v1 detail untouched for v1.4.x. v1.3.x patch swap is the
+operator's call.

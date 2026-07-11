@@ -2,6 +2,152 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.4.3 - 2026-07-11 (DEPLOYED) - TS-009 detail v2 route
+
+### Status
+
+Taste-skill-driven redesign of the individual project page.
+New sibling detail route at `/projects-v2/[slug]` composed
+of seven dedicated components. The buyer-facing live URL
+`/projects/[slug]` stays on the v1 surface for v1.4.x; the
+v2 route is the next-vintage surface the operator can flip
+to via a `v1.3.x patch` swap. Mirrors the v1 listing->v2
+listing split already shipped in 2026-07-02.
+
+### What landed
+
+  - `src/components/projects-v2/ProjectHeader.tsx` (new):
+    7/5 split, `min-h-[78dvh]` restraint, breadcrumb +
+    micro-meta row + Cormorant h1 + scope row + rich text
+    description. Zero chrome-pill; the eyebrow budget is
+    spent elsewhere.
+  - `src/components/projects-v2/ProjectBeforeAfter.tsx`
+    (new, client): wraps `BeforeAfterSlider` with a
+    `useReducedMotion()`-driven side-by-side fallback. Both
+    panes use `next/image` `priority` + `fetchPriority="high"`.
+    Single-image fallback when only the before image exists.
+    `aspect-[16/9]` CLS-locked.
+  - 3D walkthrough at section 3 renders conditionally on
+    `row.model_3d`. Reuses the existing client-only
+    `Model3DViewer` (no new component). No chrome-pill on
+    this section.
+  - `src/components/projects-v2/ProjectSpecs.tsx` (new):
+    2x2 lite-spec tile grid (Year, Location, Category,
+    Scope). Each tile carries one mono label, one display
+    value, one "why it matters" line. Banned the AI-default
+    10-row bordered spec table.
+  - `src/components/projects-v2/ProjectVoices.tsx` (new,
+    server, async): DB-backed testimonials matched by
+    slug-prefix (`ILIKE %slug-prefix%`). One `chrome-pill`
+    eyebrow lives here ("From the homeowner"). Quote runs
+    through `line-clamp-6`. Attribution via ASCII hyphen
+    with spaces. Empty state returns `null`.
+  - `src/components/projects-v2/ProjectRelated.tsx` (new):
+    3-tile bento of same-category siblings. Conditional
+    on `n >= 3` to avoid the §4.7 empty-cell violation
+    under sparse seed count.
+  - `src/components/projects-v2/DetailCtaBand.tsx` (new):
+    bottom CTA strip with `min-h-[40dvh]` restraint
+    (intentional; a 100dvh closing CTA eats scroll budget).
+    Single `btn-primary` to `/contact`. No chrome-pill.
+  - `src/app/(public)/projects-v2/[slug]/page.tsx` (new,
+    server, dynamic = "force-dynamic"): composes the seven
+    sections, fetches the row + related rows, generates
+    `Metadata`, renders the brand-footer at the bottom.
+    `notFound()` guard on missing or unpublished slug.
+  - `scripts/smoke-projects-v2-detail.mjs` (new): probes
+    `/projects-v2/<slug>` for `casa-mira`, `nalanda-house`,
+    `salt-flats` plus a 404 ghost slug. 55+ assertions per
+    run including eyebrow count, real-DB image presence,
+    no-picsum, no-em-dashes, btn-primary count spec, gated
+    related strip. Appended the three new routes to
+    `scripts/smoke-routes.mjs` public surface list.
+
+### Taste-skill audit (re-run)
+
+  - Eyebrow cap 1 per 3 sections. Page is 7 sections;
+    cap is 2. Spent on "From the homeowner" only.
+  - Single CTA intent (skill §4.5). One `Begin a project`
+    on the bottom CTA strip. Hero header carries zero
+    buttons (mirrors listing hero after fix).
+  - `prefers-reduced-motion` honored in
+    `ProjectBeforeAfterV2` (matchMedia subscription with
+    cleanup) and in `Model3DViewer` (already subscribed).
+  - No em-dashes in shipped markup. ASCII hyphens.
+  - No emojis. Mono labels at 10.5-11px / 0.22em tracking.
+  - One palette (Forest, ink deep green, paper bone,
+    accent amber). One radius scale (`--radius-card`,
+    `--radius-pill`).
+  - No fabricated stats; every field rendered comes from
+    the DB row.
+  - Real DB images: `before_image` / `after_image` only.
+    No picsum, no `// TODO` markers, no `FALLBACK` string
+    in shipped markup.
+  - `Back to selected work` link uses ASCII hyphen.
+  - CLS: `aspect-[16/9]` reservations on slider + tile
+    boxes; `min-h-[78dvh]` on header.
+  - Bento cells: related strip gated on `n >= 3`, never
+    renders an empty placeholder tile.
+
+### Verification
+
+  - `npx tsc --noEmit` exit 0.
+  - `npm run verify:deploy` 19/19 green.
+  - `node --check scripts/smoke-projects-v2-detail.mjs`
+    parses cleanly.
+  - `node scripts/smoke-projects-v2-detail.mjs` against
+    the local `next start` server (port 3030) returned
+    pass=55 fail=0. Ghost slug returned the expected
+    404.
+  - `node scripts/smoke-projects-v2.mjs` (listing probe)
+    passed 18/18 (unchanged from prior session; the
+    listing surface was not touched).
+  - `node scripts/smoke-render.mjs` passed 32/32
+    (v1 surfaces + home + journal slugs unchanged).
+  - `node scripts/smoke-routes.mjs` extended list now
+    includes `/projects-v2` (one entry) plus
+    `/projects-v2/casa-mira`, `/nalanda-house`,
+    `/salt-flats`. Pre-deploy the three detail routes
+    fail at the live URL until Vercel rebuild lands;
+    the new route assertions are forward-looking.
+  - `npm run build` green; `/projects-v2/[slug]` listed
+    in the route manifest as `ƒ Dynamic` (server-rendered
+    on demand).
+
+### Decision log
+
+  - Strategy pick: sibling route (`/projects-v2/[slug]`)
+    not swap-in-place. The v1 detail is buyer-live; the
+    operator previously confirmed the v1 listing -> v2
+    listing split strategy works for `/projects`, so the
+    same shape applies to the detail surface.
+  - Why `min-h-[78dvh]` and not 100dvh on the header:
+    the header IS the project. A 100dvh cap on a single-
+    project page overshoots and reads as half-empty
+    beneath the fold. 78dvh keeps the CTA reachable and
+    the page feels editorial.
+  - Seven sections: header, before-after, optional 3D,
+    specs, from-the-homeowner, optional related, CTA.
+    Two sections are conditional on row state
+    (3D walkthrough on `model_3d`, related on n>=3).
+    The conditional sections never surface an empty cell.
+  - Headline period discipline (D2 carry): h2 and h1
+    carry no terminal periods other than where rhythm
+    demands it. The header h1 ignores the period rule
+    because it reads as a title (`Casa Mira`), not
+    spread copy.
+  - Tier-gate preserved: the only `/api/admin/*` write
+    surface touched was zero here; all admin is admin or
+    superadmin gated per the v1.2.0 tier split.
+  - Eyebrow budget: 1 spent (From-the-homeowner). The
+    "From the homeowner" eyebrow is column-counted as 1,
+    not 2 - because both the visible rendering and the
+    Next.js RSC payload echo count toward the markup
+    captured by the `sitemap` indexer. The smoke probe
+    uses `strippedHtml.replace(/Before<\/span>/g, "")` etc
+    to count only visible eyebrow chrome-pills, not the
+    BeforeAfterSlider's functional anchor labels.
+
 ## v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring
 
 ### Status

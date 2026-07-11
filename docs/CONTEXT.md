@@ -2697,6 +2697,162 @@ Carry-forward (unchanged):
 
 
 
+### 2026-07-11 - TS-009 detail v2 ship (/projects-v2/[slug])
+
+Operator intent this session: update `/projects/[slug]` via
+the taste-skill. Question tool routed three operator pre-
+confirms (sibling route v1.3.x patch split, conditional
+related-strip, min-h-[78dvh] header cap) all chosen
+"Recommended". Strategy: ship a sibling `/projects-v2/[slug]`
+detail route under the v1.4.x freeze carve-out, compiled
+from seven dedicated v2 components that honor every taste-
+skill §4.1-§4.10 rule. v1 detail untouched.
+
+What landed (1 commit, v1.4.3 stamp):
+
+1. Seven new components under `src/components/projects-v2/`:
+   - `ProjectHeader.tsx` (server). 7/5 asymmetric split.
+     `min-h-[78dvh]` cap. Cormorant `font-display` h1.
+     Mono micro-meta row (year + category), scope row,
+     `RichTextRenderer` description in the right column.
+     ASCII-hyphen breadcrumb `Selected work / {title}` in
+     the top rail. No chrome-pill; zero em-dashes.
+   - `ProjectBeforeAfter.tsx` (client). Wraps the existing
+     `BeforeAfterSlider` (already shipped). Adds a
+     `useEffect`-subscribed `useMatchMedia` for
+     `(prefers-reduced-motion: reduce)`. Under reduce-
+     motion the slider renders a static 50/50 side-by-side
+     panel pair rather than the pointer-driven drag (no
+     continuous physics the viewer cannot stop). Single-
+     image fallback uses `next/image` `priority` +
+     `fetchPriority="high"`. `aspect-[16/9]` reserved on
+     every shape (CLS = 0).
+   - `<section aria-label="3D walkthrough" />` rendered
+     conditionally on `row.model_3d`. Reuses the existing
+     `Model3DViewer` client-only component. Zero chrome-
+     pill on this section.
+   - `ProjectSpecs.tsx` (server). 2x2 lite-spec tile grid
+     (Year, Location, Category, Scope). Each tile carries:
+     mono label, large display value (`font-display`),
+     one "why it matters" line. Editorial register.
+     Empty state returns `null`. Banned the AI-default
+     10-row bordered spec table per skill §4.9.
+   - `ProjectVoices.tsx` (server, async). DB-backed
+     homeowner testimonials matched by slug-prefix via
+     `pgMany ... WHERE role ILIKE %${slug.split("-")[0]}%`.
+     Renders up to 3 published rows. Each row carries
+     `line-clamp-6` blockquote, ASCII-hyphen attribution
+     `${name} - ${role}` (NAME only when role is null).
+     Empty state returns `null`. The single `chrome-pill`
+     "From the homeowner" eyebrow lives here.
+   - `ProjectRelated.tsx` (server). 3-tile bento of
+     same-category siblings. Conditional on `n>=3` to
+     dodge §4.7 empty-cell violation. Aspect ratios vary
+     slightly so it reads as a real bento, not three
+     equal slots.
+   - `DetailCtaBand.tsx` (server). Closing CTA strip with
+     `min-h-[40dvh]` restraint (intentional - a 100dvh
+     closing CTA wastes scroll budget). Single
+     `btn-primary` to `/contact`. No chrome-pill.
+
+2. `src/app/(public)/projects-v2/[slug]/page.tsx` (server,
+   `dynamic = "force-dynamic"`). Composes the seven
+   sections, fetches via `pgOne` / `pgMany`, generates
+   `Metadata` per slug, renders the studio-brand footer.
+   `notFound()` guard on missing or `is_published = false`
+   rows. Reads `description_json` and casts to
+   `RichTextRenderer`-compatible type (string-or-record,
+   per the v1.2.0 read-side fix that closed the JSONB-
+   shape regression).
+
+3. `scripts/smoke-projects-v2-detail.mjs` (new). Probes
+   `/projects-v2/casa-mira`, `/nalanda-house`,
+   `/salt-flats`, plus a ghost slug for the 404 path.
+   55 assertions across three slugs covering: header
+   reaches `min-h-[78dvh]`, no chrome-pill in `<header>`,
+   studio_address not duplicated, before-and-after
+   section present with `role="slider"` OR single-image
+   fallback, specs renders exactly 4 tiles, clean DOM
+   in `<main>` is exactly 1 chrome-pill (counting only
+   the From-the-homeowner eyebrow, stripping
+   `<span class="chrome-pill">Before/After</span>` as
+   component-state labels not section eyebrows), bottom
+   CTA exactly one `btn-primary`, no `picsum.photos`,
+   no `// TODO:` markers, no em-dash (U+2014) or en-dash
+   (U+2013), no `FALLBACK` literal in src=, related
+   strip either absent (n<3) or exactly 3 tiles, ghost
+   slug -> 404.
+
+   Routes smoke extended to include `/projects-v2` plus
+   the three detail routes; live URL probe expected to
+   fail those three until Vercel rebuilds.
+
+4. Doc rolls:
+   - `CHANGELOG.md`: v1.4.3 stamp prepended with what
+     landed / taste-skill audit / verification / decision
+     log.
+   - `FREEZE-MARKER`: rolled forward from v1.4.2 to
+     v1.4.3. New "v1.4.3 increment" section lists the
+     seven files + the smoke. Current state footer
+     updated. Procedural signature bumped ("1.4.3 ->
+     1.5.0").
+   - `package.json`: 1.4.2 -> 1.4.3.
+   - `docs/SESSION-TODO.md`: TS-009 row added to the
+     active block, flipped to `@done`, then replicated
+     to the closed list.
+   - `docs/PROJECTS-AUDIT.md`: §F records the detail v2
+     follow-up audit (four V1 detail page complaints
+     and how v2 closes them).
+   - `docs/PLAN-PROJECTS-V2.md`: appended "Detail v2
+     (TS-009 additive)" section recording the v1/v2
+     split applied to the case-study surface.
+
+5. Verified:
+   - `npx tsc --noEmit` exit 0.
+   - `npm run verify:deploy` 19/19 green.
+   - `npm run build` green; `/projects-v2/[slug]` listed
+     in route manifest as `f Dynamic` (server-rendered
+     on demand). Two pre-existing Turbopack NFT-list
+     warnings about `next.config.mjs x path.join` are
+     unchanged from the v1.4.2 ship; not introduced by
+     this session.
+   - `node scripts/smoke-projects-v2-detail.mjs`
+     against local `next start` (port 3030) - pass=55
+     fail=0. Ghost slug returned expected 404.
+   - `node scripts/smoke-projects-v2.mjs` (listing)
+     18/18 unchanged.
+   - `node scripts/smoke-render.mjs` 32/32 unchanged
+     (v1 surfaces + home + journal slugs stay green).
+   - `node scripts/smoke-routes.mjs` against the local
+     server: 39/39 green (v2 detail routes pass locally;
+     the live URL probe expects the same after Vercel
+     rebuild).
+
+6. NOT shipped:
+   - v1 detail edit (zero touches per the v1.4.x carve-
+     out decision).
+   - Operator-uploaded before/after image overrides for
+     specific projects. Content decision, not code.
+   - `src/components/projects/ProjectFilters.tsx` dead
+     client island cleanup (carry-forward from v1.3.0
+     audit). Not blocking.
+   - Smoke assertion-vs-design mismatch on
+     `smoke-editable-crossc.mjs` (operator-actionable
+     follow-up from v1.4.0). Not blocking.
+
+7. Carry-forward:
+   - Tier-gate preserved. No `/api/admin/*` write touched.
+   - Smoke is forward-looking for the live URL: pre-deploy
+     the new v2 detail routes 404 on
+     `https://ethinterior.vercel.app/...`; post-deploy
+     they flip to 200.
+   - `graphify update .` ran this session and refreshed
+     `graphify-out/` to capture every code change (the
+     eight new source files plus the touched docs).
+   - Future-version asks continue through v1.5 per the
+     FREEZE marker.
+
+
 
 ### 2026-07-02 - TS-004 live verify /projects-v2 (no code ship)
 

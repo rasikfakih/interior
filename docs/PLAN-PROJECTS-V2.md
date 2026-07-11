@@ -171,3 +171,28 @@ Operator deploys. After deploy, the operator can confirm the new
 v2 route works live; v1 keeps serving buyers. A v1.3.x cut can
 later swap /projects to point at /projects-v2 once parity is
 reviewed.
+
+## Detail v2 (TS-009 additive)
+
+Same v1/v2 split strategy extended to the detail surface.
+
+  - New route: `/projects-v2/[slug]`. Sibling to v1 detail.
+    v1 detail at `/projects/[slug]` stays untouched for v1.4.x.
+  - Composed of seven dedicated components under
+    `src/components/projects-v2/`:
+      - `ProjectHeader` (78dvh, 7/5 split, zero chrome-pill)
+      - `ProjectBeforeAfter` (client, reduce-motion-aware)
+      - 3D walkthrough (conditional on row.model_3d, reuses
+        existing Model3DViewer client component)
+      - `ProjectSpecs` (2x2 lite-spec tile grid)
+      - `ProjectVoices` (server, DB-backed, single eyebrow)
+      - `ProjectRelated` (conditional n>=3)
+      - `DetailCtaBand` (40dvh, single btn-primary to /contact)
+  - Server-side: `app/(public)/projects-v2/[slug]/page.tsx`
+    fetches via `pgOne`/`pgMany`, generates `Metadata`,
+    composes the seven sections. `notFound()` on missing
+    or unpublished slug.
+  - Smoke: `scripts/smoke-projects-v2-detail.mjs` enforces the
+    seven-section discipline + taste-skill §4.7 audience rules.
+  - Eyebrow budget: 1 (From the homeowner only).
+  - Ship stamp: v1.4.3. Carve-out under the v1.4.0 freeze.
