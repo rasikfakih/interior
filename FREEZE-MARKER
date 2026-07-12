@@ -320,6 +320,39 @@ What v1.4.3 adds on top of v1.4.2, also frozen:
       - `src/app/(public)/projects-v2/[slug]/page.tsx` (new)
       - `scripts/smoke-projects-v2-detail.mjs` (new)
 
+## v1.4.4 increment
+
+What v1.4.4 adds on top of v1.4.3, also frozen:
+
+  - WP-admin bump-tail sweep. Six admin / operator
+    write routes were missing the v1.4.2 `bump(...)`
+    tail; writes committed but the public side stayed
+    stale until the next cold-start sweep. This patch
+    appends one `bump({...})` or `bumpAll()` call to
+    the happy-path tail of each. No frozen file
+    touched; every patched route sits on the v1.4.0 /
+    v1.4.2 operator-write carve-out. The
+    `EntityKind` union in `src/lib/revalidate.ts`
+    already covered every kind touched - no new
+    case, no new abstraction.
+  - Files unfrozen for v1.4.4:
+      - `src/app/api/operator/issue/route.ts`
+        (additive `bump({ kind: "install" })` tail)
+      - `src/app/api/operator/rotate-hmac/route.ts`
+        (additive `bump({ kind: "install" })` tail)
+      - `src/app/api/operator/tenants/[id]/route.ts`
+        (additive `bumpAll()` on PATCH + DELETE)
+      - `src/app/api/newsletter/route.ts`
+        (additive `bumpAll()` on insert happy path)
+      - `src/app/api/media/upload/local/route.ts`
+        (additive `bump({ kind: "media" })` tail)
+      - `src/app/api/upload/route.ts`
+        (additive `bumpAll()` after file write)
+  - Tier-gate preserved: license POST, HMAC rotate,
+    demo reset, distro apply stay superadmin-only.
+    The six patched routes were already gated; this
+    patch only adds the revalidate tail.
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -394,28 +427,27 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-11 (rolled forward from v1.4.2
-    2026-07-11, v1.4.1 2026-07-11, v1.4.0 2026-07-09, v1.3.0
-    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28,
-    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.4.3
+  - **Frozen since**: 2026-07-13 (rolled forward from v1.4.3
+    2026-07-11, v1.4.2 2026-07-11, v1.4.1 2026-07-11,
+    v1.4.0 2026-07-09, v1.3.0 2026-07-01, v1.2.0
+    2026-06-30, v1.1.2 2026-06-28, v1.1.0 2026-06-23,
+    v1.0.0 2026-06-18)
+  - **Version**: 1.4.4
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: DEPLOYED 2026-07-11. TS-009 detail v2
-    route ships at `/projects-v2/[slug]` alongside the
-    existing v1 detail. v1 detail untouched. The buyer-
-    facing live URLs of `/projects/[slug]` remain on the
-    v1 surface for v1.4.x. The seven new components under
-    `src/components/projects-v2/*` and the new
-    `app/(public)/projects-v2/[slug]/page.tsx` are the
-    route additions carried under this stamp. Tier-gate
-    preserved. `npx tsc --noEmit` exit 0.
-    `npm run verify:deploy` green.
+  - **Status**: PENDING DEPLOY 2026-07-13. WP-admin
+    bump-tail sweep on six write routes that were
+    missing the v1.4.2 `bump(...)` tail. No frozen
+    file touched; every patched route sits on the
+    v1.4.0 / v1.4.2 operator-write carve-out. Tier-
+    gate preserved. `npx tsc --noEmit` exit 0.
+    `npm run verify:deploy` 19/19 green. `npm run
+    build` green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.4.3` to `1.5.0`
+  - Bumping `package.json` version from `1.4.4` to `1.5.0`
   - Adding a v1.5 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 

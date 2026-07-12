@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOperatorSession } from "@/lib/operator-auth";
 import { getTenant, updateTenant, revokeTenant, applyDistro, signLicense } from "@/lib/operator-store";
+import { bumpAll } from "@/lib/revalidate";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const ok = await getOperatorSession();
@@ -30,6 +31,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (body[k] !== undefined) tPatch[k] = body[k];
   }
   if (Object.keys(tPatch).length > 0) await updateTenant(numericId, tPatch);
+  bumpAll();
   return NextResponse.json({ ok: true });
 }
 
@@ -44,6 +46,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const url = new URL(req.url);
   if (url.searchParams.get("revoke") === "1") {
     await revokeTenant(numericId, "manual");
+    bumpAll();
     return NextResponse.json({ ok: true, revoked: true });
   }
   return NextResponse.json({ error: "pass ?revoke=1 to revoke" }, { status: 400 });

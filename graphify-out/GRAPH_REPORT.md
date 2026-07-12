@@ -1,16 +1,16 @@
-# Graph Report - etihad-interiors-website  (2026-07-11)
+# Graph Report - etihad-interiors-website  (2026-07-12)
 
 ## Corpus Check
-- 292 files · ~199,469 words
+- 292 files · ~201,059 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1753 nodes · 2767 edges · 161 communities (127 shown, 34 thin omitted)
+- 1769 nodes · 2802 edges · 159 communities (126 shown, 33 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9c3e85a2`
+- Built from commit: `3c19c15c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -155,7 +155,6 @@
 - [[_COMMUNITY_AdminSiteIdentity.tsx|AdminSiteIdentity.tsx]]
 - [[_COMMUNITY_license-key.test.ts|license-key.test.ts]]
 - [[_COMMUNITY_Faq.tsx|Faq.tsx]]
-- [[_COMMUNITY_StudioServer.tsx|StudioServer.tsx]]
 - [[_COMMUNITY_smoke-projects-v2-detail.mjs|smoke-projects-v2-detail.mjs]]
 - [[_COMMUNITY_I18nProvider.tsx|I18nProvider.tsx]]
 - [[_COMMUNITY_v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)|v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)]]
@@ -165,14 +164,13 @@
 - [[_COMMUNITY_v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring|v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring]]
 - [[_COMMUNITY_v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save|v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save]]
 - [[_COMMUNITY_Testimonials.tsx|Testimonials.tsx]]
-- [[_COMMUNITY_probe-chrome-pills.mjs|probe-chrome-pills.mjs]]
 - [[_COMMUNITY_Faq.tsx|Faq.tsx]]
 - [[_COMMUNITY_ProcessStrip.tsx|ProcessStrip.tsx]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `ensureMigrated()` - 131 edges
 2. `pgOne()` - 55 edges
-3. `bump()` - 49 edges
+3. `bump()` - 55 edges
 4. `pgMany()` - 43 edges
 5. `9. Last session log` - 41 edges
 6. `pgQuery()` - 35 edges
@@ -196,15 +194,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (161 total, 34 thin omitted)
+## Communities (159 total, 33 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.16
-Nodes (15): GET(), GET(), POST(), adminOnlyOrFail(), DELETE(), gateOrFail(), GET(), PUT() (+7 more)
+Cohesion: 0.09
+Nodes (27): GET(), POST(), GET(), POST(), handler, GET(), POST(), GET() (+19 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.08
-Nodes (39): POST(), timingSafeHexEq(), POST(), GET(), POST(), DELETE(), GET(), PATCH() (+31 more)
+Cohesion: 0.07
+Nodes (38): POST(), timingSafeHexEq(), POST(), GET(), POST(), DELETE(), GET(), PATCH() (+30 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
@@ -235,8 +233,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.13
-Nodes (16): handler, GET(), COLUMN_MAP, DELETE(), GET(), isAuthorized(), PUT(), GET() (+8 more)
+Cohesion: 0.14
+Nodes (27): DELETE(), GET(), isAuthorized(), PUT(), adminOnlyOrFail(), DELETE(), gateOrFail(), GET() (+19 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.80
@@ -267,20 +265,20 @@ Cohesion: 0.29
 Nodes (3): __dirname, PROJECTS, repoRoot
 
 ### Community 17 - "Community 17"
-Cohesion: 0.18
-Nodes (22): GET(), NOTE: this route is intentionally not gated by NextAuth, PUT(), POST(), getStorageConfig(), head(), HeadResult, kindFromMime() (+14 more)
+Cohesion: 0.17
+Nodes (21): GET(), NOTE: this route is intentionally not gated by NextAuth, POST(), getStorageConfig(), head(), HeadResult, kindFromMime(), localFsPath() (+13 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.08
-Nodes (32): LoginCard(), AdminPage(), metadata, safeCheckLicense(), safeGetServerSession(), GET(), POST(), InstallPage() (+24 more)
+Cohesion: 0.05
+Nodes (33): LoginCard(), AdminPage(), metadata, safeCheckLicense(), safeGetServerSession(), InstallPage(), metadata, ADMIN_NAV (+25 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.16
 Nodes (19): ALLOWED_DOC_MIME, ALLOWED_IMAGE_MIME, ALLOWED_MODEL_MIME, detectKind(), extForMime(), GET(), POST(), safeName() (+11 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.70
-Nodes (4): DELETE(), GET(), isAuthorized(), PUT()
+Cohesion: 0.15
+Nodes (12): 0. Read this first, 1. Root cause, two tracks, 2. Scope, 3. Out of scope, 4. Freeze marker impact, 5. Acceptance, 6. Decision ledger, Make /admin work like WordPress - implementation plan (+4 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.17
@@ -339,8 +337,8 @@ Cohesion: 0.20
 Nodes (8): aboutPage, blockCount, contactPage, DB_PATH, journal, pageRow, projectsPage, sqlite
 
 ### Community 35 - "Community 35"
-Cohesion: 0.13
-Nodes (33): GET(), License, LICENSE_FILE, PUT(), readLicense(), reSign(), writeLicense(), DELETE() (+25 more)
+Cohesion: 0.16
+Nodes (23): GET(), License, LICENSE_FILE, PUT(), readLicense(), reSign(), writeLicense(), DELETE() (+15 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.13
@@ -355,8 +353,8 @@ Cohesion: 0.22
 Nodes (8): File location, Forbidden keys (rejected at submit), Future (v1.2+), How a distro lands on a tenant, Optional keys, Required keys, theme.distro.json - schema and rules, Validation rules
 
 ### Community 39 - "Community 39"
-Cohesion: 0.07
-Nodes (36): AdminJournalEditor(), metadata, PageEditor(), safeJson(), AdminProjectEditor(), metadata, AdminSiteIdentityPage(), emptyIdentity() (+28 more)
+Cohesion: 0.06
+Nodes (38): AdminJournalEditor(), metadata, PageEditor(), safeJson(), AdminProjectEditor(), metadata, AdminTeamEditor(), metadata (+30 more)
 
 ### Community 40 - "Community 40"
 Cohesion: 0.25
@@ -375,8 +373,8 @@ Cohesion: 0.12
 Nodes (4): Block, ServicesTsxCells(), defaultItems, Principles()
 
 ### Community 44 - "Community 44"
-Cohesion: 0.20
-Nodes (13): applyFallbackAdditiveMigrations(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath(), isLocalDevPath(), isVercel(), isVercelFallbackPath() (+5 more)
+Cohesion: 0.18
+Nodes (16): GET(), PUT(), POST(), applyFallbackAdditiveMigrations(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath() (+8 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.12
@@ -415,8 +413,8 @@ Cohesion: 0.21
 Nodes (9): Home(), safeParse(), Props, BlockRow, getFrontPage(), getPageById(), getPageBySlug(), listPages() (+1 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.15
-Nodes (20): AdminSettingsPage(), metadata, asBool(), GET(), GET(), PUT(), GET(), POST() (+12 more)
+Cohesion: 0.13
+Nodes (19): AdminSettingsPage(), metadata, GET(), isAuthorized(), POST(), asBool(), GET(), GET() (+11 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.62
@@ -555,8 +553,8 @@ Cohesion: 0.67
 Nodes (3): cookieHeader(), cookies, login()
 
 ### Community 112 - "Community 112"
-Cohesion: 0.18
-Nodes (12): POST(), GET(), isAuthorized(), POST(), requireSuperadmin(), bumpAll(), BumpOptions, EntityKind (+4 more)
+Cohesion: 0.19
+Nodes (11): POST(), GET(), isAuthorized(), POST(), bumpAll(), BumpOptions, EntityKind, flushLocation() (+3 more)
 
 ### Community 113 - "Community 113"
 Cohesion: 0.33
@@ -583,8 +581,8 @@ Cohesion: 0.50
 Nodes (3): defaultEntries, Entry, JournalPreview()
 
 ### Community 121 - "Community 121"
-Cohesion: 0.12
-Nodes (4): ADMIN_NAV, AdminShell(), Tab, useToast()
+Cohesion: 0.33
+Nodes (6): Decision log, Status, Taste-skill audit (re-run), v1.4.3 - 2026-07-11 (DEPLOYED) - TS-009 detail v2 route, Verification, What landed
 
 ### Community 124 - "Community 124"
 Cohesion: 0.33
@@ -611,8 +609,8 @@ Cohesion: 0.33
 Nodes (6): Operating notes, Status, v1.2.0 - 2026-06-30 (DEPLOYED) - Production-grade persistence + admin operator polish, Verification, What does NOT change in v1.2, What landed
 
 ### Community 140 - "route.ts"
-Cohesion: 0.38
-Nodes (6): ALLOWED_FOLDERS, ALLOWED_IMAGE_MIME, ALLOWED_MODEL_MIME, EXT_BY_MIME, POST(), safeName()
+Cohesion: 0.50
+Nodes (4): AdminSiteIdentityPage(), emptyIdentity(), metadata, SiteIdentity
 
 ### Community 141 - "AdminInstallView.tsx"
 Cohesion: 0.24
@@ -638,10 +636,6 @@ Nodes (5): Public runtime impact, Status, v1.1.2 - 2026-06-25 (Phase 1 connectiv
 Cohesion: 0.40
 Nodes (5): Status, Taste-skill audit, v1.3.0 - 2026-07-01 (DEPLOYED) - Projects page UI/UX overhaul, Verification, What landed
 
-### Community 148 - "StudioServer.tsx"
-Cohesion: 0.22
-Nodes (5): metadata, Row, StudioServer(), Row, VoicesServer()
-
 ### Community 149 - "smoke-projects-v2-detail.mjs"
 Cohesion: 0.32
 Nodes (6): BASE_URL, check(), checks, lines, perPageAssertions(), SLUGS
@@ -660,7 +654,7 @@ Nodes (4): Migration hooks (v1.0.0), Public runtime (v1.0.0), Scope freeze, v1.0
 
 ### Community 153 - "v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save"
 Cohesion: 0.33
-Nodes (6): Decision log, Status, Taste-skill audit (re-run), v1.4.3 - 2026-07-11 (DEPLOYED) - TS-009 detail v2 route, Verification, What landed
+Nodes (6): Carry-forward, Decision log, Status, v1.4.4 - 2026-07-13 (PENDING DEPLOY) - WP-admin bump-tail sweep, Verification, What landed
 
 ### Community 154 - "v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack"
 Cohesion: 0.50
@@ -675,24 +669,24 @@ Cohesion: 0.50
 Nodes (4): Status, v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save, Verification, What landed
 
 ## Knowledge Gaps
-- **730 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+725 more)
+- **743 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+738 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **33 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ensureMigrated()` connect `Community 39` to `Community 0`, `Community 1`, `Community 35`, `Community 36`, `Community 104`, `Community 9`, `Community 44`, `Community 46`, `LicenseBanner.tsx`, `Community 112`, `Community 17`, `Community 20`, `StudioServer.tsx`, `Community 54`, `Community 53`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `ensureMigrated()` connect `Community 39` to `Community 0`, `Community 1`, `Community 35`, `Community 36`, `Community 104`, `Community 9`, `route.ts`, `Community 44`, `Community 46`, `LicenseBanner.tsx`, `Community 112`, `Community 17`, `Community 53`, `Community 54`?**
+  _High betweenness centrality (0.058) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `Community 5` to `Community 68`, `Community 7`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
 - **Why does `pg` connect `Community 5` to `Community 44`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
 - **What connects `$schema`, `plugin`, `IMPORTANT: keep the reminder string free of backticks and $(...) constructs.` to the rest of the system?**
-  _733 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _746 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.09230769230769231 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07562008469449485 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07393483709273183 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.041666666666666664 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.11264367816091954 - nodes in this community are weakly interconnected._

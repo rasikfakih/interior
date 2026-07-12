@@ -9,6 +9,7 @@ import {
   type StorageKind,
 } from "@/lib/storage";
 import { ensureMigrated, pgOne } from "@/lib/pg";
+import { bump } from "@/lib/revalidate";
 
 /**
  * Local-mode sink for Phase 2 media uploads.
@@ -70,6 +71,7 @@ export async function PUT(req: NextRequest) {
     // Non-fatal; the row exists from the upload intent.
   }
 
+  bump({ kind: "media" });
   return NextResponse.json({
     ok: true,
     storagePath,

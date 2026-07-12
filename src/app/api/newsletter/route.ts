@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, pgQuery } from "@/lib/pg";
+import { bumpAll } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
     if (!r.rowCount) {
       return NextResponse.json({ message: "Already subscribed!" });
     }
+    bumpAll();
     return NextResponse.json({ message: "Successfully subscribed!" });
   } catch (e) {
     return NextResponse.json({ error: "Subscription failed" }, { status: 500 });

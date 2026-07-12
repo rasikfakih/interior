@@ -147,7 +147,6 @@
   "145": "AdminSiteIdentity.tsx",
   "146": "license-key.test.ts",
   "147": "Faq.tsx",
-  "148": "StudioServer.tsx",
   "149": "smoke-projects-v2-detail.mjs",
   "150": "I18nProvider.tsx",
   "151": "v1.1.1 - 2026-06-25 (v1.1.0 post-deploy hotfix)",
@@ -157,7 +156,6 @@
   "155": "v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring",
   "156": "v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save",
   "157": "Testimonials.tsx",
-  "158": "probe-chrome-pills.mjs",
   "159": "Faq.tsx",
   "160": "ProcessStrip.tsx"
 }

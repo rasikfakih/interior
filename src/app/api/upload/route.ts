@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { requireLicense } from "@/lib/license-gate";
+import { bumpAll } from "@/lib/revalidate";
 
 const ALLOWED_FOLDERS = new Set(["images", "models"]);
 const ALLOWED_IMAGE_MIME = new Set([
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
 
     const buf = Buffer.from(await file.arrayBuffer());
     await writeFile(filePath, buf);
-
+    bumpAll();
     return NextResponse.json({
       success: true,
       url: `/uploads/${folder}/${filename}`,

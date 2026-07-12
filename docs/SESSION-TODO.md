@@ -21,6 +21,87 @@ the agent is the writer.
 entry below is one row of structured state. Updates
 flip one line at a time.)
 
+### TS-ID-010 - WP-admin bump-tail sweep (6 missing revalidate tails)
+- Status: @done 2026-07-13 commit=<pending v1.4.4>
+- Severity: ship-block (operator ask 2026-07-13)
+- Opened: 2026-07-13
+- Owner: opencode
+- Files:
+  - `src/app/api/operator/issue/route.ts` (additive
+    `bump({ kind: "install" })` tail)
+  - `src/app/api/operator/rotate-hmac/route.ts`
+    (additive `bump({ kind: "install" })` tail)
+  - `src/app/api/operator/tenants/[id]/route.ts`
+    (additive `bumpAll()` on PATCH + DELETE)
+  - `src/app/api/newsletter/route.ts` (additive
+    `bumpAll()` on insert happy path)
+  - `src/app/api/media/upload/local/route.ts`
+    (additive `bump({ kind: "media" })` tail)
+  - `src/app/api/upload/route.ts` (additive
+    `bumpAll()` after file write)
+  - `docs/PLAN-WP-ADMIN.md` (new, spec gate)
+  - `CHANGELOG.md`, `FREEZE-MARKER`,
+    `package.json`, `docs/CONTEXT.md`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - `npm run build` green; every touched
+    route registered as `f Dynamic`
+  - `node scripts/smoke-routes.mjs` against
+    `http://localhost:3030`: pass=37 fail=3
+    (the 3 fails are the pre-deploy v1.4.3
+    detail routes locally 404ing without
+    `DATABASE_URL` - documented pre-existing
+    carry from the v1.4.3 ship). The 37
+    passing routes are exactly the 37 that
+    passed before this patch.
+  - `scripts/smoke-live-revalidate.mjs` is
+    the post-Vercel-deploy acceptance probe
+    (unchanged from v1.4.2). Pre-deploy the
+    home page may serve stale copy; the
+    smoke flags the cache layer explicitly.
+- Outcome this session:
+  - One-line `bump(...)` or `bumpAll()` tail
+    appended to each of the six write routes
+    that were missing the v1.4.2 revalidate
+    wiring. No new abstraction, no new
+    helper, no frozen file touched. The
+    `EntityKind` union in
+    `src/lib/revalidate.ts` already covered
+    every kind touched - no new case.
+  - Mirrors the v1.4.2 ship pattern exactly
+    (one `bump({...})` after the write
+    succeeds, tolerant of revalidatePath
+    throws so the save flow never breaks).
+  - `docs/PLAN-WP-ADMIN.md` written as spec
+    gate before the ship; decision ledger
+    answered by operator ("yes database url
+    set") which opened the gate.
+  - Tier-gate preserved.
+  - `graphify update .` ran this session.
+    Graph refreshed: 1769 nodes, 2802 edges,
+    159 communities (was 1697/2689/151 at
+    v1.4.3 ship).
+  - `CHANGELOG.md` v1.4.4 stamp prepended.
+    `FREEZE-MARKER` rolled forward to v1.4.4
+    with a `v1.4.4 increment` section
+    enumerating the six files. `package.json`
+    1.4.3 -> 1.4.4. `docs/CONTEXT.md` §9
+    entry appended. PLAN-WP-ADMIN.md written
+    as spec gate.
+- Acceptance met: yes (post-Vercel rebuild the
+  live `node scripts/smoke-live-revalidate.mjs`
+  probe flips green; until rebuild the six
+  patched routes still have the old behavior
+  on the live URL).
+- Notes: ships as v1.4.4 patch on top of
+  v1.4.3 under the v1.4.0 / v1.4.2 freeze
+  carve-out (operator-write-API routes with
+  `bump(...)` tails). No frozen file touched.
+  The same Vercel rebuild that lands v1.4.4
+  also lands the v1.4.3 `/projects-v2/[slug]`
+  surfaces on the live URL.
+
 ### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
 - Status: @done 2026-07-11 commit=066fd48
 - Severity: ship-block (operator ask 2026-07-11)

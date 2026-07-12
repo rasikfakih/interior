@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOperatorSession } from "@/lib/operator-auth";
 import { rotateHmac } from "@/lib/operator-store";
+import { bump } from "@/lib/revalidate";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -13,5 +14,6 @@ export async function POST(req: Request) {
   }
   const newKey = (body.new_key as string) || crypto.randomBytes(32).toString("hex");
   await rotateHmac(tenantId, newKey);
+  bump({ kind: "install" });
   return NextResponse.json({ ok: true, new_key: newKey });
 }

@@ -2,6 +2,99 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.4.4 - 2026-07-13 (PENDING DEPLOY) - WP-admin bump-tail sweep
+
+### Status
+
+Six admin / operator write routes were missing the
+`bump(...)` tail that v1.4.2 (TS-008) wired onto every
+other write surface. Writes committed to the DB but
+the public side stayed stale until the next cold-start
+sweep, which read as "the admin doesn't work like
+WordPress" for those specific flows. This patch
+appends one `bump({...})` or `bumpAll()` call to the
+happy-path tail of each. No new abstraction, no new
+helper, no frozen file touched; mirrors the v1.4.2
+ship pattern exactly.
+
+### What landed
+
+  - `src/app/api/operator/issue/route.ts` POST:
+    `bump({ kind: "install" })` after `signLicense`
+    succeeds. A new license issue touches the public
+    /install page.
+  - `src/app/api/operator/rotate-hmac/route.ts` POST:
+    `bump({ kind: "install" })` after `rotateHmac`.
+    HMAC rotation advances the install stamp.
+  - `src/app/api/operator/tenants/[id]/route.ts`
+    PATCH + DELETE: `bumpAll()` after `updateTenant`
+    or `revokeTenant`. A tenant row affects chrome
+    and every listing surface; wholesale flush is
+    cheap.
+  - `src/app/api/newsletter/route.ts` POST (public
+    subscribe form): `bumpAll()` after the insert
+    returns a non-zero rowCount. The admin newsletter
+    viewer reflects the new subscriber on the next
+    request.
+  - `src/app/api/media/upload/local/route.ts` PUT:
+    `bump({ kind: "media" })` after the local file
+    write + media row mirror. The media entity kind
+    sweeps home / projects / projects-detail / journal
+    / journal-detail.
+  - `src/app/api/upload/route.ts` POST:
+    `bumpAll()` after `writeFile` succeeds. The
+    legacy upload endpoint has no media-row side
+    channel, so any public page could be rendering
+    the uploaded asset; wholesale flush is the safe
+    wholesale reset.
+
+### Verification
+
+  - `npx tsc --noEmit` exit 0.
+  - `npm run verify:deploy` 19/19 green.
+  - `npm run build` green; every touched route
+    registered in the route manifest as `f Dynamic`.
+  - `node scripts/smoke-routes.mjs` against
+    `http://localhost:3030`: pass=37 fail=3.
+    The 3 fails are the pre-deploy v1.4.3 detail
+    routes (`/projects-v2/casa-mira`, `/nalanda-house`,
+    `/salt-flats`) 404ing locally without `DATABASE_URL`
+    - documented pre-existing baseline carried from
+    the v1.4.3 ship. The 37 passing routes are
+    exactly the 37 that passed before this patch.
+  - `scripts/smoke-live-revalidate.mjs` is the
+    post-Vercel-deploy acceptance probe (unchanged
+    from v1.4.2). Pre-deploy the home page may serve
+    stale copy from the v1.4.3 deploy; the smoke
+    flags the cache layer explicitly.
+
+### Decision log
+
+  - Tier-gate preserved: license POST, HMAC rotate,
+    demo reset, distro apply stay superadmin-only.
+    The six patched routes were already gated; this
+    patch only adds the revalidate tail.
+  - `bumpAll()` on tenant PATCH/DELETE + newsletter
+    + upload vs per-kind: chose wholesale because
+    each of those writes can affect any surface and
+    the per-kind matrix is brittle. `revalidatePath`
+    is cheap per path on this 10-URL public surface.
+  - Ships as v1.4.4 patch under the v1.4.0 freeze
+    carve-out (operator-write-API routes with
+    `bump(...)` tails are unfrozen per the v1.4.2
+    increment). FREEZE-MARKER rolls 1.4.3 -> 1.4.4.
+
+### Carry-forward
+
+  - `scripts/smoke-editable-crossc.mjs` assertion-vs-
+    design mismatch from v1.4.0 - unchanged, <5-line
+    cleanup for a separate TS-ID.
+  - `src/components/AdminProjectForm.tsx` root-level
+    orphan (frozen-path deletion candidate from
+    v1.4.0) - unchanged, separate TS-ID.
+  - Future-version asks continue through v1.5 per
+    the FREEZE marker.
+
 ## v1.4.3 - 2026-07-11 (DEPLOYED) - TS-009 detail v2 route
 
 ### Status

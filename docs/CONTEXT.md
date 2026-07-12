@@ -3127,3 +3127,119 @@ Carry-forward (unchanged):
 - Future-version asks continue through v1.5 per
   the FREEZE marker.
 
+### 2026-07-13 - v1.4.4 ship (WP-admin bump-tail sweep)
+
+Operator intent: "I want my admin panel to work like
+WordPress." After clarification (no answer returned)
+the lazy interpretation was taken: edits in admin
+silently fail to propagate to the live site. Verified
+two tracks:
+
+- Track A (durability): operator confirmed
+  `DATABASE_URL` is set on Vercel. So writes persist.
+- Track B (propagation): audit of `src/app/api/**`
+  found 6 write routes missing the v1.4.2 `bump(...)`
+  tail. Writes committed but the public side stayed
+  stale until the next cold-start sweep, which read
+  as "the admin doesn't work like WordPress" for
+  those specific flows.
+
+Shipped v1.4.4 (one commit, 6 files, +13/-1 lines):
+
+1. `src/app/api/operator/issue/route.ts` POST:
+   append `bump({ kind: "install" })` after
+   `signLicense` succeeds. A new license issue
+   touches the public /install page.
+2. `src/app/api/operator/rotate-hmac/route.ts`
+   POST: append `bump({ kind: "install" })` after
+   `rotateHmac`. HMAC rotation advances the install
+   stamp.
+3. `src/app/api/operator/tenants/[id]/route.ts`
+   PATCH + DELETE: append `bumpAll()` after
+   `updateTenant` or `revokeTenant`. A tenant row
+   affects chrome and every listing surface;
+   wholesale flush is cheap.
+4. `src/app/api/newsletter/route.ts` POST (public
+   subscribe form): append `bumpAll()` after the
+   insert returns a non-zero rowCount. The admin
+   newsletter viewer reflects the new subscriber
+   on the next request.
+5. `src/app/api/media/upload/local/route.ts` PUT:
+   append `bump({ kind: "media" })` after the local
+   file write + media row mirror. The media entity
+   kind sweeps home / projects / projects-detail /
+   journal / journal-detail.
+6. `src/app/api/upload/route.ts` POST: append
+   `bumpAll()` after `writeFile` succeeds. The
+   legacy upload endpoint has no media-row side
+   channel, so any public page could be rendering
+   the uploaded asset; wholesale flush is the
+   safe wholesale reset.
+
+No new abstraction, no new helper, no frozen file
+touched. The `EntityKind` union in
+`src/lib/revalidate.ts` already covered every
+kind touched - no new case. Mirrors the v1.4.2
+ship pattern exactly.
+
+Verification this session:
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- `npm run build` green; every touched route
+  registered in the route manifest as `f Dynamic`.
+- `node scripts/smoke-routes.mjs` against
+  `http://localhost:3030`: pass=37 fail=3.
+  The 3 fails are the pre-deploy v1.4.3 detail
+  routes (`/projects-v2/casa-mira`,
+  `/nalanda-house`, `/salt-flats`) 404ing locally
+  without `DATABASE_URL` - documented pre-existing
+  baseline carried from the v1.4.3 ship. The 37
+  passing routes are exactly the 37 that passed
+  before this patch.
+- `scripts/smoke-live-revalidate.mjs` is the
+  post-Vercel-deploy acceptance probe (unchanged
+  from v1.4.2). Pre-deploy the home page may serve
+  stale copy from the v1.4.3 deploy; the smoke
+  flags the cache layer explicitly.
+- `graphify update .` ran this session. Graph
+  refreshed: 1769 nodes, 2802 edges, 159
+  communities (was 1697/2689/151 at v1.4.3 ship).
+  Delta reflects the 6 API routes touched.
+
+Doc rolls:
+
+- `package.json` 1.4.3 -> 1.4.4.
+- `CHANGELOG.md`: v1.4.4 stamp prepended with
+  status / what landed / verification / decision
+  log / carry-forward.
+- `FREEZE-MARKER`: rolled forward from v1.4.3 to
+  v1.4.4. New "v1.4.4 increment" section
+  enumerates the six files. Current state footer
+  updated. Procedural signature bumped
+  ("1.4.4 -> 1.5.0" is the next gate).
+- `docs/PLAN-WP-ADMIN.md`: plan-as-spec-gate
+  written before this ship; decision ledger
+  answered by operator ("yes database url set")
+  which opened the gate.
+- `docs/CONTEXT.md`: §9 this entry.
+
+Carry-forward (unchanged):
+
+- Tier-gate preserved: license POST, HMAC rotate,
+  demo reset, distro apply stay superadmin-only.
+  The six patched routes were already gated; this
+  patch only adds the revalidate tail.
+- `scripts/smoke-editable-crossc.mjs` assertion-vs-
+  design mismatch from v1.4.0 - unchanged,
+  <5-line cleanup for a separate TS-ID.
+- `src/components/AdminProjectForm.tsx` root-level
+  orphan (frozen-path deletion candidate from
+  v1.4.0) - unchanged, separate TS-ID.
+- v1.4.3 detail routes `/projects-v2/[slug]` still
+  pending Vercel rebuild - the same rebuild that
+  lands v1.4.4 also lands the v1.4.3 surfaces on
+  the live URL.
+- Future-version asks continue through v1.5 per
+  the FREEZE marker.
+
