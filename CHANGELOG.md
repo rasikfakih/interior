@@ -2,6 +2,37 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.5.0 - 2026-07-13 (PENDING DEPLOY) - Media sign-skip for relative URLs
+
+### Status
+
+Admin media thumbnails (MediaGrid + MediaPicker)
+round-tripped every row's URL through
+`/api/media/[id]/sign` even when the row already
+carried a browser-loadable relative path. In local
+SQLite-fallback mode (and Vercel cold starts before
+a file is uploaded), `signedGetUrl` resolves
+`storage_path` to a `/tmp` scratch path that 404s.
+This patch lets rows whose `url` already begins with
+`/` render directly, keeping the sign roundtrip only
+for rows that actually need it. Ships as a v1.5.0
+carve-out under the freeze marker naming exactly the
+two admin-widget files touched. No new abstraction,
+no frozen file beyond the two carved-out widgets.
+
+### What landed
+
+  - `src/components/admin/MediaGrid.tsx`
+    `signedUrlForRow`: widened `test` from
+    `/^https?:\/\//` to `/^(https?:)?\//`. A row
+    url starting with `/` is shipped in `public/`
+    by the demo seed or by pre-existing tenant
+    uploads, so it is browser-loadable immediately;
+    skip the sign roundtrip that would 404.
+  - `src/components/admin/MediaPicker.tsx`
+    `resolveUrl`: same one-line regex widen,
+    mirroring MediaGrid for the picker surface.
+
 ## v1.4.4 - 2026-07-13 (PENDING DEPLOY) - WP-admin bump-tail sweep
 
 ### Status

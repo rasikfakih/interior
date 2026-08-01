@@ -22,7 +22,7 @@ entry below is one row of structured state. Updates
 flip one line at a time.)
 
 ### TS-ID-010 - WP-admin bump-tail sweep (6 missing revalidate tails)
-- Status: @done 2026-07-13 commit=<pending v1.4.4>
+- Status: @done 2026-07-13 commit=dee66f1
 - Severity: ship-block (operator ask 2026-07-13)
 - Opened: 2026-07-13
 - Owner: opencode
@@ -101,6 +101,52 @@ flip one line at a time.)
   The same Vercel rebuild that lands v1.4.4
   also lands the v1.4.3 `/projects-v2/[slug]`
   surfaces on the live URL.
+
+### TS-ID-011 - Media sign-skip for relative URLs (admin thumbnails)
+- Status: @done 2026-07-13 commit=<pending v1.5.0>
+- Severity: follow-up (found as uncommitted working-tree
+  patch at v1.4.4 session close; operator approved TS-011
+  carve-out + push 2026-07-13)
+- Opened: 2026-07-13
+- Owner: opencode
+- Files:
+  - `src/components/admin/MediaGrid.tsx` (1-line regex
+    widen in `signedUrlForRow`)
+  - `src/components/admin/MediaPicker.tsx` (1-line regex
+    widen in `resolveUrl`)
+  - `CHANGELOG.md`, `FREEZE-MARKER`,
+    `package.json`, `docs/CONTEXT.md`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - Admin media row with a relative `"/..."` url
+    renders directly; it no longer round-trips
+    `/api/media/[id]/sign` (which in local /
+    Vercel-fallback mode resolves
+    `storage_path` to a `/tmp` scratch path that
+    404s on cold starts when no file was ever
+    uploaded there). Absolute https URLs (Supabase
+    signed) still go straight through; rows with
+    no usable url still fall through to `/sign`.
+- Outcome this session:
+  - `signedUrlForRow` / `resolveUrl` widened their
+    `test` from `/^https?:\/\//` to
+    `/^(https?:)?\//`. Rows whose `url` already
+    starts with `/` are browser-loadable as-is
+    (shipped in `public/` by the demo seed or
+    pre-existing tenant uploads); skipping the
+    sign roundtrip fixes the local-mode 404.
+  - Ships as v1.5.0 (the FREEZE-MARKER procedural
+    signature gates the next bump after v1.4.4 to
+    1.5.0). `src/components/**` is frozen, so this
+    lands under a new v1.5.0 carve-out naming
+    exactly these two admin-widget files.
+  - `npx tsc --noEmit` exit 0, `npm run verify:deploy`
+    19/19 green.
+- Notes: two-file, two-line-edit patch. No new
+  abstraction. Tier-gate untouched. Mirrors the
+  v1.4.2-in-reverse pattern (media render path
+  instead of write path).
 
 ### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
 - Status: @done 2026-07-11 commit=066fd48

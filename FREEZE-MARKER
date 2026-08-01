@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.4.3 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.5.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.4.3. Until
+This file is the authoritative freeze marker for v1.5.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -353,6 +353,32 @@ What v1.4.4 adds on top of v1.4.3, also frozen:
     The six patched routes were already gated; this
     patch only adds the revalidate tail.
 
+## v1.5.0 increment
+
+What v1.5.0 adds on top of v1.4.4, also frozen:
+
+  - Media sign-skip for relative URLs. Admin media
+    thumbnails (MediaGrid + MediaPicker) round-tripped
+    every row URL through `/api/media/[id]/sign` even
+    when the row already carried a browser-loadable
+    relative path. In local SQLite-fallback mode (and
+    Vercel cold starts before a file is uploaded),
+    `signedGetUrl` resolves `storage_path` to a `/tmp`
+    scratch path that 404s. The patch lets rows whose
+    `url` already begins with `/` render directly,
+    keeping the sign roundtrip only for rows that
+    actually need it. Mirror into both admin widgets,
+    no new abstraction.
+  - Files unfrozen for v1.5.0 (explicit carve-out
+    under `src/components/**`, the first admin-widget
+    freeze exception):
+      - `src/components/admin/MediaGrid.tsx` (1-line
+        regex widen in `signedUrlForRow`)
+      - `src/components/admin/MediaPicker.tsx` (1-line
+        regex widen in `resolveUrl`)
+  - Tier-gate preserved. No public route changes, no
+    schema change, no new dependency.
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -420,6 +446,9 @@ gate, and the admin write-path persistence layer:
     detail ships as `/projects-v2/<slug>` and is currently
     pre-deploy - the next Vercel rebuild closes the carry.
     The operator chooses the future v1.3.x patch swap.
+  - Media sign-skip for relative URLs in the admin
+    media widgets - the first `src/components/**` freeze
+    exception, carved out explicitly under v1.5.0 (v1.5.0)
 
 The buyer's rendered site (any GET on `/`, `/projects`,
 `/journal`, `/install`, `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
@@ -427,28 +456,27 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-13 (rolled forward from v1.4.3
-    2026-07-11, v1.4.2 2026-07-11, v1.4.1 2026-07-11,
-    v1.4.0 2026-07-09, v1.3.0 2026-07-01, v1.2.0
-    2026-06-30, v1.1.2 2026-06-28, v1.1.0 2026-06-23,
-    v1.0.0 2026-06-18)
-  - **Version**: 1.4.4
+  - **Frozen since**: 2026-07-13 (rolled forward from v1.4.4
+    2026-07-13, v1.4.3 2026-07-11, v1.4.2 2026-07-11,
+    v1.4.1 2026-07-11, v1.4.0 2026-07-09, v1.3.0
+    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28,
+    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.5.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-07-13. WP-admin
-    bump-tail sweep on six write routes that were
-    missing the v1.4.2 `bump(...)` tail. No frozen
-    file touched; every patched route sits on the
-    v1.4.0 / v1.4.2 operator-write carve-out. Tier-
-    gate preserved. `npx tsc --noEmit` exit 0.
-    `npm run verify:deploy` 19/19 green. `npm run
-    build` green.
+  - **Status**: PENDING DEPLOY 2026-07-13. Media
+    sign-skip for relative URLs in the two admin media
+    widgets (MediaGrid + MediaPicker). First explicit
+    carve-out under `src/components/**`. Tier-gate
+    preserved; no public route, schema, or dependency
+    change. `npx tsc --noEmit` exit 0. `npm run
+    verify:deploy` 19/19 green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.4.4` to `1.5.0`
-  - Adding a v1.5 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.5.0` to `1.6.0`
+  - Adding a v1.6 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

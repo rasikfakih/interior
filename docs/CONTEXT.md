@@ -3243,3 +3243,78 @@ Carry-forward (unchanged):
 - Future-version asks continue through v1.5 per
   the FREEZE marker.
 
+### 2026-07-13 - v1.5.0 ship (TS-011 media sign-skip for relative URLs)
+
+Operator approved committing the uncommitted
+working-tree patch from the v1.4.4 close as
+TS-011 with a freeze carve-out + push.
+
+The patch (two files, two line-edits, both in
+`src/components/admin/`):
+
+- `MediaGrid.tsx` `signedUrlForRow` and
+  `MediaPicker.tsx` `resolveUrl` both widened
+  their `test` from `/^https?:\/\//` to
+  `/^(https?:)?\//`. Admin media rows whose
+  `url` already starts with `/` (shipped in
+  `public/` by the demo seed or pre-existing
+  tenant uploads) are browser-loadable as-is
+  and no longer round-trip `/api/media/[id]/sign`.
+  In local SQLite-fallback mode - and Vercel cold
+  starts before a file is uploaded - `signedGetUrl`
+  resolves `storage_path` to a `/tmp` scratch
+  path that 404s. Skipping the sign roundtrip
+  removes that 404 for relative-url rows.
+  Absolute https URLs (Supabase signed) still go
+  straight through; rows with no usable url still
+  fall through to `/sign`.
+
+Ships as v1.5.0 because the FREEZE-MARKER
+procedural signature gates the next bump after
+v1.4.4 to 1.5.0, and `src/components/**` is
+frozen - so the patch lands under a new
+"v1.5.0 increment" carve-out naming exactly the
+two admin-widget files. This is the first
+`src/components/**` freeze exception.
+
+Verification this session:
+
+- `npx tsc --noEmit` exit 0.
+- `npm run verify:deploy` 19/19 green.
+- (build not re-run; a two-line regex widen on
+  two already-typechecked client components is
+  covered by the tsc pass; the route manifest is
+  unchanged - no route touched.)
+
+Doc rolls:
+
+- `package.json` 1.4.4 -> 1.5.0.
+- `CHANGELOG.md`: v1.5.0 stamp prepended. v1.4.4
+  heading/status restored intact below it.
+- `FREEZE-MARKER`: title + current state +
+  procedural signature rolled to v1.5.0
+  (next gate 1.5.0 -> 1.6.0). New "v1.5.0
+  increment" carve-out section enumerating the
+  two files.
+- `docs/SESSION-TODO.md`: TS-010 row finally
+  stamped with its closing commit `dee66f1`
+  (was `<pending v1.4.4>`); new TS-011 row added.
+- `scripts/smoke-server.out.log` diff was
+  incidental runtime output; not part of the
+  ship.
+- `graphify update .` runs next within the ship
+  sequence.
+
+Carry-forward (unchanged):
+
+- Tier-gate preserved.
+- `scripts/smoke-editable-crossc.mjs` assertion-vs-
+  design mismatch from v1.4.0 - unchanged,
+  separate TS-ID.
+- `src/components/AdminProjectForm.tsx` root-level
+  orphan (frozen-path deletion candidate) -
+  unchanged, separate TS-ID.
+- v1.4.3 `/projects-v2/[slug]` + v1.4.4 + v1.5.0
+  all PENDING DEPLOY - the next Vercel rebuild
+  lands all three on the live URL.
+

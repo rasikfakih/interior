@@ -75,7 +75,10 @@ export default function MediaPicker({
   }, [kind, open]);
 
   async function resolveUrl(item: MediaRow): Promise<string | null> {
-    if (item.url && /^https?:\/\//.test(item.url)) return item.url;
+    // ponytail: see MediaGrid.signedUrlForRow - relative "/" URLs are
+    // browser-loadable already; only fall through to /sign when no usable
+    // url exists on the row. Avoids the local-mode 404 on Vercel cold starts.
+    if (item.url && /^(https?:)?\//.test(item.url)) return item.url;
     const r = await fetch(`/api/media/${item.id}/sign`, {
       credentials: "include",
     });
