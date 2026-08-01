@@ -3302,8 +3302,13 @@ Doc rolls:
 - `scripts/smoke-server.out.log` diff was
   incidental runtime output; not part of the
   ship.
-- `graphify update .` runs next within the ship
-  sequence.
+- `graphify update .` ran: 1776 nodes / 2809
+  edges / 158 communities (was 1769/2802/159
+  at v1.4.4). Dated backup dirs under
+  `graphify-out/` and `scripts/*.log` are now
+  gitignored.
+- Shipped as commit `c745b2a`, pushed to
+  `origin/main` (range `dee66f1..c745b2a`).
 
 Carry-forward (unchanged):
 

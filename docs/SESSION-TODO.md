@@ -103,7 +103,7 @@ flip one line at a time.)
   surfaces on the live URL.
 
 ### TS-ID-011 - Media sign-skip for relative URLs (admin thumbnails)
-- Status: @done 2026-07-13 commit=<pending v1.5.0>
+- Status: @done 2026-07-13 commit=c745b2a
 - Severity: follow-up (found as uncommitted working-tree
   patch at v1.4.4 session close; operator approved TS-011
   carve-out + push 2026-07-13)
