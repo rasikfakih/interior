@@ -3362,7 +3362,7 @@ Confirms the TS-008 revalidation wiring works in prod.
 The probe self-restores the home page; verified 0 marker
 residue after each run. No production data left dirty.
 
-Committed as `<pending>` + pushed to `origin/main`.
+Committed as `d369ae0` + pushed to `origin/main`.
 
 Carry-forward (unchanged): tier-gate; `smoke-editable-crossc`
 mismatch; `AdminProjectForm.tsx` orphan. Note the
