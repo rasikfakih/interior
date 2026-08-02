@@ -149,7 +149,7 @@ flip one line at a time.)
   instead of write path).
 
 ### TS-ID-012 - tenant_data.kind schema fix (superadmin tenant detail)
-- Status: @done 2026-07-13 commit=<pending v1.6.0>
+- Status: @done 2026-07-13 commit=937dc69
 - Severity: ship-block (operator ask 2026-07-13: check
   /superadmin and rectify all errors)
 - Opened: 2026-07-13
