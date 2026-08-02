@@ -50,7 +50,8 @@ function fail(msg) {
 const BASE = process.env.SMOKE_BASE_URL || "https://ethinterior.vercel.app";
 const EMAIL = process.env.SMOKE_ADMIN_EMAIL;
 const PASSWORD = process.env.SMOKE_ADMIN_PASSWORD;
-const PAGE_ID = Number(process.env.SMOKE_LIVE_PAGE_ID || "1") || 1;
+let PAGE_ID = Number(process.env.SMOKE_LIVE_PAGE_ID || "1") || 1;
+const PAGE_ID_EXPLICIT = process.env.SMOKE_LIVE_PAGE_ID !== undefined;
 const NO_RESTORE = process.env.SMOKE_LIVE_NO_RESTORE === "1";
 const GRACE_MS = Number(process.env.SMOKE_LIVE_GRACE_MS || "350") || 350;
 
@@ -203,6 +204,21 @@ async function main() {
 
   log(`step 4 - login as admin and read the prior blocks list`);
   const jar = await login();
+  if (!PAGE_ID_EXPLICIT) {
+    // Resolve the real home page id by slug (not hardcoded "1"): the home
+    // page is the one rendered at /, and its id varies by install (here 6).
+    const pagesRes = await fetch(`${BASE}/api/pages`, {
+      redirect: "manual",
+      headers: await authedHeaders(jar),
+    });
+    const pagesBody = await pagesRes.json().catch(() => ({}));
+    const pages = Array.isArray(pagesBody) ? pagesBody : pagesBody?.pages || [];
+    const home = pages.find((p) => p.slug === "home") || pages.find((p) => p.is_front);
+    if (home?.id) {
+      PAGE_ID = home.id;
+      log(`resolved home page id = ${home.id} (slug=${home.slug})`);
+    }
+  }
   const prior = await getBlocks(jar);
   log(`ok - GET /api/pages/${PAGE_ID}/blocks -> ${prior.length} blocks`);
 
@@ -215,10 +231,8 @@ async function main() {
   };
 
   log(`step 5 - save with the marker stamp`);
-  const saveBody = {
-    blocks: [...prior, markerBlock],
-  };
-  const save = await saveBlocks(jar, saveBody);
+  const nextBlocks = [...prior, markerBlock];
+  const save = await saveBlocks(jar, nextBlocks);
   if (!save?.success) {
     fail(`save returned success != true (body=${JSON.stringify(save).slice(0, 200)})`);
   }
@@ -233,7 +247,10 @@ async function main() {
     fail(`GET / (post-save) -> ${afterRes.status} (expected 200)`);
   }
   const afterHtml = await afterRes.text();
-  const stampSeen = afterHtml.includes(`data-smoke-marker="${stamp}"`);
+  // The stamp is a bare token (digits + dash) that survives the RSC
+  // flight-payload JSON escaping verbatim, whereas the data-smoke-marker=
+  // attribute form is quote-escaped inside the payload. Assert on the stamp.
+  const stampSeen = afterHtml.includes(stamp);
   if (!stampSeen) {
     fail(
       `marker stamp ${stamp} did NOT reflect on the public homepage within ${GRACE_MS}ms. ` +

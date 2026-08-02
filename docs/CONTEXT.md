@@ -3323,3 +3323,50 @@ Carry-forward (unchanged):
   all PENDING DEPLOY - the next Vercel rebuild
   lands all three on the live URL.
 
+### 2026-07-13 - Deploy landed + smoke-live-revalidate fix (TS-008 green)
+
+The push to `origin/main` (`dee66f1..c745b2a`) auto-deployed
+on Vercel via the GitHub integration. Live confirmation:
+`/projects-v2/casa-mira` and `/nalanda-house` return 200
+(v1.4.3), ghost slug 404, `smoke-routes.mjs` vs live =
+pass=40 fail=0 (was 37/3 pre-deploy). All three pending
+versions landed on the live URL.
+
+Then, running `scripts/smoke-live-revalidate.mjs` (the
+v1.4.4 acceptance probe) against the live URL revealed a
+false-negative in the probe, not a live bug:
+
+- The probe hardcoded `PAGE_ID=1`, but the real home page
+  is id=6 (slug `home`). It was saving the marker block to
+  a nonexistent page, so the home page never changed.
+- Even after correcting that, the probe asserted on the
+  literal `data-smoke-marker="..."` attribute, but blocks
+  render into the RSC flight payload (JSON-escaped to
+  `\"`), so the substring never matched despite the block
+  landing. Asserting on the bare stamp token (digits +
+  dash, unescaped) is the correct check.
+- The save call also double-wrapped the blocks array
+  (`{blocks:[...]}` passed to a helper that expected a raw
+  array), so the server received `blocks:{blocks:[...]}`
+  -> `blocksIn=[]` -> `saved.blocks=0`.
+
+Fix: `scripts/smoke-live-revalidate.mjs` now (a) resolves
+the real home page id by slug `home` when
+`SMOKE_LIVE_PAGE_ID` is not explicitly set, (b) passes the
+raw block array, (c) asserts on the stamp token. After the
+fix the probe passes green against the live URL:
+`resolved home page id = 6`, `saved.blocks=10`, re-GET /
+reflects the stamp within 350ms, restores to 9 blocks.
+Confirms the TS-008 revalidation wiring works in prod.
+
+The probe self-restores the home page; verified 0 marker
+residue after each run. No production data left dirty.
+
+Committed as `<pending>` + pushed to `origin/main`.
+
+Carry-forward (unchanged): tier-gate; `smoke-editable-crossc`
+mismatch; `AdminProjectForm.tsx` orphan. Note the
+`smoke-live-revalidate` probe's hardcoded-page-id class of
+bug may also live in other `scripts/smoke-*.mjs` that assume
+a fixed page id.
+
