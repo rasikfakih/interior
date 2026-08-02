@@ -3421,3 +3421,36 @@ deploy re-probe `GET /api/operator/tenants/1` should
 return the tenant row (not null) and
 `/superadmin/tenants/1` should render tenant details.
 
+### 2026-07-13 - v1.6.0 follow-up: deploy failure + missed callers
+
+The first v1.6.0 push deployed and FAILED at postinstall:
+
+```
+SqliteError: table tenant_data has no column named payload
+    at scripts/apply-distro.mjs:58
+```
+
+Root cause: the v1.6.0 schema alignment renamed tenant_data's
+column to `data`, but two callers still referenced the old
+`payload` column: `scripts/apply-distro.mjs` (runs in the
+Vercel postinstall chain, so the build failed) and
+`src/lib/tenant-brand.ts` (readBrand / findTenant). The
+`payload` references in the `revisions` table (migrate.mjs,
+sqlite-fallback-ddl.ts, initDb.ts, schema.ts, db-postgres.ts,
+supabase-bootstrap.sql) are a different table and were left
+intact.
+
+Fixes (this follow-up):
+- `scripts/apply-distro.mjs`: UPDATE ... SET data /
+  INSERT (tenant_id, kind, data) - was payload. Unblocks the
+  Vercel postinstall.
+- `src/lib/tenant-brand.ts`: readBrand / findTenant select
+  `data` - was payload.
+
+Verified locally: `npm run postinstall` (the exact Vercel
+buildCommand sequence) now completes clean, including
+`+ distro applied to tenant=studio (id=1)`. tsc 0,
+verify:deploy 19/19, build green. Amended the v1.6.0 docs
+(CHANGELOG, FREEZE-MARKER, SESSION-TODO). Committed + pushed
+on top of 937dc69; re-deploy pending.
+

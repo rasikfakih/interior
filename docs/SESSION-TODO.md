@@ -164,6 +164,10 @@ flip one line at a time.)
     `data`, kind default)
   - `scripts/migrate.mjs` (tenant_data uses `data`,
     kind default)
+  - `scripts/apply-distro.mjs` (UPDATE/INSERT use `data`;
+    was `payload` - the Vercel postinstall blocker)
+  - `src/lib/tenant-brand.ts` (readBrand / findTenant
+    select `data`; was `payload`)
   - `CHANGELOG.md`, `FREEZE-MARKER`,
     `package.json`, `docs/CONTEXT.md`
 - Acceptance:

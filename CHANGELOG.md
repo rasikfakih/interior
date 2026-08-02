@@ -20,8 +20,11 @@ wrong (had `kind` but `payload` instead of `data`).
 
 This patch aligns all four schema mirrors to
 `tenant_data(id, tenant_id, kind TEXT NOT NULL DEFAULT 'distro',
-data, updated_at)` and adds an idempotent Postgres additive
-migration so the existing live table gets `kind`.
+data, updated_at)`, adds an idempotent Postgres additive
+migration so the existing live table gets `kind`, and fixes the
+two read/write callers that still used the old `payload` column
+(`scripts/apply-distro.mjs`, `src/lib/tenant-brand.ts`) so the
+Vercel postinstall (migrate -> apply-distro) does not fail.
 
 ### What landed
 
@@ -38,12 +41,23 @@ migration so the existing live table gets `kind`.
     'distro'`.
   - `scripts/migrate.mjs`: same `data` + `kind` alignment for
     the local dev SQLite schema.
+  - `scripts/apply-distro.mjs`: `UPDATE ... SET data` /
+    `INSERT ... (tenant_id, kind, data)` (was `payload`).
+    This is the fix that unblocks the Vercel postinstall; the
+    first v1.6.0 deploy failed here with `table tenant_data has
+    no column named payload`.
+  - `src/lib/tenant-brand.ts`: `readBrand` / `findTenant`
+    select `data` from `tenant_data` (was `payload`).
 
 ### Verification
 
   - `npx tsc --noEmit` exit 0.
   - `npm run verify:deploy` 19/19 green.
   - `npm run build` green (all superadmin routes dynamic).
+  - Local postinstall chain (`npm run postinstall`, the exact
+    Vercel buildCommand sequence) runs clean: migrate + seed +
+    `apply-distro` completes with `+ distro applied to
+    tenant=studio (id=1)`.
   - Live probe: `GET /api/operator/tenants/1` previously
     `{"ok":true,"tenant":null,"distro":null}`; after deploy
     returns the tenant row. `POST /install` + `PATCH .../distro`

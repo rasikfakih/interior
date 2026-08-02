@@ -53,11 +53,11 @@ export function readBrandFor(domain?: string | null, slug?: string | null): Tena
       db.prepare("SELECT id FROM tenants ORDER BY id ASC LIMIT 1").get();
     if (!tenant) return readDefaultBrand();
     const row = db
-      .prepare("SELECT payload FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1")
-      .get((tenant as any).id) as { payload: string } | undefined;
+      .prepare("SELECT data FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1")
+      .get((tenant as any).id) as { data: string } | undefined;
     db.close();
     if (!row) return readDefaultBrand();
-    const distro = JSON.parse(row.payload) as TenantBrand;
+    const distro = JSON.parse(row.data) as TenantBrand;
     return { ...FALLBACK, ...distro };
   } catch {
     return readDefaultBrand();
@@ -93,9 +93,9 @@ export function findTenant(id: number) {
   try {
     const db = openReadonlyDb();
     const t = db.prepare(`SELECT * FROM tenants WHERE id = ?`).get(id);
-    const distroRow = db.prepare(`SELECT payload FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1`).get(id);
+    const distroRow = db.prepare(`SELECT data FROM tenant_data WHERE tenant_id = ? AND kind = 'distro' ORDER BY id DESC LIMIT 1`).get(id);
     db.close();
-    return { tenant: t, distro: distroRow ? JSON.parse((distroRow as any).payload) : null };
+    return { tenant: t, distro: distroRow ? JSON.parse((distroRow as any).data) : null };
   } catch {
     return { tenant: null, distro: null };
   }

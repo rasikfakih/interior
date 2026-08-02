@@ -51,11 +51,11 @@ const existing = db
   .get(t.id);
 
 if (existing) {
-  db.prepare("UPDATE tenant_data SET payload = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+  db.prepare("UPDATE tenant_data SET data = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
     .run(JSON.stringify(distro), existing.id);
   console.log(`= distro replaced for tenant=${tenantSlug} (id=${t.id})`);
 } else {
-  db.prepare("INSERT INTO tenant_data (tenant_id, kind, payload) VALUES (?, 'distro', ?)")
+  db.prepare("INSERT INTO tenant_data (tenant_id, kind, data) VALUES (?, 'distro', ?)")
     .run(t.id, JSON.stringify(distro));
   console.log(`+ distro applied to tenant=${tenantSlug} (id=${t.id})`);
 }

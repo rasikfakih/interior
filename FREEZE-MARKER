@@ -406,6 +406,11 @@ What v1.6.0 adds on top of v1.5.0, also frozen:
         `data`, kind default)
       - `scripts/migrate.mjs` (tenant_data uses `data`,
         kind default)
+      - `scripts/apply-distro.mjs` (UPDATE/INSERT use
+        `data`; was `payload` - this was the Vercel
+        postinstall blocker)
+      - `src/lib/tenant-brand.ts` (readBrand / findTenant
+        select `data`; was `payload`)
   - Tier-gate preserved. No public route, behavior, or
     dependency change.
 
