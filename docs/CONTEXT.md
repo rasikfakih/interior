@@ -3370,3 +3370,54 @@ mismatch; `AdminProjectForm.tsx` orphan. Note the
 bug may also live in other `scripts/smoke-*.mjs` that assume
 a fixed page id.
 
+### 2026-07-13 - v1.6.0 ship (tenant_data.kind schema fix)
+
+Checked /superadmin with the operator creds
+(`operator@etihadinteriors.com`). The console renders
+correctly (login sets superadmin_session; all six pages
+200; /api/operator/{login,tenants,metrics} work; the 401s
+on /api/site-identity, /api/newsletter-subscribers,
+/api/install/stamp are correct NextAuth tiering, not
+errors).
+
+Real bug found: `GET /api/operator/tenants/1` returned
+`{"ok":true,"tenant":null,"distro":null}` even though
+tenant id=1 (studio) exists (listTenants returns it).
+Root cause: the `tenant_data` table was missing the
+`kind` column that `operator-store.ts` reads and writes
+(`WHERE kind='distro'`, `INSERT ... (tenant_id, kind,
+data)`). The Postgres bootstrap DDL had
+`tenant_data(id, tenant_id, data, updated_at)` - no
+`kind` - so `getTenant()`'s distro sub-query threw, the
+silent catch collapsed the result to null, and
+`/superadmin/tenants/[id]` rendered empty. The SQLite
+mirrors were also wrong (kind but `payload` instead of
+`data`).
+
+Fix (four schema mirrors aligned to
+`tenant_data(id, tenant_id, kind TEXT NOT NULL DEFAULT
+'distro', data, updated_at)` + idempotent Postgres
+additive migration in ensureMigrated so the existing
+live table gets `kind`):
+- supabase-bootstrap.sql (CREATE adds kind)
+- src/lib/pg.ts ensureMigrated (ALTER TABLE ... ADD
+  COLUMN IF NOT EXISTS kind)
+- src/lib/sqlite-fallback-ddl.ts (data, kind default)
+- scripts/migrate.mjs (data, kind default)
+
+Local env note: verify:deploy first FAILED because the
+better-sqlite3 native binding was built for a different
+Node ABI (NODE_MODULE_VERSION 137 vs node v22). Fixed by
+`npm install-scripts approve better-sqlite3` + `npm
+rebuild better-sqlite3`; verify then 19/19.
+
+Verification: tsc exit 0; verify:deploy 19/19; build
+green (all superadmin routes dynamic). Ships as v1.6.0
+(FREEZE-MARKER next gate 1.5.0 -> 1.6.0). CHANGELOG,
+FREEZE-MARKER, package.json, CONTEXT rolled.
+
+PENDING DEPLOY - the push auto-builds on Vercel; after
+deploy re-probe `GET /api/operator/tenants/1` should
+return the tenant row (not null) and
+`/superadmin/tenants/1` should render tenant details.
+

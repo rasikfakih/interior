@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.5.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.6.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.5.0. Until
+This file is the authoritative freeze marker for v1.6.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -379,6 +379,36 @@ What v1.5.0 adds on top of v1.4.4, also frozen:
   - Tier-gate preserved. No public route changes, no
     schema change, no new dependency.
 
+## v1.6.0 increment
+
+What v1.6.0 adds on top of v1.5.0, also frozen:
+
+  - `tenant_data.kind` schema fix. `GET /api/operator/
+    tenants/[id]` returned `tenant:null` (superadmin
+    tenant detail empty) because the `tenant_data` table
+    lacked the `kind` column that `operator-store.ts` reads
+    and writes. Postgres bootstrap DDL had
+    `tenant_data(id, tenant_id, data, updated_at)` - no
+    `kind`; SQLite mirrors had `kind` but `payload` instead
+    of `data`. This patch aligns all four schema mirrors to
+    `tenant_data(id, tenant_id, kind TEXT NOT NULL DEFAULT
+    'distro', data, updated_at)` and adds an idempotent
+    Postgres additive migration so the existing live table
+    gets `kind`.
+  - Files unfrozen for v1.6.0 (explicit carve-out under
+    `src/lib/**` + `scripts/migrate.mjs`):
+      - `supabase-bootstrap.sql` (tenant_data CREATE adds
+        `kind`)
+      - `src/lib/pg.ts` (ensureMigrated adds idempotent
+        `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS
+        kind`)
+      - `src/lib/sqlite-fallback-ddl.ts` (tenant_data uses
+        `data`, kind default)
+      - `scripts/migrate.mjs` (tenant_data uses `data`,
+        kind default)
+  - Tier-gate preserved. No public route, behavior, or
+    dependency change.
+
 ## Operator carve-out (added to v1.1.0)
 
 The v1.1.0 release introduces operator surfaces that are **not** under the
@@ -456,27 +486,29 @@ gated auth and the buyer can never reach them.
 
 ## Current state
 
-  - **Frozen since**: 2026-07-13 (rolled forward from v1.4.4
-    2026-07-13, v1.4.3 2026-07-11, v1.4.2 2026-07-11,
-    v1.4.1 2026-07-11, v1.4.0 2026-07-09, v1.3.0
-    2026-07-01, v1.2.0 2026-06-30, v1.1.2 2026-06-28,
-    v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.5.0
+  - **Frozen since**: 2026-07-13 (rolled forward from v1.5.0
+    2026-07-13, v1.4.4 2026-07-13, v1.4.3 2026-07-11,
+    v1.4.2 2026-07-11, v1.4.1 2026-07-11, v1.4.0
+    2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
+    v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
+  - **Version**: 1.6.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-07-13. Media
-    sign-skip for relative URLs in the two admin media
-    widgets (MediaGrid + MediaPicker). First explicit
-    carve-out under `src/components/**`. Tier-gate
-    preserved; no public route, schema, or dependency
-    change. `npx tsc --noEmit` exit 0. `npm run
-    verify:deploy` 19/19 green.
+  - **Status**: PENDING DEPLOY 2026-07-13. `tenant_data.kind`
+    schema fix. `GET /api/operator/tenants/[id]` returned
+    `tenant:null` because the `tenant_data` table lacked the
+    `kind` column the code reads/writes. Aligned all four
+    schema mirrors + idempotent Postgres additive migration.
+    Tier-gate preserved; no public route, behavior, or
+    dependency change. `npx tsc --noEmit` exit 0.
+    `npm run verify:deploy` 19/19 green. `npm run build`
+    green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.5.0` to `1.6.0`
-  - Adding a v1.6 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.6.0` to `1.7.0`
+  - Adding a v1.7 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

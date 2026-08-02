@@ -194,8 +194,8 @@ export const SQLITE_FALLBACK_DDL = [
   `CREATE TABLE IF NOT EXISTS tenant_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tenant_id INTEGER NOT NULL,
-    kind TEXT NOT NULL,
-    payload TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'distro',
+    data TEXT NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`,
 

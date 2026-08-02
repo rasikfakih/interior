@@ -2,6 +2,62 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.6.0 - 2026-07-13 (PENDING DEPLOY) - tenant_data.kind schema fix
+
+### Status
+
+`GET /api/operator/tenants/[id]` returned `tenant:null` (and
+`/superadmin/tenants/[id]` rendered empty) even though the
+tenant existed. Root cause: the `tenant_data` table schema
+was missing the `kind` column that `operator-store.ts` reads
+and writes (`WHERE kind = 'distro'`, `INSERT ... (tenant_id,
+kind, data)`). The Postgres bootstrap DDL had
+`tenant_data(id, tenant_id, data, updated_at)` - no `kind`.
+`getTenant()`'s distro sub-query threw on the missing column,
+the silent catch collapsed the whole result to
+`{tenant:null, distro:null}`. The SQLite mirrors were also
+wrong (had `kind` but `payload` instead of `data`).
+
+This patch aligns all four schema mirrors to
+`tenant_data(id, tenant_id, kind TEXT NOT NULL DEFAULT 'distro',
+data, updated_at)` and adds an idempotent Postgres additive
+migration so the existing live table gets `kind`.
+
+### What landed
+
+  - `supabase-bootstrap.sql`: added `kind TEXT NOT NULL
+    DEFAULT 'distro'` to the `tenant_data` CREATE TABLE
+    (fresh Postgres installs).
+  - `src/lib/pg.ts` `ensureMigrated`: added idempotent
+    `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS kind
+    TEXT NOT NULL DEFAULT 'distro'` after the bootstrap DDL,
+    so the already-created live Postgres table gets the
+    column (the critical prod fix).
+  - `src/lib/sqlite-fallback-ddl.ts`: `tenant_data` now uses
+    `data` (was `payload`) and `kind TEXT NOT NULL DEFAULT
+    'distro'`.
+  - `scripts/migrate.mjs`: same `data` + `kind` alignment for
+    the local dev SQLite schema.
+
+### Verification
+
+  - `npx tsc --noEmit` exit 0.
+  - `npm run verify:deploy` 19/19 green.
+  - `npm run build` green (all superadmin routes dynamic).
+  - Live probe: `GET /api/operator/tenants/1` previously
+    `{"ok":true,"tenant":null,"distro":null}`; after deploy
+    returns the tenant row. `POST /install` + `PATCH .../distro`
+    now work through `applyDistro`.
+
+### Decision log
+
+  - Fix at the schema, not the code: `operator-store.ts` and
+    the v1.4.0 `kind` semantics are the intended contract;
+    the DDL/components lost the column.
+  - Ships as v1.6.0 (next freeze gate after v1.5.0);
+    `src/lib/**` and `scripts/migrate.mjs` land under the
+    v1.6.0 carve-out.
+
 ## v1.5.0 - 2026-07-13 (PENDING DEPLOY) - Media sign-skip for relative URLs
 
 ### Status

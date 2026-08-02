@@ -148,6 +148,52 @@ flip one line at a time.)
   v1.4.2-in-reverse pattern (media render path
   instead of write path).
 
+### TS-ID-012 - tenant_data.kind schema fix (superadmin tenant detail)
+- Status: @done 2026-07-13 commit=<pending v1.6.0>
+- Severity: ship-block (operator ask 2026-07-13: check
+  /superadmin and rectify all errors)
+- Opened: 2026-07-13
+- Owner: opencode
+- Files:
+  - `supabase-bootstrap.sql` (tenant_data CREATE adds
+    `kind TEXT NOT NULL DEFAULT 'distro'`)
+  - `src/lib/pg.ts` (ensureMigrated adds idempotent
+    `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS
+    kind`)
+  - `src/lib/sqlite-fallback-ddl.ts` (tenant_data uses
+    `data`, kind default)
+  - `scripts/migrate.mjs` (tenant_data uses `data`,
+    kind default)
+  - `CHANGELOG.md`, `FREEZE-MARKER`,
+    `package.json`, `docs/CONTEXT.md`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run verify:deploy` 19/19 green
+  - `npm run build` green (superadmin routes dynamic)
+  - Live post-deploy: `GET /api/operator/tenants/1`
+    returns `ok:true, tenant:{...}` (not null) and
+    `/superadmin/tenants/1` renders tenant details.
+- Outcome this session:
+  - Diagnosed `GET /api/operator/tenants/1` ->
+    `{ok:true, tenant:null, distro:null}`: the
+    `tenant_data` table was missing the `kind` column
+    the code reads/writes (`WHERE kind='distro'`,
+    `INSERT ... (tenant_id, kind, data)`), so
+    `getTenant()`'s distro sub-query threw and the
+    silent catch nulled the whole result.
+  - Aligned four schema mirrors to
+    `tenant_data(id, tenant_id, kind, data, updated_at)`
+    and added the idempotent Postgres additive
+    migration so the existing live table gets `kind`.
+  - Local env fix: better-sqlite3 native binding was
+    built for a stale Node ABI; `npm install-scripts
+    approve better-sqlite3` + `npm rebuild
+    better-sqlite3` restored verify:deploy 19/19.
+  - Ships as v1.6.0.
+- Notes: `src/lib/**` + `scripts/migrate.mjs` frozen,
+  landed under the new v1.6.0 carve-out. Tier-gate
+  untouched.
+
 ### TS-ID-009 - /projects-v2/[slug] detail page (taste-skill pass)
 - Status: @done 2026-07-11 commit=066fd48
 - Severity: ship-block (operator ask 2026-07-11)

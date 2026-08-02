@@ -371,6 +371,14 @@ export async function ensureMigrated(): Promise<void> {
       );
       const ddl = loadBootstrapDdl();
       await client.query(ddl);
+      // Additive Postgres migrations: CREATE TABLE IF NOT EXISTS never
+      // alters an existing table, so older live tables miss columns that
+      // the code expects. `tenant_data.kind` is required by operator-store
+      // (SELECT/UPDATE/INSERT ... kind = 'distro'); the shipped bootstrap
+      // DDL omitted it. Each ADD COLUMN IF NOT EXISTS is idempotent.
+      await client.query(
+        `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'distro'`
+      );
     } finally {
       client.release();
     }
