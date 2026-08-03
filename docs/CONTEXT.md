@@ -3489,5 +3489,5 @@ applied a cobalt distro to tenant 1 -> home page rendered
 ink `#14213d`, accent `#2743c8`; restored the forest distro after.
 `tsc` 0, `build` green, `check:themes` PASS 8. Version bumped to
 1.6.0 -> 1.7.0; CHANGELOG + FREEZE-MARKER + SESSION-TODO updated.
-Deploy pending.
+Committed `98cb084`, pushed to origin/main. Deploy pending.
 

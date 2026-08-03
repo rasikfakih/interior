@@ -45,7 +45,7 @@ the agent is the writer.
   - Root cause: `tenant-brand.ts` `readBrandFor` was uncalled dead code
     reading a throwing SQLite shim. Replaced with a working Postgres
     read (`resolveTheme`).
-- Closes on: pending commit
+- Closes on: 98cb084
 
 (Sorted by severity desc, then TS-ID asc. Each active
 entry below is one row of structured state. Updates
