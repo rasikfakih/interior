@@ -2,7 +2,60 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
-## v1.6.0 - 2026-07-13 (PENDING DEPLOY) - tenant_data.kind schema fix
+## v1.7.0 - 2026-08-02 - Custom theme engine (per-tenant palettes)
+
+### Status
+
+The palette in `theme.distro.json` / `studio-brand.json` was validated
+and stored but never applied - every customer's site rendered the
+identical hardcoded `globals.css` forest palette. v1.7.0 closes that gap:
+the per-tenant distro palette is now read at request time and injected as
+CSS custom properties in the `(public)` layout, so each buyer's install
+can carry a genuinely different look with zero component changes.
+
+The theme engine resolves the effective palette in order:
+
+1. Postgres `tenant_data` distro row for the tenant matched by domain,
+   then slug, then the single default tenant.
+2. `data/studio-brand.json` (shipped white-label neutral).
+3. Built-in `globals.css` defaults.
+
+It derives the full secondary token set (`--bg-elev`, `--surface`,
+`--line`, `--accent-deep`, `--chrome`, dark-mode values) from the four
+base colors (ink / paper / accent / muted), mirroring the ratios baked
+into `globals.css`, and injects both light (`:root`) and dark
+(`html.dark`) var blocks so the existing ThemeProvider toggle keeps
+working.
+
+### What landed
+
+- `src/lib/theme.ts` (new) - `resolveTheme()` resolver + `deriveThemeVars()`.
+- `src/lib/theme-presets.ts` (new) - the taste-compliant preset catalog:
+  forest, cold-luxury, cobalt, olive-brick, terracotta-slate,
+  monochrome-pop, burgundy, slate-steel. Every palette passes the same
+  WCAG AA contrast rule `apply-distro.mjs` enforces.
+- `src/app/(public)/layout.tsx` - injects the resolved theme `<style>`.
+- `src/app/(public)/themes/page.tsx` (new) - palette showcase page so the
+  demo/sales listing proves the range.
+- `src/components/operator/DistroForm.tsx` - "Apply a preset" quick-pick
+  that fills the palette into the distro editor.
+- `scripts/apply-distro.mjs` - switched SQLite writes from WAL to DELETE
+  journal mode so an external process write is immediately visible to the
+  runtime reader connection.
+- `scripts/check-theme-presets.mjs` (new) - self-check for preset contrast
+  + derivation; wired as `npm run check:themes`.
+
+### Verification
+
+- `npx tsc --noEmit` exit 0
+- `npm run lint` - no new errors (354 pre-existing remain; none from this
+  change)
+- `npm run build` green; `/themes` registered dynamic
+- `npm run check:themes` - PASS 8 presets
+- Live E2E: applying a cobalt distro to Postgres re-themed the served home
+  page (ink `#14213d`, accent `#2743c8`); restored forest after.
+
+
 
 ### Status
 

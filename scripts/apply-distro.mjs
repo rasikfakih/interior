@@ -38,7 +38,12 @@ if (errors.length > 0) {
 }
 
 const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
+// Match the runtime reader (src/lib/pg.ts getSqlite uses DELETE mode).
+// WAL writes from a separate process are not reliably visible to a
+// DELETE-mode reader that already has the file open, which caused the
+// live page to keep serving the old palette. DELETE mode commits
+// straight to the main file so any reader sees it immediately.
+db.pragma("journal_mode = DELETE");
 
 const t = db.prepare("SELECT id FROM tenants WHERE slug = ?").get(tenantSlug);
 if (!t) {

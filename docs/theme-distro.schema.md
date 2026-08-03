@@ -76,18 +76,30 @@ $ node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json
 
 Idempotent. Re-running with a different file replaces the row.
 
-The row is read at request time by `src/lib/tenant-brand.ts`:
+The row is read at request time by `src/lib/theme.ts` (v1.7.0):
 
 ```ts
-const brand = readBrandFor(domain, slug);
+const theme = await resolveTheme(domain, slug);
 ```
 
-If the tenant row or distro row is missing, the renderer falls back to
-`data/studio-brand.json`. If that is also missing, the renderer falls
-back to built-in `"Your Studio"` defaults.
+The theme engine reads the distro palette from Postgres, derives the
+full CSS custom-property set (`--ink`, `--bg`, `--accent`, `--line`,
+`--chrome`, dark-mode values, etc.), and injects it into the `(public)`
+layout. This is what actually makes the palette visible. Resolution
+falls back to `data/studio-brand.json`, then to built-in defaults.
 
-## Future (v1.2+)
+## Preset catalog
+
+The operator can apply a curated preset from the `/superadmin/theme`
+distro editor ("Apply a preset"). The catalog lives in
+`src/lib/theme-presets.ts` and is validated by `npm run check:themes`
+(scripts/check-theme-presets.mjs) for the same WCAG AA contrast rule
+this schema enforces. Eight families ship: forest, cold-luxury, cobalt,
+olive-brick, terracotta-slate, monochrome-pop, burgundy, slate-steel.
+
+## Future (v1.8+)
 
   - `header.logo_media_id` - pull a buyer-uploaded logo from media library.
-  - `custom_css_tokens` - per-tenant CSS custom properties injection.
+  - `custom_css_tokens` - free-form per-tenant CSS custom properties
+    beyond the four palette colors (fonts, radii).
   - `home_block_overrides[]` - per-tenant home page reorder.

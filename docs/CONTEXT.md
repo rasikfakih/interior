@@ -138,6 +138,8 @@ AGENT_BEST_PRACTICES, LICENSE, INSTALL, freeze marker.
 | Concern | File / dir |
 |---|---|
 | Theme tokens | `src/app/globals.css` |
+| Theme engine | `src/lib/theme.ts` |
+| Theme preset catalog | `src/lib/theme-presets.ts` |
 | Block registry | `src/cms/blocks/registry.ts` |
 | License verifier | `src/lib/license.ts` |
 | License signer | `src/lib/license-key.ts` |
@@ -3453,4 +3455,39 @@ buildCommand sequence) now completes clean, including
 verify:deploy 19/19, build green. Amended the v1.6.0 docs
 (CHANGELOG, FREEZE-MARKER, SESSION-TODO). Committed + pushed
 on top of 937dc69; re-deploy pending.
+
+### 2026-08-02 - v1.7.0 custom theme engine
+
+Shipped the missing half of the white-label story: the stored
+per-tenant palette is now actually applied to the rendered site.
+
+- `src/lib/theme.ts` (new) - `resolveTheme()` + `deriveThemeVars()`.
+  Reads the tenant distro palette from Postgres (domain -> slug ->
+  single default tenant), falls back to `studio-brand.json`, then to
+  `globals.css` defaults. Derives the full CSS custom-property set
+  (light + dark) and injects it into the `(public)` layout.
+- `src/lib/theme-presets.ts` (new) - 8 taste-compliant presets
+  (forest, cold-luxury, cobalt, olive-brick, terracotta-slate,
+  monochrome-pop, burgundy, slate-steel), all passing the distro
+  contrast rule.
+- `src/app/(public)/layout.tsx` - injects the theme `<style>`;
+  now `force-dynamic`. `src/app/(public)/themes/page.tsx` (new) -
+  palette showcase at `/themes`.
+- `src/components/operator/DistroForm.tsx` - "Apply a preset"
+  quick-pick fills the palette into the distro editor.
+- `scripts/apply-distro.mjs` - SQLite journal mode WAL -> DELETE so an
+  external-process write is immediately visible to the runtime reader.
+- `scripts/check-theme-presets.mjs` (new) + `npm run check:themes`.
+
+Root-cause note: the palette had always been validated-and-discarded.
+`tenant-brand.ts`'s `readBrandFor` was uncalled dead code reading a
+throwing SQLite shim, so the public site never saw the distro palette at
+all. The theme engine replaces that with a working Postgres read.
+
+E2E proof (dev, `DATABASE_URL` set so Postgres is the live store):
+applied a cobalt distro to tenant 1 -> home page rendered
+ink `#14213d`, accent `#2743c8`; restored the forest distro after.
+`tsc` 0, `build` green, `check:themes` PASS 8. Version bumped to
+1.6.0 -> 1.7.0; CHANGELOG + FREEZE-MARKER + SESSION-TODO updated.
+Deploy pending.
 

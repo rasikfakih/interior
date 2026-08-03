@@ -17,6 +17,36 @@ the agent is the writer.
 
 ## Active todos
 
+### TS-ID-013 - Custom theme engine (per-tenant palettes) - v1.7.0
+- Status: @done 2026-08-02 (pending Vercel deploy)
+- Severity: ship-block (operator ask 2026-08-02: sell license with
+  custom themes)
+- Opened: 2026-08-02
+- Owner: opencode
+- Files:
+  - `src/lib/theme.ts` (new) - resolveTheme + deriveThemeVars
+  - `src/lib/theme-presets.ts` (new) - 8-preset catalog
+  - `src/app/(public)/layout.tsx` - theme injection, force-dynamic
+  - `src/app/(public)/themes/page.tsx` (new) - palette showcase
+  - `src/components/operator/DistroForm.tsx` - preset quick-pick
+  - `scripts/apply-distro.mjs` - SQLite WAL -> DELETE journal mode
+  - `scripts/check-theme-presets.mjs` (new) + `npm run check:themes`
+  - `CHANGELOG.md`, `FREEZE-MARKER`, `package.json`,
+    `docs/CONTEXT.md`, `docs/theme-distro.schema.md`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run build` green; `/themes` registered dynamic
+  - `npm run check:themes` PASS 8 presets
+  - E2E: applying a cobalt distro to Postgres re-themes the served
+    home page (ink #14213d, accent #2743c8)
+- Outcome this session:
+  - The distro palette was validated-and-discarded; v1.7.0 closes the
+    gap by reading it at request time and injecting CSS custom props.
+  - Root cause: `tenant-brand.ts` `readBrandFor` was uncalled dead code
+    reading a throwing SQLite shim. Replaced with a working Postgres
+    read (`resolveTheme`).
+- Closes on: pending commit
+
 (Sorted by severity desc, then TS-ID asc. Each active
 entry below is one row of structured state. Updates
 flip one line at a time.)

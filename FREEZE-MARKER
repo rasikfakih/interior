@@ -489,6 +489,33 @@ The buyer's rendered site (any GET on `/`, `/projects`,
 `/journal`, `/install`, `/admin`) stays in the v1.0.0 contract. The operator surfaces live behind
 gated auth and the buyer can never reach them.
 
+## v1.7.0 increment (custom theme engine)
+
+What v1.7.0 adds on top of v1.6.0, also frozen:
+
+  - `src/lib/theme.ts` (new) - `resolveTheme()` per-tenant palette
+    resolver + `deriveThemeVars()`. Read order: Postgres distro ->
+    studio-brand.json -> globals defaults. Injects both `:root`
+    (light) and `html.dark` var blocks.
+  - `src/lib/theme-presets.ts` (new) - taste-compliant preset
+    catalog (forest, cold-luxury, cobalt, olive-brick,
+    terracotta-slate, monochrome-pop, burgundy, slate-steel).
+  - `src/app/(public)/layout.tsx` - injects the resolved theme
+    `<style>` at the top of the public group; now `force-dynamic`.
+  - `src/app/(public)/themes/page.tsx` (new) - palette showcase.
+  - `src/components/operator/DistroForm.tsx` - "Apply a preset"
+    quick-pick that fills the palette into the distro editor
+    (second `src/components/**` freeze exception, carved under
+    v1.7.0).
+  - `scripts/check-theme-presets.mjs` (new) + `npm run check:themes`.
+  - `scripts/apply-distro.mjs` - SQLite writes switched from WAL to
+    DELETE journal mode so external-process writes are immediately
+    visible to the runtime reader connection.
+
+No public route slug, nav label, or buyer-facing behavior changed.
+The theme engine only makes the already-stored distro palette take
+effect. Tier-gate preserved.
+
 ## Current state
 
   - **Frozen since**: 2026-07-13 (rolled forward from v1.5.0
@@ -496,23 +523,20 @@ gated auth and the buyer can never reach them.
     v1.4.2 2026-07-11, v1.4.1 2026-07-11, v1.4.0
     2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
     v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.6.0
+  - **Version**: 1.7.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-07-13. `tenant_data.kind`
-    schema fix. `GET /api/operator/tenants/[id]` returned
-    `tenant:null` because the `tenant_data` table lacked the
-    `kind` column the code reads/writes. Aligned all four
-    schema mirrors + idempotent Postgres additive migration.
-    Tier-gate preserved; no public route, behavior, or
-    dependency change. `npx tsc --noEmit` exit 0.
-    `npm run verify:deploy` 19/19 green. `npm run build`
-    green.
+  - **Status**: PENDING DEPLOY 2026-08-02. Custom theme engine
+    (v1.7.0): per-tenant distro palette now injected as CSS custom
+    properties at request time, plus an 8-preset taste-compliant
+    catalog, an operator preset quick-pick, and a `/themes` showcase
+    page. No public route/behavior regression. `npx tsc --noEmit`
+    exit 0. `npm run build` green. `npm run check:themes` PASS 8.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.6.0` to `1.7.0`
+  - Bumping `package.json` version from `1.7.0` to `1.8.0`
   - Adding a v1.7 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 

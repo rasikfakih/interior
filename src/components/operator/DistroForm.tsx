@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { THEME_PRESETS } from "@/lib/theme-presets";
 
 export function DistroForm({ tenants, example }: { tenants: any[]; example: string }) {
   const router = useRouter();
@@ -9,6 +10,20 @@ export function DistroForm({ tenants, example }: { tenants: any[]; example: stri
   const [json, setJson] = useState(example);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+
+  function applyPreset(slug: string) {
+    const preset = THEME_PRESETS.find((p) => p.slug === slug);
+    if (!preset) return;
+    let distro: any;
+    try {
+      distro = json.trim() ? JSON.parse(json) : {};
+    } catch {
+      distro = {};
+    }
+    distro.palette = { ...preset.palette };
+    setJson(JSON.stringify(distro, null, 2));
+    setMsg(`preset applied: ${preset.name} (palette only)`);
+  }
 
   async function go(e: React.FormEvent) {
     e.preventDefault();
@@ -50,6 +65,23 @@ export function DistroForm({ tenants, example }: { tenants: any[]; example: stri
       </label>
       <label className="block">
         <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">theme.distro.json</span>
+        <div className="mb-3 flex flex-wrap items-end gap-2">
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">Apply a preset</label>
+            <select
+              value=""
+              onChange={(e) => e.target.value && applyPreset(e.target.value)}
+              className="ml-2 border border-zinc-300 px-2 py-1.5 text-xs focus:outline-none"
+            >
+              <option value="">Select preset...</option>
+              {THEME_PRESETS.map((p) => (
+                <option key={p.slug} value={p.slug}>
+                  {p.name} - {p.family}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <textarea
           value={json}
           onChange={(e) => setJson(e.target.value)}
