@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useCallback,
@@ -85,14 +85,12 @@ export default function MediaGrid() {
   }
 
   async function signedUrlForRow(row: MediaRow): Promise<string | null> {
-    // ponytail: row.url starting with "/" is already browser-loadable
-    // (shipped in public/ by the demo seed or pre-existing tenant uploads).
-    // Skip the /sign roundtrip; that route calls signedGetUrl which in
-    // local storage mode returns /api/uploads/local?path=storage_path - a
-    // /tmp scratch path that 404s on Vercel cold starts when no file was
-    // ever uploaded there. Absolute https URLs (Supabase signed) still go
-    // straight through; only rows with no url fall through to sign.
-    if (row.url && /^(https?:)?\//.test(row.url)) return row.url;
+    // ponytail: /api/uploads/local?path=... rows are a local-storage synthetic
+    // path that 404s in supabase mode - route through /sign so they resolve
+    // to a real signed URL there (and the identical local path in local mode).
+    // Absolute https and /uploads/... public static assets load as-is (TS-011).
+    if (row.url && /^https?:\/\//.test(row.url)) return row.url;
+    if (row.url && row.url.startsWith("/uploads/")) return row.url;
     const r = await fetch(`/api/media/${row.id}/sign`, {
       credentials: "include",
     });

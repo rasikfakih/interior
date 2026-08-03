@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { BLOCK_REGISTRY, BLOCK_TYPES, type BlockType } from "@/cms/blocks/registry";

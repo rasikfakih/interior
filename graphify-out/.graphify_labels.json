@@ -156,5 +156,7 @@
   "154": "v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack",
   "155": "v1.4.2 - 2026-07-11 (DEPLOYED) - TS-008 live-update wiring",
   "156": "v1.4.1 - 2026-07-11 (DEPLOYED) - TS-007 atomic page-save",
-  "157": "Testimonials.tsx"
+  "157": "Testimonials.tsx",
+  "158": "Faq.tsx",
+  "159": "ProcessStrip.tsx"
 }

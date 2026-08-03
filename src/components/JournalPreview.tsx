@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRef } from "react";
@@ -150,7 +150,7 @@ export default function JournalPreview({
             href="/journal"
             className="text-sm font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
-            All entries â†’
+            All entries →
           </Link>
         </div>
 

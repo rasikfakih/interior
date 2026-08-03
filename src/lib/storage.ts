@@ -1,24 +1,24 @@
 /**
  * Storage abstraction for v1.1.2. Phase 2 ships with Supabase Storage
  * plus a local-disk fallback so a fresh project without Supabase
- * credentials can still upload, sign, and delete media; the
- * developer sets SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY when
- * they wire up Supabase Storage and the abstraction transparently
- * switches surfaces. This keeps the admin usable in environments
- * where the env wiring is not done yet (carried forward from
- * v1.1.0 cont/per README).
+ * credentials can still upload, sign, and delete media.
  *
- * Public surface (mirrors the prior shape):
+ * Supabase mode uses the official @supabase/supabase-js SDK. This is
+ * required because Supabase now issues new-format keys
+ * (sb_secret_... / sb_publishable_...) that are NOT accepted as raw
+ * `Authorization: Bearer` tokens on the Storage REST API ("Invalid
+ * Compact JWS"). The SDK signs requests correctly for both key
+ * formats. Local mode keeps the existing /uploads/media disk path.
+ *
+ * Public surface (unchanged, mirrors the prior shape):
  *   getStorageConfig()      - reads env once; returns mode | supabase
  *   signedPutUrl(path, ...) - returns upload signed URL + token
  *   signedGetUrl(path, ttl) - returns signed read URL OR a relative
  *                              local path that the browser can load
  *   remove(path)            - deletes object
  *   head(path)              - returns content metadata when reachable
- *
- * The local mode keeps the existing `/uploads/media/<path>` shape
- * that ship-as-public-asset consumers already expect.
  */
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import fs from "fs/promises";
 import path from "path";
 
@@ -33,6 +33,7 @@ export type StorageConfig = {
 };
 
 let _cached: StorageConfig | null = null;
+let _client: SupabaseClient | null = null;
 
 export function getStorageConfig(): StorageConfig {
   if (_cached) return _cached;
@@ -51,10 +52,7 @@ export function getStorageConfig(): StorageConfig {
   }
   // Local-disk fallback. When we don't have Supabase Storage, we
   // serve uploads from /uploads/media/<path> via the existing
-  // public/uploads/media tree. The public-side assets folder is
-  // shared between operator uploads (admin/media) and the bundled
-  // demo JPGs (public/demo). Local mode is for environments where
-  // the operator has not finished the Supabase wiring.
+  // public/uploads/media tree.
   _cached = {
     mode: "local",
     baseUrl: "",
@@ -63,6 +61,15 @@ export function getStorageConfig(): StorageConfig {
     publicBase: "/uploads/media",
   };
   return _cached;
+}
+
+function getClient(): SupabaseClient {
+  if (_client) return _client;
+  const cfg = getStorageConfig();
+  _client = createClient(cfg.baseUrl, cfg.serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return _client;
 }
 
 /**
@@ -98,14 +105,27 @@ export type SignedUrlResult = {
 };
 
 /**
+ * Ensure the configured bucket exists (best-effort). Only the
+ * service/secret key can create buckets; the publishable key cannot,
+ * so a 4xx here is swallowed and the caller surfaces the real error
+ * from the subsequent signed-URL call.
+ */
+async function ensureBucket(): Promise<void> {
+  const cfg = getStorageConfig();
+  if (cfg.mode !== "supabase") return;
+  const { error: listErr } = await getClient().storage.getBucket(cfg.bucket);
+  if (!listErr) return;
+  await getClient().storage.createBucket(cfg.bucket, { public: false });
+}
+
+/**
  * Phase 2 - one-shot signed upload URL.
  *
- * In supabase mode: ask Supabase Storage REST for a token-bound
- * PUT URL. The client PUTs the file body directly to that URL
- * with the matching Authorization header.
+ * In supabase mode: ask the SDK for a token-bound signed upload URL.
+ * The client PUTs the file body directly to that URL.
  *
  * In local mode: the URL points at our own `/api/media/upload/local`
- * route which writes the bytes to `public/uploads/media/<path>`.
+ * route which writes the bytes to the local scratch.
  */
 export async function signedPutUrl(
   storagePath: string,
@@ -121,34 +141,17 @@ export async function signedPutUrl(
       token: localUploadToken(storagePath, contentType, contentLength),
     };
   }
-  const expSeconds = 600;
-  const url = `${cfg.baseUrl}/storage/v1/object/sign/upload/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${cfg.serviceKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ expiresIn: expSeconds }),
-  });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(
-      `signedPutUrl failed (${res.status}): ${txt.slice(0, 200)}`
-    );
+  await ensureBucket();
+  const { data, error } = await getClient().storage
+    .from(cfg.bucket)
+    .createSignedUploadUrl(storagePath);
+  if (error || !data?.signedUrl) {
+    throw new Error(`signedPutUrl failed: ${error?.message ?? "no url"}`);
   }
-  const out = (await res.json()) as {
-    url?: string;
-    signedURL?: string;
-    expiresIn?: number;
-    token?: string;
-  };
-  const signedURL = out.url ?? out.signedURL;
-  if (!signedURL) throw new Error("signedPutUrl response missing url");
   return {
-    url: signedURL,
-    expiresIn: out.expiresIn ?? expSeconds,
-    token: out.token,
+    url: data.signedUrl,
+    expiresIn: 600,
+    token: data.token,
   };
 }
 
@@ -158,8 +161,7 @@ function localUploadToken(
   size: number
 ): string {
   // Token = base64({path,mime,size}). Used only as an opaque
-  // pointer for the upload receiver; the route does not currently
-  // enforce it (sent for parity with supabase-mode shape).
+  // pointer for the upload receiver; not enforced.
   return Buffer.from(JSON.stringify({ storagePath, mime, size })).toString(
     "base64"
   );
@@ -168,11 +170,9 @@ function localUploadToken(
 /**
  * Phase 2 - read URL for an existing media row.
  *
- * In supabase mode: ask Supabase Storage REST for a short-lived
- * signed read URL.
+ * In supabase mode: ask the SDK for a short-lived signed read URL.
  *
- * In local mode: return the public path. The browser can fetch
- * it directly because the file lives under /public/uploads/.
+ * In local mode: return the public path.
  */
 export async function signedGetUrl(
   storagePath: string,
@@ -185,26 +185,15 @@ export async function signedGetUrl(
       expiresIn: _ttlSeconds,
     };
   }
-  const url = `${cfg.baseUrl}/storage/v1/object/sign/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${cfg.serviceKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ expiresIn: _ttlSeconds }),
-  });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(
-      `signedGetUrl failed (${res.status}): ${txt.slice(0, 200)}`
-    );
+  const { data, error } = await getClient().storage
+    .from(cfg.bucket)
+    .createSignedUrl(storagePath, _ttlSeconds);
+  if (error || !data?.signedUrl) {
+    throw new Error(`signedGetUrl failed: ${error?.message ?? "no url"}`);
   }
-  const out = (await res.json()) as { signedURL?: string; expiresIn?: number };
-  if (!out.signedURL) throw new Error("signedGetUrl response missing signedURL");
   return {
-    url: out.signedURL,
-    expiresIn: out.expiresIn ?? _ttlSeconds,
+    url: data.signedUrl,
+    expiresIn: _ttlSeconds,
   };
 }
 
@@ -221,16 +210,18 @@ export async function remove(storagePath: string): Promise<void> {
     }
     return;
   }
-  const url = `${cfg.baseUrl}/storage/v1/object/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${cfg.serviceKey}` },
-  });
-  if (!res.ok && res.status !== 404) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(
-      `storage remove failed (${res.status}): ${txt.slice(0, 200)}`
+  const { error } = await getClient().storage.from(cfg.bucket).remove([
+    storagePath,
+  ]);
+  if (error && error.status && error.status !== 404 && error.status !== 400) {
+    const { data: info } = await getClient().storage.from(cfg.bucket).info(
+      storagePath
     );
+    if (!info) {
+      // object absent - treat as removed
+      return;
+    }
+    throw new Error(`storage remove failed: ${error.message}`);
   }
 }
 
@@ -258,21 +249,14 @@ export async function head(storagePath: string): Promise<HeadResult> {
     }
     return { ok: false };
   }
-  const url = `${cfg.baseUrl}/storage/v1/object/info/${cfg.bucket}/${encodeURIComponent(storagePath).replace(/'/g, "%27")}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${cfg.serviceKey}` },
-  });
-  if (!res.ok) return { ok: false };
-  const meta = (await res.json()) as {
-    contentType?: string;
-    contentLength?: number;
-    size?: number;
-  };
+  const { data, error } = await getClient().storage.from(cfg.bucket).info(
+    storagePath
+  );
+  if (error || !data) return { ok: false };
   return {
     ok: true,
-    contentType: meta.contentType ?? "application/octet-stream",
-    contentLength: Number(meta.contentLength ?? meta.size ?? 0),
+    contentType: data.metadata?.mimetype ?? "application/octet-stream",
+    contentLength: Number(data.metadata?.size ?? 0),
   };
 }
 
@@ -300,8 +284,7 @@ function pathFor(storagePath: string): string {
 }
 
 /**
- * Path on the URL the browser can use to stream the bytes
- * back. Phase 2 mode in dev/test/local acceptance.
+ * Path on the URL the browser can use to stream the bytes back.
  */
 export function localPublicPath(storagePath: string): string {
   return `/api/uploads/local?path=${encodeURIComponent(storagePath)}`;
@@ -309,10 +292,7 @@ export function localPublicPath(storagePath: string): string {
 
 /**
  * Variant used by {@link localPublicPath}-reading consumers that
- * still expect `/uploads/media...`. Kept for back-compat with
- * any caller that synthesises a URL row from public/ - routes
- * through the same /api/uploads/local handler if a row says
- * /uploads/media but the file isn't there.
+ * still expect `/uploads/media...`.
  */
 export function localFsPath(storagePath: string): string {
   return pathFor(storagePath);

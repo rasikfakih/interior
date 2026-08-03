@@ -1,4 +1,4 @@
-﻿import { ensureMigrated, pgMany } from "@/lib/pg";
+import { ensureMigrated, pgMany } from "@/lib/pg";
 
 type Row = {
   id: number;

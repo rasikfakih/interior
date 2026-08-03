@@ -17,6 +17,38 @@ the agent is the writer.
 
 ## Active todos
 
+### TS-ID-014 - Encoding cleanup + media storage SDK (bugfix) - v1.8.0
+- Status: @done 2026-08-03 (pending Vercel deploy)
+- Severity: operator ask 2026-08-03 (unknown chars in admin; media
+  library not loading; admin save not reflecting live)
+- Opened: 2026-08-03
+- Owner: opencode
+- Files:
+  - `src/lib/storage.ts` (port supabase mode to @supabase/supabase-js
+    SDK; new-format sb_* keys are rejected as raw Bearer tokens by the
+    Storage REST API "Invalid Compact JWS"; SDK signs them correctly) +
+    best-effort `ensureBucket()` to auto-create the missing `media` bucket
+  - `src/components/admin/MediaGrid.tsx`, `MediaPicker.tsx` (route
+    `/api/uploads/local` rows through `/sign` instead of returning raw -
+    that path is a 404 no-op in supabase mode; https + /uploads/... static
+    assets keep loading directly per TS-011)
+  - `src/components/admin/LicenseAdmin.tsx`, `PageBuilder.tsx`,
+    `src/components/JournalPreview.tsx` (mojibake fix)
+  - 38 files (37 src + .env.local) UTF-8 BOM stripped
+  - `package.json` / lock (add @supabase/supabase-js)
+  - `CHANGELOG.md`, `FREEZE-MARKER`, `docs/CONTEXT.md`
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run build` green
+  - `npm run verify:deploy` green (19/19)
+  - lint: 0 new errors (storage.ts lint-clean)
+  - Media: live SDK probe - bucket auto-created, signed upload URL
+    minted, PUT 200, `/api/media/[id]/sign` returns working signed URL,
+    image loads
+  - Save/realtime: verified working at the data layer (PUT project ->
+    public page reflects immediately -> restore); no code change
+- Closes on: 5ef7110
+
 ### TS-ID-013 - Custom theme engine (per-tenant palettes) - v1.7.0
 - Status: @done 2026-08-02 (pending Vercel deploy)
 - Severity: ship-block (operator ask 2026-08-02: sell license with

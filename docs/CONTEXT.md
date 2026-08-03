@@ -3491,3 +3491,41 @@ ink `#14213d`, accent `#2743c8`; restored the forest distro after.
 1.6.0 -> 1.7.0; CHANGELOG + FREEZE-MARKER + SESSION-TODO updated.
 Committed `98cb084`, pushed to origin/main. Deploy pending.
 
+### 2026-08-03 - v1.8.0 TS-014 bugfix (encoding + media storage SDK)
+
+Closed three operator-reported bugs without disturbing buyer-facing
+behavior or the tier-gate.
+
+Interview results:
+- Unknown characters in admin panel = UTF-8 mojibake in three visible
+  strings (`LicenseAdmin.tsx` `<=`/`>=`, `PageBuilder.tsx` drag-handle,
+  `JournalPreview.tsx` arrow) plus a UTF-8 BOM at the top of 38 files
+  (37 under `src/` + `.env.local`, where `NEXTAUTH_URL` was prefixed
+  with U+FEFF).
+- Media library not loading = storage layer sent the new-format key
+  (`sb_secret_...` / `sb_publishable_...`) as a raw `Authorization:
+  Bearer` token on the Supabase Storage REST API, which Supabase rejects
+  with `Invalid Compact JWS`. The `media` bucket also did not exist
+  (`NoSuchBucket`). Ported `src/lib/storage.ts` to the official
+  `@supabase/supabase-js` SDK (signs `sb_*` keys correctly) and added a
+  best-effort `ensureBucket()` that auto-creates the bucket. Same public
+  API; local-mode disk path unchanged.
+- Save / realtime = verified working end-to-end at the data layer
+  (PUT project -> public `/projects/[slug]` reflects immediately ->
+  restore). All public pages are force-dynamic; every admin write route
+  calls `bump()` / `revalidatePath`. No code change required.
+
+Also fixed MediaGrid/MediaPicker to route `/api/uploads/local?path=...`
+rows through `/api/media/[id]/sign` (that path is a 404 no-op in
+supabase mode); absolute https and `/uploads/...` static assets still
+load directly (TS-011 preserved).
+
+Live SDK probe against the operator's Supabase project
+(`bdutmzyjrtkmiitvemsb`): bucket auto-created, signed upload URL
+minted, PUT 200, `/api/media/[id]/sign` returns a working signed URL,
+image loads. `tsc` 0, `build` green, `verify:deploy` green, 0 new lint
+errors. Version bumped 1.7.0 -> 1.8.0; CHANGELOG + FREEZE-MARKER +
+SESSION-TODO (TS-014) updated. Committed + pushed to origin/main.
+Deploy pending.
+
+

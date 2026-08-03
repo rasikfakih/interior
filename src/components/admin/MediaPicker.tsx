@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import {
@@ -75,10 +75,11 @@ export default function MediaPicker({
   }, [kind, open]);
 
   async function resolveUrl(item: MediaRow): Promise<string | null> {
-    // ponytail: see MediaGrid.signedUrlForRow - relative "/" URLs are
-    // browser-loadable already; only fall through to /sign when no usable
-    // url exists on the row. Avoids the local-mode 404 on Vercel cold starts.
-    if (item.url && /^(https?:)?\//.test(item.url)) return item.url;
+    // ponytail: analogous to MediaGrid.signedUrlForRow - /api/uploads/local
+    // synthetic paths go through /sign (404 no-op in supabase mode otherwise);
+    // https and /uploads/... static assets load directly.
+    if (item.url && /^https?:\/\//.test(item.url)) return item.url;
+    if (item.url && item.url.startsWith("/uploads/")) return item.url;
     const r = await fetch(`/api/media/${item.id}/sign`, {
       credentials: "include",
     });

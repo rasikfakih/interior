@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.6.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.8.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.6.0. Until
+This file is the authoritative freeze marker for v1.8.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -516,6 +516,31 @@ No public route slug, nav label, or buyer-facing behavior changed.
 The theme engine only makes the already-stored distro palette take
 effect. Tier-gate preserved.
 
+## v1.8.0 increment (encoding + media storage SDK) - TS-014
+
+What v1.8.0 adds on top of v1.7.0, also frozen:
+
+  - 38 files - UTF-8 BOM stripped (37 under `src/` + `.env.local`).
+  - Mojibake fixes: `src/components/admin/LicenseAdmin.tsx` (<= / >=),
+    `src/components/admin/PageBuilder.tsx` (drag-handle glyph),
+    `src/components/JournalPreview.tsx` (arrow).
+  - `src/components/admin/MediaGrid.tsx` + `MediaPicker.tsx` - route
+    `/api/uploads/local?path=...` media rows through `/api/media/[id]/sign`
+    instead of returning them raw (that path is a 404 no-op in supabase
+    mode). Absolute https and `/uploads/...` public static assets still
+    load directly (TS-011 preserved).
+  - `src/lib/storage.ts` - ported supabase mode to the official
+    `@supabase/supabase-js` SDK (new-format sb_* keys are rejected as raw
+    Bearer tokens by the Storage REST API; the SDK signs them correctly),
+    plus best-effort `ensureBucket()` that auto-creates the `media`
+    bucket. Local-mode disk path and the public API surface unchanged.
+  - `package.json` / lock - add `@supabase/supabase-js` (2.112.0).
+
+Freeze carve-out: this ship touches frozen paths
+(`src/components/**`, `src/lib/**`), carved under v1.8.0 exactly as
+enumerated above. No public route slug, nav label, or buyer-facing
+behavior changed. Tier-gate preserved.
+
 ## Current state
 
   - **Frozen since**: 2026-07-13 (rolled forward from v1.5.0
@@ -523,14 +548,15 @@ effect. Tier-gate preserved.
     v1.4.2 2026-07-11, v1.4.1 2026-07-11, v1.4.0
     2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
     v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.7.0
+  - **Version**: 1.8.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-08-02. Custom theme engine
-    (v1.7.0): per-tenant distro palette now injected as CSS custom
-    properties at request time, plus an 8-preset taste-compliant
-    catalog, an operator preset quick-pick, and a `/themes` showcase
-    page. No public route/behavior regression. `npx tsc --noEmit`
-    exit 0. `npm run build` green. `npm run check:themes` PASS 8.
+  - **Status**: PENDING DEPLOY 2026-08-03. TS-014 bugfix ship:
+    encoding cleanup (mojibake + BOMs), media library storage ported
+    to the Supabase SDK (new-format keys now sign correctly; media
+    bucket auto-created), and media rows with relative /api/uploads/local
+    URLs routing through /sign. Save/realtime verified working at the
+    data layer; no change required. `npx tsc --noEmit` exit 0.
+    `npm run build` green. `npm run verify:deploy` green.
 
 ## Procedural signature
 

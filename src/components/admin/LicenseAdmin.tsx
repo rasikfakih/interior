@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import DemoReset from "./DemoReset";
@@ -187,7 +187,7 @@ export default function LicenseAdmin() {
                 </span>
                 <p className="text-sm mt-2">
                   {t === "personal"
-                    ? "1 site. EN-only. No 3D. Page builder â‰¤ 5. Media â‰¤ 50."
+                    ? "1 site. EN-only. No 3D. Page builder ≤ 5. Media ≤ 50."
                     : "Up to 5 sites. Multilingual. 3D viewer. Unlimited."}
                 </p>
               </label>

@@ -2,6 +2,54 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.8.0 - 2026-08-03 - TS-014 bugfix: encoding + media storage SDK
+
+### Status
+
+Bugfix ship closing three operator-reported issues:
+
+1. **Unknown characters in admin panel.** UTF-8 mojibake in three
+   visible strings (LicenseAdmin `<=`, PageBuilder drag handle,
+   JournalPreview arrow) plus UTF-8 BOMs stripped from 38 files
+   (37 under `src/` + `.env.local`).
+
+2. **Media library not loading.** Root cause was not logic: the
+   storage layer sent Supabase's new-format key (sb_secret_... /
+   sb_publishable_...) as a raw `Authorization: Bearer` token on the
+   Storage REST API, which Supabase rejects with "Invalid Compact
+   JWS". The `media` bucket also did not exist. Fixed by porting
+   `src/lib/storage.ts` to the official `@supabase/supabase-js` SDK
+   (which signs requests correctly for sb_* keys) plus a best-effort
+   `ensureBucket()` that auto-creates the missing bucket. Local-mode
+   disk path and the public API surface are unchanged.
+
+3. **Save / realtime.** Verified working end-to-end at the data layer
+   (PUT project -> public page reflects immediately -> restore); no
+   code change required. All public pages are force-dynamic and every
+   admin write route calls bump()/revalidatePath.
+
+### What landed
+
+- `src/components/admin/LicenseAdmin.tsx` - mojibake `<=`, `>=`
+- `src/components/admin/PageBuilder.tsx` - mojibake drag handle `...`
+- `src/components/JournalPreview.tsx` - mojibake arrow
+- 38 files - UTF-8 BOM stripped (37 src + .env.local)
+- `src/components/admin/MediaGrid.tsx`, `MediaPicker.tsx` - route
+  `/api/uploads/local` rows through `/sign` (404 no-op in supabase
+  mode otherwise); https + /uploads/... static assets load as-is
+- `src/lib/storage.ts` - ported to @supabase/supabase-js SDK +
+  ensureBucket; local mode unchanged
+- `package.json` + lock - add @supabase/supabase-js@^2.112.0
+
+### Verification
+
+- `npx tsc --noEmit` exit 0
+- `npm run build` green
+- `npm run verify:deploy` green
+- lint: 0 new errors - storage.ts lint-clean
+- Live SDK probe: bucket auto-created, signed upload URL minted, PUT
+  200, `/api/media/[id]/sign` returns working signed URL, image loads
+
 ## v1.7.0 - 2026-08-02 - Custom theme engine (per-tenant palettes)
 
 ### Status

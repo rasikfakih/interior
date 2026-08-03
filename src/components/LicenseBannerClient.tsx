@@ -1,4 +1,4 @@
-﻿type CheckResult =
+type CheckResult =
   | { ok: true; license: any }
   | { ok: false; reason: string };
 

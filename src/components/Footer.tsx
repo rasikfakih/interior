@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getSiteSettings } from "@/lib/settings";
 import NewsletterForm from "./NewsletterForm";
 
