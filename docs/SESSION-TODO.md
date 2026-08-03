@@ -47,7 +47,7 @@ the agent is the writer.
     image loads
   - Save/realtime: verified working at the data layer (PUT project ->
     public page reflects immediately -> restore); no code change
-- Closes on: 5ef7110
+- Closes on: 3525790
 
 ### TS-ID-013 - Custom theme engine (per-tenant palettes) - v1.7.0
 - Status: @done 2026-08-02 (pending Vercel deploy)
