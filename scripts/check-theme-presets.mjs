@@ -48,7 +48,7 @@ function contrast(a, b) {
 // The catalog below must stay in sync with src/lib/theme-presets.ts; this
 // redundancy is the check, so a drift in either direction fails loudly.
 const CATALOG = [
-  ["forest", "#1f3a2d", "#f2efe7", "#c28b3c", "#5a6b5f"],
+  ["forest", "#122a20", "#ecece6", "#c0964f", "#626d66"],
   ["cold-luxury", "#1c2127", "#eef1f4", "#5b7d9e", "#5c6770"],
   ["cobalt", "#14213d", "#f6f1e7", "#2743c8", "#5a5f72"],
   ["olive-brick", "#3a4431", "#f4f0e6", "#a34a2a", "#6a6b56"],

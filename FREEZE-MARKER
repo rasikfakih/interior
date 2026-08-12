@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.8.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.9.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.8.0. Until
+This file is the authoritative freeze marker for v1.9.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -541,29 +541,63 @@ Freeze carve-out: this ship touches frozen paths
 enumerated above. No public route slug, nav label, or buyer-facing
 behavior changed. Tier-gate preserved.
 
+## v1.9.0 increment (Forest & Bone recalibration) - brand polish
+
+What v1.9.0 adds on top of v1.8.0, also frozen:
+
+  - Buyer-visible brand recalibration, carved under v1.9.0 exactly as
+    enumerated: the Forest family deepens and cools (ink `#122A20`,
+    paper `#ECECE6`, accent `#C0964F`, muted `#626D66`) and the display
+    serif moves from Cormorant Garamond to Newsreader. The muted was
+    darkened within the same forest-shadow hue so it still passes the
+    AA contrast gate (4.54:1 vs paper) that `apply-distro.mjs` and
+    `scripts/check-theme-presets.mjs` enforce.
+  - Every palette source the theme engine can read is aligned:
+      - `src/app/globals.css` (default tokens, light + dark)
+      - `data/studio-brand.json` (white-label brand)
+      - `data/theme.distro.json` (shipped demo distro, applied by
+        postinstall)
+      - `src/lib/theme.ts` (DEFAULT_PALETTE fallback)
+      - `src/lib/studio-brand.ts` (DEFAULTS fallback)
+      - `src/lib/theme-presets.ts` + `scripts/check-theme-presets.mjs`
+        (forest preset + CATALOG)
+  - `scripts/seed-content.mjs` - seed writes
+    `/models/seed/reception-room.glb` into `model_3d` and backfills
+    NULL-or-empty values on already-seeded installs (closes the
+    PROJECTS-AUDIT 3D wiring gap without clobbering operator-set
+    URLs).
+  - `src/lib/pg.ts` - local-SQLite SELECT path: `sqliteExec` returns
+    the `{ rows, rowCount }` wrapper shape pgQuery / pgOne / pgMany
+    already expect (previously `rows: undefined` on local reads).
+  - `src/app/layout.tsx` - Newsreader wire (400/500/600 + italic).
+
+No route slug, nav label, schema, or dependency change. Tier-gate
+preserved.
+
 ## Current state
 
-  - **Frozen since**: 2026-07-13 (rolled forward from v1.5.0
-    2026-07-13, v1.4.4 2026-07-13, v1.4.3 2026-07-11,
+  - **Frozen since**: 2026-08-12 (rolled forward from v1.8.0
+    2026-08-03, v1.7.0 2026-08-02, v1.6.0 2026-07-13,
+    v1.5.0 2026-07-13, v1.4.4 2026-07-13, v1.4.3 2026-07-11,
     v1.4.2 2026-07-11, v1.4.1 2026-07-11, v1.4.0
     2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
     v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.8.0
+  - **Version**: 1.9.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-08-03. TS-014 bugfix ship:
-    encoding cleanup (mojibake + BOMs), media library storage ported
-    to the Supabase SDK (new-format keys now sign correctly; media
-    bucket auto-created), and media rows with relative /api/uploads/local
-    URLs routing through /sign. Save/realtime verified working at the
-    data layer; no change required. `npx tsc --noEmit` exit 0.
-    `npm run build` green. `npm run verify:deploy` green.
+  - **Status**: PENDING DEPLOY 2026-08-12. v1.9.0 Forest & Bone
+    recalibration: recalibrated palette across every theme source,
+    Cormorant Garamond -> Newsreader display serif, seed populates
+    `model_3d` on the three projects (NULL-only backfill for existing
+    installs), local-SQLite SELECT wrapper fix. `npx tsc --noEmit`
+    exit 0. `npm run check:themes` PASS 8. `npm run verify:deploy`
+    green.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.7.0` to `1.8.0`
-  - Adding a v1.7 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.8.0` to `1.9.0`
+  - Adding a v1.8 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

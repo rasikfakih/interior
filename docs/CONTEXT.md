@@ -3528,4 +3528,60 @@ errors. Version bumped 1.7.0 -> 1.8.0; CHANGELOG + FREEZE-MARKER +
 SESSION-TODO (TS-014) updated. Committed + pushed to origin/main.
 Deploy pending.
 
+### 2026-08-12 - v1.9.0 Forest & Bone recalibration (palette + Newsreader + 3D seed)
+
+Recalibrated the shipped brand look in one cohesive pass.
+
+- Palette sources aligned on the recalibrated family (ink `#122A20` /
+  paper `#ECECE6` / accent `#C0964F` / muted `#626D66`):
+  `globals.css` tokens, `data/studio-brand.json`,
+  `data/theme.distro.json` (shipped demo distro applied by
+  postinstall), `src/lib/theme.ts` DEFAULT_PALETTE,
+  `src/lib/studio-brand.ts` DEFAULTS fallback, and the `forest`
+  preset + `check-theme-presets.mjs` CATALOG. The draft muted
+  `#748179` failed the AA gate (3.43:1 vs paper) that apply-distro +
+  check-theme-presets enforce; darkened within the same hue to
+  `#626D66` (4.54:1) so the shipped distro still passes postinstall.
+- Display serif swap: Cormorant Garamond -> Newsreader in
+  `src/app/layout.tsx` + the `--font-display` / `--font-serif` vars in
+  `globals.css`. No stale `--font-cormorant` references remain.
+- `scripts/seed-content.mjs` writes `/models/seed/reception-room.glb`
+  into `model_3d` and backfills NULL-or-empty values on existing
+  installs, closing the PROJECTS-AUDIT 3D wiring gap on already-seeded
+  DBs (the insert-only change was a no-op on non-empty tables; the
+  live `salt-flats` row carried `''`, which the NULL-only guard
+  initially missed).
+- `src/lib/pg.ts` local-SQLite SELECT fix: `sqliteExec` now returns
+  the `{ rows, rowCount }` wrapper shape pgQuery / pgOne / pgMany
+  expect (SELECTs previously returned a bare row array, so local
+  reads yielded `rows: undefined`).
+- Validation: `tsc` 0, `check:themes` PASS 8, `verify:deploy` green,
+  distro + brand validate under apply-distro rules, backfill +
+  wrapper contract verified behaviorally on a temp SQLite copy, 0 new
+  lint problems. Stale better-sqlite3 binding rebuilt (Node ABI).
+- Version bumped 1.8.0 -> 1.9.0; CHANGELOG + FREEZE-MARKER +
+  SESSION-TODO (TS-015) updated. Working tree uncommitted; operator
+  to commit and deploy.
+- Live validation (2026-08-12): `npm run seed:content` ran against
+  Postgres - backfilled casa-mira + nalanda-house (NULL) and
+  salt-flats (''). Fresh `next build` + `next start` probe: 21/21
+  pass - all three projects render the 3D walkthrough with
+  `/models/seed/reception-room.glb` on both `/projects/<slug>` and
+  `/projects-v2/<slug>`, the GLB asset serves (259 KB), and both
+  listings reference it. Stray `smoke-probe-*` project row
+  (pre-existing test litter) left untouched.
+- Live brand check (2026-08-12): pre-deploy snapshot captured;
+  `scripts/verify-brand-v190.mjs` added as the post-deploy acceptance
+  probe (`node scripts/verify-brand-v190.mjs`). GAP FOUND + CLOSED:
+  the live Postgres `tenant_data` distro row (tenant 1) held the
+  pre-recalibration forest palette, and the theme engine resolves
+  the distro row before `studio-brand.json` - a bare code deploy
+  would flip the font to Newsreader but NOT the palette. The
+  recalibrated palette was applied to the live distro row (surgical
+  palette-only UPDATE; backup at `%TEMP%/v190/distro-tenant1-pre-v190.json`);
+  live home + projects now serve ink #122a20 / paper #ecece6 /
+  accent #c0964f / muted #626d66 (probe pass=11/13; the only
+  remaining FAILs are the Newsreader checks, which need the v1.9.0
+  code deploy).
+
 

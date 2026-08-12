@@ -40,10 +40,10 @@ const DEFAULTS: StudioBrand = {
   instagram_url: "https://instagram.com/etihadinteriors",
   footer_credit: "Powered by Etihad Interiors Theme v1.3.0",
   palette: {
-    ink: "#1F3A2D",
-    paper: "#F2EFE7",
-    accent: "#C28B3C",
-    muted: "#5A6B5F",
+    ink: "#122A20",
+    paper: "#ECECE6",
+    accent: "#C0964F",
+    muted: "#626D66",
   },
   hero: {
     eyebrow: "Residential Studio - Maharashtra",

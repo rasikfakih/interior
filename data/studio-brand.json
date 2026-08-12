@@ -10,11 +10,11 @@
   "instagram_url": "https://instagram.com/etihadinteriors",
   "footer_credit": "Powered by Etihad Interiors Theme v1.3.0",
   "palette": {
-    "_comment": "Forest family (taste-skill Section 4.2 locked palette). ink = deep green, paper = bone, accent = amber, muted = forest-shadow green. NOT the AI-default beige/brass/oxblood family.",
-    "ink": "#1F3A2D",
-    "paper": "#F2EFE7",
-    "accent": "#C28B3C",
-    "muted": "#5A6B5F"
+    "_comment": "Forest & Bone recalibrated (v1.9.0). ink = deep forest green, paper = cooler bone, accent = restrained soft amber, muted = forest-shadow green. NOT the AI-default beige/brass/oxblood family.",
+    "ink": "#122A20",
+    "paper": "#ECECE6",
+    "accent": "#C0964F",
+    "muted": "#626D66"
   },
   "hero": {
     "eyebrow": "Residential Studio · Maharashtra",

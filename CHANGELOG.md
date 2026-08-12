@@ -2,6 +2,66 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.9.0 - 2026-08-12 - Forest & Bone recalibration (palette + Newsreader + 3D seed)
+
+### Status
+
+Brand recalibration of the shipped demo and the white-label defaults.
+The Forest family deepens and cools (deeper forest ink on cooler bone
+paper with one restrained soft-amber accent), the display serif moves
+from Cormorant Garamond to Newsreader, and the seed now populates
+`model_3d` on the three projects so the 3D walkthrough surfaces
+finally render (closing the PROJECTS-AUDIT wiring gap).
+
+The recalibrated palette is applied consistently across every palette
+source the theme engine can read - `globals.css` defaults,
+`data/studio-brand.json`, `data/theme.distro.json` (the shipped demo
+distro applied by postinstall), the `theme.ts` fallback, the
+`studio-brand.ts` DEFAULTS fallback, and the `forest` preset in the
+operator quick-pick catalog - with the muted darkened within the same
+forest-shadow hue to `#626D66` so it still passes the AA contrast gate
+(4.54:1 vs paper) that `apply-distro.mjs` and
+`check-theme-presets.mjs` enforce.
+
+### What landed
+
+- `src/app/globals.css` - Forest & Bone recalibrated tokens (light +
+  dark): ink `#122A20`, paper `#ECECE6`, accent `#C0964F`, muted
+  `#626D66`; `--font-display` / `--font-serif` point at Newsreader
+- `src/app/layout.tsx` - display serif swap: Cormorant Garamond ->
+  Newsreader (`--font-newsreader`), 400/500/600 + italic
+- `data/studio-brand.json` - recalibrated palette + comment
+- `data/theme.distro.json` - shipped demo distro palette recalibrated
+  (was the pre-recalibration Forest values; postinstall applies this
+  to the demo tenant)
+- `src/lib/theme.ts` - DEFAULT_PALETTE recalibrated
+- `src/lib/studio-brand.ts` - DEFAULTS fallback palette recalibrated
+  (the last old-palette holder)
+- `src/lib/theme-presets.ts` + `scripts/check-theme-presets.mjs` -
+  `forest` preset recalibrated so the operator quick-pick matches the
+  studio default
+- `scripts/seed-content.mjs` - projects seed writes
+  `/models/seed/reception-room.glb` into `model_3d` (was null/empty)
+  plus an idempotent NULL-and-empty backfill so already-seeded
+  installs pick up the model without clobbering operator-set URLs
+- `src/lib/pg.ts` - local-SQLite SELECT path fixed: `sqliteExec` now
+  returns the `{ rows, rowCount }` result-set wrapper shape that
+  pgQuery / pgOne / pgMany already expect (SELECTs previously returned
+  a bare row array, so local reads yielded `rows: undefined`)
+
+### Verification
+
+- `npx tsc --noEmit` exit 0
+- `npm run check:themes` - PASS 8 presets (forest ink/paper 12.85:1,
+  muted/paper 4.54:1)
+- `npm run verify:deploy` green (incl. models-seed check)
+- Updated `theme.distro.json` / `studio-brand.json` validate under the
+  exact `apply-distro.mjs` contrast + hex rules
+- Seed backfill + sqliteExec wrapper contract verified behaviorally
+  on a temp SQLite copy; lint 0 new problems
+- Stale better-sqlite3 native binding rebuilt (Node ABI) so the
+  SQLite checks run locally
+
 ## v1.8.0 - 2026-08-03 - TS-014 bugfix: encoding + media storage SDK
 
 ### Status

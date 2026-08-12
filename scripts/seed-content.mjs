@@ -48,6 +48,8 @@ function img(base, w = 1600) {
   return `${base}?q=80&w=${w}&auto=format&fit=crop`;
 }
 
+const GLB_RECEPTION = "/models/seed/reception-room.glb";
+
 const PROJECTS = [
   {
     slug: "casa-mira",
@@ -57,6 +59,7 @@ const PROJECTS = [
     location_city: "Mumbai",
     year: "2024",
     scope: "1,820 sq.ft · 3-bed apartment",
+    model: GLB_RECEPTION,
     description:
       "Casa Mira is a 1,820 sq.ft Bandra apartment, drawn across four months and built across seven. The brief asked for calm, and ended up being a study in restraint.",
     before: img(PHOTO_BEFORE_BASE),
@@ -70,6 +73,7 @@ const PROJECTS = [
     location_city: "Kalyan",
     year: "2024",
     scope: "4,200 sq.ft · Independent villa",
+    model: GLB_RECEPTION,
     description:
       "A 4,200 sq.ft villa for a family of five. Drawings reflect how each room opens into the next. Stone and wood specified together, never apart.",
     before: img(PHOTO_AFTER_BASE),
@@ -83,6 +87,7 @@ const PROJECTS = [
     location_city: "Alibaug",
     year: "2023",
     scope: "3,400 sq.ft · Coastal home",
+    model: GLB_RECEPTION,
     description:
       "A weekend house facing west. Salinity, monsoon, fungi finishes the home's first year softer than the renders.",
     before: img(PHOTO_DIFFERENT_BASE),
@@ -225,7 +230,7 @@ async function seedPostgres() {
           p.description,
           p.before,
           p.after,
-          null,
+          p.model,
           JSON.stringify([]),
           order++,
         ]
@@ -234,6 +239,18 @@ async function seedPostgres() {
     console.log(
       FORCE ? "projects forced-write" : "projects seeded"
     );
+  }
+  // v1.9.0: backfill model_3d on installs seeded before the GLB field
+  // existed (PROJECTS-AUDIT 3D wiring gap). Fills NULL and empty
+  // values only (the render check is truthy), so operator-set model
+  // URLs are never clobbered. Idempotent.
+  for (const p of PROJECTS) {
+    const r = await pool.query(
+      `UPDATE projects SET model_3d = $2
+       WHERE slug = $1 AND (model_3d IS NULL OR model_3d = '')`,
+      [p.slug, p.model]
+    );
+    if (r.rowCount > 0) console.log(`+ model_3d backfilled for ${p.slug}`);
   }
   if (FORCE) {
     await pool.query(`DELETE FROM journal_posts`);
@@ -409,7 +426,7 @@ async function seedSqlite() {
           p.description,
           p.before,
           p.after,
-          null,
+          p.model,
           JSON.stringify([]),
           order++
         );
@@ -419,6 +436,17 @@ async function seedSqlite() {
     console.log(
       FORCE ? "projects forced-write" : "projects seeded"
     );
+  }
+  // v1.9.0: backfill model_3d on installs seeded before the GLB field
+  // existed (PROJECTS-AUDIT 3D wiring gap). Fills NULL and empty
+  // values only (the render check is truthy), so operator-set model
+  // URLs are never clobbered. Idempotent.
+  const backfillModel = prep(
+    `UPDATE projects SET model_3d = ? WHERE slug = ? AND (model_3d IS NULL OR model_3d = '')`
+  );
+  for (const p of PROJECTS) {
+    const r = backfillModel.run(p.model, p.slug);
+    if (r.changes > 0) console.log(`+ model_3d backfilled for ${p.slug}`);
   }
   if (FORCE) {
     for (const slug of JOURNAL.map((j) => j.slug)) {

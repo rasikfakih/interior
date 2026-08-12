@@ -17,6 +17,43 @@ the agent is the writer.
 
 ## Active todos
 
+### TS-ID-015 - Forest & Bone recalibration (palette + Newsreader + 3D seed) - v1.9.0
+- Status: @done 2026-08-12 (pending commit + Vercel deploy)
+- Severity: operator ask 2026-08-12 (recalibrate the shipped brand look)
+- Opened: 2026-08-12
+- Owner: freebuff
+- Files:
+  - `src/app/globals.css`, `src/app/layout.tsx` - Forest & Bone
+    recalibrated tokens (ink #122A20 / paper #ECECE6 / accent #C0964F
+    / muted #626D66) + display serif swap Cormorant Garamond ->
+    Newsreader
+  - `data/studio-brand.json`, `data/theme.distro.json` - recalibrated
+    palette in the white-label brand + shipped demo distro
+  - `src/lib/theme.ts`, `src/lib/studio-brand.ts`,
+    `src/lib/theme-presets.ts`, `scripts/check-theme-presets.mjs` -
+    DEFAULT_PALETTE / DEFAULTS fallback / forest preset + CATALOG
+  - `scripts/seed-content.mjs` - seed `model_3d` + NULL-only backfill
+  - `src/lib/pg.ts` - sqliteExec SELECT result-set wrapper fix
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run check:themes` PASS 8
+  - `npm run verify:deploy` green
+  - Updated theme.distro.json / studio-brand.json pass apply-distro
+    validation (muted/paper >= 4.5:1)
+- Outcome:
+  - Draft muted #748179 failed the AA gate (3.43:1 vs paper);
+    darkened within the same forest-shadow hue to #626D66 (4.54:1)
+    and applied across every palette source so the shipped distro
+    still passes postinstall.
+  - Seed closes the PROJECTS-AUDIT 3D wiring gap on existing installs
+    via an idempotent NULL-or-empty model_3d backfill (insert-only
+    was a no-op on non-empty tables; live salt-flats carried '').
+  - Local-SQLite SELECT path fixed in pg.ts (was returning
+    rows:undefined through pgQuery / pgOne / pgMany).
+  - Version bumped 1.8.0 -> 1.9.0; CHANGELOG + FREEZE-MARKER +
+    CONTEXT.md §9 updated.
+- Closes on: <pending v1.9.0 commit>
+
 ### TS-ID-014 - Encoding cleanup + media storage SDK (bugfix) - v1.8.0
 - Status: @done 2026-08-03 (pending Vercel deploy)
 - Severity: operator ask 2026-08-03 (unknown chars in admin; media

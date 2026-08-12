@@ -218,7 +218,7 @@ async function sqliteExec(text: string, params: ReadonlyArray<unknown>): Promise
   }
   if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
     const rows = db.prepare(sql).all(...args);
-    return rows as unknown[];
+    return [{ rows: rows as unknown[], rowCount: rows.length }];
   }
   const r = db.prepare(sql).run(...args);
   // better-sqlite3 `run` returns { changes, lastInsertRowid }. Wrap.

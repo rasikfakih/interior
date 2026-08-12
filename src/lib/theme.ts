@@ -30,10 +30,10 @@ export type ThemePalette = {
 export type ThemeVars = { light: Record<string, string>; dark: Record<string, string> };
 
 const DEFAULT_PALETTE: ThemePalette = {
-  ink: "#1f3a2d",
-  paper: "#f2efe7",
-  accent: "#c28b3c",
-  muted: "#5a6b5f",
+  ink: "#122a20",
+  paper: "#ecece6",
+  accent: "#c0964f",
+  muted: "#626d66",
 };
 
 export async function resolveTheme(
