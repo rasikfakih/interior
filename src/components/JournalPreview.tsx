@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@/lib/use-gsap";
+import { IconArrowRight } from "./icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -150,7 +151,7 @@ export default function JournalPreview({
             href="/journal"
             className="text-sm font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
-            All entries →
+            All entries <IconArrowRight aria-hidden className="inline" />
           </Link>
         </div>
 

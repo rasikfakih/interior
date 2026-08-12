@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MediaRow } from "./media-types";
 import MediaPicker from "./MediaPicker";
 import { ProjectRoom } from "@/lib/rooms";
+import { IconArrowUp, IconArrowDown } from "../icons";
 
 type Toast = { kind: "ok" | "err"; msg: string };
 
@@ -220,7 +221,7 @@ export default function ProjectRoomsManager({
               disabled={i === 0}
               className="btn-ghost text-xs h-9 px-3 disabled:opacity-30"
             >
-              ↑
+              <IconArrowUp aria-hidden size={14} />
             </button>
             <button
               type="button"
@@ -228,7 +229,7 @@ export default function ProjectRoomsManager({
               disabled={i === rooms.length - 1}
               className="btn-ghost text-xs h-9 px-3 disabled:opacity-30"
             >
-              ↓
+              <IconArrowDown aria-hidden size={14} />
             </button>
             <button
               type="button"

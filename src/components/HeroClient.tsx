@@ -6,6 +6,7 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
+import { IconArrowUpRight } from "./icons";
 import Magnetic from "@/components/Magnetic";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -224,7 +225,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
               <Magnetic>
                 <Link href="/contact" className="btn-primary">
                   Start a project
-                  <span aria-hidden>↗</span>
+                  <IconArrowUpRight aria-hidden className="inline" />
                 </Link>
               </Magnetic>
               <Link href="/projects-v2" className="btn-ghost">

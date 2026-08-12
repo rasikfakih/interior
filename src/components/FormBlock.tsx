@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FormField, FormFieldType } from "@/lib/forms";
+import { IconArrowRight } from "./icons";
 
 type PublicForm = {
   slug: string;
@@ -191,7 +192,7 @@ export default function FormBlock({ formSlug }: { formSlug: string }) {
                 className="btn-primary disabled:opacity-50"
               >
                 {state === "submitting" ? "Sending" : def.submit_label || "Send"}
-                <span aria-hidden>→</span>
+                <IconArrowRight aria-hidden className="inline" />
               </button>
             </div>
           </form>

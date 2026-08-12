@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconArrowRight } from "@/components/icons";
 
 export default function InstallForm() {
   const [purchaseCode, setPurchaseCode] = useState("");
@@ -110,7 +111,7 @@ export default function InstallForm() {
           className="btn-primary disabled:opacity-50"
         >
           {busy ? "Installing" : "Install license"}
-          <span aria-hidden>→</span>
+          <IconArrowRight aria-hidden className="inline" />
         </button>
       </div>
     </form>

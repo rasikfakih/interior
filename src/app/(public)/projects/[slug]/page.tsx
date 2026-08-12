@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import Model3DViewer from "@/components/Model3DViewer";
 import RichTextRenderer from "@/components/RichTextRenderer";
+import { IconArrowLeft } from "@/components/icons";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 type Row = {
@@ -61,7 +62,7 @@ export default async function ProjectDetailPage({
           href="/projects-v2"
           className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-ink-mute hover:text-warm mb-10"
         >
-          <span aria-hidden>←</span> Back to selected work
+          <IconArrowLeft aria-hidden className="inline" /> Back to selected work
         </Link>
 
         <header className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-14">

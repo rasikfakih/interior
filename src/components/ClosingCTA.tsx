@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
+import { IconArrowRight } from "./icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -129,7 +130,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
               href={buttonHref}
               className="btn-primary w-fit"
             >
-              {buttonLabel} <span aria-hidden>→</span>
+              {buttonLabel} <IconArrowRight aria-hidden className="inline" />
             </a>
           </div>
         </div>

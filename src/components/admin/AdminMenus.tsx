@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconArrowUp, IconArrowDown } from "../icons";
 
 type MenuItem = {
   id?: number;
@@ -162,7 +163,7 @@ export default function AdminMenus({
                   className="px-2 py-1 border hairline rounded-[var(--radius-control)] text-xs disabled:opacity-30"
                   aria-label="Move up"
                 >
-                  ↑
+                  <IconArrowUp aria-hidden size={14} />
                 </button>
                 <button
                   type="button"
@@ -171,7 +172,7 @@ export default function AdminMenus({
                   className="px-2 py-1 border hairline rounded-[var(--radius-control)] text-xs disabled:opacity-30"
                   aria-label="Move down"
                 >
-                  ↓
+                  <IconArrowDown aria-hidden size={14} />
                 </button>
                 <button
                   type="button"

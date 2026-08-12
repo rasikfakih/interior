@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Model3DViewer from "./Model3DViewer";
 import Link from "next/link";
 import Image from "next/image";
+import { IconArrowRight } from "./icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -291,7 +292,7 @@ function WalkthroughCard({
           href={`/projects-v2/${item.slug}`}
           className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1 shrink-0"
         >
-          Dossier →
+          Dossier <IconArrowRight aria-hidden className="inline" />
         </Link>
       </div>
     </article>

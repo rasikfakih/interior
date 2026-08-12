@@ -1,5 +1,6 @@
 import Link from "next/link";
 import RichTextRenderer from "@/components/RichTextRenderer";
+import { IconArrowLeft } from "../icons";
 
 type Props = {
   slug: string;
@@ -69,7 +70,7 @@ export default function ProjectHeaderV2({
             href="/projects-v2"
             className="inline-flex items-center gap-2 hover:text-ink transition-colors"
           >
-            <span aria-hidden>{"<-"}</span>
+            <IconArrowLeft aria-hidden className="inline" />
             <span>Selected work</span>
           </Link>
           <span className="hidden md:inline-flex items-center gap-2 truncate">

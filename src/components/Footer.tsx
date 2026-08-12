@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/settings";
 import NewsletterForm from "./NewsletterForm";
+import { IconArrowRight } from "./icons";
 
 export const Footer = async () => {
   const settings = await getSiteSettings();
@@ -88,7 +89,7 @@ export const Footer = async () => {
                 rel="noreferrer noopener"
                 className="hover:text-ink"
               >
-                Instagram →
+                Instagram <IconArrowRight aria-hidden className="inline" />
               </a>
               <a
                 href="https://www.are.na"
@@ -96,7 +97,7 @@ export const Footer = async () => {
                 rel="noreferrer noopener"
                 className="hover:text-ink"
               >
-                Are.na →
+                Are.na <IconArrowRight aria-hidden className="inline" />
               </a>
             </div>
           </div>

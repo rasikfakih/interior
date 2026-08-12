@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import RichTextRenderer from "@/components/RichTextRenderer";
+import { IconArrowLeft } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,7 @@ export default async function JournalEntryPage({
           href="/journal"
           className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-ink-mute hover:text-accent mb-10"
         >
-          <span aria-hidden>←</span> Back to journal
+          <IconArrowLeft aria-hidden className="inline" /> Back to journal
         </Link>
 
         <header className="mb-12">

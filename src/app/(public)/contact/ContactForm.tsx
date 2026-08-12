@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import CalendlyEmbed from "@/components/CalendlyEmbed";
+import { IconArrowRight } from "@/components/icons";
 
 type State = "idle" | "submitting" | "success" | "error";
 
@@ -220,7 +221,7 @@ export default function ContactForm({
                 className="btn-primary disabled:opacity-50"
               >
                 {state === "submitting" ? "Sending" : "Send message"}
-                <span aria-hidden>→</span>
+                <IconArrowRight aria-hidden className="inline" />
               </button>
             </div>
           </form>

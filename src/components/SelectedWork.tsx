@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@/lib/use-gsap";
+import { IconArrowRight } from "./icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -159,7 +160,7 @@ export default function SelectedWork({
             href="/projects-v2"
             className="text-sm font-mono uppercase tracking-[0.18em] hairline-strong border-b pb-1"
           >
-            Full archive →
+            Full archive <IconArrowRight aria-hidden className="inline" />
           </Link>
         </div>
 

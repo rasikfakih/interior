@@ -6,6 +6,18 @@ import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect, useRef, useState } from "react";
+import {
+  IconImage,
+  IconLink,
+  IconListBullets,
+  IconListNumbers,
+  IconParagraph,
+  IconQuote,
+  IconTextBold,
+  IconTextH2,
+  IconTextH3,
+  IconTextItalic,
+} from "../icons";
 
 type Toolbar = "bold" | "italic" | "h2" | "h3" | "bullet" | "ordered" | "quote" | "link" | "image";
 
@@ -94,8 +106,25 @@ export default function RichTextEditor({
     );
   }
 
-  const btn = "px-2 py-1 text-xs font-mono uppercase tracking-[0.16em]";
-  const btnActive = "bg-canvas";
+  const btn =
+    "px-2 py-1.5 text-ink-mute hover:text-ink transition-colors flex items-center justify-center";
+  const btnActive = "bg-canvas text-ink";
+  const TOOLBAR: {
+    key: Toolbar | "paragraph";
+    label: string;
+    Icon: (p: React.ComponentProps<typeof IconTextBold>) => React.ReactNode;
+  }[] = [
+    { key: "bold", label: "Bold", Icon: IconTextBold },
+    { key: "italic", label: "Italic", Icon: IconTextItalic },
+    { key: "h2", label: "Heading 2", Icon: IconTextH2 },
+    { key: "h3", label: "Heading 3", Icon: IconTextH3 },
+    { key: "bullet", label: "Bullet list", Icon: IconListBullets },
+    { key: "ordered", label: "Numbered list", Icon: IconListNumbers },
+    { key: "quote", label: "Quote", Icon: IconQuote },
+    { key: "link", label: "Link", Icon: IconLink },
+    { key: "image", label: "Image", Icon: IconImage },
+    { key: "paragraph", label: "Paragraph", Icon: IconParagraph },
+  ];
 
   const isActive = (name: Toolbar) =>
     name === "bold"
@@ -179,39 +208,33 @@ export default function RichTextEditor({
 
   return (
     <div className="surface-tile overflow-hidden">
-      <div className="flex flex-wrap items-center gap-1 p-2 border-b hairline">
-        {([
-          ["bold", "B"],
-          ["italic", "I"],
-          ["h2", "H2"],
-          ["h3", "H3"],
-          ["bullet", "•"],
-          ["ordered", "1."],
-          ["quote", "\u201C"],
-          ["link", "Link"],
-          ["image", "Img"],
-          ["paragraph", "¶"],
-        ] as [Toolbar | "paragraph", string][]).map(([k, label]) => {
-          if (k === "paragraph") {
+      <div className="flex flex-wrap items-center gap-1 p-2 border-b hairline" role="toolbar" aria-label="Formatting">
+        {TOOLBAR.map(({ key, label, Icon }) => {
+          if (key === "paragraph") {
             return (
               <button
-                key={k}
+                key={key}
                 type="button"
+                title={label}
+                aria-label={label}
                 className={btn}
                 onClick={() => editor.chain().focus().setParagraph().run()}
               >
-                {label}
+                <Icon aria-hidden size={18} />
               </button>
             );
           }
           return (
             <button
-              key={k}
+              key={key}
               type="button"
-              className={`${btn} ${isActive(k as Toolbar) ? btnActive : ""}`}
-              onClick={() => run(k as Toolbar)}
+              title={label}
+              aria-label={label}
+              aria-pressed={isActive(key as Toolbar)}
+              className={`${btn} ${isActive(key as Toolbar) ? btnActive : ""}`}
+              onClick={() => run(key as Toolbar)}
             >
-              {label}
+              <Icon aria-hidden size={18} />
             </button>
           );
         })}
