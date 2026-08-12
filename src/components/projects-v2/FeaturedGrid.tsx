@@ -70,7 +70,7 @@ export default function FeaturedGridV2({ items }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
           <Link
-            href={`/projects/${featured.slug}`}
+            href={`/projects-v2/${featured.slug}`}
             data-tile
             data-cat={featured.category}
             data-year={featured.year}
@@ -103,7 +103,7 @@ export default function FeaturedGridV2({ items }: Props) {
             return (
               <Link
                 key={p.slug}
-                href={`/projects/${p.slug}`}
+                href={`/projects-v2/${p.slug}`}
                 data-tile
                 data-cat={p.category}
                 data-year={p.year}

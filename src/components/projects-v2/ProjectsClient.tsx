@@ -108,7 +108,7 @@ export default function ProjectsClientV2({
               className={`${staggerActive && i % 2 === 1 ? "md:mt-12" : ""}`}
             >
               <Link
-                href={`/projects/${p.slug}`}
+                href={`/projects-v2/${p.slug}`}
                 className="group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/11]"
               >
                 <Image
@@ -128,7 +128,7 @@ export default function ProjectsClientV2({
                 <div>
                   <h3 className="text-2xl md:text-3xl tracking-tight">
                     <Link
-                      href={`/projects/${p.slug}`}
+                      href={`/projects-v2/${p.slug}`}
                       className="hover:text-accent transition-colors"
                     >
                       {p.title}
@@ -195,7 +195,7 @@ export default function ProjectsClientV2({
                 {openModel.scope}
               </p>
               <Link
-                href={`/projects/${openModel.slug}`}
+                href={`/projects-v2/${openModel.slug}`}
                 className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
               >
                 Full project

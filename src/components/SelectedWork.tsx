@@ -156,7 +156,7 @@ export default function SelectedWork({
             <p className="mt-4 text-ink-mute max-w-[48ch]">{lede}</p>
           </div>
           <Link
-            href="/projects"
+            href="/projects-v2"
             className="text-sm font-mono uppercase tracking-[0.18em] hairline-strong border-b pb-1"
           >
             Full archive →
@@ -172,7 +172,7 @@ export default function SelectedWork({
               }`}
             >
               <Link
-                href={`/projects/${p.slug}`}
+                href={`/projects-v2/${p.slug}`}
                 className="ei-work-photo md:col-span-8 block overflow-hidden rounded-[var(--radius-card)] aspect-[16/10] relative md:[direction:ltr]"
               >
                 <Image
@@ -189,7 +189,7 @@ export default function SelectedWork({
                 </p>
                 <h3 className="text-3xl md:text-4xl mt-3 tracking-tight">
                   <Link
-                    href={`/projects/${p.slug}`}
+                    href={`/projects-v2/${p.slug}`}
                     className="hover:text-accent transition-colors"
                   >
                     {p.title}
@@ -200,7 +200,7 @@ export default function SelectedWork({
                 </p>
                 <p className="mt-4 text-ink-mute">{p.scope}</p>
                 <Link
-                  href={`/projects/${p.slug}`}
+                  href={`/projects-v2/${p.slug}`}
                   className="inline-flex items-center gap-2 mt-6 text-sm border-b hairline-strong pb-1"
                 >
                   View project

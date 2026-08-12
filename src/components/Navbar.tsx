@@ -104,7 +104,7 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { href: "/projects", label: "Selected work" },
+    { href: "/projects-v2", label: "Selected work" },
     { href: "/about", label: "Studio" },
     { href: "/journal", label: "Journal" },
     { href: "/contact", label: "Contact" },

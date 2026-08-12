@@ -226,7 +226,7 @@ export default function AdminProjectsIndex() {
                     Edit
                   </Link>
                   <Link
-                    href={`/projects/${r.slug}`}
+                    href={`/projects-v2/${r.slug}`}
                     target="_blank"
                     className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
                   >

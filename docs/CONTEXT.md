@@ -3580,8 +3580,51 @@ Recalibrated the shipped brand look in one cohesive pass.
   recalibrated palette was applied to the live distro row (surgical
   palette-only UPDATE; backup at `%TEMP%/v190/distro-tenant1-pre-v190.json`);
   live home + projects now serve ink #122a20 / paper #ecece6 /
-  accent #c0964f / muted #626d66 (probe pass=11/13; the only
-  remaining FAILs are the Newsreader checks, which need the v1.9.0
-  code deploy).
+  accent #c0964f / muted #626d66 (probe pass=11/13 pre-deploy; the
+  only FAILs were the Newsreader checks). Deploy landed 2026-08-12
+  (pushed cc23ab6 + 6d703bd to origin/main, Vercel rebuilt in ~80s):
+  `node scripts/verify-brand-v190.mjs` now 13/13 PASS - Newsreader +
+  recalibrated palette fully live, and the 3D walkthrough sections
+  on all three project pages render the seeded GLB on the new build.
+
+### 2026-08-12 - v1.10.0 Demo Cut (pre-ship, uncommitted)
+
+Direction set by operator: product is a hosted multi-tenant theme
+(first buyer: Etihad Interiors live at ethinterior.vercel.app); the
+studio hosts and supports buyer installs; demo to theme buyers on
+2026-08-15. Milestone: v1.10.0 Demo Cut, not a features release.
+
+- v2 swap: every public project link now points at the v2 surface
+  (the swap PLAN-PROJECTS-V2 always intended once parity was
+  achieved). Navbar, Footer, HeroClient, SelectedWork,
+  SpatialWalkthroughs, not-found, ContactForm, the v1 detail
+  back-link, the v2 grid components (ProjectsClient, FeaturedGrid),
+  and the admin preview link all repointed to `/projects-v2` and
+  `/projects-v2/<slug>`. The v1 routes stay live as the fallback;
+  sitemap/revalidate still cover both.
+- CI gate: `.github/workflows/ci.yml` runs on push/PR - npm ci,
+  tsc --noEmit, check:themes, build, verify:deploy, and a
+  diff-scoped eslint gate. `scripts/lint-changed.mjs` (npm run
+  lint:changed) lints only changed files and reports only errors on
+  lines the diff adds, so the repo's legacy lint debt (279 errors,
+  mostly no-explicit-any) cannot grow while a hygiene release is
+  deferred. Converted the two touched `<a href>` internal links to
+  next/link to satisfy the gate.
+- Health + uptime: `GET /api/health` (force-dynamic, 200 + db:ok
+  when Postgres/SQLite answers SELECT 1, 503 otherwise) and
+  `scripts/check-uptime.mjs` (npm run check:uptime) - the operator's
+  per-buyer-site probe now that the studio hosts and supports.
+- footer_credit -> "Powered by Interior Studio Theme Made By Rasik
+  Fakih" across src/lib/studio-brand.ts DEFAULTS, data/studio-brand.json,
+  data/theme.distro.json, the initDb SQLite seeds, AND the live
+  tenant 1 distro row (surgical footer_credit-only UPDATE; backup at
+  `%TEMP%/v190/distro-tenant1-pre-footer-credit.json`). The credit
+  renders on /projects, /projects-v2, and /projects-v2/<slug>.
+- Validation: tsc OK, check:themes PASS 8, build green,
+  lint:changed exit 0, local `next start` probe 16/16 (health
+  endpoint, v2 links everywhere, footer credit, v1 fallback still
+  serves; the lone probe FAIL was an invalid assumption - v1 detail
+  never rendered the credit), check:uptime 1/1. Uncommitted; next:
+  commit + deploy, then `node scripts/check-uptime.mjs` against live.
 
 

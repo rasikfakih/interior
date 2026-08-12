@@ -32,7 +32,7 @@ export const Footer = async () => {
             </p>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/projects" className="hover:text-ink">
+                <Link href="/projects-v2" className="hover:text-ink">
                   Selected work
                 </Link>
               </li>

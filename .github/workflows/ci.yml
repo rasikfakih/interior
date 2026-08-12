@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # postinstall runs migrate + seed-pages + apply-distro against the
+      # local SQLite fallback, so the DB-dependent checks below work
+      # without secrets.
+      - run: npm ci
+
+      - run: npx tsc --noEmit
+
+      - run: npm run check:themes
+
+      - run: npm run build
+
+      - run: npm run verify:deploy
+
+      # Lint only the diff: the repo carries a legacy lint debt, so the
+      # gate is "no new errors on changed files", not a full-repo pass.
+      - name: Lint changed files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node scripts/lint-changed.mjs

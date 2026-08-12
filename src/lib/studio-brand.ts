@@ -38,7 +38,7 @@ const DEFAULTS: StudioBrand = {
   year_established: "2017",
   residences_delivered: "60+",
   instagram_url: "https://instagram.com/etihadinteriors",
-  footer_credit: "Powered by Etihad Interiors Theme v1.3.0",
+  footer_credit: "Powered by Interior Studio Theme Made By Rasik Fakih",
   palette: {
     ink: "#122A20",
     paper: "#ECECE6",

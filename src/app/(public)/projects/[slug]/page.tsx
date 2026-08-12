@@ -58,7 +58,7 @@ export default async function ProjectDetailPage({
     <article className="pt-24 md:pt-28 pb-24">
       <div className="container-page">
         <Link
-          href="/projects"
+          href="/projects-v2"
           className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-ink-mute hover:text-warm mb-10"
         >
           <span aria-hidden>←</span> Back to selected work

@@ -985,6 +985,52 @@ already shipped.)
   404 on the live URL, which the smoke flags with
   a 404-on-the-new-path report).
 
+### TS-ID-016 - Demo Cut: v2 default surface + CI gate + health/uptime + vendor credit - v1.10.0
+- Status: @done 2026-08-12 (pending commit + Vercel deploy)
+- Severity: operator ask 2026-08-12 (demo to theme buyers 2026-08-15;
+  product is hosted multi-tenant, studio hosts + supports)
+- Opened: 2026-08-12
+- Owner: freebuff
+- Files:
+  - `src/components/Navbar.tsx`, `Footer.tsx`, `HeroClient.tsx`,
+    `SelectedWork.tsx`, `SpatialWalkthroughs.tsx`,
+    `src/app/not-found.tsx`, `src/app/(public)/contact/ContactForm.tsx`,
+    `src/app/(public)/projects/[slug]/page.tsx`,
+    `src/components/projects-v2/ProjectsClient.tsx`,
+    `src/components/projects-v2/FeaturedGrid.tsx`,
+    `src/components/admin/AdminProjectsIndex.tsx`,
+    `src/lib/initDb.ts` - every public project link repointed to the
+    v2 surface (`/projects-v2`, `/projects-v2/<slug>`); v1 routes stay
+    live as fallback
+  - `.github/workflows/ci.yml` (new) - push/PR gate: npm ci, tsc,
+    check:themes, build, verify:deploy, diff-scoped eslint
+  - `scripts/lint-changed.mjs` (new) - eslint on changed files,
+    errors on added lines only (legacy debt deferred to hygiene release)
+  - `src/app/api/health/route.ts` (new) - force-dynamic liveness +
+    DB reachability (200/503)
+  - `scripts/check-uptime.mjs` (new) - per-buyer-site uptime probe
+  - `src/lib/studio-brand.ts`, `data/studio-brand.json`,
+    `data/theme.distro.json`, `src/lib/initDb.ts` - footer_credit ->
+    "Powered by Interior Studio Theme Made By Rasik Fakih" (+ live
+    tenant 1 distro row, surgical UPDATE, backup in %TEMP%/v190/)
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run check:themes` PASS 8
+  - `npm run build` green
+  - `node scripts/lint-changed.mjs` exit 0 (no new errors on changed lines)
+  - `npm run verify:deploy` green
+  - Local probe: /api/health 200 db=ok; v2 links on home/nav/CTAs;
+    footer credit on /projects, /projects-v2, /projects-v2/<slug>;
+    v1 fallback still serves
+  - Post-deploy: `npm run check:uptime` 1/1 against live
+- Outcome:
+  - v2 becomes the default surface (the swap PLAN-PROJECTS-V2 always
+    intended once parity was achieved; parity verified on both live
+    routes incl. 3D walkthroughs).
+  - The lint gate is line-scoped so the 279-error legacy debt cannot
+    grow while a hygiene release is deferred; two touched <a> links
+    converted to next/link to satisfy the rule.
+
 ---
 
 ## Pending escalation

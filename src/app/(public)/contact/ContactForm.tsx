@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import CalendlyEmbed from "@/components/CalendlyEmbed";
 
 type State = "idle" | "submitting" | "success" | "error";
@@ -104,12 +105,12 @@ export default function ContactForm({
                 journal
               </a>{" "}
               for our field notes, or{" "}
-              <a
-                href="/projects"
+              <Link
+                href="/projects-v2"
                 className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
               >
                 browse selected work
-              </a>
+              </Link>
               .
             </p>
           </div>

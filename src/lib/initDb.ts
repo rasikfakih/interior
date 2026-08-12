@@ -298,7 +298,7 @@ function seedIdentity() {
   if (!row) {
     sqlite.exec(`
       INSERT INTO site_identity (brand_name, tagline, accent_mode, footer_credit)
-      VALUES ('Etihad Interiors', 'A residential interior studio based in Kalyan, Maharashtra.', 'auto', 'Powered by Etihad Interiors Theme v1.0.0');
+      VALUES ('Etihad Interiors', 'A residential interior studio based in Kalyan, Maharashtra.', 'auto', 'Powered by Interior Studio Theme Made By Rasik Fakih');
     `);
   }
 }
@@ -318,7 +318,7 @@ function seedPrimaryMenu() {
     .get(row.id) as { c: number };
   if (count.c === 0) {
     const items = [
-      ["Selected work", "/projects", null, 0, 0],
+      ["Selected work", "/projects-v2", null, 0, 0],
       ["Studio", "/about", null, 1, 0],
       ["Journal", "/journal", null, 2, 0],
       ["Contact", "/contact", null, 3, 0],

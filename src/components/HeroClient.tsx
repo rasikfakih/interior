@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -223,9 +224,9 @@ export default function HeroClient({ data }: { data: HeroData }) {
                 Start a project
                 <span aria-hidden>↗</span>
               </a>
-              <a href="/projects" className="btn-ghost">
+              <Link href="/projects-v2" className="btn-ghost">
                 See selected work
-              </a>
+              </Link>
             </div>
           </div>
 
