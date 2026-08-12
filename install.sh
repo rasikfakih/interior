@@ -37,9 +37,12 @@ if [[ ! -d node_modules ]]; then
   fi
 fi
 
-# Run migrations once
-node scripts/migrate.mjs or true
-node scripts/seed-pages.mjs or true
+# Run migrations once (best-effort; failures must not abort the install)
+node scripts/migrate.mjs || true
+node scripts/seed-pages.mjs || true
+# Seed demo projects/journal/testimonials so a fresh site has visible
+# content. Idempotent - never touches non-empty tables.
+node scripts/seed-content.mjs || true
 
 # Call the install API. The api signs and writes data/license.json.
 PAYLOAD=$(printf '{"purchaseCode":"%s","domain":"%s","tier":"%s"}' "$CODE" "$DOMAIN" "$TIER")
