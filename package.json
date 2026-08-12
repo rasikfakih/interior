@@ -29,7 +29,7 @@
     "smoke:editable:crossc": "node scripts/smoke-editable-crossc.mjs",
     "smoke:live": "node scripts/smoke-live-revalidate.mjs",
     "check:themes": "node scripts/check-theme-presets.mjs",
-    "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs"
+    "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs --allow-skip"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

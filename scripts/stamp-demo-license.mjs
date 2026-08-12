@@ -20,6 +20,12 @@
  *
  * The HMAC key is read from process.env.LICENSE_HMAC_KEY; if absent,
  * the script bails (no fallback write - we never write with a default key).
+ *
+ * When invoked from the npm postinstall chain with `--allow-skip`, a
+ * missing key degrades to a notice + exit 0 instead of failing the
+ * whole install: a fresh checkout / buyer install must not die on the
+ * demo-license convenience stamp. Direct runs keep the hard bail so a
+ * caller never mistakes a skipped stamp for a real one.
  */
 import crypto from "crypto";
 import fs from "fs";
@@ -34,6 +40,10 @@ const PURCHASE_CODE = process.env.STAMP_PURCHASE_CODE || "ELITE-MARCH-2026";
 const HMAC_KEY = process.env.LICENSE_HMAC_KEY || "";
 
 if (!HMAC_KEY) {
+  if (process.argv.includes("--allow-skip")) {
+    console.log("= license stamp skipped (LICENSE_HMAC_KEY unset; set it to stamp the demo license)");
+    process.exit(0);
+  }
   console.error("LICENSE_HMAC_KEY is not set; refusing to stamp with a default key.");
   process.exit(1);
 }
