@@ -213,3 +213,52 @@ YES votes (counter rule in `AGENT_BEST_PRACTICES.md`) plus the
 4-week acceptance window since v1.0 ship elapses before a
 candidate enters v1.3 planning. If no YES has reached 3 votes
 at the 4-week mark, ship no v1.3 - the floor held.
+
+## 15. Postgres backup (studio hosts + supports)
+
+The studio hosts and supports buyer installs, so a restorable
+backup is part of demo readiness and the operating cadence.
+Two layers - run both before demo day (2026-08-15), after any
+live DB write (distro apply, seed, tenant change), and weekly
+afterward. Keep at least one copy off this machine (Supabase
+dashboard backup or a private bucket).
+
+**Layer 1 - full-fidelity pg_dump (schema + data + sequences).**
+Run from any machine with `pg_dump` installed. The connection
+string in `.env.local` (`DATABASE_URL`) is a valid pg URI:
+
+```bash
+# From the repo root, using the live DATABASE_URL
+pg_dump "$DATABASE_URL" --no-owner --no-privileges \
+  -Fc -f data/backups/postgres-$(date +%F).dump
+```
+
+Verify the dump before trusting it:
+
+```bash
+pg_restore --list data/backups/postgres-2026-08-12.dump | head -20
+```
+
+Restore to a fresh database (same Postgres version family):
+
+```bash
+createdb interior-restore
+pg_restore --no-owner -d interior-restore data/backups/postgres-2026-08-12.dump
+```
+
+**Layer 2 - lightweight JSON snapshot (no local pg_dump needed).**
+
+```bash
+npm run backup:postgres
+```
+
+Writes `data/backups/postgres-YYYY-MM-DD.json` (gitignored -
+buyer-derived data never commits). Read-only against Postgres;
+re-reads the file after writing and exits non-zero if the row
+counts do not match. This is the same export pattern as the
+pre-cutover `scripts/export-sqlite.mjs`, and it is what the
+operator can run from any machine with the repo + `DATABASE_URL`.
+
+Supabase dashboard backups (Project Settings -> Database ->
+Backups) complement both layers with point-in-time recovery;
+treat the local dumps as the portable, verifiable copies.

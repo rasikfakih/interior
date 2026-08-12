@@ -12,6 +12,9 @@ data/etihad.db-journal
 data/etihad.db-wal
 data/etihad.db-shm
 
+# Live Postgres backups (buyer-derived). Never commit.
+data/backups/
+
 # Per-install license - buyer stamped.
 data/license.json
 data/license.localhost.json

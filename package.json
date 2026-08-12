@@ -16,6 +16,7 @@
     "seed:content:sqlite": "node scripts/seed-content.mjs",
     "verify:deploy": "node scripts/verify-deploy.mjs",
     "check:uptime": "node scripts/check-uptime.mjs",
+    "backup:postgres": "node scripts/export-postgres.mjs",
     "lint:changed": "node scripts/lint-changed.mjs",
     "graphify:update": "graphify update .",
     "graphify:query": "graphify query",
