@@ -52,7 +52,7 @@ the agent is the writer.
     rows:undefined through pgQuery / pgOne / pgMany).
   - Version bumped 1.8.0 -> 1.9.0; CHANGELOG + FREEZE-MARKER +
     CONTEXT.md §9 updated.
-- Closes on: <pending v1.9.0 commit>
+- Closes on: cc23ab6
 
 ### TS-ID-014 - Encoding cleanup + media storage SDK (bugfix) - v1.8.0
 - Status: @done 2026-08-03 (pending Vercel deploy)
