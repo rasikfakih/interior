@@ -160,6 +160,21 @@ function applyFallbackAdditiveMigrations(db: Database.Database) {
     { table: "site_identity", column: "logo_url", def: "TEXT" },
     { table: "site_identity", column: "favicon_url", def: "TEXT" },
     { table: "newsletter_subscribers", column: "active", def: "INTEGER DEFAULT 1" },
+    // StudioOS v2.0 Phase 0 column additions.
+    { table: "tenants", column: "seats", def: "INTEGER DEFAULT 1" },
+    { table: "tenants", column: "support_notes", def: "TEXT" },
+    { table: "tenants", column: "last_health_at", def: "DATETIME" },
+    { table: "tenants", column: "storage_used_bytes", def: "INTEGER DEFAULT 0" },
+    { table: "tenants", column: "health_status", def: "TEXT DEFAULT 'unknown'" },
+    { table: "media", column: "folder", def: "TEXT" },
+    { table: "media", column: "is_pinned", def: "INTEGER DEFAULT 0" },
+    { table: "pages", column: "robots", def: "TEXT DEFAULT 'index,follow'" },
+    { table: "users", column: "is_active", def: "INTEGER DEFAULT 1" },
+    { table: "users", column: "tenant_id", def: "INTEGER" },
+    // created_at carries no DEFAULT here: SQLite forbids non-constant
+    // defaults on ADD COLUMN. The users INSERT supplies CURRENT_TIMESTAMP.
+    { table: "users", column: "created_at", def: "DATETIME" },
+    { table: "license_log", column: "revenue_cents", def: "INTEGER DEFAULT 0" },
   ];
   for (const a of ADDS) {
     try {
@@ -187,9 +202,19 @@ function placeholderToSqlite(text: string, params: ReadonlyArray<unknown>): {
   sql: string;
   args: unknown[];
 } {
-  const args = [...params];
+  // better-sqlite3 binds numbers, strings, bigints, buffers and null
+  // only. Coerce booleans to 1/0 (Postgres bool parity) and undefined
+  // to null so the same params work on both runtimes.
+  const args = [...params].map((a) =>
+    typeof a === "boolean" ? (a ? 1 : 0) : a === undefined ? null : a
+  );
   let i = 0;
-  const sql = text.replace(/\$(\d+)/g, () => `?`);
+  const sql = text
+    .replace(/\$(\d+)/g, () => `?`)
+    // Postgres-cast syntax (`$3::jsonb`) is meaningless to SQLite; strip
+    // it so the same query text runs on both runtimes. Postgres ignores
+    // nothing here because this branch only executes on the SQLite path.
+    .replace(/::jsonb/gi, "");
   // SQLite supports dynamic placeholder via `?`, no numbered match needed.
   // The above replace strips $1/$2 pushes a sequence, but we still
   // want sqlite's parameter binding to consume them deterministically.
@@ -217,6 +242,13 @@ async function sqliteExec(text: string, params: ReadonlyArray<unknown>): Promise
     return [{ rows: [], rowCount: 0, __ephemeral_writable: true }];
   }
   if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
+    const rows = db.prepare(sql).all(...args);
+    return [{ rows: rows as unknown[], rowCount: rows.length }];
+  }
+  if (/RETURNING/i.test(sql)) {
+    // INSERT/UPDATE ... RETURNING: better-sqlite3's .run() drops the
+    // returned rows; .all() returns them (SQLite 3.35+). Keeps the
+    // dev shim contract with Postgres RETURNING.
     const rows = db.prepare(sql).all(...args);
     return [{ rows: rows as unknown[], rowCount: rows.length }];
   }
@@ -280,15 +312,38 @@ export async function withPgTx<T>(
   fn: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> {
   if (isLocalDevPath()) {
+    // StudioOS Phase 1: the local SQLite fallback now executes
+    // transactional writes for real (BEGIN/COMMIT around the fn) so
+    // routes that rely on withPgTx behave identically to Postgres in
+    // the dev loop. The query shim mirrors sqliteExec (placeholders,
+    // ::jsonb strip, RETURNING via better-sqlite3).
     const db = getSqlite();
-    const synthetic = {
-      async query(_text: any, ..._args: any[]) {
-        return { rows: [], rowCount: 0 };
+    const client = {
+      async query(text: string, params: ReadonlyArray<unknown> = []) {
+        const { sql, args } = placeholderToSqlite(text, params);
+        const trimmed = sql.trim().toUpperCase();
+        if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
+          const rows = db.prepare(sql).all(...args);
+          return { rows: rows as unknown[], rowCount: rows.length };
+        }
+        if (/RETURNING/i.test(sql)) {
+          const rows = db.prepare(sql).all(...args);
+          return { rows: rows as unknown[], rowCount: rows.length };
+        }
+        const r = db.prepare(sql).run(...args);
+        const out: { rows: unknown[]; rowCount: number; lastInsertRowid?: number } = {
+          rows: [],
+          rowCount: r.changes ?? 0,
+        };
+        if (typeof r.lastInsertRowid === 'number') {
+          out.lastInsertRowid = r.lastInsertRowid;
+        }
+        return out;
       },
     } as unknown as pg.PoolClient;
     db.exec('BEGIN');
     try {
-      const result = await fn(synthetic);
+      const result = await fn(client);
       db.exec('COMMIT');
       return result;
     } catch (e) {

@@ -16,8 +16,12 @@ export default async function PageEditor({
     slug: string;
     title: string;
     status: string;
+    seo_title: string | null;
+    seo_description: string | null;
+    robots: string | null;
   }>(
-    `SELECT id, slug, title, status FROM pages WHERE id = $1 LIMIT 1`,
+    `SELECT id, slug, title, status, seo_title, seo_description, robots
+     FROM pages WHERE id = $1 LIMIT 1`,
     [pageId]
   );
   if (!page) {
@@ -44,6 +48,9 @@ export default async function PageEditor({
       initialTitle={page.title}
       initialStatus={page.status}
       initialBlocks={initialBlocks}
+      initialSeoTitle={page.seo_title ?? ""}
+      initialSeoDescription={page.seo_description ?? ""}
+      initialRobots={page.robots ?? "index,follow"}
     />
   );
 }

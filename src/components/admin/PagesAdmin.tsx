@@ -64,6 +64,18 @@ export default function PagesAdmin() {
     else alert("Delete failed");
   }
 
+  async function duplicate(id: number) {
+    const r = await fetch(`/api/pages/${id}/duplicate`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (r.ok) load();
+    else {
+      const j = await r.json().catch(() => ({}));
+      alert(j.error ?? "Duplicate failed");
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-end justify-between flex-wrap gap-4">
@@ -153,6 +165,13 @@ export default function PagesAdmin() {
                 >
                   Edit
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => duplicate(p.id)}
+                  className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
+                >
+                  Duplicate
+                </button>
                 <button
                   type="button"
                   onClick={() => destroy(p.id)}

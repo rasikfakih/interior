@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import Spotlight from "@/components/Spotlight";
+import Reveal from "@/components/Reveal";
 
 type RelatedItem = {
   slug: string;
@@ -63,14 +65,15 @@ export default function ProjectRelatedV2({ items }: Props) {
                   ? "aspect-[4/5]"
                   : "aspect-[4/5]";
             return (
+              <Reveal key={tile.slug} delay={i * 90} className="h-full">
               <Link
-                key={tile.slug}
                 href={`/projects-v2/${tile.slug}`}
-                className="group block"
+                className="group block h-full"
               >
                 <div
-                  className={`relative overflow-hidden rounded-[var(--radius-card)] ${aspect}`}
+                  className={`ei-spot relative overflow-hidden rounded-[var(--radius-card)] ${aspect}`}
                 >
+                  <Spotlight />
                   <Image
                     src={tile.image || FALLBACK}
                     alt={tile.title}
@@ -86,6 +89,7 @@ export default function ProjectRelatedV2({ items }: Props) {
                   {tile.location} - {tile.scope}
                 </p>
               </Link>
+              </Reveal>
             );
           })}
         </div>

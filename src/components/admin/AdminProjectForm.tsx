@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor";
+import ProjectRoomsManager from "./ProjectRoomsManager";
 
 type FormState = {
   title: string;
@@ -200,7 +201,7 @@ export default function AdminProjectForm({
 
       <label className="block">
         <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-          3D model URL (.glb)
+          3D model URL (.glb) - fallback for the walkthrough + rooms
         </span>
         <input
           className="input-line"
@@ -209,6 +210,17 @@ export default function AdminProjectForm({
           placeholder="/uploads/models/seed/reception-room.glb"
         />
       </label>
+
+      {initial?.id ? (
+        <div className="border-t hairline pt-6">
+          <ProjectRoomsManager projectId={initial.id} />
+        </div>
+      ) : (
+        <p className="text-xs text-ink-mute">
+          Rooms (per-space 3D walkthrough) become available after the project
+          is created.
+        </p>
+      )}
 
       <label className="flex items-center gap-3 text-sm">
         <input

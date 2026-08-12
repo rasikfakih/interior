@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Magnetic from "@/components/Magnetic";
+import Reveal from "@/components/Reveal";
 
 /**
  * CtaBandV2 - single closing CTA back to /contact.
@@ -30,9 +32,13 @@ export default function CtaBandV2() {
             </p>
           </div>
           <div className="md:col-span-3 flex md:justify-end">
-            <Link href="/contact" className="btn-primary">
-              Begin a project
-            </Link>
+            <Reveal delay={120}>
+              <Magnetic>
+                <Link href="/contact" className="btn-primary">
+                  Begin a project
+                </Link>
+              </Magnetic>
+            </Reveal>
           </div>
         </div>
       </div>

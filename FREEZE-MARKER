@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.9.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.17.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.9.0. Until
+This file is the authoritative freeze marker for v1.17.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -574,30 +574,53 @@ What v1.9.0 adds on top of v1.8.0, also frozen:
 No route slug, nav label, schema, or dependency change. Tier-gate
 preserved.
 
+## v1.17.0 increment (StudioOS - multi-tenant SaaS, Phases 0-6)
+
+What v1.17.0 adds on top of v1.9.0, frozen under the same carve-out
+rules as the phases below (each phase's file list is recorded in
+`docs/PLATFORM-V2-PLAN.md` phase-status blocks):
+
+  - Tenant admin: theme customizer (8 presets + live preview),
+    DB-driven menus, page revisions + draft preview + per-page SEO +
+    duplicate, forms builder + submissions inbox + CSV, redirects,
+    users/roles, JSON import/export (replace-all restore).
+  - Project rooms: per-room GLB pipeline via the media library,
+    3D viewer upgrade (tone mapping, lighting rig, auto-fit,
+    camera presets, fullscreen), procedural placeholder rooms.
+  - Public immersion: view transitions, cinematic hero, magnetic
+    CTAs, spotlight hover trails, motion pass.
+  - Superadmin: license wizard + revenue ledger, health board,
+    revenue + usage metrics, audited login-as, announcements,
+    full-table backup console.
+  - Schema: 7 new tables + 9 column additions across all three
+    schema surfaces (`scripts/migrate.mjs`, `supabase-bootstrap.sql`,
+    `src/lib/sqlite-fallback-ddl.ts`, pg.ts additive ALTERs).
+
 ## Current state
 
-  - **Frozen since**: 2026-08-12 (rolled forward from v1.8.0
-    2026-08-03, v1.7.0 2026-08-02, v1.6.0 2026-07-13,
-    v1.5.0 2026-07-13, v1.4.4 2026-07-13, v1.4.3 2026-07-11,
-    v1.4.2 2026-07-11, v1.4.1 2026-07-11, v1.4.0
-    2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
+  - **Frozen since**: 2026-08-12 (rolled forward from v1.9.0
+    2026-08-12, v1.8.0 2026-08-03, v1.7.0 2026-08-02,
+    v1.6.0 2026-07-13, v1.5.0 2026-07-13, v1.4.4 2026-07-13,
+    v1.4.3 2026-07-11, v1.4.2 2026-07-11, v1.4.1 2026-07-11,
+    v1.4.0 2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
     v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.9.0
+  - **Version**: 1.17.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-08-12. v1.9.0 Forest & Bone
-    recalibration: recalibrated palette across every theme source,
-    Cormorant Garamond -> Newsreader display serif, seed populates
-    `model_3d` on the three projects (NULL-only backfill for existing
-    installs), local-SQLite SELECT wrapper fix. `npx tsc --noEmit`
-    exit 0. `npm run check:themes` PASS 8. `npm run verify:deploy`
-    green.
+  - **Status**: PENDING DEPLOY 2026-08-12. StudioOS v1.17.0: the
+    hosted multi-tenant SaaS build (Phases 0-6) - WordPress-grade
+    tenant admin, per-room 3D walkthroughs, public immersion pass,
+    and the superadmin back office (license wizard, health board,
+    revenue + usage metrics, login-as, announcements, backup,
+    import/export). `npx tsc --noEmit` exit 0. `npm run check:themes`
+    PASS 8. `npm run verify:deploy` green. Phase E2E on the local
+    SQLite runtime: 16/16, 43/43, 26/26, 35/35, 30/30.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.8.0` to `1.9.0`
-  - Adding a v1.8 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.9.0` to `1.17.0`
+  - Adding a v1.17.0 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

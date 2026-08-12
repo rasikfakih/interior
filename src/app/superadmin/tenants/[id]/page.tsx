@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTenant } from "@/lib/operator-store";
+import { getTenant, listTenantUsers } from "@/lib/operator-store";
 import { TenantDetailClient } from "@/components/operator/TenantDetailClient";
 
 export const dynamic = "force-dynamic";
@@ -18,10 +18,13 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
   const data = await getTenant(numericId);
   if (!data.tenant) redirect("/superadmin/tenants");
 
+  const users = await listTenantUsers(numericId);
+
   return (
     <TenantDetailClient
-      tenant={data.tenant as any}
+      tenant={data.tenant}
       distro={data.distro}
+      users={users}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { getStudioBrand } from "@/lib/studio-brand";
+import Reveal from "@/components/Reveal";
 
 type Stats =
   | { label: string; value: string; kind: "data" }
@@ -37,8 +38,10 @@ export default function NumbersStripV2({ projectCount }: Props) {
       <div className="container-page">
         <ul className="grid grid-cols-1 md:grid-cols-3 gap-y-8">
           {stats.map((s, i) => (
-            <li
+            <Reveal
+              as="li"
               key={s.label}
+              delay={i * 90}
               className={`flex flex-col gap-2 px-0 md:px-6 ${
                 i > 0 ? "md:border-l hairline" : ""
               }`}
@@ -49,7 +52,7 @@ export default function NumbersStripV2({ projectCount }: Props) {
               <span className="font-mono text-3xl md:text-5xl tracking-tight text-ink">
                 {s.kind === "data" ? s.value : computeYears(s.valueFrom)}
               </span>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

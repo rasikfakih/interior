@@ -9,6 +9,7 @@ export type PageRow = {
   is_front: boolean;
   seo_title: string | null;
   seo_description: string | null;
+  robots: string | null;
   published_at: string | null;
   created_at: string;
 };
@@ -21,7 +22,7 @@ export type BlockRow = {
   order_index: number;
 };
 
-const PAGE_COLUMNS = `id, slug, title, status, is_front, seo_title, seo_description, published_at, created_at`;
+const PAGE_COLUMNS = `id, slug, title, status, is_front, seo_title, seo_description, robots, published_at, created_at`;
 
 export async function listPages(): Promise<PageRow[]> {
   try {

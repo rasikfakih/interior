@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext,
   PointerSensor,
@@ -26,24 +27,54 @@ type Block = {
   data: any;
 };
 
+type RevisionRow = {
+  id: number;
+  saved_at: string;
+  payload?: { meta?: Record<string, unknown>; blocks?: unknown[] };
+};
+
+const SEO_ROBOTS_OPTIONS = ["index,follow", "noindex,nofollow"];
+const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
+const INPUT_CLS =
+  "input-line";
+
 export default function PageBuilder({
   pageId,
   initialTitle,
   initialStatus,
   initialBlocks,
+  initialSeoTitle = "",
+  initialSeoDescription = "",
+  initialRobots = "index,follow",
 }: {
   pageId: number;
   initialTitle: string;
   initialStatus: string;
   initialBlocks: Block[];
+  initialSeoTitle?: string;
+  initialSeoDescription?: string;
+  initialRobots?: string;
 }) {
+  const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [status, setStatus] = useState(initialStatus);
+  const [seoTitle, setSeoTitle] = useState(initialSeoTitle);
+  const [seoDescription, setSeoDescription] = useState(initialSeoDescription);
+  const [robots, setRobots] = useState(initialRobots);
   const [blocks, setBlocks] = useState<Block[]>(initialBlocks);
   const [busy, setBusy] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [showSeo, setShowSeo] = useState(false);
+  const [showRevisions, setShowRevisions] = useState(false);
+  const [revisions, setRevisions] = useState<RevisionRow[]>([]);
+  const [toast, setToast] = useState<string | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  function flash(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2600);
+  }
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -55,22 +86,17 @@ export default function PageBuilder({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, status, blocks]);
+  }, [title, status, seoTitle, seoDescription, robots, blocks]);
 
   async function save() {
     setBusy(true);
     try {
-      const meta = await fetch(`/api/pages/${pageId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ title, status }),
-      });
-      const block = await fetch(`/api/pages/${pageId}/blocks`, {
-        method: "PUT",
+      const r = await fetch(`/api/pages/${pageId}/save`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
+          meta: { title, status, seoTitle, seoDescription, robots },
           blocks: blocks.map((b, i) => ({
             type: b.type,
             data: b.data,
@@ -78,17 +104,83 @@ export default function PageBuilder({
           })),
         }),
       });
-      if (!meta.ok) {
-        const j = await meta.json().catch(() => ({}));
-        alert(`Save failed: ${j.error || meta.status}`);
-        return;
-      }
-      if (!block.ok) {
-        const j = await block.json().catch(() => ({}));
-        alert(`Save failed: ${j.error || block.status}`);
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        flash(`Save failed: ${j.error || r.status}`);
         return;
       }
       setSavedAt(new Date().toLocaleTimeString());
+      flash("Saved. A revision snapshot was recorded.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function loadRevisions() {
+    setShowRevisions((open) => {
+      const next = !open;
+      if (next) {
+        fetch(`/api/pages/${pageId}/revisions`, { credentials: "include" })
+          .then((r) => r.json())
+          .then((j) => setRevisions(Array.isArray(j.revisions) ? j.revisions : []))
+          .catch(() => setRevisions([]));
+      }
+      return next;
+    });
+  }
+
+  async function restoreRevision(revId: number) {
+    if (!confirm("Restore this revision? Current state is kept as a snapshot too.")) return;
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/pages/${pageId}/revisions/${revId}/restore`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        flash(`Restore failed: ${j.error || r.status}`);
+        return;
+      }
+      flash("Revision restored. Reloading editor state.");
+      setTimeout(() => router.refresh(), 600);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function preview() {
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/pages/${pageId}/preview`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        flash(`Preview failed: ${j.error || r.status}`);
+        return;
+      }
+      window.open(j.url, "_blank", "noopener,noreferrer");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function duplicate() {
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/pages/${pageId}/duplicate`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        flash(`Duplicate failed: ${j.error || r.status}`);
+        return;
+      }
+      flash(`Duplicated to /${j.slug}.`);
+      router.push(`/admin/pages/${j.id}`);
     } finally {
       setBusy(false);
     }
@@ -148,7 +240,7 @@ export default function PageBuilder({
     <div className="space-y-8">
       <header className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center surface-elevated p-5 rounded-[var(--radius-card)]">
         <input
-          className="input-line md:col-span-5"
+          className="input-line md:col-span-4"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Page title"
@@ -166,14 +258,134 @@ export default function PageBuilder({
         <div className="md:col-span-3 text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
           {savedAt ? `Saved ${savedAt}` : "Not saved"}
         </div>
-        <button
-          onClick={save}
-          disabled={busy}
-          className="btn-primary md:col-span-2 disabled:opacity-50"
-        >
-          {busy ? "Saving" : "Save"}
-        </button>
+        <div className="md:col-span-3 flex items-center justify-end gap-2 flex-wrap">
+          <button onClick={preview} disabled={busy} className="btn-ghost text-xs h-9 px-3">
+            Preview
+          </button>
+          <button onClick={duplicate} disabled={busy} className="btn-ghost text-xs h-9 px-3">
+            Duplicate
+          </button>
+          <button
+            onClick={save}
+            disabled={busy}
+            className="btn-primary md:col-span-2 disabled:opacity-50"
+          >
+            {busy ? "Saving" : "Save"}
+          </button>
+        </div>
       </header>
+
+      {toast && (
+        <div
+          role="status"
+          className="surface-elevated px-4 py-3 text-sm text-accent rounded-[var(--radius-card)]"
+        >
+          {toast}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setShowSeo((v) => !v)}
+          className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
+        >
+          SEO {showSeo ? "▲" : "▼"}
+        </button>
+        <button
+          type="button"
+          onClick={loadRevisions}
+          className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
+        >
+          Revisions {showRevisions ? "▲" : "▼"}
+        </button>
+        <span className="ml-auto text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
+          Blocks · {blocks.length}
+        </span>
+      </div>
+
+      {showSeo && (
+        <section className="surface-tile p-5 rounded-[var(--radius-card)] space-y-4">
+          <p className={LABEL_CLS}>Search engine</p>
+          <label className="block">
+            <span className={LABEL_CLS}>SEO title</span>
+            <input
+              className={INPUT_CLS}
+              value={seoTitle}
+              onChange={(e) => setSeoTitle(e.target.value)}
+              placeholder="Page title shown in search results"
+              maxLength={200}
+            />
+          </label>
+          <label className="block">
+            <span className={LABEL_CLS}>SEO description</span>
+            <textarea
+              className={INPUT_CLS + " resize-y"}
+              rows={2}
+              value={seoDescription}
+              onChange={(e) => setSeoDescription(e.target.value)}
+              placeholder="One or two sentences for search engines"
+              maxLength={500}
+            />
+          </label>
+          <label className="block">
+            <span className={LABEL_CLS}>Robots</span>
+            <select
+              className={INPUT_CLS + " bg-transparent"}
+              value={robots}
+              onChange={(e) => setRobots(e.target.value)}
+            >
+              {SEO_ROBOTS_OPTIONS.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="text-xs text-ink-mute">
+            The home page serves these in its &lt;meta&gt;. Save to apply.
+          </p>
+        </section>
+      )}
+
+      {showRevisions && (
+        <section className="surface-tile p-5 rounded-[var(--radius-card)]">
+          <p className={LABEL_CLS + " mb-3"}>
+            History · {revisions.length} snapshot(s), newest first
+          </p>
+          {revisions.length === 0 ? (
+            <p className="text-sm text-ink-mute">No revisions yet. Save the page to create one.</p>
+          ) : (
+            <ul className="divide-y hairline">
+              {revisions.map((rev, idx) => (
+                <li key={rev.id} className="py-3 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
+                      #{rev.id}
+                      {idx === 0 ? " · latest" : ""}
+                    </p>
+                    <p className="text-sm mt-0.5">
+                      {rev.saved_at
+                        ? new Date(rev.saved_at).toLocaleString()
+                        : "unknown time"}
+                      {" · "}
+                      {rev.payload?.blocks?.length ?? 0} blocks
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => restoreRevision(rev.id)}
+                    disabled={busy}
+                    className="btn-ghost text-xs h-9 px-3 disabled:opacity-50"
+                  >
+                    Restore
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="text-xl tracking-tight">Blocks - {blocks.length}</h2>

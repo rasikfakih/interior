@@ -158,6 +158,14 @@ export const BLOCK_REGISTRY: Record<BlockType, BlockDefinition> = {
       ],
     },
   },
+  form: {
+    type: "form",
+    label: "Form",
+    description: "Admin-built form definition",
+    defaultData: {
+      formSlug: "contact",
+    },
+  },
   divider: { type: "divider", label: "Divider", description: "Hairline rule", defaultData: {} },
   spacer: { type: "spacer", label: "Spacer", description: "Vertical space", defaultData: { size: "md" } },
 };

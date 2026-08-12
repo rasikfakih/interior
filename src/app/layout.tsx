@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Newsreader,
+  Inter_Tight,
+  Space_Grotesk,
+} from "next/font/google";
 import "./globals.css";
+import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { I18nProvider } from "@/components/I18nProvider";
 import { SessionProvider } from "@/components/SessionProvider";
@@ -35,6 +42,26 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
+/**
+ * Customizer font tokens (Phase 1 Theme tab options). Loaded so the
+ * per-tenant theme engine can emit var(--font-inter-tight) /
+ * var(--font-space-grotesk) stacks; the default display/body stays
+ * Newsreader + Geist regardless.
+ */
+const interTight = Inter_Tight({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter-tight",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://etihadinteriors.com"),
   title: {
@@ -61,12 +88,17 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable} ${newsreader.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} ${interTight.variable} ${spaceGrotesk.variable}`}
     >
       <body className="font-sans antialiased bg-canvas text-ink">
         <SessionProvider>
           <ThemeProvider>
-            <I18nProvider>{children}</I18nProvider>
+            <I18nProvider>
+              {/* Phase 4: soft crossfade between routes via the View
+                  Transitions API. Styling lives in globals.css under
+                  ::view-transition rules with a reduced-motion guard. */}
+              <ViewTransitions>{children}</ViewTransitions>
+            </I18nProvider>
           </ThemeProvider>
         </SessionProvider>
         <GA4Script />

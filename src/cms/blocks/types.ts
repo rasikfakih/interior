@@ -12,7 +12,8 @@ export type BlockType =
   | "image"
   | "image-grid"
   | "divider"
-  | "spacer";
+  | "spacer"
+  | "form";
 
 export type BlockDefinition<T = any> = {
   type: BlockType;

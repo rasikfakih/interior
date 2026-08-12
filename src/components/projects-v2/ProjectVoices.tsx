@@ -1,4 +1,5 @@
 import { ensureMigrated, pgMany } from "@/lib/pg";
+import Reveal from "@/components/Reveal";
 
 type Row = {
   id: number;
@@ -63,11 +64,9 @@ export default async function ProjectVoicesV2({ slug }: Props) {
       <div className="container-page">
         <p className="chrome-pill mb-4 inline-flex">From the homeowner</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mt-2">
-          {rows.map((q) => (
-            <figure
-              key={q.id}
-              className="surface-tile p-6 md:p-7 flex flex-col gap-4"
-            >
+          {rows.map((q, i) => (
+            <Reveal key={q.id} delay={i * 90} className="h-full">
+            <figure className="surface-tile p-6 md:p-7 flex flex-col gap-4 h-full">
               <blockquote className="font-display text-xl md:text-2xl tracking-[-0.015em] leading-[1.2] pb-2 line-clamp-6 max-w-[40ch]">
                 &ldquo;{q.quote}&rdquo;
               </blockquote>
@@ -80,6 +79,7 @@ export default async function ProjectVoicesV2({ slug }: Props) {
                 </p>
               </figcaption>
             </figure>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -45,6 +45,11 @@ the bundle, but the distro file is a deliberate per-tenant override.
 | `default_locales` | string[] | Subset of `["en", "hi", "mr"]`. Business tier only. |
 | `tier` | `'personal'` \| `'business'` | Used by the install CLI to override the choice on the install form. |
 | `domain` | string | Buyer-served domain. License signs to it. |
+| `fonts.display` | string | Display type token: `newsreader` \| `geist` \| `inter-tight` \| `space-grotesk`. Maps to `--font-display` via the theme engine (v2.0 customizer). |
+| `fonts.body` | string | Body type token, same allowed set. Maps to `--font-sans`. |
+| `spacing_density` | `1` \| `2` \| `3` | Section rhythm: loose / standard / tight. Maps to `--section-gap` (8rem / 6rem / 4rem). |
+| `motion_intensity` | integer `1..10` | Drives reveal + parallax tiers. Maps to `--motion-level`. |
+| `radius_scale` | `'sharp'` \| `'soft'` \| `'pill'` | Maps to `--radius-control` / `--radius-card` (2px / 14px / 9999px). |
 
 ## Forbidden keys (rejected at submit)
 
@@ -53,6 +58,8 @@ the bundle, but the distro file is a deliberate per-tenant override.
 - `hmac_key` - HMAC keys live in `tenants.hmac_key` only.
 - `purchase_code` - that's a per-license field, not a theme field.
 - Anything matching `/^x-/i` - reserved for future extension hooks.
+
+Customizer keys are validated when present: `fonts.*` must be in the allowed token set, `spacing_density` in `{1,2,3}`, `motion_intensity` an integer `1..10`, `radius_scale` in the enum. The theme engine (`src/lib/theme.ts`) derives `--font-display`, `--font-sans`, `--radius-*`, `--section-gap`, `--motion-level` from them; an old bundle serving a new distro degrades to system fonts for unknown tokens.
 
 ## Validation rules
 

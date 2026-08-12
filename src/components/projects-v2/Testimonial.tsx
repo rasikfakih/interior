@@ -1,4 +1,5 @@
 import { ensureMigrated, pgMany } from "@/lib/pg";
+import Reveal from "@/components/Reveal";
 
 type Row = {
   id: number;
@@ -70,7 +71,8 @@ export default async function ProjectsTestimonialV2() {
               {row ? "From the homeowner" : "Studio line"}
             </p>
           </div>
-          <blockquote className="md:col-span-10">
+          <Reveal className="md:col-span-10">
+          <blockquote>
             <p className="font-display text-2xl md:text-4xl lg:text-5xl tracking-[-0.015em] leading-[1.1] pb-4 max-w-[28ch]">
               {pull.quote}
             </p>
@@ -84,6 +86,7 @@ export default async function ProjectsTestimonialV2() {
               </p>
             </footer>
           </blockquote>
+          </Reveal>
         </div>
       </div>
     </section>

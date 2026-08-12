@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
 import { bump } from "@/lib/revalidate";
+import { snapshotPage } from "@/lib/revisions";
 
 export async function GET(
   _req: NextRequest,
@@ -67,6 +68,7 @@ export async function PUT(
     } catch {
       bump({ kind: "pages" });
     }
+    await snapshotPage(pageId);
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? "db error" }, { status: 400 });

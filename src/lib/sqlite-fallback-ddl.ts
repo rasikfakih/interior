@@ -188,7 +188,8 @@ export const SQLITE_FALLBACK_DDL = [
     hmac_key TEXT,
     installed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expires_at DATETIME,
-    revoked_at DATETIME
+    revoked_at DATETIME,
+    health_status TEXT DEFAULT 'unknown'
   )`,
 
   `CREATE TABLE IF NOT EXISTS tenant_data (
@@ -204,5 +205,75 @@ export const SQLITE_FALLBACK_DDL = [
     email TEXT UNIQUE NOT NULL,
     subscribed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     active INTEGER DEFAULT 1
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS project_rooms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    description TEXT,
+    model_3d TEXT,
+    cover_media_id INTEGER,
+    hotspots TEXT,
+    order_index INTEGER NOT NULL DEFAULT 0,
+    is_published INTEGER DEFAULT 1
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS form_definitions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    fields TEXT NOT NULL,
+    submit_label TEXT,
+    success_message TEXT,
+    is_published INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS form_submissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    form_id INTEGER NOT NULL,
+    payload TEXT NOT NULL,
+    read_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS redirects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    status_code INTEGER DEFAULT 301,
+    is_active INTEGER DEFAULT 1
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS usage_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tenant_id INTEGER,
+    kind TEXT NOT NULL,
+    path TEXT,
+    meta TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS license_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tenant_id INTEGER NOT NULL,
+    action TEXT NOT NULL,
+    tier TEXT,
+    seats INTEGER,
+    expires_at DATETIME,
+    issued_by TEXT,
+    revenue_cents INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS announcements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    audience TEXT NOT NULL DEFAULT 'all',
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`,
 ];

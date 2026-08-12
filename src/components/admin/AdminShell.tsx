@@ -14,6 +14,12 @@ type Tab =
   | "team"
   | "settings"
   | "site-identity"
+  | "theme"
+  | "menus"
+  | "forms"
+  | "redirects"
+  | "users"
+  | "export-import"
   | "newsletter"
   | "install";
 
@@ -24,6 +30,12 @@ const ADMIN_NAV: { key: Tab; label: string; sub: string }[] = [
   { key: "journal", label: "Journal", sub: "Field notes" },
   { key: "testimonials", label: "Testimonials", sub: "Client voices" },
   { key: "team", label: "Team", sub: "Studio members" },
+  { key: "theme", label: "Theme", sub: "Palette, type, motion" },
+  { key: "menus", label: "Menus", sub: "Primary navigation" },
+  { key: "forms", label: "Forms", sub: "Builder + submissions" },
+  { key: "redirects", label: "Redirects", sub: "301/302 rules" },
+  { key: "users", label: "Users", sub: "Team & roles" },
+  { key: "export-import", label: "Export / Import", sub: "JSON backup & restore" },
   { key: "settings", label: "Settings", sub: "Site & contact" },
   { key: "site-identity", label: "Site identity", sub: "Brand & accent" },
   { key: "newsletter", label: "Newsletter", sub: "Subscriber viewer" },
@@ -43,8 +55,10 @@ function useToast() {
 
 export default function AdminShell({
   email,
+  role,
 }: {
   email: string;
+  role: string;
 }) {
   const [tab, setTab] = useState<Tab>("pages");
   const { msg } = useToast();
@@ -106,7 +120,7 @@ export default function AdminShell({
           </aside>
 
           <main className="md:col-span-9">
-            <TabPanel tab={tab} />
+            <TabPanel tab={tab} role={role} />
           </main>
         </div>
       </div>
@@ -114,7 +128,7 @@ export default function AdminShell({
   );
 }
 
-function TabPanel({ tab }: { tab: Tab }) {
+function TabPanel({ tab, role }: { tab: Tab; role: string }) {
   if (tab === "pages") return <PagesPanel />;
   if (tab === "media") return <Dynamic mount="/admin/media" />;
   if (tab === "license") return <Dynamic mount="/admin/license" />;
@@ -122,6 +136,12 @@ function TabPanel({ tab }: { tab: Tab }) {
   if (tab === "journal") return <JournalRoutePanel />;
   if (tab === "testimonials") return <TestimonialsRoutePanel />;
   if (tab === "team") return <TeamRoutePanel />;
+  if (tab === "theme") return <ThemeRoutePanel />;
+  if (tab === "menus") return <MenusRoutePanel />;
+  if (tab === "forms") return <FormsRoutePanel role={role} />;
+  if (tab === "redirects") return <RedirectsRoutePanel role={role} />;
+  if (tab === "users") return <UsersRoutePanel role={role} />;
+  if (tab === "export-import") return <ExportImportRoutePanel role={role} />;
   if (tab === "settings") return <SettingsRoutePanel />;
   if (tab === "site-identity") return <SiteIdentityRoutePanel />;
   if (tab === "newsletter") return <NewsletterRoutePanel />;
@@ -269,6 +289,299 @@ function InstallRoutePanel() {
           Open editor
         </button>
       )}
+    </div>
+  );
+}
+
+// ThemeRoutePanel mirrors the probe-then-push pattern. The customizer
+// lives at /admin/theme, a server page mounting AdminTheme.
+function ThemeRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/theme", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/theme");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Theme</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/theme." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/theme")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+// MenusRoutePanel mirrors the probe-then-push pattern. The nav editor
+// lives at /admin/menus, a server page mounting AdminMenus.
+function MenusRoutePanel() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/menus", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/menus");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Menus</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/menus." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/menus")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+    </div>
+  );
+}
+
+// FormsRoutePanel mirrors the probe-then-push pattern. The forms
+// manager lives at /admin/forms, a server page mounting AdminForms.
+function FormsRoutePanel({ role }: { role: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/forms", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/forms");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Forms</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/forms." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/forms")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+      <p className="text-xs text-ink-mute mt-4">
+        Your role: <span className="font-mono text-xs">{role}</span>.
+      </p>
+    </div>
+  );
+}
+
+// ExportImportRoutePanel probes the export route (admin-gated; editors
+// get 403) then pushes to the full page at /admin/export-import.
+function ExportImportRoutePanel({ role }: { role: string }) {
+  const router = useRouter();
+  const isEditor = role === "editor";
+  // Editors never probe (the route 403s them); admins start "busy"
+  // until the probe answers. Avoids a sync setState in the effect.
+  const [state, setState] = useState<
+    { phase: "busy" } | { phase: "errored" } | { phase: "done" }
+  >(isEditor ? { phase: "done" } : { phase: "busy" });
+  useEffect(() => {
+    if (isEditor) return;
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/export", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/export-import");
+          return;
+        }
+      } catch {}
+      if (alive) setState({ phase: "errored" });
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router, isEditor]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Export / Import</p>
+      <p className="text-sm text-ink-mute">
+        {isEditor
+          ? "Editors cannot export or import content — ask an admin."
+          : state.phase === "busy"
+            ? "Opening exporter…"
+            : state.phase === "errored"
+              ? "Could not reach /api/export."
+              : ""}
+      </p>
+      {state.phase === "errored" && !isEditor && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/export-import")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open exporter
+        </button>
+      )}
+    </div>
+  );
+}
+
+// RedirectsRoutePanel mirrors the probe-then-push pattern. The
+// redirect manager lives at /admin/redirects.
+function RedirectsRoutePanel({ role }: { role: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/redirects", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/redirects");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Redirects</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/redirects." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/redirects")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+      <p className="text-xs text-ink-mute mt-4">
+        Your role: <span className="font-mono text-xs">{role}</span>.
+      </p>
+    </div>
+  );
+}
+
+// UsersRoutePanel mirrors the probe-then-push pattern. The team &
+// roles manager lives at /admin/users.
+function UsersRoutePanel({ role }: { role: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(true);
+  const [errored, setErrored] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    async function probe() {
+      try {
+        const r = await fetch("/api/users", { credentials: "include" });
+        if (!alive) return;
+        if (r.ok) {
+          router.push("/admin/users");
+          return;
+        }
+      } catch {}
+      if (alive) {
+        setErrored(true);
+        setBusy(false);
+      }
+    }
+    probe();
+    return () => {
+      alive = false;
+    };
+  }, [router]);
+  return (
+    <div className="surface-tile p-6 rounded-[var(--radius-card)] min-h-[200px]">
+      <p className="chrome-pill mb-3 inline-flex">Users</p>
+      <p className="text-sm text-ink-mute">
+        {busy ? "Opening editor…" : errored ? "Could not reach /api/users." : ""}
+      </p>
+      {errored && (
+        <button
+          type="button"
+          onClick={() => router.push("/admin/users")}
+          className="btn-ghost text-xs h-9 px-3 mt-3"
+        >
+          Open editor
+        </button>
+      )}
+      <p className="text-xs text-ink-mute mt-4">
+        Your role: <span className="font-mono text-xs">{role}</span>.
+      </p>
     </div>
   );
 }

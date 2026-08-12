@@ -3,6 +3,7 @@ import { ensureMigrated, pgQuery, withPgTx } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
 import { bump } from "@/lib/revalidate";
+import { snapshotPage } from "@/lib/revisions";
 
 /**
  * Single-roundtrip save endpoint for /admin/pages/[id].
@@ -121,6 +122,7 @@ export async function POST(
       }
     });
 
+    let revisionId: number | null = null;
     if (metaSaved || blocksSaved > 0) {
       const kind = "pages.save";
       const message = `pages#${numericId} save: meta=${metaSaved ? "1" : "0"} blocks=${blocksSaved}`;
@@ -132,6 +134,8 @@ export async function POST(
         metaFields: Object.keys(meta),
         blocksCount: blocksSaved,
       });
+      // WordPress-grade history: snapshot the post-save state.
+      revisionId = await snapshotPage(numericId);
     }
 
     try {
@@ -148,6 +152,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       saved: { meta: metaSaved, blocks: blocksSaved },
+      revisionId,
       audit: auditKind
         ? { kind: auditKind, message: auditMessage }
         : null,

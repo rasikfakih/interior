@@ -9,7 +9,21 @@ import { useI18n } from "./I18nProvider";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const Navbar = () => {
+export type NavLink = { href: string; label: string; is_button?: boolean };
+
+const DEFAULT_LINKS: NavLink[] = [
+  { href: "/projects-v2", label: "Selected work" },
+  { href: "/about", label: "Studio" },
+  { href: "/journal", label: "Journal" },
+  { href: "/contact", label: "Contact" },
+];
+
+/**
+ * StudioOS Phase 1: the nav is DB-driven. (public)/layout.tsx reads
+ * the primary menu row and passes it here; the hardcoded list is the
+ * fallback when the menu table is empty or unreachable.
+ */
+export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) => {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -102,13 +116,6 @@ export const Navbar = () => {
     });
     return () => ctx.revert();
   }, []);
-
-  const navLinks = [
-    { href: "/projects-v2", label: "Selected work" },
-    { href: "/about", label: "Studio" },
-    { href: "/journal", label: "Journal" },
-    { href: "/contact", label: "Contact" },
-  ];
 
   return (
     <header

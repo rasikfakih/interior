@@ -3627,4 +3627,231 @@ studio hosts and supports buyer installs; demo to theme buyers on
   never rendered the credit), check:uptime 1/1. Uncommitted; next:
   commit + deploy, then `node scripts/check-uptime.mjs` against live.
 
+### 2026-08-12 - StudioOS Phase 0 + Phase 1 (pre-ship, uncommitted)
 
+Platform v2 plan (`docs/PLATFORM-V2-PLAN.md`) approved; Phase 0 and
+Phase 1 built and verified.
+
+Phase 0 (schema + theme engine):
+- 7 new tables (project_rooms, form_definitions, form_submissions,
+  redirects, usage_events, license_log, announcements) + 9 column
+  additions (tenants.seats/support_notes/last_health_at/
+  storage_used_bytes, media.folder/is_pinned, pages.robots,
+  users.is_active/tenant_id) in `migrate.mjs`, `supabase-bootstrap.sql`,
+  `sqlite-fallback-ddl.ts` + pg.ts additive ALTERs. Live Postgres
+  self-heals on next cold start via ensureMigrated.
+- theme.ts parses the customizer surface (fonts.display/body,
+  spacing_density, motion_intensity, radius_scale) and derives
+  --font-display/--font-sans/--radius-*/--section-gap/--motion-level.
+  Fixed latent bug: SQLite distro data (TEXT) was unreadable by the
+  engine (normalizeData). Inter Tight + Space Grotesk bundled.
+  apply-distro.mjs + check-theme-presets.mjs extended. E2E probe:
+  customizer distro served all 6 derived vars on the local SQLite path.
+
+Phase 1 (admin core, all six items shipped):
+- Theme customizer: /api/theme GET/PUT (hex + AA contrast + token
+  validation, distro-row merge preserving other keys, audited) and
+  /admin/theme with palette pickers, live contrast rows, font/density/
+  radius/motion controls, 8-preset gallery, inline live preview.
+- Menu editor: /api/menus GET/PUT (transactional replace), Navbar is
+  DB-driven via (public)/layout.tsx fetch with hardcoded fallback,
+  /admin/menus editor. Verified: menu-label mutation appeared in
+  served HTML.
+- Page revisions: snapshot on every save (atomic /save + legacy
+  PUT paths), GET /api/pages/[id]/revisions, POST .../restore
+  (re-applies meta+blocks, snapshots the restored state).
+- Draft preview: HMAC-signed 2h token via POST /api/pages/[id]/preview;
+  /preview?token= renders any page (draft or published) under a
+  noindex banner.
+- Per-page SEO: PageBuilder SEO panel (seo_title, seo_description,
+  robots) saved via the atomic route; home page serves them via
+  generateMetadata.
+- Duplicate: POST /api/pages/[id]/duplicate -> unique slug-copy draft
+  with copied blocks; action in the pages list + editor.
+
+Dev-loop parity fixes in pg.ts (SQLite fallback): withPgTx now
+actually executes transactional writes; `::jsonb` casts stripped on
+placeholders; INSERT...RETURNING returns rows via .all().
+
+Validation: tsc OK, check:themes PASS 8, build green, lint:changed
+0 new errors (37 files), verify:deploy ready. Full authenticated E2E
+against the local SQLite runtime (valid local license stamped via
+stamp-demo-license, admin login): 16/16 PASS covering save->revision->
+restore->preview->duplicate->delete + home render. All local state
+restored after (dev DB + license + env). Uncommitted; next: commit +
+deploy as v1.11.0/v1.12.0, then Phase 2 (forms, redirects, roles).
+
+
+### 2026-08-12 - StudioOS Phase 2 (forms, redirects, users/roles; pre-ship, uncommitted)
+
+Phase 2 of the platform plan shipped on top of Phases 0+1.
+
+Forms builder + submissions:
+- src/lib/forms.ts: field types (text/email/tel/textarea/select), admin
+  validateFields (key regex, dup keys, select options), public
+  validateSubmission (required, email, select-option), payload sanitize.
+- /api/forms GET/POST + /api/forms/[id] GET/PUT/DELETE (slug
+  normalization, 409 dup, delete cascades submissions). Public surface:
+  /api/forms/public/[slug] (published-only) and /api/forms/submit
+  (unauthenticated; 422 on missing-required/bad-email/bad-option).
+- Inbox: /api/forms/[id]/submissions (unread count),
+  /submissions/read (mark-all), /submissions/export (quoted CSV with
+  field columns + attachment header, admin-gated).
+- New `form` block type (registry, block-schemas, PageRenderer) rendered
+  by the public FormBlock client component; AdminForms UI (list / fields
+  editor / inbox) at /admin/forms; AdminShell Forms tab.
+
+Redirects manager:
+- /api/redirects GET/POST + /api/redirects/[id] PUT/DELETE (source
+  normalization to /path, root forbidden, 301/302 only).
+- Enforcement: (public)/[...slug] catch-all serves 308 permanent /
+  307 temporary for active rows, else 404. DB-driven, no rebuild.
+  AdminRedirects UI at /admin/redirects; AdminShell Redirects tab.
+
+Users & roles:
+- /api/users GET/POST + /api/users/[id] PUT/DELETE with bcrypt hashing,
+  roles admin/editor/superadmin, self-protection (no self demote/
+  deactivate/delete), superadmin-only guards, editors blocked from user
+  management. users.created_at added to all three schema surfaces +
+  pg.ts additive (SQLite ADD COLUMN avoids non-constant default; INSERT
+  supplies CURRENT_TIMESTAMP). AdminUsers UI at /admin/users; AdminShell
+  Users tab; AdminShell now receives the session role.
+
+Dev-parity fix in pg.ts: the SQLite shim coerces booleans to 1/0 and
+undefined to null so Postgres bool params bind on better-sqlite3.
+
+Validation: tsc / build / check:themes / lint:changed / verify:deploy
+all green. Authenticated E2E on the local SQLite runtime (stamped valid
+license + admin login): 43/43 PASS - forms create/validate/409/public
+submit 200+422s/inbox unread/mark-read/CSV; redirects CRUD + live
+308/307/pause/delete; users create/role/deactivate/short-pw 400/
+self-guards 403/delete, no password_hash leak. All local state restored
+after (dev DB + license + env). Uncommitted; next: commit + deploy
+(v1.13.0), then Phase 3 (project rooms + GLB pipeline + 3D viewer
+upgrade + room-by-room detail stories).
+### 2026-08-12 - StudioOS Phase 3 (project rooms, GLB pipeline, viewer upgrade; pre-ship, uncommitted)
+
+Phase 3 of the platform plan shipped: per-room 3D walkthroughs end to
+end.
+
+Rooms schema consumers + API:
+- src/lib/rooms.ts: room validation (name, slug normalization,
+  description, model_3d, hotspots JSON, order_index, is_published).
+- /api/projects/[id]/rooms GET (public, ordered by order_index) +
+  POST (admin; auto-order = MAX+1; dup-slug 409; 404 on missing
+  project); /api/projects/[id]/rooms/[roomId] PUT/DELETE.
+
+Admin rooms manager:
+- ProjectRoomsManager embedded in AdminProjectForm (new + edit
+  projects): list, add/edit inline, up/down reorder via paired PUTs,
+  delete, published toggle, per-room GLB picked through MediaPicker
+  (accept="glb") from the tenant media library.
+
+Public room-by-room story:
+- ProjectRooms server component on /projects-v2/[slug]: full-width 3D
+  stages per room with editorial headers (deliberately not zigzag), a
+  room without its own GLB falls back to the project model, detail
+  page prefers rooms over the legacy single-model section.
+
+Viewer upgrade (three-runtime.tsx + Model3DViewer):
+- Explicit ACESFilmicToneMapping + sRGB output; 3-point lighting rig
+  (key with shadows, cool fill, warm rim) + Environment apartment 0.55.
+- Auto-fit: Box3 bounds normalize any tenant GLB to a 2.6-unit cube
+  centered at origin (camera rig + contact shadows hold at any scale).
+- Animated camera presets (Front / 3/4 / Top / Detail) via 0.8s
+  ease-in-out lerp on camera.position + OrbitControls target.
+- Fullscreen toggle, GLTF download progress bar (drei useProgress
+  outside the Canvas), poster fallback + error boundary for failed
+  model loads. Reduced-motion still disables autoRotate.
+
+Procedural placeholder rooms:
+- scripts/generate-placeholder-rooms.mjs: builds stylized low-poly
+  rooms (living/kitchen/bedroom/study) with three.js + GLTFExporter
+  (FileReader polyfill; exporter fires onloadend) -> valid glTF 2.0
+  GLBs (22-49 meshes each) in public/models/rooms/.
+- seed-content.mjs backfills 3 rooms per seeded project on both PG +
+  SQLite paths; zero-room projects only, --force reseeds, tenant rooms
+  never clobbered. Idempotent (verified by re-run).
+
+Validation: tsc / build / check:themes / lint:changed / verify:deploy
+green. Local SQLite E2E 26/26: login; 3 seeded rooms in order;
+/projects-v2/casa-mira renders Room by room with room names +
+descriptions + per-room GLB URLs; all 4 room GLBs serve 200; rooms
+CRUD (401 unauth, 201 create, slug normalization, auto-order, 400
+blank, 409 dup, 200 update + draft flag, delete, 404 missing project).
+All local state restored after (dev DB + license + env). Uncommitted;
+next: commit + deploy (v1.14.0), then Phase 4 (public immersion:
+cinematic hero, page transitions, motion pass).
+### 2026-08-12 - StudioOS Phase 4 (public immersion; pre-ship, uncommitted)
+
+Phase 4 shipped: page transitions, cinematic projects hero, magnetic
+CTAs, hover trails, and a motion pass across the v2 surfaces.
+
+Page transitions:
+- Installed next-view-transitions@0.3.5 (React 19.2 stable does not
+  export <ViewTransition> - canary-only - so the native path is out;
+  this package wraps Link/router with document.startViewTransition).
+- <ViewTransitions> wraps children in the root layout. globals.css
+  defines ::view-transition-old/new(root) animations (old fades +
+  rises 420ms, new slides in 480ms) with a hard reduced-motion guard.
+
+Cinematic projects hero (projects-v2/Hero.tsx -> client):
+- Full-viewport min-h-[100dvh] photo backdrop from the repo's real
+  public/demo/living-room-1.jpg, dark scrim, slow settle on load +
+  scrubbed parallax on scroll.
+- Kinetic word-by-word headline reveal (masked ei-word spans, 6
+  words), subtext under 20 words, single magnetic CTA (Begin a
+  project), scroll cue. Reduced-motion renders visible at first paint.
+
+Magnetic + hover trails:
+- Shared Magnetic client component (gsap.quickTo, pointer:fine +
+  reduced-motion gated) on the home hero primary CTA + v2 CtaBand CTA;
+  ClosingCTA keeps its pre-existing inline magnetic.
+- Shared Spotlight glow layer sets --spot-x/--spot-y on the parent
+  card; .ei-spot .ei-spot-glow CSS radial follows the cursor on
+  FeaturedGrid tiles + ProjectRelated cards, hidden under
+  reduced-motion.
+
+Motion pass (existing Reveal, IO + CSS transition):
+- NumbersStrip stats (staggered li), FeaturedGrid tiles (grid cols on
+  the wrappers), ProjectSpecs tiles, ProjectVoices figures,
+  ProjectRelated tiles, ProjectBeforeAfter slider, CtaBand +
+  DetailCtaBand CTAs, Testimonial pull-quote. ProcessStrip keeps its
+  own GSAP reveal.
+
+Validation: tsc / build / check:themes / lint:changed / verify:deploy
+green. Local runtime probe: /projects-v2 serves the new hero (photo,
+6+ ei-word spans, scroll cue, magnetic CTA, min-h-[100dvh]); ei-spot
+on >=4 tiles; ei-reveal wrappers present; view-transition + spotlight
+CSS in the built stylesheet (Turbopack chunk); all public routes 200.
+The crossfade itself is browser-runtime behavior - a human pass on the
+deployed page is recommended before demo day. All state restored.
+Uncommitted; next: commit + deploy (v1.15.0), then Phase 5
+(superadmin back office: license wizard, health board, revenue +
+usage metrics, login-as, announcements).
+### 2026-08-12 - StudioOS Phase 5: superadmin back office
+
+Shipped the operator back office (license wizard, health board, revenue + usage metrics, audited login-as, announcements) and verified it end to end.
+
+**What landed.** License wizard: `/api/operator/license` (issue/extend/revoke; issue writes a revenue-ledger entry in cents, extend rolls `expires_at` forward and re-signs, revoke flips the tenant state and logs `license.revoke`; response carries the install code slug + hmac_key + owner email for emailing the buyer) + `LicenseWizard` UI at `/superadmin/issue`. Health board: `/api/operator/health` GET (persisted per-tenant status dot + last probe time) + POST (sequential live probes against each tenant's `{base}/api/health`, reusing the uptime-checker contract) + `HealthBoard` UI at `/superadmin/health`. Metrics: `getMetrics` now returns dialect-neutral base counts plus revenue (total / 30d / by-tier from `license_log.revenue_cents`) and usage (pageview totals / 7d / topPaths from `usage_events`, fed by the `UsageBeacon` in the public layout via `/api/usage/record`). Login-as: superadmin picks a tenant admin user, the route records `admin.login-as` in the audit log and mints a real NextAuth JWT session cookie (same secret as the credentials flow), so `/admin` sees a fully valid impersonated session. Announcements: operator CRUD + public active-only read + `AnnouncementBar` on the public layout + `/superadmin/announcements` UI. Schema: `tenants.health_status` and `license_log.revenue_cents` added to all three DDL surfaces + the pg.ts additive ALTER loop.
+
+**Validation.** `tsc` / `build` / `check:themes` / `lint:changed` / `verify:deploy` green. Authenticated E2E against the local SQLite runtime: **35/35 PASS** - 401 gates on all four operator endpoints; superadmin login + bad-password 401; health list has tenants, live probe reports ok with ms, status persists; wizard issue returns license + install code + email, bad action 400, extend rolls expiry + re-signs, revoke + tenant restore; announcements create/pause/delete with public visibility toggling; admin session + tenant user create + login-as mints a session cookie that resolves to the impersonated user; usage record 204 + metrics pageviews/topPaths/revenue ledger populated.
+
+**Two E2E findings.** (1) The probe's login-as jar was fresh, so the second call hit the superadmin gate - fixed by logging the operator into the impersonation jar first (probe-side). (2) The dev DB's pre-existing `license.json` was signed with a different key than the dev HMAC fallback, so license-gated routes reported "License tampered" - re-stamped for the local origin during E2E and restored afterward. Note for future local E2E: restore the DB *before* booting the server so the additive ALTERs run at first open.
+
+All local state restored. Uncommitted; Phases 0-5 together. Next: commit + deploy (v1.16.0), then Phase 6 (import/export UI, backup UI, usage analytics wiring, polish + rehearsal).
+### 2026-08-12 - StudioOS Phase 6: import/export, backup, usage wiring, rehearsal
+
+Shipped the last core phase: tenant content export/import, the operator backup console, usage analytics for 3D loads + form submissions, and a rehearsed demo checklist.
+
+**Import/export.** `src/lib/content-export.ts` defines a versioned envelope (`etihad-content-export` v1) covering every content table (pages + blocks, projects + rooms, menus + items, forms + submissions, media, testimonials, team, journal, settings, site identity, redirects). `GET /api/export` is admin+ superadmin only (editors 403) and streams a JSON attachment; `POST /api/import` validates format/version and rejects unknown tables, then restores replace-all in one transaction - children deleted first, parents inserted first, explicit ids preserved so FKs survive, JSONB re-stringified, id sequences reset per dialect (`setval` on Postgres, `sqlite_sequence` on SQLite). Import is replace-not-merge and the UI says so. UI at `/admin/export-import` (download button, file picker or paste with a parsed-envelope summary, red confirm CTA), plus an editor-gated "Export / Import" tab in the AdminShell.
+
+**Backup console.** `src/lib/backup.ts` walks the full known schema surface through the shared pg layer - the same code works on live Postgres and the local SQLite fallback - into the export-postgres.mjs contract `{ generated_at, source, tables }`. `/api/operator/backup` POST triggers (persists to `data/backups/` best-effort, audits `backup.created`; `?download=1` streams the snapshot for serverless where disk is ephemeral), GET lists files, GET `?download=<name>` serves one with traversal-safe name validation. `BackupBoard` at `/superadmin/backup`, OperatorNav Backup item.
+
+**Usage wiring.** `/api/usage/record` now accepts `model_3d_load` and `form_submit` kinds. The 3D viewer fires one `model_3d_load` beacon per successful GLB load; `/api/forms/submit` records a server-side `form_submit` (host-derived tenant). `getMetrics` returns `modelLoads`/`formSubmits`, surfaced under the Usage panel on `/superadmin/metrics`.
+
+**Rehearsal.** `docs/DEMO-WALKTHROUGH-2026-08-15.md` gained the back-office beats (license wizard, health board, metrics, backup, login-as) and a 3-minute "asrasik tour" pre-demo checklist plus an export/import spot-check.
+
+**Validation.** `tsc` / `build` / `check:themes` / `lint:changed` / `verify:deploy` green. Authenticated E2E on the local SQLite runtime **30/30 PASS**: gates; backup trigger/list/download/attachment/traversal-404; export envelope well-formed; import applies + persists + rejects unknown tables and wrong format; model_3d_load/form_submit records 204 + metrics counts; restore-back-to-original verified. One lint catch: a sync `setBusy(false)` in the ExportImportRoutePanel effect was replaced by deriving the initial phase from the role. All local state restored.
+
+Phases 0-6 complete and uncommitted. Next: commit + deploy (v1.17.0), then Phase 7 (i18n, parked) and the demo on 2026-08-15.

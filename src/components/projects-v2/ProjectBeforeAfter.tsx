@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import Reveal from "@/components/Reveal";
 
 type Props = {
   title: string;
@@ -113,13 +114,15 @@ export default function ProjectBeforeAfterV2({
         className="py-10 md:py-16 bg-canvas"
       >
         <div className="container-page">
-          <BeforeAfterSlider
-            beforeSrc={before}
-            beforeAlt={beforeAlt}
-            afterSrc={after}
-            afterAlt={afterAlt}
-            caption={`${caption} - drag the seam to reveal`}
-          />
+          <Reveal>
+            <BeforeAfterSlider
+              beforeSrc={before}
+              beforeAlt={beforeAlt}
+              afterSrc={after}
+              afterAlt={afterAlt}
+              caption={`${caption} - drag the seam to reveal`}
+            />
+          </Reveal>
         </div>
       </section>
     );

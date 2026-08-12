@@ -40,6 +40,14 @@ const TABLES = [
   'license',
   'hmac_audit',
   'distro',
+  // StudioOS v2.0 Phase 0 tables.
+  'project_rooms',
+  'form_definitions',
+  'form_submissions',
+  'redirects',
+  'usage_events',
+  'license_log',
+  'announcements',
 ];
 
 function todayStamp() {

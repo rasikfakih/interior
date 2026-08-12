@@ -75,5 +75,35 @@ for (const [slug, ink, paper, accent, muted] of CATALOG) {
 if (mix("#000000", "#ffffff", 0.5) !== "#808080") { console.log("FAIL mix"); failed++; }
 if (withAlpha("#ff0000", 0.5) !== "rgba(255, 0, 0, 0.5)") { console.log("FAIL withAlpha"); failed++; }
 
+// --- StudioOS v2.0 customizer var derivation (keep in sync with src/lib/theme.ts) ---
+function customizerVars(c) {
+  const out = {};
+  const f = c.fonts;
+  const DISPLAY = {
+    newsreader: 'var(--font-newsreader), Georgia, "Iowan Old Style", serif',
+    geist: 'var(--font-geist-sans), "Inter", system-ui, sans-serif',
+    "inter-tight": "var(--font-inter-tight), var(--font-geist-sans), system-ui, sans-serif",
+    "space-grotesk": "var(--font-space-grotesk), var(--font-geist-sans), system-ui, sans-serif",
+  };
+  if (f?.display && DISPLAY[f.display]) out["--font-display"] = DISPLAY[f.display];
+  if (c.radius_scale === "soft") { out["--radius-control"] = "12px"; out["--radius-card"] = "14px"; }
+  if (c.radius_scale === "pill") { out["--radius-control"] = "9999px"; out["--radius-card"] = "9999px"; }
+  if (c.spacing_density === 1) out["--section-gap"] = "8rem";
+  else if (c.spacing_density === 2) out["--section-gap"] = "6rem";
+  else if (c.spacing_density === 3) out["--section-gap"] = "4rem";
+  if (typeof c.motion_intensity === "number") out["--motion-level"] = String(c.motion_intensity);
+  return out;
+}
+
+const cv1 = customizerVars({ fonts: { display: "inter-tight" }, spacing_density: 3, motion_intensity: 7, radius_scale: "soft" });
+if (cv1["--radius-card"] !== "14px") { console.log("FAIL customizer radius soft"); failed++; }
+if (cv1["--section-gap"] !== "4rem") { console.log("FAIL customizer density 3"); failed++; }
+if (cv1["--motion-level"] !== "7") { console.log("FAIL customizer motion"); failed++; }
+if (!/inter-tight/i.test(cv1["--font-display"] || "")) { console.log("FAIL customizer font token"); failed++; }
+const cv2 = customizerVars({ radius_scale: "pill" });
+if (cv2["--radius-control"] !== "9999px") { console.log("FAIL customizer radius pill"); failed++; }
+if (customizerVars({})["--section-gap"] !== undefined) { console.log("FAIL customizer empty must not emit"); failed++; }
+console.log("ok customizer vars: soft/dense/motion/font/pill + empty-omit");
+
 console.log(failed === 0 ? `PASS ${CATALOG.length} presets` : `FAIL (${failed})`);
 process.exit(failed === 0 ? 0 : 1);

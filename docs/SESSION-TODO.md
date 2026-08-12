@@ -1032,6 +1032,56 @@ already shipped.)
     grow while a hygiene release is deferred; two touched <a> links
     converted to next/link to satisfy the rule.
 
+### TS-ID-017 - StudioOS: multi-tenant SaaS (Phases 0-6) - v1.17.0
+- Status: @done 2026-08-12 (pending commit + Vercel deploy)
+- Closes on: <stamp-after-commit>
+- Severity: operator ask 2026-08-12 (build the hosted multi-tenant
+  SaaS before i18n; demo to theme buyers 2026-08-15)
+- Opened: 2026-08-12
+- Owner: freebuff
+- Plan: `docs/PLATFORM-V2-PLAN.md` (phases 0-6, per-phase status
+  blocks)
+- Files: (the full per-phase file lists live in the
+  `docs/PLATFORM-V2-PLAN.md` phase-status blocks; the new surfaces
+  are)
+  - Tenant admin: `/admin/theme` customizer + 8 presets, `/admin/menus`
+    DB-driven nav editor, page revisions + draft preview + SEO panel +
+    duplicate, `/admin/forms` builder + submissions inbox + CSV,
+    `/admin/redirects`, `/admin/users` roles, `/admin/export-import`
+    JSON export/import
+  - 3D: project rooms schema + `/api/projects/[id]/rooms` CRUD,
+    per-room GLB via the media library, viewer upgrade
+    (three-runtime: tone mapping, lighting rig, auto-fit, camera
+    presets, fullscreen, progress/error), procedural placeholder
+    rooms generator + seed backfill
+  - Public immersion: next-view-transitions crossfades, cinematic
+    hero with kinetic type reveal, Magnetic CTAs, Spotlight hover
+    trails, Reveal motion pass
+  - Superadmin: `/superadmin/issue` license wizard + revenue ledger,
+    `/superadmin/health` probe board, `/superadmin/metrics` revenue
+    + usage, audited login-as, `/superadmin/announcements`,
+    `/superadmin/backup` full-table snapshot
+  - Schema: 7 new tables (project_rooms, form_definitions,
+    form_submissions, redirects, usage_events, license_log,
+    announcements) + 9 column additions on all three schema surfaces
+    + pg.ts additive ALTERs
+- Acceptance:
+  - `npx tsc --noEmit` exit 0
+  - `npm run check:themes` PASS 8
+  - `npm run build` green
+  - `node scripts/lint-changed.mjs` exit 0
+  - `npm run verify:deploy` green
+  - Phase E2E on the local SQLite runtime: 16/16 (P1), 43/43 (P2),
+    26/26 (P3), 35/35 (P5), 30/30 (P6); all local state restored
+  - Post-deploy: live route probe + `npm run check:uptime` 1/1
+- Outcome:
+  - The hosted multi-tenant SaaS surface ships: buyers get a
+    WordPress-grade admin, per-room 3D walkthroughs, and the studio
+    gets the superadmin back office (licenses, health, revenue +
+    usage, login-as, announcements, backup, import/export).
+  - i18n content editing explicitly deferred to v2.0 per operator
+    decision; demo on 2026-08-15.
+
 ---
 
 ## Pending escalation

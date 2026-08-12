@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 
 /**
  * DetailCtaBandV2 - bottom CTA strip on the detail page.
@@ -39,9 +40,11 @@ export default function DetailCtaBandV2() {
             </p>
           </div>
           <div className="md:col-span-3 flex md:justify-end">
-            <Link href="/contact" className="btn-primary">
-              Begin a project
-            </Link>
+            <Reveal delay={120}>
+              <Link href="/contact" className="btn-primary">
+                Begin a project
+              </Link>
+            </Reveal>
           </div>
         </div>
       </div>

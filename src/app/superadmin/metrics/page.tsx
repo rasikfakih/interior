@@ -12,6 +12,14 @@ type Metrics = {
   personal: number;
   expiringSoon: number;
   auditLast7d: number;
+  revenueCents: number;
+  revenue30dCents: number;
+  revenueByTier: { tier: string; cents: number }[];
+  pageviews: number;
+  pageviews7d: number;
+  modelLoads: number;
+  formSubmits: number;
+  topPaths: { path: string; count: number }[];
 };
 type AuditEvent = {
   id: number;
@@ -58,6 +66,14 @@ export default function MetricsPage() {
           personal: j.personal ?? 0,
           expiringSoon: j.expiringSoon ?? 0,
           auditLast7d: j.auditLast7d ?? 0,
+          revenueCents: j.revenueCents ?? 0,
+          revenue30dCents: j.revenue30dCents ?? 0,
+          revenueByTier: Array.isArray(j.revenueByTier) ? j.revenueByTier : [],
+          pageviews: j.pageviews ?? 0,
+          pageviews7d: j.pageviews7d ?? 0,
+          modelLoads: j.modelLoads ?? 0,
+          formSubmits: j.formSubmits ?? 0,
+          topPaths: Array.isArray(j.topPaths) ? j.topPaths : [],
         });
         setAudit(Array.isArray(j.audit) ? j.audit : []);
       } catch (e: any) {
@@ -115,6 +131,70 @@ export default function MetricsPage() {
           <Stat label="Audit events (7d)" value={m?.auditLast7d ?? 0} />
         </div>
       )}
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="border border-zinc-200 bg-white">
+          <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            Revenue (license ledger)
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-2 gap-4">
+              <Stat label="All time" value={`$${((m?.revenueCents ?? 0) / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
+              <Stat label="Last 30 days" value={`$${((m?.revenue30dCents ?? 0) / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
+            </div>
+            <div className="mt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-2">
+                By tier
+              </p>
+              {(m?.revenueByTier ?? []).length === 0 ? (
+                <p className="text-sm text-zinc-500">No ledger entries yet — amounts are recorded from the license wizard.</p>
+              ) : (
+                <ul className="divide-y divide-zinc-100">
+                  {m!.revenueByTier.map((r) => (
+                    <li key={r.tier} className="flex items-center justify-between py-2">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-600">{r.tier}</span>
+                      <span className="font-mono text-sm tabular-nums text-zinc-900">${(r.cents / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="border border-zinc-200 bg-white">
+          <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+            Usage (pageviews)
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-2 gap-4">
+              <Stat label="All time" value={m?.pageviews ?? 0} />
+              <Stat label="Last 7 days" value={m?.pageviews7d ?? 0} />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <Stat label="3D walkthrough loads" value={m?.modelLoads ?? 0} />
+              <Stat label="Form submissions" value={m?.formSubmits ?? 0} />
+            </div>
+            <div className="mt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-2">
+                Top paths
+              </p>
+              {(m?.topPaths ?? []).length === 0 ? (
+                <p className="text-sm text-zinc-500">No pageviews recorded yet.</p>
+              ) : (
+                <ul className="divide-y divide-zinc-100">
+                  {m!.topPaths.map((p) => (
+                    <li key={p.path} className="flex items-center justify-between gap-4 py-2">
+                      <span className="truncate font-mono text-xs text-zinc-700">{p.path}</span>
+                      <span className="font-mono text-sm tabular-nums text-zinc-900">{p.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="border border-zinc-200 bg-white">
         <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">

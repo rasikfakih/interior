@@ -3,7 +3,33 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export function TenantDetailClient({ tenant, distro }: { tenant: any; distro: any }) {
+type TenantUser = {
+  id: number;
+  email: string;
+  role: string;
+  is_active: number | boolean;
+};
+
+type TenantShape = {
+  id: number;
+  slug: string;
+  studio_name: string;
+  owner_email?: string | null;
+  domain?: string | null;
+  tier: string;
+  state: string;
+  expires_at?: string | null;
+};
+
+export function TenantDetailClient({
+  tenant,
+  distro,
+  users,
+}: {
+  tenant: TenantShape;
+  distro: unknown;
+  users?: TenantUser[];
+}) {
   const router = useRouter();
   const [studio_name, setStudioName] = useState(tenant.studio_name);
   const [owner_email, setOwnerEmail] = useState(tenant.owner_email || "");
@@ -162,6 +188,54 @@ export function TenantDetailClient({ tenant, distro }: { tenant: any; distro: an
           <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             Save to data/license.json at the buyer's install or relay via email.
           </p>
+        </div>
+      ) : null}
+
+      {users && users.length > 0 ? (
+        <div className="border border-zinc-200 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+              Team users ({users.length})
+            </h2>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+              audited · opens /admin as this user
+            </span>
+          </div>
+          <ul className="mt-4 divide-y divide-zinc-100">
+            {users.map((u) => (
+              <li key={u.id} className="flex items-center justify-between gap-4 py-3">
+                <div>
+                  <span className="text-sm font-medium text-zinc-900">{u.email}</span>
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                    {u.role} · {Number(u.is_active) === 1 || u.is_active === true ? "active" : "off"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const r = await fetch("/api/operator/login-as", {
+                        method: "POST",
+                        headers: { "content-type": "application/json" },
+                        body: JSON.stringify({ user_id: u.id }),
+                      });
+                      const j = await r.json();
+                      if (!r.ok) {
+                        setMsg(j.error || "login-as failed");
+                        return;
+                      }
+                      window.open("/admin", "_blank");
+                    } catch (e) {
+                      setMsg((e as Error).message);
+                    }
+                  }}
+                  className="border border-zinc-300 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
+                >
+                  Login as
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
     </section>

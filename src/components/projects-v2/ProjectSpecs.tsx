@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal";
+
 type Props = {
   year: string | null;
   location: string | null;
@@ -75,11 +77,9 @@ export default function ProjectSpecsV2({
     >
       <div className="container-page">
         <div className="grid grid-cols-2 gap-3 md:gap-4">
-          {tiles.map((t) => (
-            <article
-              key={t.label}
-              className="surface-tile p-5 md:p-6 flex flex-col gap-2"
-            >
+          {tiles.map((t, i) => (
+            <Reveal key={t.label} delay={i * 80} className="h-full">
+            <article className="surface-tile p-5 md:p-6 flex flex-col gap-2 h-full">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
                 {t.label}
               </p>
@@ -90,6 +90,7 @@ export default function ProjectSpecsV2({
                 {t.why}
               </p>
             </article>
+            </Reveal>
           ))}
         </div>
       </div>

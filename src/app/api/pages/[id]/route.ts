@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureMigrated, pgMany, pgOne, pgQuery } from "@/lib/pg";
 import { requireLicense, requireAdminSession } from "@/lib/license-gate";
 import { bump } from "@/lib/revalidate";
+import { snapshotPage } from "@/lib/revisions";
 
 async function gateOrFail(action: "mutate" | "admin" | "read-public" = "read-public") {
   const g = await requireLicense(action);
@@ -99,6 +100,7 @@ export async function PUT(
       [numericId]
     );
     bump({ kind: "pages", pageSlug: pageSlug?.slug ?? null, slug: pageSlug?.slug ?? null });
+    await snapshotPage(numericId);
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });

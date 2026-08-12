@@ -13,6 +13,7 @@ import Testimonials from "./Testimonials";
 import Principles from "./Principles";
 import JournalPreview from "./JournalPreview";
 import ClosingCTA from "./ClosingCTA";
+import FormBlock from "./FormBlock";
 import HeroClient from "./HeroClient";
 import { useReducedMotion } from "@/lib/use-gsap";
 
@@ -74,6 +75,8 @@ function BlockRenderer({ block }: { block: Block }) {
           </div>
         </section>
       );
+    case "form":
+      return <FormBlock formSlug={block.data?.formSlug} />;
     case "divider":
       return <div className="py-6 container-page"><div className="chrome-rule" /></div>;
     case "spacer":

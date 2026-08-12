@@ -2,6 +2,75 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.17.0 - 2026-08-12 - StudioOS: multi-tenant SaaS (Phases 0-6)
+
+### Status
+
+StudioOS - the hosted multi-tenant SaaS build - lands as one release:
+WordPress-grade tenant admin (theme customizer, menus, page revisions +
+draft preview + SEO + duplicate, forms builder + submissions inbox +
+CSV export, redirects, users/roles, import/export), per-room 3D
+walkthroughs with a procedural placeholder room generator, the public
+immersion pass (cinematic hero, page transitions, magnetic CTAs,
+hover trails, motion), and the superadmin back office (license
+wizard, tenant health board, revenue + usage metrics, audited
+login-as, announcements, full-table backup). i18n is parked for v2.0
+per operator decision.
+
+### What landed
+
+- **Phase 0 (foundations)** - 7 new tables (project_rooms,
+  form_definitions, form_submissions, redirects, usage_events,
+  license_log, announcements) + 9 column additions across all three
+  schema surfaces; theme.ts parses the customizer surface
+  (fonts.display/body, spacing_density, motion_intensity,
+  radius_scale) and derives `--font-display`, `--font-sans`,
+  `--radius-*`, `--section-gap`, `--motion-level`; Inter Tight +
+  Space Grotesk bundled via next/font.
+- **Phase 1 (admin core)** - theme customizer (`/admin/theme`, 8
+  presets, live contrast rows, distro-merge); DB-driven menu editor
+  (`/admin/menus`); page revisions (snapshot on save + restore),
+  draft preview via HMAC token, per-page SEO panel, page duplicate;
+  dev-parity fixes in pg.ts (withPgTx on SQLite, ::jsonb strip,
+  INSERT...RETURNING).
+- **Phase 2 (forms, redirects, users)** - forms builder + submissions
+  inbox + quoted CSV export + `form` block; redirects manager
+  (DB-driven 308/307 catch-all); tenant user roles (admin/editor/
+  superadmin) with bcrypt + self-guards.
+- **Phase 3 (3D rooms)** - project rooms schema + API, per-room GLB
+  via the media library, viewer upgrade (ACES tone mapping, 3-point
+  lighting rig, auto-fit bounds, camera presets, fullscreen,
+  progress + error states), procedural placeholder room generator
+  (three.js GLTFExporter -> 4 valid GLBs), seed backfill.
+- **Phase 4 (public immersion)** - next-view-transitions page
+  crossfades, cinematic full-viewport hero with kinetic type reveal
+  + parallax, shared Magnetic CTA, spotlight hover trails, Reveal
+  motion pass across v2 surfaces.
+- **Phase 5 (superadmin back office)** - license issue/extend/revoke
+  wizard with revenue ledger (cents), tenant health board reusing
+  the uptime-probe contract, revenue + usage metrics, audited
+  login-as (mints a real NextAuth session cookie), platform
+  announcements + public bar.
+- **Phase 6 (import/export + backup + usage wiring)** - tenant
+  content export/import (versioned envelope, replace-all restore
+  with sequence reset per dialect), operator backup console
+  (dialect-neutral full-table snapshot, list/download, serverless
+  download mode), model_3d_load + form_submit usage events surfaced
+  on the metrics page, demo rehearsal checklist in the walkthrough
+  doc.
+
+### Notes
+
+- Freeze carve-outs: this release touches frozen paths
+  (`src/components/**`, `src/lib/**`, `src/app/**`) under the
+  StudioOS v1.17.0 carve-out exactly as enumerated in FREEZE-MARKER.
+  No buyer-facing route slug or nav label changed; v2 remains the
+  default public surface, v1 routes stay live as fallback.
+- Validation per phase: `tsc` / `build` / `check:themes` /
+  `lint:changed` / `verify:deploy` green; authenticated E2E on the
+  local SQLite runtime 16/16 (P1), 43/43 (P2), 26/26 (P3), 35/35
+  (P5), 30/30 (P6) with all local state restored after.
+
 ## v1.9.0 - 2026-08-12 - Forest & Bone recalibration (palette + Newsreader + 3D seed)
 
 ### Status

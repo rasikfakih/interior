@@ -5,10 +5,13 @@ import { usePathname } from "next/navigation";
 
 const ITEMS = [
   { href: "/superadmin/tenants", label: "Tenants" },
-  { href: "/superadmin/issue", label: "Issue license" },
+  { href: "/superadmin/issue", label: "License" },
+  { href: "/superadmin/health", label: "Health" },
+  { href: "/superadmin/metrics", label: "Metrics" },
+  { href: "/superadmin/announcements", label: "Announcements" },
+  { href: "/superadmin/backup", label: "Backup" },
   { href: "/superadmin/theme", label: "Theme distro" },
   { href: "/superadmin/rotate", label: "Rotate HMAC" },
-  { href: "/superadmin/metrics", label: "Metrics" },
 ];
 
 export function OperatorNav({ email }: { email: string }) {

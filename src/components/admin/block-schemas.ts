@@ -375,6 +375,19 @@ export function getSchema(type: BlockType): BlockSchema {
         },
       };
 
+    case "form":
+      return {
+        type,
+        defaults: () => ({ formSlug: "contact" }),
+        scalars: [
+          scalar("text", "Form slug", "formSlug", {
+            placeholder: "contact",
+            max: 48,
+          }),
+        ],
+        arrays: {},
+      };
+
     case "divider":
       return {
         type,

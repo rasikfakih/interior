@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import Spotlight from "@/components/Spotlight";
+import Reveal from "@/components/Reveal";
 import type { ProjectItemV2 } from "./types";
 
 type Props = {
@@ -69,13 +71,15 @@ export default function FeaturedGridV2({ items }: Props) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-          <Link
-            href={`/projects-v2/${featured.slug}`}
-            data-tile
-            data-cat={featured.category}
-            data-year={featured.year}
-            className="md:col-span-8 group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/9]"
-          >
+          <Reveal className="md:col-span-8">
+            <Link
+              href={`/projects-v2/${featured.slug}`}
+              data-tile
+              data-cat={featured.category}
+              data-year={featured.year}
+              className="ei-spot group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/9]"
+            >
+              <Spotlight />
             <Image
               src={featured.image}
               alt={featured.title}
@@ -96,19 +100,21 @@ export default function FeaturedGridV2({ items }: Props) {
                 {featured.scope}. {featured.location}.
               </p>
             </div>
-          </Link>
+            </Link>
+          </Reveal>
 
           {bento.map((p, i) => {
             const { cols, aspect } = tileAt(i);
             return (
+              <Reveal key={p.slug} delay={i * 90} className={cols}>
               <Link
-                key={p.slug}
                 href={`/projects-v2/${p.slug}`}
                 data-tile
                 data-cat={p.category}
                 data-year={p.year}
-                className={`group block relative overflow-hidden rounded-[var(--radius-card)] ${cols} ${aspect}`}
+                className={`ei-spot group block relative overflow-hidden rounded-[var(--radius-card)] ${aspect}`}
               >
+                <Spotlight />
                 <Image
                   src={p.image}
                   alt={p.title}
@@ -126,6 +132,7 @@ export default function FeaturedGridV2({ items }: Props) {
                   </h3>
                 </div>
               </Link>
+              </Reveal>
             );
           })}
         </div>

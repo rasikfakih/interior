@@ -6,6 +6,7 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
+import Magnetic from "@/components/Magnetic";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -220,10 +221,12 @@ export default function HeroClient({ data }: { data: HeroData }) {
               className="mt-6 md:mt-10 flex flex-wrap items-center gap-3"
               style={reduce ? visibleAtRest : initialHidden}
             >
-              <a href="/contact" className="btn-primary">
-                Start a project
-                <span aria-hidden>↗</span>
-              </a>
+              <Magnetic>
+                <Link href="/contact" className="btn-primary">
+                  Start a project
+                  <span aria-hidden>↗</span>
+                </Link>
+              </Magnetic>
               <Link href="/projects-v2" className="btn-ghost">
                 See selected work
               </Link>

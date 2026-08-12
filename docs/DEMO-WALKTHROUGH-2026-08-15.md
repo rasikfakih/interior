@@ -35,8 +35,19 @@ Open `https://ethinterior.vercel.app/superadmin` in a private window
 - Theme console (`/superadmin/theme`): paste a distro JSON, apply to a
   tenant - the palette flips on the next request (force-dynamic, no
   cache wait). This is the "hosted, you don't touch code" pitch.
-- Health: `https://ethinterior.vercel.app/api/health` answers 200 with
-  `db: ok` - "every buyer site gets a monitor".
+- License wizard (`/superadmin/issue`): pick the tenant, set an amount,
+  issue - the console returns the install code (slug + hmac) and owner
+  email to send the buyer, and the revenue lands in the ledger.
+- Health board (`/superadmin/health`): "Run probe" checks every tenant's
+  `/api/health` live and persists status - "every buyer site gets a
+  monitor".
+- Metrics (`/superadmin/metrics`): tenants, revenue (all-time / 30d /
+  by tier), usage (pageviews, 3D walkthrough loads, form submissions),
+  audit trail.
+- Backup (`/superadmin/backup`): "Run + download" snapshots every table
+  to one JSON file on the spot; login-as (`/superadmin/tenants` ->
+  tenant detail) opens the buyer's `/admin` as them - "we can fix it
+  for you without asking for passwords".
 
 ### 3. The install (2-3 min, optional but recommended)
 Pre-staged fresh clone (see below). Run:
@@ -61,7 +72,7 @@ is replaceable from `/admin`.
 - "What would your studio's site look like? Tell me your palette and
   I'll show you."
 
-## Pre-demo checklist (2026-08-14)
+## Pre-demo checklist (2026-08-14, updated for v1.17.0)
 
 - [ ] Live probe green: `node scripts/verify-brand-v190.mjs` (13/13),
       `npm run check:uptime` (1/1), full route probe (29/29).
@@ -75,6 +86,15 @@ is replaceable from `/admin`.
       force-dynamic; each request is a fresh render).
 - [ ] Backup restore spot-checked once (restore the JSON snapshot to a
       scratch DB and confirm row counts).
+- [ ] **Back-office rehearsal (the "asrasik tour", 3 min):** superadmin
+      login -> `/superadmin/health` probe ok -> `/superadmin/issue`
+      issue a license (revenue ledger +1) -> tenant detail -> login-as
+      -> buyer `/admin` opens (pages -> 3D project) -> back out ->
+      `/superadmin/backup` "Run + download" -> `/superadmin/metrics`
+      shows the fresh events. Practice until it flows without notes.
+- [ ] **Export/import spot-check:** `/admin` -> Export / Import ->
+      download the JSON, re-import it, confirm the success summary
+      matches the exported row counts (on a scratch install).
 
 ## Failover
 

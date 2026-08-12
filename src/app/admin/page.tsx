@@ -38,5 +38,12 @@ export default async function AdminPage() {
     return <LoginCard />;
   }
 
-  return <AdminShell email={session.user?.email || "operator@local"} />;
+  return (
+    <AdminShell
+      email={session.user?.email || "operator@local"}
+      role={
+        (session.user as { role?: string } | undefined)?.role || "admin"
+      }
+    />
+  );
 }

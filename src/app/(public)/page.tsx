@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import PageRenderer from "@/components/PageRenderer";
 import { getFrontPage } from "@/lib/pages";
@@ -8,6 +9,21 @@ import { getFrontPage } from "@/lib/pages";
 // public cache so the next request sees the new state.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+// Per-page SEO (StudioOS Phase 1): the SEO panel in the page editor
+// writes seo_title / seo_description / robots; this page serves them.
+export async function generateMetadata(): Promise<Metadata> {
+  const { page } = await getFrontPage();
+  if (!page) return {};
+  const title = page.seo_title || page.title || undefined;
+  const description = page.seo_description || undefined;
+  const noindex = page.robots ? page.robots.includes("noindex") : false;
+  return {
+    title: title || undefined,
+    description,
+    robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
+  };
+}
 
 export default async function Home() {
   const { page, blocks } = await getFrontPage();

@@ -8,11 +8,13 @@ import ProjectBeforeAfterV2 from "@/components/projects-v2/ProjectBeforeAfter";
 import ProjectSpecsV2 from "@/components/projects-v2/ProjectSpecs";
 import ProjectVoicesV2 from "@/components/projects-v2/ProjectVoices";
 import ProjectRelatedV2 from "@/components/projects-v2/ProjectRelated";
+import ProjectRooms from "@/components/projects-v2/ProjectRooms";
 import DetailCtaBandV2 from "@/components/projects-v2/DetailCtaBand";
 
 export const dynamic = "force-dynamic";
 
 type ProjectRow = {
+  id: number;
   slug: string;
   title: string;
   category: string | null;
@@ -34,7 +36,7 @@ async function getProject(slug: string): Promise<ProjectRow | null> {
   try {
     await ensureMigrated();
     return await pgOne<ProjectRow>(
-      `SELECT slug, title, category, location, year, scope,
+      `SELECT id, slug, title, category, location, year, scope,
               description, description_json, before_image, after_image,
               model_3d, is_published
        FROM projects WHERE slug = $1 LIMIT 1`,
@@ -42,6 +44,45 @@ async function getProject(slug: string): Promise<ProjectRow | null> {
     );
   } catch {
     return null;
+  }
+}
+
+async function getRooms(projectId: number) {
+  try {
+    await ensureMigrated();
+    const rows = await pgMany<{
+      id: number;
+      project_id: number;
+      name: string;
+      slug: string;
+      description: string | null;
+      model_3d: string | null;
+      cover_media_id: number | null;
+      hotspots: unknown;
+      order_index: number;
+      is_published: boolean;
+    }>(
+      `SELECT id, project_id, name, slug, description, model_3d,
+              cover_media_id, hotspots, order_index, is_published
+       FROM project_rooms
+       WHERE project_id = $1 AND is_published = TRUE
+       ORDER BY order_index ASC, id ASC`,
+      [projectId]
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      project_id: r.project_id,
+      name: r.name,
+      slug: r.slug,
+      description: r.description,
+      model_3d: r.model_3d,
+      cover_media_id: r.cover_media_id,
+      hotspots: null,
+      order_index: r.order_index,
+      is_published: true,
+    }));
+  } catch {
+    return [];
   }
 }
 
@@ -106,6 +147,7 @@ export default async function ProjectV2DetailPage({
 
   const brand = getStudioBrand();
   const related = await getRelated(row.category || "Residential", row.slug);
+  const rooms = await getRooms(row.id);
 
   return (
     <main>
@@ -129,7 +171,13 @@ export default async function ProjectV2DetailPage({
         caption={`Before and after - ${row.title}`}
       />
 
-      {row.model_3d ? (
+      {rooms.length > 0 ? (
+        <ProjectRooms
+          rooms={rooms}
+          fallbackModel={row.model_3d}
+          fallbackPoster={row.before_image || FALLBACK}
+        />
+      ) : row.model_3d ? (
         <section
           aria-label="3D walkthrough"
           className="py-12 md:py-16 bg-canvas border-t hairline"

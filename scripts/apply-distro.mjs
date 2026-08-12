@@ -97,6 +97,31 @@ function validate(distro) {
   if (distro.tier && !["personal", "business"].includes(distro.tier)) {
     errors.push(`tier must be personal|business (got: ${distro.tier})`);
   }
+  // StudioOS v2.0 customizer keys. Optional; validated when present so
+  // the theme engine never serves a token it cannot resolve.
+  const FONT_TOKENS = new Set(["newsreader", "geist", "inter-tight", "space-grotesk"]);
+  if (distro.fonts !== undefined) {
+    if (typeof distro.fonts !== "object" || distro.fonts == null || Array.isArray(distro.fonts)) {
+      errors.push("fonts must be an object { display?, body? }");
+    } else {
+      for (const role of ["display", "body"]) {
+        if (distro.fonts[role] !== undefined && !FONT_TOKENS.has(distro.fonts[role])) {
+          errors.push(`fonts.${role} not in allowed set (newsreader|geist|inter-tight|space-grotesk): ${distro.fonts[role]}`);
+        }
+      }
+    }
+  }
+  if (distro.spacing_density !== undefined && ![1, 2, 3].includes(distro.spacing_density)) {
+    errors.push(`spacing_density must be 1|2|3 (got: ${distro.spacing_density})`);
+  }
+  if (distro.motion_intensity !== undefined) {
+    if (!Number.isInteger(distro.motion_intensity) || distro.motion_intensity < 1 || distro.motion_intensity > 10) {
+      errors.push(`motion_intensity must be an integer 1..10 (got: ${distro.motion_intensity})`);
+    }
+  }
+  if (distro.radius_scale !== undefined && !["sharp", "soft", "pill"].includes(distro.radius_scale)) {
+    errors.push(`radius_scale must be sharp|soft|pill (got: ${distro.radius_scale})`);
+  }
   if (Array.isArray(distro.default_locales)) {
     const allowed = new Set(["en", "hi", "mr"]);
     for (const l of distro.default_locales) {

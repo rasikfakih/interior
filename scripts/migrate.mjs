@@ -188,7 +188,11 @@ const TABLES = [
       password_hash TEXT NOT NULL,
       role TEXT DEFAULT 'admin'
     )`,
-    columns: [],
+    columns: [
+      ["is_active", "INTEGER DEFAULT 1"],
+      ["tenant_id", "INTEGER"],
+      ["created_at", "DATETIME DEFAULT CURRENT_TIMESTAMP"],
+    ],
   },
   {
     name: "media",
@@ -205,7 +209,10 @@ const TABLES = [
       height INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    columns: [],
+    columns: [
+      ["folder", "TEXT"],
+      ["is_pinned", "INTEGER DEFAULT 0"],
+    ],
   },
   {
     name: "pages",
@@ -221,7 +228,9 @@ const TABLES = [
       published_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    columns: [],
+    columns: [
+      ["robots", "TEXT DEFAULT 'index,follow'"],
+    ],
   },
   {
     name: "page_blocks",
@@ -320,7 +329,13 @@ const TABLES = [
       expires_at DATETIME,
       revoked_at DATETIME
     )`,
-    columns: [],
+    columns: [
+      ["seats", "INTEGER DEFAULT 1"],
+      ["support_notes", "TEXT"],
+      ["last_health_at", "DATETIME"],
+      ["storage_used_bytes", "INTEGER DEFAULT 0"],
+      ["health_status", "TEXT DEFAULT 'unknown'"],
+    ],
   },
   {
     name: "tenant_data",
@@ -330,6 +345,99 @@ const TABLES = [
       kind TEXT NOT NULL DEFAULT 'distro',
       data TEXT NOT NULL,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
+  {
+    name: "project_rooms",
+    create: `CREATE TABLE project_rooms (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      description TEXT,
+      model_3d TEXT,
+      cover_media_id INTEGER,
+      hotspots TEXT,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      is_published INTEGER DEFAULT 1
+    )`,
+    columns: [],
+  },
+  {
+    name: "form_definitions",
+    create: `CREATE TABLE form_definitions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE NOT NULL,
+      title TEXT NOT NULL,
+      fields TEXT NOT NULL,
+      submit_label TEXT,
+      success_message TEXT,
+      is_published INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
+  {
+    name: "form_submissions",
+    create: `CREATE TABLE form_submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      form_id INTEGER NOT NULL,
+      payload TEXT NOT NULL,
+      read_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
+  {
+    name: "redirects",
+    create: `CREATE TABLE redirects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      source TEXT NOT NULL,
+      destination TEXT NOT NULL,
+      status_code INTEGER DEFAULT 301,
+      is_active INTEGER DEFAULT 1
+    )`,
+    columns: [],
+  },
+  {
+    name: "usage_events",
+    create: `CREATE TABLE usage_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER,
+      kind TEXT NOT NULL,
+      path TEXT,
+      meta TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
+  {
+    name: "license_log",
+    create: `CREATE TABLE license_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER NOT NULL,
+      action TEXT NOT NULL,
+      tier TEXT,
+      seats INTEGER,
+      expires_at DATETIME,
+      issued_by TEXT,
+      revenue_cents INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [
+      ["revenue_cents", "INTEGER DEFAULT 0"],
+    ],
+  },
+  {
+    name: "announcements",
+    create: `CREATE TABLE announcements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      audience TEXT NOT NULL DEFAULT 'all',
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     columns: [],
   },
