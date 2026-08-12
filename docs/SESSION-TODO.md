@@ -987,6 +987,7 @@ already shipped.)
 
 ### TS-ID-016 - Demo Cut: v2 default surface + CI gate + health/uptime + vendor credit - v1.10.0
 - Status: @done 2026-08-12 (pending commit + Vercel deploy)
+- Closes on: 2a1ac25
 - Severity: operator ask 2026-08-12 (demo to theme buyers 2026-08-15;
   product is hosted multi-tenant, studio hosts + supports)
 - Opened: 2026-08-12
