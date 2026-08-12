@@ -1034,7 +1034,7 @@ already shipped.)
 
 ### TS-ID-017 - StudioOS: multi-tenant SaaS (Phases 0-6) - v1.17.0
 - Status: @done 2026-08-12 (pending commit + Vercel deploy)
-- Closes on: <stamp-after-commit>
+- Closes on: 425ecaa
 - Severity: operator ask 2026-08-12 (build the hosted multi-tenant
   SaaS before i18n; demo to theme buyers 2026-08-15)
 - Opened: 2026-08-12
