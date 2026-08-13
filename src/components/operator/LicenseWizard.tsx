@@ -94,7 +94,7 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
 
   return (
     <div className="max-w-3xl">
-      <div className="flex border border-zinc-200 bg-white">
+      <div className="op-panel flex divide-x divide-[var(--line)]">
         {(["issue", "extend", "revoke"] as const).map((t) => (
           <button
             key={t}
@@ -104,22 +104,16 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
               setRes(null);
               setErr(null);
             }}
-            className={`flex-1 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] ${
-              tab === t
-                ? "bg-zinc-900 text-white"
-                : "text-zinc-500 hover:text-zinc-900"
-            }`}
+            className={`op-tab ${tab === t ? "op-tab--active" : ""}`}
           >
             {t}
           </button>
         ))}
       </div>
 
-      <form onSubmit={go} className="mt-4 grid gap-4 border border-zinc-200 bg-white p-6">
+      <form onSubmit={go} className="mt-4 grid gap-4 op-panel p-6">
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-            Tenant
-          </span>
+          <span className="op-label">Tenant</span>
           <select
             value={id}
             onChange={(e) => {
@@ -127,7 +121,7 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
               setRes(null);
               setErr(null);
             }}
-            className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+            className="input-line"
             required
           >
             {tenants.map((t) => (
@@ -141,20 +135,20 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
 
         {tab !== "revoke" ? (
           <label className="block">
-            <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
+            <span className="op-label">
               {tab === "extend" ? "New expiry" : "Expiry"} (default +1 year)
             </span>
             <input
               type="date"
               value={expires}
               onChange={(e) => setExpires(e.target.value)}
-              className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+              className="input-line"
             />
           </label>
         ) : null}
 
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
+          <span className="op-label">
             Revenue amount (USD) · recorded in the license ledger
           </span>
           <div className="flex gap-2">
@@ -164,18 +158,14 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
               step="1"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-40 border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+              className="input-line w-40"
             />
             {["0", "29", "49", "99"].map((v) => (
               <button
                 key={v}
                 type="button"
                 onClick={() => setAmount(v)}
-                className={`border px-3 font-mono text-[11px] ${
-                  amount === v
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-300 text-zinc-600 hover:border-zinc-700"
-                }`}
+                className={`op-btn-sm ${amount === v ? "op-btn-sm--active" : ""}`}
               >
                 ${v}
               </button>
@@ -184,13 +174,13 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
         </label>
 
         {tab === "revoke" ? (
-          <label className="flex items-center gap-2 border border-red-200 bg-red-50 px-4 py-3">
+          <label className="op-banner op-banner--bad flex items-center gap-3">
             <input
               type="checkbox"
               checked={confirm}
               onChange={(e) => setConfirm(e.target.checked)}
             />
-            <span className="text-sm text-red-800">
+            <span>
               I confirm revoking{" "}
               <span className="font-mono font-medium">{selected?.slug}</span> — this
               immediately blocks admin access and tier features.
@@ -199,7 +189,7 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
         ) : null}
 
         {err ? (
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-red-700">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--op-bad)]">
             {err}
           </p>
         ) : null}
@@ -207,9 +197,9 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
         <button
           type="submit"
           disabled={busy}
-          className={`justify-self-start px-5 py-2 text-sm font-medium text-white disabled:opacity-60 ${
-            tab === "revoke" ? "bg-red-800 hover:bg-red-700" : "bg-zinc-900 hover:bg-zinc-800"
-          }`}
+          className={`${
+            tab === "revoke" ? "op-btn-danger" : "btn-primary"
+          } justify-self-start h-10 px-5 text-[10px]`}
         >
           {busy
             ? "Working..."
@@ -222,9 +212,9 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
       </form>
 
       {res ? (
-        <div className="mt-4 border border-zinc-200 bg-white p-6">
-          <div className="flex items-center justify-between">
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+        <div className="op-panel mt-4 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
               {res.action === "revoke" ? "Revoked" : "License payload"}
             </p>
             {res.action !== "revoke" ? (
@@ -232,15 +222,12 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
                 <button
                   type="button"
                   onClick={copyLicense}
-                  className="border border-zinc-300 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700"
+                  className="op-btn-sm"
                 >
                   {copied ? "Copied" : "Copy"}
                 </button>
                 {mailto ? (
-                  <a
-                    href={mailto}
-                    className="border border-zinc-300 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700"
-                  >
+                  <a href={mailto} className="op-btn-sm">
                     Email {res.owner_email}
                   </a>
                 ) : null}
@@ -250,30 +237,26 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
 
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-1">
-                Install code (slug | HMAC key)
-              </p>
-              <pre className="overflow-x-auto bg-zinc-50 p-4 font-mono text-xs text-zinc-800">
+              <p className="op-label mb-1">Install code (slug | HMAC key)</p>
+              <pre className="op-code">
                 {res.installCode.slug ?? "-"} | {res.installCode.hmac_key ?? "-"}
               </pre>
             </div>
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-1">
-                Buyer
-              </p>
-              <p className="bg-zinc-50 p-4 font-mono text-xs text-zinc-800">
+              <p className="op-label mb-1">Buyer</p>
+              <p className="op-code">
                 {res.owner_email ?? "no email on file"} · {res.domain ?? "studio-hosted"}
               </p>
             </div>
           </div>
 
           {res.action === "revoke" ? (
-            <p className="mt-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <p className="op-banner op-banner--bad mt-4">
               Tenant {res.installCode.slug} revoked. Admin access and tier features are
               blocked; license.revoke logged.
             </p>
           ) : (
-            <pre className="mt-4 overflow-x-auto bg-zinc-50 p-4 font-mono text-xs text-zinc-800">
+            <pre className="op-code mt-4">
               {JSON.stringify(res.license, null, 2)}
             </pre>
           )}

@@ -58,7 +58,7 @@ export default async function JournalEntryPage({
         <header className="mb-12">
           <div className="flex gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-4">
             <span>{dateLabel}</span>
-            <span className="text-accent">· {entry.category || "Note"}</span>
+            <span className="text-accent-deep">· {entry.category || "Note"}</span>
             <span>· {entry.author_name || "Studio"}</span>
           </div>
           <h1 className="text-[clamp(2.2rem,5vw,4rem)] tracking-[-0.025em] leading-[1.05]">

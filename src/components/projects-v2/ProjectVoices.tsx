@@ -72,7 +72,7 @@ export default async function ProjectVoicesV2({ slug }: Props) {
               </blockquote>
               <figcaption className="mt-auto pt-4 border-t hairline flex items-center gap-3">
                 <span aria-hidden className="block h-px w-10 bg-ink" />
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
+                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink">
                   {q.role
                     ? `${q.name} - ${q.role}`
                     : q.name}

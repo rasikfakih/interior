@@ -1,5 +1,7 @@
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import AdminJournalForm from "@/components/admin/AdminJournalForm";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../../identity";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Journal entry - Edit", robots: { index: false } };
@@ -11,6 +13,7 @@ export default async function AdminJournalEditor({
 }) {
   const { id } = await params;
   const isNew = id === "new";
+  const { email, role } = await getAdminIdentity();
   let initial: any = undefined;
 
   if (!isNew) {
@@ -25,9 +28,9 @@ export default async function AdminJournalEditor({
       );
       if (!row) {
         return (
-          <div className="container-page py-24 text-ink-mute">
-            Journal entry not found.
-          </div>
+          <AdminPageShell email={email} role={role}>
+            <p className="text-ink-mute">Journal entry not found.</p>
+          </AdminPageShell>
         );
       }
       initial = row;
@@ -35,10 +38,8 @@ export default async function AdminJournalEditor({
   }
 
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminJournalForm initial={initial} />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={role}>
+      <AdminJournalForm initial={initial} />
+    </AdminPageShell>
   );
 }

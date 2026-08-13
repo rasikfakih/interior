@@ -1,5 +1,7 @@
 import AdminInstallView from "@/components/admin/AdminInstallView";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { requireAdminSession } from "@/lib/license-gate";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = {
   title: "Install",
@@ -10,22 +12,19 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminInstallPage() {
   const gate = await requireAdminSession();
+  const { email, role } = await getAdminIdentity();
   if (!gate.ok) {
     return (
-      <section className="pt-24 md:pt-28 pb-24">
-        <div className="container-page">
-          <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
-            Sign in is required to view install metadata.
-          </p>
-        </div>
-      </section>
+      <AdminPageShell email={email} role={role}>
+        <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
+          Sign in is required to view install metadata.
+        </p>
+      </AdminPageShell>
     );
   }
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminInstallView role={gate.role} />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={gate.role}>
+      <AdminInstallView role={gate.role} />
+    </AdminPageShell>
   );
 }

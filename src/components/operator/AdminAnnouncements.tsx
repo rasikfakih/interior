@@ -94,42 +94,36 @@ export function AdminAnnouncements() {
 
   return (
     <div className="grid gap-8">
-      <form onSubmit={create} className="grid gap-4 border border-zinc-200 bg-white p-6">
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+      <form onSubmit={create} className="grid gap-4 op-panel p-6">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
           New announcement
         </h2>
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-            Title
-          </span>
+          <span className="op-label">Title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+            className="input-line"
             required
           />
         </label>
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-            Body
-          </span>
+          <span className="op-label">Body</span>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
             rows={3}
-            className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+            className="input-line"
             required
           />
         </label>
         <div className="flex flex-wrap items-end gap-4">
           <label className="block">
-            <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-              Audience
-            </span>
+            <span className="op-label">Audience</span>
             <select
               value={audience}
               onChange={(e) => setAudience(e.target.value)}
-              className="border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+              className="input-line"
             >
               <option value="all">All (public bar)</option>
               <option value="public">Public only</option>
@@ -138,27 +132,25 @@ export function AdminAnnouncements() {
           </label>
           <label className="flex items-center gap-2 pb-2">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
-            <span className="text-sm text-zinc-700">Active now</span>
+            <span className="text-sm text-ink-mute">Active now</span>
           </label>
           <button
             type="submit"
             disabled={busy}
-            className="ml-auto bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+            className="btn-primary ml-auto h-10 px-5 text-[10px]"
           >
             {busy ? "Creating..." : "Create"}
           </button>
         </div>
-        {err ? <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-red-700">{err}</p> : null}
-        {msg ? <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald-700">{msg}</p> : null}
+        {err ? <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--op-bad)]">{err}</p> : null}
+        {msg ? <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--op-good)]">{msg}</p> : null}
       </form>
 
-      <div className="border border-zinc-200 bg-white">
-        <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-          All announcements
-        </div>
-        <ul className="divide-y divide-zinc-100">
+      <div className="op-panel">
+        <div className="op-panel-head">All announcements</div>
+        <ul className="divide-y divide-[var(--line)]">
           {items.length === 0 ? (
-            <li className="px-4 py-6 text-center text-sm text-zinc-500">
+            <li className="px-4 py-6 text-center text-sm text-ink-mute">
               No announcements yet.
             </li>
           ) : (
@@ -166,20 +158,20 @@ export function AdminAnnouncements() {
               <li key={a.id} className="flex items-start justify-between gap-4 px-4 py-3">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium text-zinc-900">{a.title}</span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+                    <span className="text-sm font-medium text-ink">{a.title}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
                       {a.audience}
                     </span>
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${
+                      className={`op-dot ${
                         Number(a.is_active) === 1 || a.is_active === true
-                          ? "bg-emerald-500"
-                          : "bg-zinc-300"
+                          ? "op-dot--good"
+                          : "op-dot--off"
                       }`}
                     />
                   </div>
-                  <p className="mt-1 text-sm text-zinc-600">{a.body}</p>
-                  <p className="mt-1 font-mono text-[10px] text-zinc-400">
+                  <p className="mt-1 text-sm text-ink-mute">{a.body}</p>
+                  <p className="mt-1 font-mono text-[10px] text-ink-soft">
                     {new Date(a.created_at).toLocaleString()}
                   </p>
                 </div>
@@ -187,14 +179,14 @@ export function AdminAnnouncements() {
                   <button
                     type="button"
                     onClick={() => toggle(a)}
-                    className="border border-zinc-300 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600 hover:border-zinc-700"
+                    className="op-btn-sm"
                   >
                     {Number(a.is_active) === 1 || a.is_active === true ? "Pause" : "Activate"}
                   </button>
                   <button
                     type="button"
                     onClick={() => remove(a)}
-                    className="border border-red-300 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-red-700 hover:border-red-700"
+                    className="op-btn-sm op-btn-sm--danger"
                   >
                     Delete
                   </button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 
 type PageRow = {
   id: number;
@@ -78,14 +79,11 @@ export default function PagesAdmin() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <h2 className="text-3xl md:text-4xl tracking-tighter">Pages</h2>
-          <p className="text-ink-mute text-sm mt-1">
-            {pages.length} on record · drag-reorder block builder per page
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        eyebrow="Content"
+        title="Pages"
+        desc={`${pages.length} on record · drag-reorder block builder per page`}
+      />
 
       <form
         onSubmit={create}

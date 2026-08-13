@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { MediaRow } from "./media-types";
 import MediaPicker from "./MediaPicker";
+import AdminModelPreview from "./AdminModelPreview";
 import { ProjectRoom } from "@/lib/rooms";
-import { IconArrowUp, IconArrowDown } from "../icons";
+import { IconArrowUp, IconArrowDown, IconPlus } from "../icons";
 
 type Toast = { kind: "ok" | "err"; msg: string };
 
 const INPUT_CLS =
-  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-accent focus:outline-none";
-const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
+  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
+const LABEL_CLS = "op-label";
 
 type Draft = {
   name: string;
@@ -162,25 +163,27 @@ export default function ProjectRoomsManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
-          Walkthrough rooms · {rooms.length}
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <p className="chrome-pill inline-flex">Walkthrough rooms</p>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
+            {rooms.length}
+          </span>
+        </div>
         <button
           type="button"
           onClick={() => startEdit(null)}
-          className="btn-ghost text-xs h-9 px-3"
+          className="btn-primary h-9 px-4 text-[10px]"
         >
-          + Add room
+          <IconPlus size={14} aria-hidden />
+          Add room
         </button>
       </div>
 
       {toast && (
         <div
           role="status"
-          className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
-          }`}
+          className={`op-banner ${toast.kind === "err" ? "op-banner--bad" : "op-banner--good"}`}
         >
           {toast.msg}
         </div>
@@ -197,29 +200,30 @@ export default function ProjectRoomsManager({
       {rooms.map((room, i) => (
         <div
           key={room.id}
-          className="surface-tile p-4 rounded-[var(--radius-card)] grid grid-cols-1 md:grid-cols-12 gap-3 items-center"
+          className="surface-tile grid grid-cols-1 gap-3 rounded-[var(--radius-card)] p-4 md:grid-cols-12 md:items-center"
         >
           <div className="md:col-span-5">
-            <p className="text-base tracking-tight">
-              {room.name}{" "}
+            <div className="flex items-center gap-2">
+              <p className="text-base tracking-tight">{room.name}</p>
               <span
-                className={`ml-1 font-mono text-[10px] uppercase tracking-[0.22em] ${
-                  room.is_published ? "text-accent" : "text-ink-mute"
+                className={`op-chip ${
+                  room.is_published ? "op-chip--good" : ""
                 }`}
               >
                 {room.is_published ? "live" : "draft"}
               </span>
-            </p>
-            <p className="font-mono text-xs text-ink-mute mt-1 truncate">
+            </div>
+            <p className="mt-1 truncate font-mono text-xs text-ink-mute">
               {room.model_3d || "uses project model"}
             </p>
           </div>
-          <div className="md:col-span-7 flex flex-wrap gap-2 md:justify-end">
+          <div className="flex flex-wrap gap-2 md:col-span-7 md:justify-end">
             <button
               type="button"
               onClick={() => move(room, -1)}
               disabled={i === 0}
-              className="btn-ghost text-xs h-9 px-3 disabled:opacity-30"
+              className="op-btn-sm"
+              aria-label={`Move ${room.name} up`}
             >
               <IconArrowUp aria-hidden size={14} />
             </button>
@@ -227,21 +231,22 @@ export default function ProjectRoomsManager({
               type="button"
               onClick={() => move(room, 1)}
               disabled={i === rooms.length - 1}
-              className="btn-ghost text-xs h-9 px-3 disabled:opacity-30"
+              className="op-btn-sm"
+              aria-label={`Move ${room.name} down`}
             >
               <IconArrowDown aria-hidden size={14} />
             </button>
             <button
               type="button"
               onClick={() => startEdit(room)}
-              className="btn-ghost text-xs h-9 px-3"
+              className="op-btn-sm"
             >
               Edit
             </button>
             <button
               type="button"
               onClick={() => del(room)}
-              className="btn-ghost text-xs h-9 px-3"
+              className="op-btn-sm op-btn-sm--danger"
             >
               Delete
             </button>
@@ -250,8 +255,8 @@ export default function ProjectRoomsManager({
       ))}
 
       {(editingId !== null || rooms.length === 0) && (
-        <div className="surface-elevated p-5 rounded-[var(--radius-card)] space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="surface-tile space-y-4 rounded-[var(--radius-card)] p-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className={LABEL_CLS}>Room name</label>
               <input
@@ -287,8 +292,10 @@ export default function ProjectRoomsManager({
             />
           </div>
           <div>
-            <label className={LABEL_CLS}>3D model (.glb) - pick from Media or paste a URL</label>
-            <div className="flex gap-2 mt-1">
+            <label className={LABEL_CLS}>
+              3D model (.glb) - pick from Media or paste a URL
+            </label>
+            <div className="mt-1 flex gap-2">
               <input
                 value={draft.model_3d}
                 onChange={(e) => setDraft({ ...draft, model_3d: e.target.value })}
@@ -303,16 +310,22 @@ export default function ProjectRoomsManager({
                 }
               />
             </div>
-            <p className="text-xs text-ink-mute mt-1">
+            <p className="op-hint">
               Leave empty to fall back to the project&apos;s 3D model.
             </p>
           </div>
+
+          <AdminModelPreview
+            modelUrl={draft.model_3d}
+            label={editingId !== null ? "Previewing this room's model" : "Previewing new room's model"}
+          />
+
           <div className="flex gap-2">
             <button
               type="button"
               onClick={save}
               disabled={busy}
-              className="btn-primary text-xs h-9 px-3 disabled:opacity-50"
+              className="btn-primary h-9 px-4 text-[10px] disabled:opacity-50"
             >
               {busy ? "Saving..." : editingId !== null ? "Save room" : "Add room"}
             </button>
@@ -320,7 +333,7 @@ export default function ProjectRoomsManager({
               <button
                 type="button"
                 onClick={() => startEdit(null)}
-                className="btn-ghost text-xs h-9 px-3"
+                className="btn-ghost h-9 px-4 text-[10px]"
               >
                 Cancel
               </button>

@@ -16,8 +16,10 @@ export async function GET() {
       body: string;
       created_at: string;
     }>(
+      // is_active is boolean in Postgres: `= 1` is invalid there, so
+      // use the TRUE literal (portable to SQLite too).
       `SELECT id, title, body, created_at FROM announcements
-       WHERE is_active = 1 AND audience IN ('all', 'public')
+       WHERE is_active = TRUE AND audience IN ('all', 'public')
        ORDER BY id DESC LIMIT 5`
     );
     return NextResponse.json({
@@ -29,7 +31,10 @@ export async function GET() {
         created_at: r.created_at,
       })),
     });
-  } catch {
+  } catch (err) {
+    // Public read: degrade to an empty list, but never silently -
+    // log so a broken query (or schema drift) is visible in logs.
+    console.error("announcements read failed:", (err as Error)?.message || err);
     return NextResponse.json({ ok: true, items: [] });
   }
 }

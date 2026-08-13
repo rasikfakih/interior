@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 import {
   FormDefinition,
   FormField,
@@ -14,7 +15,7 @@ type View =
   | { name: "inbox"; form: FormDefinition };
 
 const INPUT_CLS =
-  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-accent focus:outline-none";
+  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
 const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
 
 function fmtDate(s: string | null): string {
@@ -86,50 +87,51 @@ export default function AdminForms({ role }: { role: string }) {
 
   return (
     <div className="space-y-6">
-      <header className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-end">
-        <div className="md:col-span-8">
-          <p className="chrome-pill mb-3 inline-flex">Forms</p>
-          <h1 className="text-3xl md:text-5xl tracking-tighter">
-            {view.name === "list" && "Form definitions."}
-            {view.name === "editor" && "Form editor."}
-            {view.name === "inbox" && "Submissions inbox."}
-          </h1>
-          <p className="text-ink-mute text-sm mt-2">
-            {view.name === "list" &&
-              "Build forms, drop them on a page with the Form block, and read submissions here."}
-            {view.name === "editor" &&
-              "Fields render on the public page via /api/forms/submit. Keys are lowercase a-z, digits and underscores."}
-            {view.name === "inbox" &&
-              "Unread submissions are highlighted. Export pulls a CSV of every row."}
-          </p>
-        </div>
-        <div className="md:col-span-4 flex md:justify-end gap-2">
-          {view.name === "inbox" && (
-            <button
-              type="button"
-              onClick={() => setView({ name: "list" })}
-              className="btn-ghost"
-            >
-              Back
-            </button>
-          )}
-          {view.name === "list" && (
-            <button
-              type="button"
-              onClick={() => setView({ name: "editor", form: null })}
-              className="btn-primary"
-            >
-              New form
-            </button>
-          )}
-        </div>
-      </header>
+      <AdminPageHeader
+        eyebrow="Content"
+        title={
+          view.name === "list"
+            ? "Forms"
+            : view.name === "editor"
+              ? "Form editor"
+              : "Submissions inbox"
+        }
+        desc={
+          view.name === "list"
+            ? "Build forms, drop them on a page with the Form block, and read submissions here."
+            : view.name === "editor"
+              ? "Fields render on the public page via /api/forms/submit. Keys are lowercase a-z, digits and underscores."
+              : "Unread submissions are highlighted. Export pulls a CSV of every row."
+        }
+        action={
+          <div className="flex gap-2">
+            {view.name === "inbox" && (
+              <button
+                type="button"
+                onClick={() => setView({ name: "list" })}
+                className="btn-ghost h-10 px-5 text-[10px]"
+              >
+                Back
+              </button>
+            )}
+            {view.name === "list" && (
+              <button
+                type="button"
+                onClick={() => setView({ name: "editor", form: null })}
+                className="btn-primary h-10 px-5 text-[10px]"
+              >
+                New form
+              </button>
+            )}
+          </div>
+        }
+      />
 
       {toast && (
         <div
           role="status"
           className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
+            toast.kind === "err" ? "text-red-700" : "text-accent-deep"
           }`}
         >
           {toast.msg}
@@ -201,7 +203,7 @@ function FormList({
               {f.title}{" "}
               <span
                 className={`ml-2 font-mono text-[10px] uppercase tracking-[0.22em] ${
-                  f.is_published ? "text-accent" : "text-ink-mute"
+                  f.is_published ? "text-accent-deep" : "text-ink-mute"
                 }`}
               >
                 {f.is_published ? "published" : "draft"}
@@ -534,7 +536,7 @@ function Inbox({
         <p className="text-sm flex-1">
           <span className="font-mono text-xs text-ink-mute">{form.slug}</span>{" "}
           <span className="text-ink-mute">·</span>{" "}
-          <span className={unread > 0 ? "text-accent font-medium" : "text-ink-mute"}>
+          <span className={unread > 0 ? "text-accent-deep font-medium" : "text-ink-mute"}>
             {unread} unread
           </span>
         </p>
@@ -604,7 +606,7 @@ function Inbox({
                   <td className="px-4 py-3">
                     <span
                       className={`font-mono text-[10px] uppercase tracking-[0.22em] ${
-                        s.read_at ? "text-ink-mute" : "text-accent"
+                        s.read_at ? "text-ink-mute" : "text-accent-deep"
                       }`}
                     >
                       {s.read_at ? "read" : "new"}

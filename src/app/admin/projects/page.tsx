@@ -1,13 +1,14 @@
 import AdminProjectsIndex from "@/components/admin/AdminProjectsIndex";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = { title: "Projects", robots: { index: false } };
 
-export default function AdminProjectsPage() {
+export default async function AdminProjectsPage() {
+  const { email, role } = await getAdminIdentity();
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminProjectsIndex />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={role}>
+      <AdminProjectsIndex />
+    </AdminPageShell>
   );
 }

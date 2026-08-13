@@ -33,7 +33,7 @@ const seed: Item[] = [
     slug: "casa-mira",
     title: "Casa Mira",
     location: "Bandra, Mumbai",
-    modelUrl: "/models/seed/casa-mira.glb",
+    modelUrl: "/models/seed/reception-room.glb",
     posterUrl:
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1600&auto=format&fit=crop",
     scope: "1,820 sq.ft · Apartment",
@@ -42,7 +42,7 @@ const seed: Item[] = [
     slug: "salt-flats",
     title: "Salt Flats",
     location: "Alibaug, Maharashtra",
-    modelUrl: "/models/seed/salt-flats.glb",
+    modelUrl: "/models/seed/reception-room.glb",
     posterUrl:
       "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?q=80&w=1600&auto=format&fit=crop",
     scope: "3,400 sq.ft · Coastal",
@@ -53,7 +53,12 @@ export default function SpatialWalkthroughs({
   data,
   compact = false,
 }: {
-  data?: any;
+  data?: {
+    projectSlugs?: string[];
+    eyebrow?: string;
+    title?: string;
+    lede?: string;
+  };
   compact?: boolean;
 }) {
   const slugs: string[] = data?.projectSlugs || seed.map((s) => s.slug);
@@ -192,7 +197,7 @@ function WalkthroughDeck({
           See{" "}
           <Link
             href="/projects-v2"
-            className="text-accent border-b border-[var(--accent-soft)] hover:text-accent-deep transition-colors"
+            className="text-accent-deep border-b border-[var(--accent-soft)] hover:text-accent transition-colors"
           >
             Selected work
           </Link>{" "}

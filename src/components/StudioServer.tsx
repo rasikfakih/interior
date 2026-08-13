@@ -64,8 +64,8 @@ export default async function StudioServer() {
                     aria-hidden
                     className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
                     style={{
-                      background: "var(--accent-soft)",
-                      color: "var(--accent)",
+                      background: "var(--accent-deep)",
+                      color: "var(--bg)",
                     }}
                   >
                     {initial}

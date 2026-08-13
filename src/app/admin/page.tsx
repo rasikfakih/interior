@@ -1,24 +1,12 @@
 import AdminShell from "@/components/admin/AdminShell";
 import LoginCard from "./LoginCard";
 import { checkLicense } from "@/lib/license";
+import { getAdminIdentity } from "./identity";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata = { title: "Admin", robots: { index: false } };
-
-async function safeGetServerSession() {
-  try {
-    const mod = await import("next-auth/next");
-    const authMod = await import("@/lib/auth");
-    return await mod.getServerSession(authMod.authOptions);
-  } catch (e) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[admin/page] getServerSession failed:", (e as Error)?.message ?? e);
-    }
-    return null;
-  }
-}
 
 async function safeCheckLicense() {
   try {
@@ -32,18 +20,11 @@ async function safeCheckLicense() {
 }
 
 export default async function AdminPage() {
-  const [session, license] = await Promise.all([safeGetServerSession(), safeCheckLicense()]);
+  const [identity, license] = await Promise.all([getAdminIdentity(), safeCheckLicense()]);
 
-  if (!license.ok || !session) {
+  if (!license.ok || !identity.email || identity.email === "operator@local") {
     return <LoginCard />;
   }
 
-  return (
-    <AdminShell
-      email={session.user?.email || "operator@local"}
-      role={
-        (session.user as { role?: string } | undefined)?.role || "admin"
-      }
-    />
-  );
+  return <AdminShell email={identity.email} role={identity.role} />;
 }

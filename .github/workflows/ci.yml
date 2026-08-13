@@ -21,11 +21,37 @@ jobs:
       # without secrets.
       - run: npm ci
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Playwright chromium for the contrast walker; cached so the
+      # ~160MB download happens once per lockfile, not per run.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx playwright install chromium
+
       - run: npx tsc --noEmit
 
       - run: npm run check:themes
 
+      # Postgres boolean-column guard: rejects `col = 1` / `SET col = 0`
+      # against BOOLEAN columns (invalid in Postgres, silently accepted
+      # by SQLite) at merge time instead of on the deployed DB.
+      - run: node scripts/check-boolean-sql.mjs
+
       - run: npm run build
+
+      # WCAG AA contrast walker: every rendered text surface on public,
+      # tenant-admin, and superadmin routes in light + dark themes.
+      # Spawns `next start` against the freshly built .next; the
+      # postinstall seed provides the demo license + admin account.
+      - run: node scripts/check-contrast.mjs
 
       - run: npm run verify:deploy
 

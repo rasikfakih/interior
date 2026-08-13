@@ -1,6 +1,8 @@
 import AdminSiteIdentity from "@/components/admin/AdminSiteIdentity";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = {
   title: "Site identity",
@@ -37,15 +39,14 @@ function emptyIdentity(): SiteIdentity {
 
 export default async function AdminSiteIdentityPage() {
   const gate = await requireAdminSession();
+  const { email, role } = await getAdminIdentity();
   if (!gate.ok) {
     return (
-      <section className="pt-24 md:pt-28 pb-24">
-        <div className="container-page">
-          <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
-            Sign in is required to edit site identity.
-          </p>
-        </div>
-      </section>
+      <AdminPageShell email={email} role={role}>
+        <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
+          Sign in is required to edit site identity.
+        </p>
+      </AdminPageShell>
     );
   }
 
@@ -58,10 +59,8 @@ export default async function AdminSiteIdentityPage() {
   const initial = row ?? emptyIdentity();
 
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminSiteIdentity initial={initial} role={gate.role} />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={gate.role}>
+      <AdminSiteIdentity initial={initial} role={gate.role} />
+    </AdminPageShell>
   );
 }

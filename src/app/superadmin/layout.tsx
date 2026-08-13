@@ -12,15 +12,15 @@ export default async function SuperadminLayout({ children }: { children: React.R
   const loggedIn = sessionCookie?.value === "1";
 
   if (!loggedIn) {
-    return <div className="min-h-dvh bg-zinc-50 text-zinc-900">{children}</div>;
+    return <div className="op-console min-h-dvh">{children}</div>;
   }
 
   const email = process.env.SUPERADMIN_EMAIL || "operator@studio";
 
   return (
-    <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+    <div className="op-console min-h-dvh lg:flex">
       <OperatorNav email={email} />
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+      <main className="min-w-0 flex-1 px-4 py-8 md:px-8 md:py-10">{children}</main>
     </div>
   );
 }

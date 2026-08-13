@@ -112,7 +112,7 @@ export default function LicenseAdmin() {
                 <span
                   key={k}
                   className="font-mono text-[10px] uppercase tracking-[0.18em] flex items-center gap-2"
-                  style={{ color: v ? "var(--accent)" : "var(--ink-mute)" }}
+                  style={{ color: v ? "var(--accent-deep)" : "var(--ink-mute)" }}
                 >
                   <span
                     className="w-2 h-2 rounded-full"
@@ -197,7 +197,7 @@ export default function LicenseAdmin() {
         <div className="flex items-center justify-between pt-2">
           <p
             className="text-xs font-mono tracking-[0.04em]"
-            style={{ color: msg.startsWith("License") ? "var(--accent)" : "var(--accent)" }}
+            style={{ color: "var(--accent-deep)" }}
             role="status"
             aria-live="polite"
           >

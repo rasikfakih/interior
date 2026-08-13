@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 
 type Palette = { ink: string; paper: string; accent: string; muted: string };
 type Customizer = {
@@ -22,7 +23,7 @@ type Preset = {
 type Toast = { kind: "ok" | "err"; msg: string };
 
 const INPUT_CLS =
-  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-accent focus:outline-none";
+  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
 const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
 
 const FONT_OPTIONS: { value: string; label: string }[] = [
@@ -148,6 +149,10 @@ export default function AdminTheme({
     "--preview-ink": palette.ink,
     "--preview-muted": palette.muted || palette.ink,
     "--preview-accent": palette.accent,
+    // The bright accent is decorative; small text on the preview
+    // paper needs the deep role (same mix toward black as the
+    // engine's --accent-deep derivation, theme.ts).
+    "--preview-accent-deep": `color-mix(in srgb, ${palette.accent} 58%, #000000)`,
     "--preview-radius":
       customizer.radius_scale === "soft"
         ? "14px"
@@ -161,31 +166,37 @@ export default function AdminTheme({
 
   return (
     <div className="space-y-6">
-      <header className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-end">
-        <div className="md:col-span-8">
-          <p className="chrome-pill mb-3 inline-flex">Theme</p>
-          <h1 className="text-3xl md:text-5xl tracking-tighter">Customize the site.</h1>
-          <p className="text-ink-mute text-sm mt-2">
-            Palette, type, density, motion and radius. Saves to this
-            tenant&apos;s distro row; the public site re-renders on next
-            request. Role: <span className="font-mono text-xs">{role}</span>.
-          </p>
-        </div>
-        <div className="md:col-span-4 flex md:justify-end gap-2">
-          <a href="/" className="btn-ghost" target="_blank" rel="noreferrer">
-            Open site
-          </a>
-          <button type="button" onClick={save} className="btn-primary" disabled={busy}>
-            {busy ? "Saving..." : "Save theme"}
-          </button>
-        </div>
-      </header>
+      <AdminPageHeader
+        eyebrow="Appearance"
+        title="Theme customizer"
+        desc={`Palette, type, density, motion and radius. Saves to this tenant's distro row; the public site re-renders on next request. Role: ${role}.`}
+        action={
+          <div className="flex gap-2">
+            <a
+              href="/"
+              className="btn-ghost h-10 px-5 text-[10px]"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open site
+            </a>
+            <button
+              type="button"
+              onClick={save}
+              className="btn-primary h-10 px-5 text-[10px]"
+              disabled={busy}
+            >
+              {busy ? "Saving..." : "Save theme"}
+            </button>
+          </div>
+        }
+      />
 
       {toast && (
         <div
           role="status"
           className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
+            toast.kind === "err" ? "text-red-700" : "text-accent-deep"
           }`}
         >
           {toast.msg}
@@ -203,7 +214,7 @@ export default function AdminTheme({
                 {mutedPaper >= 4.5 ? "AA muted ok" : "AA muted FAIL"}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2">
               {(["ink", "paper", "accent", "muted"] as const).map((k) => (
                 <ColorField
                   key={k}
@@ -213,7 +224,7 @@ export default function AdminTheme({
                 />
               ))}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2">
               <ContrastRow label="ink / paper" ratio={inkPaper} />
               <ContrastRow label="muted / paper" ratio={mutedPaper} />
             </div>
@@ -318,7 +329,7 @@ export default function AdminTheme({
             >
               <p
                 className="font-mono text-[10px] uppercase tracking-[0.22em]"
-                style={{ color: previewStyle["--preview-accent"] }}
+                style={{ color: previewStyle["--preview-accent-deep"] }}
               >
                 Studio · Est. 2017
               </p>
@@ -363,7 +374,7 @@ export default function AdminTheme({
 
           <div className="surface-tile p-6 rounded-[var(--radius-card)]">
             <p className={LABEL_CLS + " mb-4"}>Presets</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2">
               {presets.map((p) => (
                 <button
                   key={p.slug}
@@ -455,7 +466,7 @@ function ContrastRow({ label, ratio }: { label: string; ratio: number }) {
       <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
         {label}
       </span>
-      <span className={`font-mono text-xs ${ok ? "text-accent" : "text-red-700"}`}>
+      <span className={`font-mono text-xs ${ok ? "text-accent-deep" : "text-red-700"}`}>
         {ratio > 0 ? `${ratio.toFixed(2)}:1` : "-"} {ok ? "AA" : "FAIL"}
       </span>
     </div>

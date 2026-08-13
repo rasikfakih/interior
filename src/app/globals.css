@@ -20,6 +20,13 @@
 
 @layer base {
   :root {
+    /* Shared status colors (both themes). The operator console
+       overrides these with lighter dark-mode hues; the light admin
+       uses these deeper values for legibility on bone paper. */
+    --op-good: #2e7d52;
+    --op-bad: #b3402e;
+    --op-warn: #9a6a1f;
+
     /* Forest & Bone (recalibrated, v1.9.0).
        Deeper forest ink on cooler bone paper, one restrained
        soft-amber accent. NOT the AI-default beige/brass/oxblood/
@@ -33,18 +40,27 @@
     --surface: rgba(18, 42, 32, 0.04);
     --surface-strong: rgba(18, 42, 32, 0.08);
     --ink: #122a20;
-    --ink-mute: #626d66;
-    --ink-soft: #7f8b83;
+    --ink-mute: #56605a;
+    /* mix(ink, paper, 0.36): >= 4.5:1 even on the light admin's
+       tinted tiles/elevated surfaces (surface-tile and
+       surface-elevated alpha-composite to #e3e4de / #dbdcd6 over
+       bone; #56605a clears 4.73:1 there, 5.10:1 on the tile). */
+    --ink-soft: #58685f;
     --line: rgba(18, 42, 32, 0.16);
     --line-strong: rgba(18, 42, 32, 0.32);
     --accent: #c0964f;
-    --accent-deep: #8a6a34;
+    /* mix(accent, black, 0.42): the AA text role of the accent.
+       Bright amber stays decorative (chrome, tints, hovers).
+       #735a2f clears 4.5:1 on the light admin's tinted tiles, its
+       elevated surfaces, and the accent-soft active-nav fill
+       (4.71-5.08:1 measured). Matches theme.ts's derivation. */
+    --accent-deep: #735a2f;
     --accent-soft: rgba(192, 150, 79, 0.18);
     --chrome: linear-gradient(
       135deg,
       #c2a878 0%,
       #c0964f 50%,
-      #8a6a34 100%
+      #7d6233 100%
     );
     --shadow-ambient: 0 30px 60px -30px rgba(18, 42, 32, 0.28);
   }
@@ -56,7 +72,10 @@
     --surface-strong: rgba(234, 234, 228, 0.08);
     --ink: #eaeae4;
     --ink-mute: #9aa39a;
-    --ink-soft: #6d7a6f;
+    /* Must match the theme engine's mix(darkInk, darkPaper, 0.5)
+       so the no-DB fallback stays AA (>= 4.5:1 on --bg) and
+       consistent with the served distro theme. */
+    --ink-soft: #7c837e;
     --line: rgba(234, 234, 228, 0.16);
     --line-strong: rgba(234, 234, 228, 0.28);
     --accent: #d2b06a;
@@ -83,6 +102,14 @@
     color: var(--ink);
     font-family: var(--font-sans);
     transition: background-color 400ms ease, color 400ms ease;
+  }
+
+  /* Tailwind v4's preflight placeholder is currentcolor at 50% alpha
+     (~2.4:1 - an AA failure). Bare inputs (e.g. the admin editors)
+     get the solid ink-soft placeholder instead, matching .input-line. */
+  ::placeholder {
+    color: var(--ink-soft);
+    opacity: 1;
   }
 
   ::selection {
@@ -144,6 +171,22 @@
 
   .text-accent {
     color: var(--accent);
+  }
+
+  /* The AA text role of the accent (accent is decorative: chrome,
+     tints, hovers). Tailwind does not generate utilities from plain
+     CSS vars, so this must be a real component class - the public
+     ems and the light admin console both consume it. */
+  .text-accent-deep {
+    color: var(--accent-deep);
+  }
+
+  .text-ink-soft {
+    color: var(--ink-soft);
+  }
+
+  .bg-accent {
+    background-color: var(--accent);
   }
 
   .bg-canvas {
@@ -359,5 +402,416 @@
   }
   .ei-spot .ei-spot-glow {
     display: none;
+  }
+}
+
+/* ============================================================
+   ADMIN CONSOLE SHELL (tenant admin + superadmin operator)
+   ------------------------------------------------------------
+   One brand system, two moods. Both consoles reuse the public
+   brand tokens (forest/bone/amber); the operator console is the
+   same system's dark variant, so every shared utility below
+   (btn-primary, btn-ghost, input-line, chrome-pill, surface-tile,
+   text-ink-mute, hairline) works in both without a second class
+   taxonomy. Status colors + table/chip/stat primitives are
+   operator-only and carry the --op-* vars. Sharp 2px radius
+   everywhere (shape-consistency lock).
+   ============================================================ */
+
+/* Dark Nature / Calm System (brandkit visual mode): deep-forest
+   canvas, bone type, amber accent. Superadmin is the platform
+   owner's control room; this is the brand's night shift, not a
+   separate theme. Status hues shift lighter for dark surfaces. */
+.op-console {
+  --op-good: #7cc496;
+  --op-bad: #e08a7c;
+  --op-warn: #d9b36a;
+
+  --bg: #07100b;
+  --bg-elev: #0b1510;
+  --surface: rgba(234, 235, 226, 0.035);
+  --surface-strong: rgba(234, 235, 226, 0.07);
+  --ink: #e8e9e1;
+  --ink-mute: #93a397;
+  /* #7c8f82: 5.4:1 on the op-console bg - AA for the small nav-group
+     labels and sub-captions, still clearly softer than ink-mute. */
+  --ink-soft: #7c8f82;
+  --line: rgba(232, 233, 225, 0.11);
+  --line-strong: rgba(232, 233, 225, 0.24);
+  --accent: #d2b06a;
+  --accent-deep: #e0c686;
+  --accent-soft: rgba(210, 176, 106, 0.13);
+  --chrome: linear-gradient(
+    135deg,
+    #d2b06a 0%,
+    #b78d4c 50%,
+    #6e5226 100%
+  );
+  --shadow-ambient: 0 30px 60px -32px rgba(0, 0, 0, 0.7);
+
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+.op-console ::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+@layer components {
+  /* --- Tenant admin shell --- */
+  .admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .admin-nav-group {
+    margin: 1.4rem 0.35rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    color: var(--ink);
+    font-size: 13.5px;
+    transition: background-color 140ms ease, border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .admin-nav-item:hover {
+    background: var(--surface);
+  }
+
+  .admin-nav-item--active {
+    background: var(--accent-soft);
+    border-color: var(--line-strong);
+    color: var(--accent-deep);
+  }
+
+  /* --- Operator (superadmin) primitives --- */
+  .op-panel {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+  }
+
+  .op-panel-head {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .op-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .op-th {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  .op-td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+    color: var(--ink);
+    vertical-align: middle;
+  }
+
+  .op-table tbody tr:last-child .op-td {
+    border-bottom: 0;
+  }
+
+  .op-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .op-hint {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .op-code {
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-control);
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .op-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    transition: color 140ms ease;
+    white-space: nowrap;
+  }
+
+  .op-link:hover {
+    color: var(--accent-deep);
+  }
+
+  .op-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    padding: 0.24rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    white-space: nowrap;
+  }
+
+  .op-chip--good {
+    border-color: color-mix(in srgb, var(--op-good) 45%, transparent);
+    background: color-mix(in srgb, var(--op-good) 10%, transparent);
+    color: var(--op-good);
+  }
+
+  .op-chip--bad {
+    border-color: color-mix(in srgb, var(--op-bad) 45%, transparent);
+    background: color-mix(in srgb, var(--op-bad) 10%, transparent);
+    color: var(--op-bad);
+  }
+
+  .op-chip--warn {
+    border-color: color-mix(in srgb, var(--op-warn) 45%, transparent);
+    background: color-mix(in srgb, var(--op-warn) 10%, transparent);
+    color: var(--op-warn);
+  }
+
+  .op-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+  }
+
+  .op-dot--good {
+    background: var(--op-good);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--op-good) 14%, transparent);
+  }
+
+  .op-dot--bad {
+    background: var(--op-bad);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--op-bad) 14%, transparent);
+  }
+
+  .op-dot--warn {
+    background: var(--op-warn);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--op-warn) 14%, transparent);
+  }
+
+  .op-dot--off {
+    background: var(--ink-soft);
+  }
+
+  .op-stat {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: 1rem 1.15rem 1.1rem;
+  }
+
+  .op-stat-value {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .op-stat-label {
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  .op-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    padding: 0.4rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    white-space: nowrap;
+    transition: border-color 140ms ease, color 140ms ease,
+      background-color 140ms ease;
+  }
+
+  .op-btn-sm:hover {
+    border-color: var(--accent);
+    color: var(--accent-deep);
+  }
+
+  .op-btn-sm--active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+  }
+
+  .op-btn-sm--danger {
+    border-color: color-mix(in srgb, var(--op-bad) 45%, transparent);
+    color: var(--op-bad);
+  }
+
+  .op-btn-sm--danger:hover {
+    border-color: var(--op-bad);
+    background: color-mix(in srgb, var(--op-bad) 12%, transparent);
+    color: var(--op-bad);
+  }
+
+  .op-btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    background: var(--op-bad);
+    color: #0a1813;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius-control);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background-color 160ms ease, transform 160ms ease;
+    white-space: nowrap;
+  }
+
+  .op-btn-danger:hover {
+    background: color-mix(in srgb, var(--op-bad) 85%, var(--op-ink));
+  }
+
+  .op-btn-danger:active {
+    transform: translateY(1px);
+  }
+
+  .op-btn-danger:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .op-btn-sm:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .op-tab {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+
+  .op-tab:hover {
+    color: var(--ink);
+  }
+
+  .op-tab--active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .op-tab--active:hover {
+    color: var(--bg);
+  }
+
+  .op-banner {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    padding: 0.8rem 1rem;
+    font-size: 13px;
+  }
+
+  .op-banner--good {
+    border-color: color-mix(in srgb, var(--op-good) 45%, transparent);
+    background: color-mix(in srgb, var(--op-good) 10%, transparent);
+    color: var(--op-good);
+  }
+
+  .op-banner--bad {
+    border-color: color-mix(in srgb, var(--op-bad) 45%, transparent);
+    background: color-mix(in srgb, var(--op-bad) 10%, transparent);
+    color: var(--op-bad);
+  }
+
+  .op-banner--warn {
+    border-color: color-mix(in srgb, var(--op-warn) 45%, transparent);
+    background: color-mix(in srgb, var(--op-warn) 10%, transparent);
+    color: var(--op-warn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-nav-item,
+  .op-tab,
+  .op-btn-sm,
+  .op-link {
+    transition: none;
   }
 }

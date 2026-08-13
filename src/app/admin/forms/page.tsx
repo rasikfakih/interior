@@ -1,13 +1,14 @@
 import AdminForms from "@/components/admin/AdminForms";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = { title: "Forms", robots: { index: false } };
 
-export default function AdminFormsPage() {
+export default async function AdminFormsPage() {
+  const { email, role } = await getAdminIdentity();
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminForms role="admin" />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={role}>
+      <AdminForms role={role} />
+    </AdminPageShell>
   );
 }

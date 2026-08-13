@@ -25,6 +25,9 @@ interface Props {
   posterUrl?: string;
   reducedMotion: boolean;
   onReady: () => void;
+  /** Admin previews pass false: operator inspections must not count
+   *  as public model_3d_load usage events. */
+  trackUsage?: boolean;
 }
 
 type CameraPreset = "front" | "three-quarter" | "top" | "detail";
@@ -52,6 +55,7 @@ export default function ThreeRuntime({
   posterUrl,
   reducedMotion,
   onReady,
+  trackUsage = true,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [preset, setPreset] = useState<CameraPreset>("front");
@@ -82,9 +86,11 @@ export default function ThreeRuntime({
   // Phase 6 usage analytics: one model_3d_load event per successful
   // load. progress === 100 && !active means drei finished fetching;
   // reduced-motion users still count (the event is a fetch, no motion).
+  // Admin previews opt out via trackUsage=false so operator checks
+  // never inflate public usage metrics.
   const firedLoad = useRef(false);
   useEffect(() => {
-    if (firedLoad.current) return;
+    if (!trackUsage || firedLoad.current) return;
     if (!active && progress >= 100 && !failed) {
       firedLoad.current = true;
       const ctl = new AbortController();
@@ -102,7 +108,7 @@ export default function ThreeRuntime({
       }).catch(() => {});
       return () => clearTimeout(t);
     }
-  }, [progress, active, failed]);
+  }, [progress, active, failed, trackUsage]);
 
   return (
     <div

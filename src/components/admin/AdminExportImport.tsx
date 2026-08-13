@@ -168,7 +168,7 @@ export default function AdminExportImport() {
             }}
             placeholder='{"format":"etihad-content-export","version":1,…}'
             rows={6}
-            className="w-full bg-canvas border hairline rounded-[var(--radius-control)] p-3 font-mono text-xs text-ink focus:border-accent focus:outline-none"
+            className="w-full bg-canvas border hairline rounded-[var(--radius-control)] p-3 font-mono text-xs text-ink focus:border-[var(--accent-deep)] focus:outline-none"
           />
         </div>
         {parsed && (

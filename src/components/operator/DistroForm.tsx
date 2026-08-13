@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { THEME_PRESETS } from "@/lib/theme-presets";
+import type { TenantRow } from "./RotateForm";
 
-export function DistroForm({ tenants, example }: { tenants: any[]; example: string }) {
+export function DistroForm({ tenants, example }: { tenants: TenantRow[]; example: string }) {
   const router = useRouter();
   const [id, setId] = useState(tenants[0]?.id?.toString() || "");
   const [json, setJson] = useState(example);
@@ -47,14 +48,14 @@ export function DistroForm({ tenants, example }: { tenants: any[]; example: stri
   }
 
   return (
-    <form onSubmit={go} className="grid gap-4 border border-zinc-200 bg-white p-6">
+    <form onSubmit={go} className="grid gap-4 op-panel p-6">
       <label className="block">
-        <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">Tenant</span>
+        <span className="op-label">Tenant</span>
         <select
           value={id}
           onChange={(e) => setId(e.target.value)}
           required
-          className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none"
+          className="input-line"
         >
           {tenants.map((t) => (
             <option key={t.id} value={t.id}>
@@ -64,14 +65,14 @@ export function DistroForm({ tenants, example }: { tenants: any[]; example: stri
         </select>
       </label>
       <label className="block">
-        <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">theme.distro.json</span>
-        <div className="mb-3 flex flex-wrap items-end gap-2">
+        <span className="op-label">theme.distro.json</span>
+        <div className="mb-3 flex flex-wrap items-end gap-3">
           <div>
-            <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">Apply a preset</label>
+            <label className="op-label mb-1 text-[9px]">Apply a preset</label>
             <select
               value=""
               onChange={(e) => e.target.value && applyPreset(e.target.value)}
-              className="ml-2 border border-zinc-300 px-2 py-1.5 text-xs focus:outline-none"
+              className="op-btn-sm"
             >
               <option value="">Select preset...</option>
               {THEME_PRESETS.map((p) => (
@@ -86,14 +87,22 @@ export function DistroForm({ tenants, example }: { tenants: any[]; example: stri
           value={json}
           onChange={(e) => setJson(e.target.value)}
           spellCheck={false}
-          className="h-96 w-full resize-y border border-zinc-300 bg-zinc-50 p-3 font-mono text-xs focus:border-zinc-700 focus:outline-none"
+          className="op-code h-96 w-full resize-y"
         />
       </label>
-      {msg ? <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">{msg}</p> : null}
+      {msg ? (
+        <p
+          className={`font-mono text-[11px] uppercase tracking-[0.18em] ${
+            msg === "applied" ? "text-[var(--op-good)]" : "text-ink-mute"
+          }`}
+        >
+          {msg}
+        </p>
+      ) : null}
       <button
         type="submit"
         disabled={busy || !id}
-        className="justify-self-start bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="btn-primary justify-self-start h-10 px-5 text-[10px]"
       >
         {busy ? "Applying..." : "Apply distro"}
       </button>

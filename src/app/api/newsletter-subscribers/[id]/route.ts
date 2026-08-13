@@ -40,8 +40,10 @@ export async function DELETE(
   if (!row) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  // TRUE/FALSE literals are portable across Postgres (boolean
+    // column: `= 1` is invalid) and SQLite (loosely typed).
   await pgQuery(
-    `UPDATE newsletter_subscribers SET active = 0 WHERE id = $1`,
+    `UPDATE newsletter_subscribers SET active = FALSE WHERE id = $1`,
     [numId]
   );
   await appendAudit(
@@ -79,7 +81,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
   await pgQuery(
-    `UPDATE newsletter_subscribers SET active = 1 WHERE id = $1`,
+    `UPDATE newsletter_subscribers SET active = TRUE WHERE id = $1`,
     [numId]
   );
   await appendAudit(

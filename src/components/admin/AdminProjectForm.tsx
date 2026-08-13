@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor";
 import ProjectRoomsManager from "./ProjectRoomsManager";
 
+const FLABEL =
+  "block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2";
+
 type FormState = {
   title: string;
   slug: string;
@@ -81,16 +84,14 @@ export default function AdminProjectForm({
   }
 
   return (
-    <form onSubmit={save} className="surface-elevated p-6 md:p-8 rounded-[var(--radius-card)] space-y-6">
+    <form onSubmit={save} className="surface-tile p-6 md:p-8 rounded-[var(--radius-card)] space-y-6">
       <p className="chrome-pill inline-flex">
         {initial?.id ? "Edit project" : "New project"}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Title
-          </span>
+          <span className={FLABEL}>Title</span>
           <input
             className="input-line"
             required
@@ -99,9 +100,7 @@ export default function AdminProjectForm({
           />
         </label>
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Slug (auto if blank)
-          </span>
+          <span className={FLABEL}>Slug (auto if blank)</span>
           <input
             className="input-line"
             value={form.slug}
@@ -117,9 +116,7 @@ export default function AdminProjectForm({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Category
-          </span>
+          <span className={FLABEL}>Category</span>
           <select
             className="input-line bg-transparent"
             value={form.category}
@@ -133,9 +130,7 @@ export default function AdminProjectForm({
           </select>
         </label>
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Location
-          </span>
+          <span className={FLABEL}>Location</span>
           <input
             className="input-line"
             value={form.location}
@@ -143,9 +138,7 @@ export default function AdminProjectForm({
           />
         </label>
         <label className="block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Year
-          </span>
+          <span className={FLABEL}>Year</span>
           <input
             className="input-line"
             value={form.year}
@@ -155,9 +148,7 @@ export default function AdminProjectForm({
       </div>
 
       <label className="block">
-        <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-          Scope (1 line)
-        </span>
+        <span className={FLABEL}>Scope (1 line)</span>
         <input
           className="input-line"
           value={form.scope}
@@ -166,18 +157,14 @@ export default function AdminProjectForm({
       </label>
 
       <div>
-        <p className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-          Long description (rich text)
-        </p>
+        <p className={FLABEL}>Long description (rich text)</p>
         <RichTextEditor
           value={form.descriptionJson}
           onChange={(j) => setForm({ ...form, descriptionJson: j })}
           placeholder="Tell the story of this project…"
         />
         <label className="block mt-3">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-            Plain fallback (used if rich text empty)
-          </span>
+          <span className={FLABEL}>Plain fallback (used if rich text empty)</span>
           <textarea
             rows={3}
             className="input-line resize-none"
@@ -188,9 +175,7 @@ export default function AdminProjectForm({
       </div>
 
       <label className="block">
-        <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-          Cover image URL (or pick from Media)
-        </span>
+        <span className={FLABEL}>Cover image URL (or pick from Media)</span>
         <input
           className="input-line"
           value={form.beforeImage}
@@ -200,9 +185,7 @@ export default function AdminProjectForm({
       </label>
 
       <label className="block">
-        <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mb-2">
-          3D model URL (.glb) - fallback for the walkthrough + rooms
-        </span>
+        <span className={FLABEL}>3D model URL (.glb) - fallback for the walkthrough + rooms</span>
         <input
           className="input-line"
           value={form.model3d}
@@ -212,9 +195,12 @@ export default function AdminProjectForm({
       </label>
 
       {initial?.id ? (
-        <div className="border-t hairline pt-6">
+        <section className="border-t hairline pt-6">
+          <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
+            Per-space walkthrough
+          </h2>
           <ProjectRoomsManager projectId={initial.id} />
-        </div>
+        </section>
       ) : (
         <p className="text-xs text-ink-mute">
           Rooms (per-space 3D walkthrough) become available after the project

@@ -67,7 +67,7 @@ export default async function ProjectsTestimonialV2() {
       <div className="container-page">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
           <div className="md:col-span-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink">
               {row ? "From the homeowner" : "Studio line"}
             </p>
           </div>
@@ -81,7 +81,7 @@ export default async function ProjectsTestimonialV2() {
                 className="block h-px w-12 bg-ink"
                 aria-hidden="true"
               />
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
+              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink">
                 {attribution}
               </p>
             </footer>

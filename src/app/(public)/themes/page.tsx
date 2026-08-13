@@ -28,37 +28,56 @@ export default function ThemesPage() {
           return (
             <div
               key={p.slug}
-              className="flex flex-col overflow-hidden border border-line"
-              style={{ background: light["--bg"], color: light["--ink"] }}
+              className="flex flex-col overflow-hidden border"
+              style={{
+                background: light["--bg"],
+                color: light["--ink"],
+                borderColor: light["--line"],
+              }}
             >
               <div
-                className="flex h-28 items-center justify-center border-b border-line"
-                style={{ background: light["--chrome"] }}
+                className="flex h-28 items-center justify-center border-b"
+                style={{ background: light["--chrome"], borderColor: light["--line"] }}
               >
                 <span
                   className="px-3 py-1.5 text-sm font-semibold"
-                  style={{ background: light["--accent"], color: light["--ink"] }}
+                  style={{
+                    background: light["--paper"],
+                    color: light["--ink"],
+                    border: `1px solid ${light["--line"]}`,
+                  }}
                 >
                   {p.name}
                 </span>
               </div>
               <div className="flex flex-1 flex-col gap-3 p-6">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
+                <p
+                  className="font-mono text-[10px] uppercase tracking-[0.18em]"
+                  style={{ color: light["--ink-mute"] }}
+                >
                   {p.family}
                 </p>
-                <p className="text-sm leading-relaxed text-ink-mute">{p.description}</p>
-                <div className="mt-auto flex items-center gap-2 border-t border-line pt-4">
+                <p className="text-sm leading-relaxed" style={{ color: light["--ink-mute"] }}>
+                  {p.description}
+                </p>
+                <div
+                  className="mt-auto flex items-center gap-2 border-t pt-4"
+                  style={{ borderColor: light["--line"] }}
+                >
                   {[p.palette.ink, p.palette.paper, p.palette.accent, p.palette.muted].map(
                     (hex) => (
                       <span
                         key={hex}
                         title={hex}
-                        className="h-6 w-6 rounded-full border border-line"
-                        style={{ background: hex }}
+                        className="h-6 w-6 rounded-full border"
+                        style={{ background: hex, borderColor: light["--line"] }}
                       />
                     )
                   )}
-                  <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.16em] text-ink-mute">
+                  <span
+                    className="ml-auto font-mono text-[10px] uppercase tracking-[0.16em]"
+                    style={{ color: light["--ink-mute"] }}
+                  >
                     {p.slug}
                   </span>
                 </div>
@@ -70,7 +89,7 @@ export default function ThemesPage() {
 
       <p className="mt-12 text-sm text-ink-mute">
         See the live studio in its default palette at{" "}
-        <Link href="/" className="text-accent underline underline-offset-2">
+        <Link href="/" className="text-ink underline underline-offset-2 hover:text-accent">
           the home page
         </Link>
         .

@@ -1,5 +1,7 @@
 import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
 import PageBuilder from "@/components/admin/PageBuilder";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../../identity";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +12,7 @@ export default async function PageEditor({
 }) {
   const { id } = await params;
   const pageId = Number(id);
+  const { email, role } = await getAdminIdentity();
   await ensureMigrated();
   const page = await pgOne<{
     id: number;
@@ -26,7 +29,9 @@ export default async function PageEditor({
   );
   if (!page) {
     return (
-      <div className="container-page py-24 text-ink-mute">Page not found.</div>
+      <AdminPageShell email={email} role={role}>
+        <p className="text-ink-mute">Page not found.</p>
+      </AdminPageShell>
     );
   }
   const rows = await pgMany<{
@@ -43,15 +48,17 @@ export default async function PageEditor({
     data: typeof r.data === "string" ? safeJson(r.data) : r.data ?? {},
   }));
   return (
-    <PageBuilder
-      pageId={pageId}
-      initialTitle={page.title}
-      initialStatus={page.status}
-      initialBlocks={initialBlocks}
-      initialSeoTitle={page.seo_title ?? ""}
-      initialSeoDescription={page.seo_description ?? ""}
-      initialRobots={page.robots ?? "index,follow"}
-    />
+    <AdminPageShell email={email} role={role}>
+      <PageBuilder
+        pageId={pageId}
+        initialTitle={page.title}
+        initialStatus={page.status}
+        initialBlocks={initialBlocks}
+        initialSeoTitle={page.seo_title ?? ""}
+        initialSeoDescription={page.seo_description ?? ""}
+        initialRobots={page.robots ?? "index,follow"}
+      />
+    </AdminPageShell>
   );
 }
 

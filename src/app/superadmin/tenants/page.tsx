@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { listTenants } from "@/lib/operator-store";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
+import { IconArrowRight } from "@/components/icons";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -18,30 +20,23 @@ export default async function TenantsPage() {
 
   return (
     <section>
-      <div className="mb-8 flex items-end justify-between">
-        <div>
-          <h1 className="text-3xl tracking-tight text-zinc-900">Tenants</h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-            License + distro control
-          </p>
-        </div>
-        <Link
-          href="/superadmin/tenants/new"
-          className="border border-zinc-300 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
-        >
-          New tenant
-        </Link>
-      </div>
+      <AdminPageHeader
+        eyebrow="Platform"
+        title="Tenants"
+        desc="License + distro control across every studio on the platform."
+        action={
+          <Link href="/superadmin/tenants/new" className="btn-primary h-10 px-5 text-[10px]">
+            New tenant
+          </Link>
+        }
+      />
 
-      <div className="overflow-x-auto border border-zinc-200 bg-white">
-        <table className="w-full text-left">
-          <thead className="border-b border-zinc-200 bg-zinc-50">
+      <div className="op-panel overflow-x-auto">
+        <table className="op-table">
+          <thead>
             <tr>
               {["ID", "Slug", "Studio", "Owner", "Domain", "Tier", "State", "Expires", ""].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500"
-                >
+                <th key={h} className="op-th">
                   {h}
                 </th>
               ))}
@@ -50,37 +45,43 @@ export default async function TenantsPage() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-sm text-zinc-500">
+                <td colSpan={9} className="op-td px-4 py-12 text-center text-ink-mute">
                   No tenants yet.
                 </td>
               </tr>
             ) : (
               rows.map((t: any) => (
-                <tr key={t.id} className="border-b border-zinc-100 last:border-b-0">
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-700">{t.id}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-700">{t.slug}</td>
-                  <td className="px-4 py-3 text-sm text-zinc-900">{t.studio_name}</td>
-                  <td className="px-4 py-3 text-sm text-zinc-700">{t.owner_email || "—"}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-700">{t.domain || "—"}</td>
-                  <td className="px-4 py-3">
-                    <span className="border border-zinc-300 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-700">
+                <tr key={t.id}>
+                  <td className="op-td font-mono text-xs text-ink-mute">{t.id}</td>
+                  <td className="op-td font-mono text-xs text-ink-mute">{t.slug}</td>
+                  <td className="op-td text-sm">{t.studio_name}</td>
+                  <td className="op-td text-sm text-ink-mute">{t.owner_email || "—"}</td>
+                  <td className="op-td font-mono text-xs text-ink-mute">{t.domain || "—"}</td>
+                  <td className="op-td">
+                    <span className={`op-chip ${t.tier === "business" ? "op-chip--warn" : ""}`}>
                       {t.tier}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="border border-zinc-300 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-700">
+                  <td className="op-td">
+                    <span
+                      className={`op-chip ${
+                        t.state === "active"
+                          ? "op-chip--good"
+                          : t.state === "revoked" || t.state === "suspended"
+                            ? "op-chip--bad"
+                            : "op-chip--warn"
+                      }`}
+                    >
                       {t.state}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-700">
+                  <td className="op-td font-mono text-xs text-ink-mute">
                     {t.expires_at ? t.expires_at.split("T")[0] : "—"}
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/superadmin/tenants/${t.id}`}
-                      className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-700 hover:text-zinc-900"
-                    >
-                      Open <span aria-hidden="true">{'->'}</span>
+                  <td className="op-td text-right">
+                    <Link href={`/superadmin/tenants/${t.id}`} className="op-link">
+                      Open
+                      <IconArrowRight size={13} aria-hidden />
                     </Link>
                   </td>
                 </tr>

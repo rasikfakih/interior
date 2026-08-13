@@ -62,7 +62,7 @@ export default async function JournalPage() {
           <div className="md:col-span-7">
             <p className="chrome-pill mb-6 inline-flex">Journal</p>
             <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1]">
-              <em className="text-accent not-italic font-medium">Field</em> notes
+              <em className="text-accent-deep not-italic font-medium">Field</em> notes
               from the studio.
             </h1>
           </div>

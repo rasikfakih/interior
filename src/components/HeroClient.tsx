@@ -170,8 +170,8 @@ export default function HeroClient({ data }: { data: HeroData }) {
 
   return (
     <section
-      ref={root as any}
-      className="relative pt-16 md:pt-28 pb-12 md:pb-24"
+      ref={root as React.RefObject<HTMLElement>}
+      className="relative pt-16 md:pt-24 pb-12 md:pb-24"
       aria-label="Hero"
     >
       <div className="container-page">
@@ -192,7 +192,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
               <span className="ei-word inline-block overflow-hidden align-bottom">
                 <span className="inline-block">{data?.headlinePlain || "Homes built around"}</span>
               </span>{" "}
-              <em className="text-accent font-medium italic ei-word inline-block overflow-hidden align-bottom">
+              <em className="text-accent-deep font-medium italic ei-word inline-block overflow-hidden align-bottom">
                 <span className="inline-block">{data?.headlineItalic || "how you live"}</span>
               </em>
               {normalizeTail(data?.afterPlain) && (
@@ -261,7 +261,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
                 style={reduce ? visibleAtRest : initialHidden}
               >
                 <div className="surface-elevated px-5 py-4 max-w-[220px]">
-                  <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-mute">
+                  <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink">
                     Studio note
                   </p>
                   <p className="text-sm mt-2 leading-snug">{data.studioNote}</p>

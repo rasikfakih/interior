@@ -1,13 +1,14 @@
 import AdminTestimonialsIndex from "@/components/admin/AdminTestimonialsIndex";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = { title: "Testimonials", robots: { index: false } };
 
-export default function AdminTestimonialsPage() {
+export default async function AdminTestimonialsPage() {
+  const { email, role } = await getAdminIdentity();
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminTestimonialsIndex />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={role}>
+      <AdminTestimonialsIndex />
+    </AdminPageShell>
   );
 }

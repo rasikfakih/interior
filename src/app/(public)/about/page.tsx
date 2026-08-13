@@ -42,7 +42,7 @@ export default async function AboutPage() {
               <p className="chrome-pill mb-6 inline-flex">Studio · Since 2017</p>
               <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1]">
                 A small studio, working at the scale of{" "}
-                <em className="text-accent not-italic font-medium">one home at a time</em>.
+                <em className="text-accent-deep not-italic font-medium">one home at a time</em>.
               </h1>
             </div>
             <div className="md:col-span-5 md:pt-3">
@@ -113,8 +113,8 @@ export default async function AboutPage() {
                         aria-hidden
                         className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
                         style={{
-                          background: "var(--accent-soft)",
-                          color: "var(--accent)",
+                          background: "var(--accent-deep)",
+                          color: "var(--bg)",
                         }}
                       >
                         {initial}

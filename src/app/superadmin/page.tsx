@@ -34,46 +34,50 @@ export default function SuperadminLogin() {
   }
 
   return (
-    <section className="min-h-[80dvh] flex items-center justify-center px-6">
+    <section className="flex min-h-dvh items-center justify-center px-6">
       <form
         onSubmit={submit}
-        className="w-full max-w-sm border border-zinc-200 bg-white p-8 shadow-sm"
+        className="op-panel w-full max-w-sm p-8"
       >
-        <h1 className="text-2xl tracking-tight text-zinc-900">Superadmin</h1>
-        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+        <div className="flex items-center gap-2.5">
+          <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
+          <span className="font-display text-xl leading-none tracking-tight">
+            StudioOS
+          </span>
+          <span className="ml-1 font-mono text-[9px] uppercase tracking-[0.24em] text-ink-mute">
+            Operator
+          </span>
+        </div>
+        <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
           Tenant + License Control
         </p>
 
-        <label className="mt-6 block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-            Email
-          </span>
+        <label className="mt-8 block">
+          <span className="op-label">Email</span>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="w-full border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-zinc-700 focus:outline-none"
+            className="input-line"
           />
         </label>
 
-        <label className="mt-4 block">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-            Password
-          </span>
+        <label className="mt-5 block">
+          <span className="op-label">Password</span>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className="w-full border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-zinc-700 focus:outline-none"
+            className="input-line"
           />
         </label>
 
         {error ? (
-          <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-red-700">
+          <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--op-bad)]">
             {error}
           </p>
         ) : null}
@@ -81,7 +85,7 @@ export default function SuperadminLogin() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-6 w-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+          className="btn-primary mt-8 w-full justify-center"
         >
           {submitting ? "Signing in..." : "Sign in"}
         </button>

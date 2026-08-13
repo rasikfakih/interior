@@ -92,27 +92,25 @@ export default function MetricsPage() {
 
   return (
     <section className="grid gap-8">
-      <div className="flex items-baseline justify-between flex-wrap gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl tracking-tight text-zinc-900">Metrics</h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          <p className="chrome-pill mb-3 inline-flex">Operations</p>
+          <h1 className="text-3xl tracking-tighter">Metrics</h1>
+          <p className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-ink-mute">
             Operator dashboard
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.refresh()}
-          className="border border-zinc-300 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
+          className="op-btn-sm"
         >
           Refresh
         </button>
       </div>
 
       {error && (
-        <div
-          role="alert"
-          className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-        >
+        <div role="alert" className="op-banner op-banner--bad">
           Couldn't load metrics: {error}
         </div>
       )}
@@ -132,28 +130,24 @@ export default function MetricsPage() {
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="border border-zinc-200 bg-white">
-          <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-            Revenue (license ledger)
-          </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="op-panel">
+          <div className="op-panel-head">Revenue (license ledger)</div>
           <div className="p-5">
             <div className="grid grid-cols-2 gap-4">
               <Stat label="All time" value={`$${((m?.revenueCents ?? 0) / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
               <Stat label="Last 30 days" value={`$${((m?.revenue30dCents ?? 0) / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}`} />
             </div>
-            <div className="mt-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-2">
-                By tier
-              </p>
+            <div className="mt-5">
+              <p className="op-label">By tier</p>
               {(m?.revenueByTier ?? []).length === 0 ? (
-                <p className="text-sm text-zinc-500">No ledger entries yet — amounts are recorded from the license wizard.</p>
+                <p className="text-sm text-ink-mute">No ledger entries yet — amounts are recorded from the license wizard.</p>
               ) : (
-                <ul className="divide-y divide-zinc-100">
+                <ul className="divide-y divide-[var(--line)]">
                   {m!.revenueByTier.map((r) => (
-                    <li key={r.tier} className="flex items-center justify-between py-2">
-                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-600">{r.tier}</span>
-                      <span className="font-mono text-sm tabular-nums text-zinc-900">${(r.cents / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                    <li key={r.tier} className="flex items-center justify-between py-2.5">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-mute">{r.tier}</span>
+                      <span className="font-mono text-sm tabular-nums text-accent">${(r.cents / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                     </li>
                   ))}
                 </ul>
@@ -162,10 +156,8 @@ export default function MetricsPage() {
           </div>
         </div>
 
-        <div className="border border-zinc-200 bg-white">
-          <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-            Usage (pageviews)
-          </div>
+        <div className="op-panel">
+          <div className="op-panel-head">Usage (pageviews)</div>
           <div className="p-5">
             <div className="grid grid-cols-2 gap-4">
               <Stat label="All time" value={m?.pageviews ?? 0} />
@@ -175,18 +167,16 @@ export default function MetricsPage() {
               <Stat label="3D walkthrough loads" value={m?.modelLoads ?? 0} />
               <Stat label="Form submissions" value={m?.formSubmits ?? 0} />
             </div>
-            <div className="mt-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 mb-2">
-                Top paths
-              </p>
+            <div className="mt-5">
+              <p className="op-label">Top paths</p>
               {(m?.topPaths ?? []).length === 0 ? (
-                <p className="text-sm text-zinc-500">No pageviews recorded yet.</p>
+                <p className="text-sm text-ink-mute">No pageviews recorded yet.</p>
               ) : (
-                <ul className="divide-y divide-zinc-100">
+                <ul className="divide-y divide-[var(--line)]">
                   {m!.topPaths.map((p) => (
-                    <li key={p.path} className="flex items-center justify-between gap-4 py-2">
-                      <span className="truncate font-mono text-xs text-zinc-700">{p.path}</span>
-                      <span className="font-mono text-sm tabular-nums text-zinc-900">{p.count}</span>
+                    <li key={p.path} className="flex items-center justify-between gap-4 py-2.5">
+                      <span className="truncate font-mono text-xs text-ink-mute">{p.path}</span>
+                      <span className="font-mono text-sm tabular-nums text-ink">{p.count}</span>
                     </li>
                   ))}
                 </ul>
@@ -196,29 +186,27 @@ export default function MetricsPage() {
         </div>
       </div>
 
-      <div className="border border-zinc-200 bg-white">
-        <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-          Audit (last 20)
-        </div>
-        <ul className="divide-y divide-zinc-100">
+      <div className="op-panel">
+        <div className="op-panel-head">Audit (last 20)</div>
+        <ul className="divide-y divide-[var(--line)]">
           {audit.length === 0 ? (
-            <li className="px-4 py-6 text-center text-sm text-zinc-500">
+            <li className="px-4 py-6 text-center text-sm text-ink-mute">
               {loading ? "Loading" : "No events."}
             </li>
           ) : (
             audit.map((e) => (
               <li key={e.id} className="px-4 py-3">
-                <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700">
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
                     {e.kind}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
                     {e.created_at}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-zinc-800">{e.message}</p>
+                <p className="mt-1 text-sm text-ink">{e.message}</p>
                 {e.meta ? (
-                  <pre className="mt-1 overflow-x-auto bg-zinc-50 px-3 py-2 font-mono text-[10px] text-zinc-700">
+                  <pre className="op-code mt-2 px-3 py-2 text-[10px]">
                     {typeof e.meta === "string"
                       ? e.meta
                       : JSON.stringify(e.meta, null, 2)}
@@ -235,13 +223,9 @@ export default function MetricsPage() {
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="border border-zinc-200 bg-white p-5">
-      <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-        {label}
-      </div>
-      <div className="mt-2 font-mono text-3xl tabular-nums text-zinc-900">
-        {value}
-      </div>
+    <div className="op-stat">
+      <div className="op-stat-value tabular-nums">{value}</div>
+      <div className="op-stat-label">{label}</div>
     </div>
   );
 }
@@ -250,12 +234,9 @@ function SkeletonStats() {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4" aria-busy>
       {Array.from({ length: 8 }).map((_, i) => (
-        <div
-          key={i}
-          className="border border-zinc-200 bg-white p-5 animate-pulse"
-        >
-          <div className="h-3 w-1/2 bg-zinc-100" />
-          <div className="mt-3 h-7 w-1/3 bg-zinc-100" />
+        <div key={i} className="op-stat animate-pulse">
+          <div className="h-3 w-1/2 rounded-full bg-[var(--surface-strong)]" />
+          <div className="mt-3 h-7 w-1/3 rounded-full bg-[var(--surface-strong)]" />
         </div>
       ))}
     </div>

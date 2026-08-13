@@ -142,7 +142,7 @@ export default function JournalPreview({
         <div className="ei-news-head flex items-end justify-between flex-wrap gap-6 mb-12 md:mb-16">
           <div>
             <h2 className="text-4xl md:text-6xl tracking-tighter">
-              <em className="text-accent not-italic font-medium">{cfg.titleEm}</em>{" "}
+              <em className="text-accent-deep not-italic font-medium">{cfg.titleEm}</em>{" "}
               {cfg.title?.replace(cfg.titleEm, "")}
             </h2>
             <p className="mt-4 text-ink-mute max-w-[48ch]">{cfg.lede}</p>

@@ -1,5 +1,7 @@
 import { ensureMigrated, pgOne } from "@/lib/pg";
 import AdminProjectForm from "@/components/admin/AdminProjectForm";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
+import { getAdminIdentity } from "../../identity";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Project - Edit", robots: { index: false } };
@@ -11,6 +13,7 @@ export default async function AdminProjectEditor({
 }) {
   const { id } = await params;
   const isNew = id === "new";
+  const { email, role } = await getAdminIdentity();
   let initial: any = undefined;
 
   if (!isNew) {
@@ -23,9 +26,9 @@ export default async function AdminProjectEditor({
       );
       if (!row) {
         return (
-          <div className="container-page py-24 text-ink-mute">
-            Project not found.
-          </div>
+          <AdminPageShell email={email} role={role}>
+            <p className="text-ink-mute">Project not found.</p>
+          </AdminPageShell>
         );
       }
       initial = row;
@@ -33,10 +36,8 @@ export default async function AdminProjectEditor({
   }
 
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminProjectForm initial={initial} />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={role}>
+      <AdminProjectForm initial={initial} />
+    </AdminPageShell>
   );
 }

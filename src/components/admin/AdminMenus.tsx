@@ -13,7 +13,7 @@ type MenuItem = {
 type Toast = { kind: "ok" | "err"; msg: string };
 
 const INPUT_CLS =
-  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-accent focus:outline-none";
+  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
 const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
 
 export default function AdminMenus({
@@ -112,7 +112,7 @@ export default function AdminMenus({
         <div
           role="status"
           className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
+            toast.kind === "err" ? "text-red-700" : "text-accent-deep"
           }`}
         >
           {toast.msg}
@@ -123,7 +123,7 @@ export default function AdminMenus({
         <ul className="divide-y hairline">
           {items.map((it, idx) => (
             <li key={idx} className="p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft md:col-span-1">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute md:col-span-1">
                 #{idx + 1}
               </span>
               <div className="md:col-span-4">

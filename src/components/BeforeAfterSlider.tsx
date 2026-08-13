@@ -59,19 +59,23 @@ export default function BeforeAfterSlider({
           draggable={false}
         />
         <div
-          className="absolute inset-0 overflow-hidden"
+          className="absolute inset-y-0 left-0 overflow-hidden"
           style={{ width: `${pos}%` }}
         >
-          <Image
-            src={beforeSrc}
-            alt={beforeAlt}
-            fill
-            sizes="(min-width: 1280px) 1232px, 100vw"
-            priority
-            className="object-cover"
+          <div
+            className="absolute inset-y-0 left-0"
             style={{ width: `${(100 / pos) * 100}%`, maxWidth: "none" }}
-            draggable={false}
-          />
+          >
+            <Image
+              src={beforeSrc}
+              alt={beforeAlt}
+              fill
+              sizes="(min-width: 1280px) 1232px, 100vw"
+              priority
+              className="object-cover"
+              draggable={false}
+            />
+          </div>
         </div>
         <div
           className="pointer-events-none absolute inset-y-0"
@@ -89,7 +93,7 @@ export default function BeforeAfterSlider({
         <span className="absolute top-3 right-3 chrome-pill pointer-events-none">After</span>
       </div>
       {caption && (
-        <figcaption className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute px-4 py-3">
+        <figcaption className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink px-4 py-3">
           {caption}
         </figcaption>
       )}

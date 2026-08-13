@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import GLBThumb from "@/components/admin/GLBThumb";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 import {
   formatBytes,
   kindFromMime,
@@ -173,37 +174,36 @@ export default function MediaGrid() {
 
   return (
     <div className="space-y-8">
-      <header className="flex items-end justify-between flex-wrap gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-3xl tracking-tighter">Media library</h1>
-          <p className="text-ink-mute text-sm">
-            {items.length} on record, {formatBytes(totalBytes)} total
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <input
-            ref={fileRef}
-            type="file"
-            hidden
-            accept="image/*,video/*,application/pdf,.glb,.gltf"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void upload(f);
-            }}
-          />
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={() => fileRef.current?.click()}
-            disabled={Boolean(activeUpload)}
-            aria-busy={Boolean(activeUpload)}
-          >
-            {activeUpload
-              ? `Uploading ${activeUpload.filename} (${formatBytes(activeUpload.size)})`
-              : "Upload"}
-          </button>
-        </div>
-      </header>
+      <AdminPageHeader
+        eyebrow="Content"
+        title="Media library"
+        desc={`${items.length} on record, ${formatBytes(totalBytes)} total`}
+        action={
+          <div className="flex items-center gap-3">
+            <input
+              ref={fileRef}
+              type="file"
+              hidden
+              accept="image/*,video/*,application/pdf,.glb,.gltf"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void upload(f);
+              }}
+            />
+            <button
+              type="button"
+              className="btn-primary h-10 px-5 text-[10px]"
+              onClick={() => fileRef.current?.click()}
+              disabled={Boolean(activeUpload)}
+              aria-busy={Boolean(activeUpload)}
+            >
+              {activeUpload
+                ? `Uploading ${activeUpload.filename} (${formatBytes(activeUpload.size)})`
+                : "Upload"}
+            </button>
+          </div>
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -427,7 +427,7 @@ function MediaTile({
               <button
                 type="button"
                 onClick={() => void saveAlt(item.id, editing.alt)}
-                className="text-xs font-mono uppercase tracking-[0.18em] text-accent border-b hairline-strong pb-0.5"
+                className="text-xs font-mono uppercase tracking-[0.18em] text-accent-deep border-b hairline-strong pb-0.5"
               >
                 Save alt
               </button>

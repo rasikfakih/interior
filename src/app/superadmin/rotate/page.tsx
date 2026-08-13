@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { listTenants } from "@/lib/operator-store";
 import { RotateForm } from "@/components/operator/RotateForm";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -14,13 +15,12 @@ export default async function RotatePage() {
   const tenants = await listTenants();
   return (
     <section>
-      <h1 className="text-3xl tracking-tight text-zinc-900">Rotate HMAC key</h1>
-      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-        Re-stamp a tenant's HMAC key. Buyers must re-stamp their license at /install after a rotation.
-      </p>
-      <div className="mt-8">
-        <RotateForm tenants={tenants as any[]} />
-      </div>
+      <AdminPageHeader
+        eyebrow="Platform"
+        title="Rotate HMAC key"
+        desc="Re-stamp a tenant's HMAC key. Buyers must re-stamp their license at /install after a rotation."
+      />
+      <RotateForm tenants={tenants} />
     </section>
   );
 }

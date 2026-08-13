@@ -1,6 +1,8 @@
 import AdminMenus from "@/components/admin/AdminMenus";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { requireAdminSession } from "@/lib/license-gate";
 import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = {
   title: "Menus",
@@ -18,15 +20,14 @@ const DEFAULT_ITEMS = [
 
 export default async function AdminMenusPage() {
   const gate = await requireAdminSession();
+  const { email, role } = await getAdminIdentity();
   if (!gate.ok) {
     return (
-      <section className="pt-24 md:pt-28 pb-24">
-        <div className="container-page">
-          <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
-            Sign in is required to edit the menu.
-          </p>
-        </div>
-      </section>
+      <AdminPageShell email={email} role={role}>
+        <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
+          Sign in is required to edit the menu.
+        </p>
+      </AdminPageShell>
     );
   }
 
@@ -56,10 +57,8 @@ export default async function AdminMenusPage() {
   }
 
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminMenus initial={items} role={gate.role} />
-      </div>
-    </section>
+    <AdminPageShell email={email} role={gate.role}>
+      <AdminMenus initial={items} role={gate.role} />
+    </AdminPageShell>
   );
 }

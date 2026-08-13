@@ -86,16 +86,16 @@ export default function ProcessStickyStack({ data }: { data?: any }) {
             <div className="surface-elevated w-full overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-0 rounded-[var(--radius-card)]">
               <div className="md:col-span-5 p-6 md:p-12 flex flex-col justify-between">
                 <div>
-                  <span className="font-mono text-xs tracking-[0.22em] uppercase text-ink-mute">
+                  <span className="font-mono text-xs tracking-[0.22em] uppercase text-ink">
                     Phase {p.number}
                   </span>
                   <h3 className="text-3xl md:text-5xl mt-3 md:mt-4 mb-4 md:mb-6">{p.title}</h3>
-                  <p className="text-ink-mute text-base md:text-lg leading-relaxed">
+                  <p className="text-ink text-base md:text-lg leading-relaxed">
                     {p.body}
                   </p>
                 </div>
                 <div className="mt-8 md:mt-10 space-y-2">
-                  <div className="flex justify-between text-xs font-mono uppercase tracking-[0.18em] text-ink-mute">
+                  <div className="flex justify-between text-xs font-mono uppercase tracking-[0.18em] text-ink">
                     <span>Deliverable</span>
                     <span className="text-ink">{p.duration}</span>
                   </div>

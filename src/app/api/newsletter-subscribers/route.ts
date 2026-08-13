@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       `SELECT id, email, subscribed_at, active
          FROM newsletter_subscribers
         WHERE LOWER(email) LIKE $1
-          ${includeInactive ? "" : "AND active = 1"}
+          ${includeInactive ? "" : "AND active = TRUE"}
         ORDER BY subscribed_at DESC, id DESC
         LIMIT $2`,
       [`%${search.toLowerCase()}%`, limit]
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     const r = (await pgMany(
       `SELECT id, email, subscribed_at, active
          FROM newsletter_subscribers
-        ${includeInactive ? "" : "WHERE active = 1"}
+        ${includeInactive ? "" : "WHERE active = TRUE"}
         ORDER BY subscribed_at DESC, id DESC
         LIMIT $1`,
       [limit]

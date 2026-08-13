@@ -29,6 +29,7 @@
     "smoke:editable:crossc": "node scripts/smoke-editable-crossc.mjs",
     "smoke:live": "node scripts/smoke-live-revalidate.mjs",
     "check:themes": "node scripts/check-theme-presets.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
     "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs --allow-skip"
   },
   "dependencies": {
@@ -72,6 +73,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

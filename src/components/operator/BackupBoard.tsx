@@ -106,13 +106,13 @@ export function BackupBoard() {
 
   return (
     <div className="grid gap-6">
-      <div className="border border-zinc-200 bg-white p-5">
+      <div className="op-panel p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-900">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink">
               Full-table snapshot
             </h2>
-            <p className="mt-1 max-w-xl text-sm text-zinc-600">
+            <p className="mt-1 max-w-xl text-sm text-ink-mute">
               Walks every public table through the shared data layer — works on
               live Postgres and the local SQLite fallback. On serverless, use{" "}
               <span className="font-mono text-xs">Run + download</span> so the
@@ -124,7 +124,7 @@ export function BackupBoard() {
               type="button"
               disabled={busy}
               onClick={() => run(false)}
-              className="border border-zinc-300 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900 disabled:opacity-50"
+              className="op-btn-sm"
             >
               {busy ? "Snapshoting…" : "Run backup"}
             </button>
@@ -132,56 +132,51 @@ export function BackupBoard() {
               type="button"
               disabled={busy}
               onClick={() => run(true)}
-              className="bg-zinc-900 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="btn-primary h-10 px-4 text-[10px]"
             >
               Run + download
             </button>
           </div>
         </div>
         {last && (
-          <div className="mt-4 border border-emerald-200 bg-emerald-50 px-4 py-3 font-mono text-xs text-emerald-900">
+          <div className="op-banner op-banner--good mt-4 font-mono text-xs">
             Snapshot {last.generated_at} — {last.rows.toLocaleString()} rows,{" "}
             {fmtBytes(last.bytes)}
             {last.persisted ? ` · persisted as ${last.persisted}` : " · not persisted (serverless)"}
           </div>
         )}
         {err && (
-          <div
-            role="alert"
-            className="mt-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-          >
+          <div role="alert" className="op-banner op-banner--bad mt-4">
             {err}
           </div>
         )}
       </div>
 
-      <div className="border border-zinc-200 bg-white">
-        <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-          Persisted backups (data/backups/)
-        </div>
+      <div className="op-panel">
+        <div className="op-panel-head">Persisted backups (data/backups/)</div>
         {loading ? (
-          <div className="px-4 py-6 text-center text-sm text-zinc-500">Loading…</div>
+          <div className="px-4 py-6 text-center text-sm text-ink-mute">Loading…</div>
         ) : items.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-zinc-500">
+          <div className="px-4 py-6 text-center text-sm text-ink-mute">
             No persisted backups yet — run one above (persists when the runtime
             has a writable disk, e.g. self-hosted or local).
           </div>
         ) : (
-          <ul className="divide-y divide-zinc-100">
+          <ul className="divide-y divide-[var(--line)]">
             {items.map((f) => (
               <li
                 key={f.name}
                 className="flex items-center justify-between gap-4 px-4 py-3"
               >
                 <div className="min-w-0">
-                  <div className="truncate font-mono text-xs text-zinc-800">{f.name}</div>
-                  <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+                  <div className="truncate font-mono text-xs text-ink">{f.name}</div>
+                  <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
                     {fmtBytes(f.bytes)} · {f.mtime}
                   </div>
                 </div>
                 <a
                   href={`/api/operator/backup?download=${encodeURIComponent(f.name)}`}
-                  className="shrink-0 border border-zinc-300 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
+                  className="op-btn-sm shrink-0"
                 >
                   Download
                 </a>

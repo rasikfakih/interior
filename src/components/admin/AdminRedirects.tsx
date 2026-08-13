@@ -13,7 +13,7 @@ type RedirectRow = {
 type Toast = { kind: "ok" | "err"; msg: string };
 
 const INPUT_CLS =
-  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-accent focus:outline-none";
+  "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
 const LABEL_CLS = "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute";
 
 const EMPTY: RedirectRow = {
@@ -140,7 +140,7 @@ export default function AdminRedirects({ role }: { role: string }) {
         <div
           role="status"
           className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
+            toast.kind === "err" ? "text-red-700" : "text-accent-deep"
           }`}
         >
           {toast.msg}
@@ -245,7 +245,7 @@ export default function AdminRedirects({ role }: { role: string }) {
                   <td className="px-4 py-3">
                     <span
                       className={`font-mono text-[10px] uppercase tracking-[0.22em] ${
-                        row.is_active ? "text-accent" : "text-ink-mute"
+                        row.is_active ? "text-accent-deep" : "text-ink-mute"
                       }`}
                     >
                       {row.is_active ? "active" : "paused"}

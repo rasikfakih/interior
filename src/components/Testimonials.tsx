@@ -23,7 +23,7 @@ const defaultQuotes: Quote[] = [
     name: "Rhea D.",
     role: "Homeowner",
     location: "Casa Mira, Bandra",
-    tone: "var(--accent)",
+    tone: "var(--accent-deep)",
   },
   {
     body:
@@ -31,7 +31,7 @@ const defaultQuotes: Quote[] = [
     name: "Aravind K.",
     role: "Homeowner",
     location: "Nalanda House, Kalyan",
-    tone: "var(--accent)",
+    tone: "var(--accent-deep)",
   },
   {
     body:
@@ -39,7 +39,7 @@ const defaultQuotes: Quote[] = [
     name: "Mira S.",
     role: "Homeowner",
     location: "Salt Flats, Alibaug",
-    tone: "var(--accent)",
+    tone: "var(--accent-deep)",
   },
 ];
 
@@ -76,7 +76,7 @@ export default function Testimonials({ data }: { data?: any }) {
     (q: Quote, i: number) => ({
       ...q,
       initial: q.initial ?? ((q.name?.charAt(0) || "·").toUpperCase()),
-      tone: q.tone ?? "var(--accent)",
+      tone: q.tone ?? "var(--accent-deep)",
     })
   );
   const title = data?.title ?? "Words from the homes.";

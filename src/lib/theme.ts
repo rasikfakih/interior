@@ -279,7 +279,12 @@ export function deriveThemeVars(p: ThemePalette, customizer?: ThemeCustomizer): 
   const paper = p.paper;
   const accent = p.accent;
   const muted = p.muted || mix(ink, paper, 0.45);
-  const accentDeep = mix(accent, paper, 0.35);
+  // Role split (light mode): the bright brand accent is decorative
+  // (chrome, soft tints, hovers), while text in accent needs a darker
+  // variant that clears WCAG AA on the paper background. Mixing with
+  // black (not paper) keeps the hue and guarantees >= 4.5:1 for every
+  // preset palette. Dark mode keeps its own light-gold accent-deep.
+  const accentDeep = mix(accent, "#000000", 0.42);
   const accentLight = mix(accent, paper, 0.45);
   const custom = customizer ? customizerVars(customizer) : {};
 
@@ -290,7 +295,9 @@ export function deriveThemeVars(p: ThemePalette, customizer?: ThemeCustomizer): 
     "--surface-strong": withAlpha(ink, 0.08),
     "--ink": ink,
     "--ink-mute": muted,
-    "--ink-soft": mix(ink, paper, 0.5),
+    // Darker than muted so soft/placeholder text still clears 4.5:1
+    // on paper (mix 0.5 fails at ~3:1 for the default palettes).
+    "--ink-soft": mix(ink, paper, 0.32),
     "--line": withAlpha(ink, 0.16),
     "--line-strong": withAlpha(ink, 0.32),
     "--accent": accent,

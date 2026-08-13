@@ -97,10 +97,11 @@ export function TenantDetailClient({
 
   return (
     <section className="grid gap-8">
-      <header className="flex items-end justify-between">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl tracking-tight text-zinc-900">Tenant #{tenant.id}</h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          <p className="chrome-pill mb-3 inline-flex">Operations</p>
+          <h1 className="text-3xl tracking-tighter">Tenant #{tenant.id}</h1>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
             {tenant.slug}
           </p>
         </div>
@@ -109,7 +110,7 @@ export function TenantDetailClient({
             type="button"
             onClick={issueLicense}
             disabled={busy}
-            className="border border-zinc-300 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
+            className="op-btn-sm"
           >
             Issue license
           </button>
@@ -117,7 +118,7 @@ export function TenantDetailClient({
             type="button"
             onClick={revoke}
             disabled={busy}
-            className="border border-red-300 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-red-700 hover:border-red-700 hover:text-red-900"
+            className="op-btn-sm op-btn-sm--danger"
           >
             Revoke
           </button>
@@ -125,26 +126,26 @@ export function TenantDetailClient({
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="grid gap-4 border border-zinc-200 bg-white p-6">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">Tenant record</h2>
+        <div className="op-panel grid gap-4 p-6">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">Tenant record</h2>
           <Field label="Studio name">
-            <input type="text" value={studio_name} onChange={(e) => setStudioName(e.target.value)} className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none" />
+            <input type="text" value={studio_name} onChange={(e) => setStudioName(e.target.value)} className="input-line" />
           </Field>
           <Field label="Owner email">
-            <input type="email" value={owner_email} onChange={(e) => setOwnerEmail(e.target.value)} className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none" />
+            <input type="email" value={owner_email} onChange={(e) => setOwnerEmail(e.target.value)} className="input-line" />
           </Field>
           <Field label="Domain">
-            <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="example.com" className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none" />
+            <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="example.com" className="input-line" />
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Tier">
-              <select value={tier} onChange={(e) => setTier(e.target.value)} className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none">
+              <select value={tier} onChange={(e) => setTier(e.target.value)} className="input-line">
                 <option value="personal">Personal</option>
                 <option value="business">Business</option>
               </select>
             </Field>
             <Field label="State">
-              <select value={state} onChange={(e) => setState(e.target.value)} className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none">
+              <select value={state} onChange={(e) => setState(e.target.value)} className="input-line">
                 <option value="pending">Pending</option>
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
@@ -153,60 +154,60 @@ export function TenantDetailClient({
             </Field>
           </div>
           <Field label="Expires">
-            <input type="date" value={expires_at} onChange={(e) => setExpiresAt(e.target.value)} className="w-full border border-zinc-300 px-3 py-2 focus:border-zinc-700 focus:outline-none" />
+            <input type="date" value={expires_at} onChange={(e) => setExpiresAt(e.target.value)} className="input-line" />
           </Field>
         </div>
 
-        <div className="grid gap-4 border border-zinc-200 bg-white p-6">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">Theme distro</h2>
-          <p className="text-xs text-zinc-500">JSON applied at install + runtime overlay. See <code className="font-mono">docs/theme-distro.schema.md</code>.</p>
+        <div className="op-panel grid gap-4 p-6">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">Theme distro</h2>
+          <p className="text-xs text-ink-soft">JSON applied at install + runtime overlay. See <code className="font-mono">docs/theme-distro.schema.md</code>.</p>
           <textarea
             value={distroJson}
             onChange={(e) => setDistroJson(e.target.value)}
             spellCheck={false}
-            className="h-96 w-full resize-y border border-zinc-300 bg-zinc-50 p-3 font-mono text-xs text-zinc-900 focus:border-zinc-700 focus:outline-none"
+            className="op-code h-96 w-full resize-y"
           />
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">{msg}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-mute">{msg}</p>
         <button
           type="button"
           onClick={save}
           disabled={busy}
-          className="bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+          className="btn-primary h-10 px-5 text-[10px]"
         >
           Save changes
         </button>
       </div>
 
       {issue ? (
-        <div className="border border-zinc-200 bg-white p-6">
-          <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">Issued license payload</h2>
-          <pre className="overflow-x-auto bg-zinc-50 p-4 font-mono text-xs text-zinc-800">{JSON.stringify(issue, null, 2)}</pre>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+        <div className="op-panel p-6">
+          <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">Issued license payload</h2>
+          <pre className="op-code">{JSON.stringify(issue, null, 2)}</pre>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
             Save to data/license.json at the buyer's install or relay via email.
           </p>
         </div>
       ) : null}
 
       {users && users.length > 0 ? (
-        <div className="border border-zinc-200 bg-white p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+        <div className="op-panel p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">
               Team users ({users.length})
             </h2>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
               audited · opens /admin as this user
             </span>
           </div>
-          <ul className="mt-4 divide-y divide-zinc-100">
+          <ul className="mt-4 divide-y divide-[var(--line)]">
             {users.map((u) => (
               <li key={u.id} className="flex items-center justify-between gap-4 py-3">
                 <div>
-                  <span className="text-sm font-medium text-zinc-900">{u.email}</span>
-                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                  <span className="text-sm font-medium text-ink">{u.email}</span>
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
                     {u.role} · {Number(u.is_active) === 1 || u.is_active === true ? "active" : "off"}
                   </span>
                 </div>
@@ -229,7 +230,7 @@ export function TenantDetailClient({
                       setMsg((e as Error).message);
                     }
                   }}
-                  className="border border-zinc-300 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-700 hover:border-zinc-700 hover:text-zinc-900"
+                  className="op-btn-sm"
                 >
                   Login as
                 </button>
@@ -254,7 +255,7 @@ function defaultDistro(studio: string) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500 mb-2">{label}</span>
+      <span className="op-label">{label}</span>
       {children}
     </label>
   );

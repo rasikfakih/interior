@@ -1,8 +1,10 @@
 import AdminTheme from "@/components/admin/AdminTheme";
+import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { requireAdminSession } from "@/lib/license-gate";
 import { ensureMigrated } from "@/lib/pg";
 import { resolveThemeFull } from "@/lib/theme";
 import { THEME_PRESETS } from "@/lib/theme-presets";
+import { getAdminIdentity } from "../identity";
 
 export const metadata = {
   title: "Theme",
@@ -13,15 +15,14 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminThemePage() {
   const gate = await requireAdminSession();
+  const { email, role } = await getAdminIdentity();
   if (!gate.ok) {
     return (
-      <section className="pt-24 md:pt-28 pb-24">
-        <div className="container-page">
-          <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
-            Sign in is required to edit the theme.
-          </p>
-        </div>
-      </section>
+      <AdminPageShell email={email} role={role}>
+        <p className="surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)]">
+          Sign in is required to edit the theme.
+        </p>
+      </AdminPageShell>
     );
   }
 
@@ -30,9 +31,8 @@ export default async function AdminThemePage() {
   const p = full.palette;
 
   return (
-    <section className="pt-24 md:pt-28 pb-24">
-      <div className="container-page">
-        <AdminTheme
+    <AdminPageShell email={email} role={gate.role}>
+      <AdminTheme
           initialPalette={{
             ink: p.ink,
             paper: p.paper,
@@ -49,7 +49,6 @@ export default async function AdminThemePage() {
           }))}
           role={gate.role}
         />
-      </div>
-    </section>
+    </AdminPageShell>
   );
 }

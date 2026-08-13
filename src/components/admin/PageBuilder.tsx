@@ -278,7 +278,7 @@ export default function PageBuilder({
       {toast && (
         <div
           role="status"
-          className="surface-elevated px-4 py-3 text-sm text-accent rounded-[var(--radius-card)]"
+          className="surface-elevated px-4 py-3 text-sm text-accent-deep rounded-[var(--radius-card)]"
         >
           {toast}
         </div>

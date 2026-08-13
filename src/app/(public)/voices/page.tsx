@@ -20,7 +20,7 @@ export default function VoicesPage() {
           <div className="md:col-span-7">
             <p className="chrome-pill mb-6 inline-flex">Voices and Studio</p>
             <h1 className="text-[clamp(2.4rem,6vw,5rem)] tracking-[-0.025em] leading-[1]">
-              <em className="text-accent not-italic font-medium">Words and hands.</em>
+              <em className="text-accent-deep not-italic font-medium">Words and hands.</em>
             </h1>
           </div>
           <div className="md:col-span-5 md:pt-3">

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AdminPageHeader } from "@/components/AdminPageHeader";
 
 type Row = {
   id: number;
@@ -119,23 +120,20 @@ export default function AdminProjectsIndex() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <h2 className="text-3xl md:text-4xl tracking-tighter">Projects</h2>
-          <p className="text-ink-mute text-sm mt-1">
-            {rows.length} on record - {filtered.length} shown
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+      <AdminPageHeader
+        eyebrow="Content"
+        title="Projects"
+        desc={`${rows.length} on record · ${filtered.length} shown`}
+        action={
           <button
             type="button"
             onClick={() => router.push("/admin/projects/new")}
-            className="btn-primary"
+            className="btn-primary h-10 px-5 text-[10px]"
           >
             New project
           </button>
-        </div>
-      </header>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 surface-tile p-3">
         <label className="md:col-span-8 block">

@@ -138,7 +138,7 @@ export default function AdminInstallView({ role }: { role: string }) {
         <div
           role="status"
           className={`surface-elevated px-4 py-3 text-sm rounded-[var(--radius-card)] ${
-            toast.kind === "err" ? "text-red-700" : "text-accent"
+            toast.kind === "err" ? "text-red-700" : "text-accent-deep"
           }`}
         >
           {toast.msg}
@@ -189,7 +189,7 @@ export default function AdminInstallView({ role }: { role: string }) {
                       <span className="font-mono text-xs">{k}</span>
                       <span
                         className={`font-mono text-[10px] uppercase tracking-[0.22em] ${
-                          v ? "text-accent" : "text-ink-mute"
+                          v ? "text-accent-deep" : "text-ink-mute"
                         }`}
                       >
                         {v ? "on" : "off"}
