@@ -233,7 +233,11 @@ export default function AdminInstallView({ role }: { role: string }) {
               <li className="flex justify-between">
                 <span className="text-ink-mute">Advance stamp</span>
                 <span className="font-mono text-xs">
-                  {data?.canAdvance ? "yes" : "no license"}
+                  {data?.canAdvance
+                    ? "yes"
+                    : data?.available
+                      ? "read-only host"
+                      : "no license"}
                 </span>
               </li>
               <li className="flex justify-between">

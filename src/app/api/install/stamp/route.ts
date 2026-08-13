@@ -9,6 +9,27 @@ import path from "path";
 const LICENSE_FILE = path.join(process.cwd(), "data", "license.json");
 const HMAC_KEY_ENV = process.env.LICENSE_HMAC_KEY || "";
 
+// Serverless hosts (Vercel lambdas) mount the deployed bundle
+// read-only, so writeLicense() would throw. Detect writability once
+// per module instance (each lambda is fresh anyway) with a probe
+// write+unlink; the GET reports canAdvance=false and the PUT refuses
+// with a structured 503 instead of an unhandled 500.
+let _licenseDirWritable: boolean | null = null;
+function licenseDirWritable(): boolean {
+  if (_licenseDirWritable !== null) return _licenseDirWritable;
+  try {
+    const dir = path.dirname(LICENSE_FILE);
+    fs.mkdirSync(dir, { recursive: true });
+    const probe = path.join(dir, `.write-probe-${process.pid}-${Date.now()}`);
+    fs.writeFileSync(probe, "ok");
+    fs.unlinkSync(probe);
+    _licenseDirWritable = true;
+  } catch {
+    _licenseDirWritable = false;
+  }
+  return _licenseDirWritable;
+}
+
 type License = {
   purchaseCode: string;
   domain: string;
@@ -94,7 +115,10 @@ export async function GET() {
     license,
     rotatedAt: license?.installedAt ?? null,
     available: Boolean(license),
-    canAdvance: Boolean(license),
+    // Advance needs a license AND a writable filesystem; on
+    // serverless the bundle is read-only, so the editor must not
+    // offer an action that can never persist.
+    canAdvance: Boolean(license) && licenseDirWritable(),
     canRotate: Boolean(HMAC_KEY_ENV),
   });
 }
@@ -121,6 +145,25 @@ export async function PUT() {
     );
   }
 
+  if (!licenseDirWritable()) {
+    await appendAudit(
+      "install.stamp_advance_unavailable",
+      "install stamp advance refused: server filesystem is read-only (serverless)",
+      { role: gate.role }
+    );
+    return NextResponse.json(
+      {
+        error: "license_stamp_serverless_ro",
+        detail:
+          "this host's filesystem is read-only (serverless deployment); " +
+          "stamp advance cannot persist here. Advance the stamp where " +
+          "the license file is writable, or move license storage to a " +
+          "durable surface.",
+      },
+      { status: 503 }
+    );
+  }
+
   const previousInstalledAt = license.installedAt;
   const advanced: License = {
     ...license,
@@ -128,7 +171,24 @@ export async function PUT() {
     issuedBy: `${license.issuedBy ?? "api-install-route"}|advancing-admin`,
   };
   const signed = reSign(advanced);
-  writeLicense(signed);
+  try {
+    writeLicense(signed);
+  } catch (err) {
+    // Defense in depth: the probe can pass while the real write
+    // still fails (layered mounts). Fail structured, never raw 500.
+    await appendAudit(
+      "install.stamp_advance_failed",
+      `install stamp advance write failed: ${(err as Error)?.message ?? err}`,
+      { role: gate.role }
+    );
+    return NextResponse.json(
+      {
+        error: "license_stamp_write_failed",
+        detail: `could not write ${LICENSE_FILE}: ${(err as Error)?.message ?? err}`,
+      },
+      { status: 503 }
+    );
+  }
 
   await appendAudit(
     "install.stamp_advance",

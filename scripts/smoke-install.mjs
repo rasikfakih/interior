@@ -163,7 +163,9 @@ async function main() {
 
   if (!before?.available || !before?.canAdvance || !before?.canRotate) {
     log(
-      "skip - no license or no LICENSE_HMAC_KEY env on this server; advance smoke skipped"
+      `skip - stamp advance unavailable on this server ` +
+        `(available=${before?.available} canAdvance=${before?.canAdvance} ` +
+        `canRotate=${before?.canRotate}); advance smoke skipped`
     );
     log("OK - install get-shape round-trip is clean.");
     process.exit(0);
@@ -175,8 +177,19 @@ async function main() {
   const putRaw = await fetchRaw("PUT", "/api/install/stamp", {
     cookie: cookieHeader(jar),
   });
+  if (putRaw.status === 503) {
+    // Serverless hosts mount the bundle read-only: advance cannot
+    // persist and the route refuses with a structured 503. Tolerate
+    // it (the gating, not the write, is what this smoke asserts).
+    const j = await readJson(putRaw);
+    log(
+      `ok - PUT /api/install/stamp -> 503 (${j?.error || "unavailable"}; tolerated on read-only hosts)`
+    );
+    log("OK - install advance unavailable (503) - tolerated.");
+    process.exit(0);
+  }
   if (putRaw.status !== 200) {
-    fail(`PUT /api/install/stamp (authed) -> ${putRaw.status} expected 200`);
+    fail(`PUT /api/install/stamp (authed) -> ${putRaw.status} expected 200 or 503`);
   }
   const after = await readJson(putRaw);
   if (!after?.license) {
