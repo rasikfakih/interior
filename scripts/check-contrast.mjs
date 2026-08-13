@@ -28,7 +28,11 @@
  *                        tenant-admin creds for the NextAuth login.
  *                        Defaults to the repo's committed dev seed
  *                        (admin@etihadinteriors.com / admin123) from
- *                        src/lib/initDb.ts.
+ *                        src/lib/initDb.ts, which also exists on the
+ *                        live DB unless the operator changed it.
+ *   CONTRAST_CREDS_FILE  path to a JSON file { "email", "password" }
+ *                        for secrets-backed runs (nightly/live audits
+ *                        in CI). Env vars above win over the file.
  *   CONTRAST_NO_ADMIN=1  skip the admin + superadmin surfaces
  *   CONTRAST_HEADLESS=0  run headed (debugging)
  *
@@ -83,9 +87,24 @@ const ONLY = (process.env.CONTRAST_ONLY || "")
   .filter(Boolean);
 const HEADLESS = process.env.CONTRAST_HEADLESS !== "0";
 const DO_ADMIN = process.env.CONTRAST_NO_ADMIN !== "1";
-const ADMIN_EMAIL =
-  process.env.CONTRAST_ADMIN_EMAIL || "admin@etihadinteriors.com";
-const ADMIN_PASSWORD = process.env.CONTRAST_ADMIN_PASSWORD || "admin123";
+let ADMIN_EMAIL = process.env.CONTRAST_ADMIN_EMAIL || "admin@etihadinteriors.com";
+let ADMIN_PASSWORD = process.env.CONTRAST_ADMIN_PASSWORD || "admin123";
+// Secrets-backed runs (nightly live audits) pass a creds file so the
+// plaintext password never lives in the command line or the workflow
+// YAML. Env vars take precedence over the file.
+const CREDS_FILE = process.env.CONTRAST_CREDS_FILE || null;
+if (CREDS_FILE) {
+  try {
+    const creds = JSON.parse(fs.readFileSync(CREDS_FILE, "utf8"));
+    if (!process.env.CONTRAST_ADMIN_EMAIL && creds.email) ADMIN_EMAIL = creds.email;
+    if (!process.env.CONTRAST_ADMIN_PASSWORD && creds.password) ADMIN_PASSWORD = creds.password;
+  } catch (e) {
+    console.error(
+      `check-contrast: cannot read CONTRAST_CREDS_FILE ${CREDS_FILE}: ${e.message}`
+    );
+    process.exit(2);
+  }
+}
 
 // ------------------------------------------------------------------
 // Routes
@@ -508,10 +527,62 @@ async function loginAdmin(page, baseUrl) {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto(baseUrl + "/admin", { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForSelector('input[name="email"]', { timeout: 15000 });
+  // The submit button stays disabled until the CSRF token arrives.
+  await page
+    .waitForFunction(() => {
+      const btn = document.querySelector('button[type="submit"]');
+      return btn && !btn.disabled;
+    }, { timeout: 10000 })
+    .catch(() => {});
   await page.fill('input[name="email"]', ADMIN_EMAIL);
   await page.fill('input[name="password"]', ADMIN_PASSWORD);
   await page.click('button[type="submit"]');
-  await page.waitForURL("**/admin", { timeout: 15000 });
+  // LoginCard posts no callbackUrl, so NextAuth redirects to `/` on
+  // success - NOT back to /admin. Waiting for a URL is therefore the
+  // wrong signal (it was the original bug: the audit "bounced" even
+  // though the login had succeeded). Two things matter here:
+  //   1. Let the credentials navigation settle (POST -> 302 -> /)
+  //      before any follow-up goto - an in-flight submit navigation
+  //      interrupted by goto() aborts to chrome-error://chromewebdata
+  //      and crashes the audit.
+  //   2. Verify the authentication artifact itself: the session-token
+  //      cookie must land.
+  await page
+    .waitForFunction(() => window.location.pathname !== "/admin", {
+      timeout: 15000,
+    })
+    .catch(() => {});
+  let session = false;
+  for (let i = 0; i < 20; i++) {
+    session = (await page.context().cookies()).some((c) =>
+      /session-token/i.test(c.name)
+    );
+    if (session) break;
+    await page.waitForTimeout(500);
+  }
+  if (!session) {
+    throw new Error(
+      `admin login failed for ${ADMIN_EMAIL}: no session cookie after submit. ` +
+        "Set CONTRAST_ADMIN_EMAIL / CONTRAST_ADMIN_PASSWORD (or CONTRAST_CREDS_FILE " +
+        "for a secrets-backed run) to a tenant-admin account that exists on the target."
+    );
+  }
+  // With a valid session /admin renders the AdminShell console; a
+  // failed or unauthorized login re-renders LoginCard. Distinguish the
+  // two instead of trusting a redirect target.
+  await page.goto(baseUrl + "/admin", { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page
+    .waitForSelector(".admin-topbar, .admin-nav-group", { timeout: 20000 })
+    .catch(() => {});
+  const authed = await page.evaluate(() =>
+    Boolean(document.querySelector(".admin-topbar, .admin-nav-group"))
+  );
+  if (!authed) {
+    throw new Error(
+      `admin login: session cookie set but /admin did not render the console for ` +
+        `${ADMIN_EMAIL}. The account may exist but lack the admin role.`
+    );
+  }
 }
 
 async function main() {
