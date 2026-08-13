@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -27,14 +27,49 @@ export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) =
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const progressRef = useRef<HTMLDivElement | null>(null);
+  // Taste-skill §5.D: no window scroll listeners. The scrolled flag is
+  // driven by a ScrollTrigger (same mechanism as the progress bar), read
+  // through useSyncExternalStore so there is no setState in an effect and
+  // the value is correct on mid-scroll reloads.
+  const scrolled = useSyncExternalStore(
+    (onStoreChange) => {
+      const st = ScrollTrigger.create({
+        start: 0,
+        end: "max",
+        onUpdate: () => onStoreChange(),
+      });
+      return () => st.kill();
+    },
+    () => window.scrollY > 8,
+    () => false
+  );
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    if (typeof window === "undefined") return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const el = progressRef.current;
+    if (!el) return;
+    if (reduce) {
+      el.style.transform = "scaleX(0)";
+    }
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        start: 0,
+        end: "max",
+        onUpdate: (self) => {
+          if (!reduce) {
+            gsap.to(el, {
+              scaleX: self.progress,
+              duration: 0.18,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          }
+        },
+      });
+    });
+    return () => ctx.revert();
   }, []);
 
   // Mobile drawer: escape closes, body scroll locks while open, and

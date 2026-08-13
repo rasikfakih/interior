@@ -277,7 +277,7 @@ function seedDefaultSettings() {
     { key: "contact_phone", value: "+91 99999 99999" },
     { key: "studio_address", value: "Kalyan, Maharashtra, India" },
     { key: "calendly_url", value: "https://calendly.com/etihadinteriors/intro" },
-    { key: "site_seo_title", value: "Etihad Interiors — Residential Design Studio" },
+    { key: "site_seo_title", value: "Etihad Interiors - Residential Design Studio" },
     { key: "site_seo_description", value: "A residential studio shaping considered homes across Maharashtra." },
     { key: "instagram_url", value: "https://instagram.com/etihadinteriors" },
     { key: "youtube_url", value: "" },

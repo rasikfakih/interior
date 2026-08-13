@@ -65,7 +65,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL("https://etihadinteriors.com"),
   title: {
-    default: "Etihad Interiors — Residential Interior Design Studio",
+    default: "Etihad Interiors - Residential Interior Design Studio",
     template: "%s · Etihad Interiors",
   },
   description:

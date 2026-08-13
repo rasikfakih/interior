@@ -23,6 +23,9 @@ data/license.localhost.json
 dev.log
 dev.pid
 
+# Freebuff agent working dir (local DB, preview logs, license backups).
+.freebuff/
+
 # v1.1.0: dev-only generator scripts archived here; not part of normal runtime.
 scripts/dev-archive/
 

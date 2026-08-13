@@ -25,6 +25,21 @@ const BASE_URL = process.env.BASE_URL || "https://ethinterior.vercel.app";
 const ADMIN_EMAIL = process.env.SMOKE_ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.SMOKE_ADMIN_PASSWORD;
 
+// Mirrors src/lib/settings-whitelist.ts (keys only). The anon GET on
+// /api/settings is deliberately public with only these keys returned;
+// keep this list in sync when the whitelist grows.
+const SETTINGS_WHITELIST = [
+  "contact_email",
+  "contact_phone",
+  "studio_address",
+  "calendly_url",
+  "site_seo_title",
+  "site_seo_description",
+  "instagram_url",
+  "year_established",
+  "residences_delivered",
+];
+
 function ts() {
   return new Date().toISOString().slice(11, 19);
 }
@@ -67,6 +82,25 @@ function cookieHeader(jar) {
 
 async function expectAnonGated(paths) {
   for (const p of paths) {
+    // /api/settings is the deliberate exception: its GET is
+    // anonymous-readable by design (whitelisted keys only, see
+    // src/app/api/settings/route.ts). Everything else must 401.
+    if (p === "/api/settings") {
+      const r = await fetchRaw("GET", p);
+      if (r.status !== 200) {
+        fail(`GET ${p} (anon) -> ${r.status} expected 200 (whitelisted public read)`);
+      }
+      const body = await readJson(r);
+      const leak = Array.isArray(body)
+        ? body.filter((s) => s && !SETTINGS_WHITELIST.includes(s.key))
+        : null;
+      if (!Array.isArray(body) || (leak && leak.length > 0)) {
+        fail(`GET ${p} (anon) leaked non-whitelisted keys`);
+      } else {
+        log(`ok - GET ${p} (anon) -> 200, whitelisted keys only`);
+      }
+      continue;
+    }
     const r = await fetchRaw("GET", p);
     if (r.status !== 401) {
       fail(`GET ${p} (anon) -> ${r.status} expected 401`);
@@ -144,35 +178,61 @@ async function main() {
   log("ok - admin login captured session cookie");
   const ch = cookieHeader(jar);
 
-  // 1) Settings: PUT -> GET -> DELETE -> GET(404).
+  // 1) Settings: arbitrary keys are refused (whitelist), and a
+  // whitelisted key round-trips with its prior value restored.
   const settingsKey = `crossc-${tag}`;
+  const refute = await fetchRaw("PUT", `/api/settings/${settingsKey}`, {
+    cookie: ch,
+    body: { value: "noop" },
+  });
+  if (refute.status !== 400) {
+    fail(`PUT /api/settings/${settingsKey} (authed, non-whitelisted) -> ${refute.status} expected 400`);
+  }
+  const refuteGet = await fetchRaw("GET", `/api/settings/${settingsKey}`, {
+    cookie: ch,
+  });
+  if (refuteGet.status !== 404) {
+    fail(`GET /api/settings/${settingsKey} (authed, non-whitelisted) -> ${refuteGet.status} expected 404`);
+  }
+  log("ok - settings non-whitelisted key refused (PUT 400 / GET 404)");
+
+  const settingsKey2 = "year_established";
+  const settingsBefore = await readJson(
+    await fetchRaw("GET", `/api/settings/${settingsKey2}`, { cookie: ch })
+  );
+  const settingsPrior =
+    settingsBefore && typeof settingsBefore.value === "string"
+      ? settingsBefore.value
+      : null;
   const settingsValue = `cross-${tag}`;
-  const putSettings = await fetchRaw("PUT", `/api/settings/${settingsKey}`, {
+  const putSettings = await fetchRaw("PUT", `/api/settings/${settingsKey2}`, {
     cookie: ch,
     body: { value: settingsValue },
   });
   if (putSettings.status !== 200) {
-    fail(`PUT /api/settings/${settingsKey} (authed) -> ${putSettings.status}`);
+    fail(`PUT /api/settings/${settingsKey2} (authed) -> ${putSettings.status}`);
   }
-  const getSettings = await fetchRaw("GET", `/api/settings/${settingsKey}`, {
+  const getSettings = await fetchRaw("GET", `/api/settings/${settingsKey2}`, {
     cookie: ch,
   });
-  if (getSettings.status !== 200) {
-    fail(`GET /api/settings/${settingsKey} (authed) -> ${getSettings.status}`);
-  }
   const settingsRow = await readJson(getSettings);
   if (settingsRow?.value !== settingsValue) {
     fail(
       `settings round-trip mismatch: expected ${settingsValue} got ${JSON.stringify(settingsRow)}`
     );
   }
-  const delSettings = await fetchRaw("DELETE", `/api/settings/${settingsKey}`, {
-    cookie: ch,
-  });
-  if (delSettings.status !== 200) {
-    fail(`DELETE /api/settings/${settingsKey} (authed) -> ${delSettings.status}`);
+  if (settingsPrior === null) {
+    await fetchRaw("DELETE", `/api/settings/${settingsKey2}`, { cookie: ch });
+  } else {
+    const restoreSettings = await fetchRaw("PUT", `/api/settings/${settingsKey2}`, {
+      cookie: ch,
+      body: { value: settingsPrior },
+    });
+    if (restoreSettings.status !== 200) {
+      fail(`settings restore failed: ${restoreSettings.status}`);
+    }
   }
-  log("ok - settings PUT -> GET -> DELETE round-trip clean");
+  log("ok - settings whitelisted PUT -> GET round-trip clean (restored)");
 
   // 2) Site identity: GET -> PUT tagline -> GET (verify) -> restore.
   const getSite = await fetchRaw("GET", "/api/site-identity", { cookie: ch });
@@ -276,7 +336,6 @@ async function main() {
     );
     const wanted = [
       "settings.update",
-      "settings.delete",
       "site_identity.update",
       "newsletter.deactivate",
       "newsletter.reactivate",

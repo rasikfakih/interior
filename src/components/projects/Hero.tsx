@@ -22,7 +22,7 @@ export default function ProjectsHero({ count }: Props) {
   return (
     <section
       aria-label="Projects hero"
-      className="relative pt-24 md:pt-28 pb-12 md:pb-20 min-h-[100dvh] flex items-center bg-canvas"
+      className="relative pt-24 pb-12 md:pb-20 min-h-[100dvh] flex items-center bg-canvas"
     >
       <div className="container-page w-full">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10">

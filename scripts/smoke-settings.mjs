@@ -186,53 +186,99 @@ async function adminGated() {
   }
   log("ok - admin login captured session cookie");
 
+  // The settings API now enforces a whitelist (see
+  // src/lib/settings-whitelist.ts): arbitrary tags are rejected, so
+  // the durable authed proof is (a) non-whitelisted keys are refused
+  // even with a valid session, and (b) a whitelisted key round-trips
+  // with its original value restored afterwards.
+
+  // (a) Non-whitelisted tag: session is valid but the key is refused.
+  const badGet = await fetchRaw("GET", `/api/settings/${tag}`, {
+    cookie: cookieHeader(jar),
+  });
+  if (badGet.status !== 404) {
+    fail(
+      `GET /api/settings/${tag} (authed, non-whitelisted) -> ${badGet.status} expected 404`
+    );
+  }
+  log(`ok - GET  /api/settings/${tag}  -> 404 (not whitelisted)`);
+
+  const badPut = await fetchRaw("PUT", `/api/settings/${tag}`, {
+    cookie: cookieHeader(jar),
+    body: { value: "noop" },
+  });
+  if (badPut.status !== 400) {
+    fail(
+      `PUT /api/settings/${tag} (authed, non-whitelisted) -> ${badPut.status} expected 400`
+    );
+  }
+  log(`ok - PUT  /api/settings/${tag}  -> 400 (whitelist gate)`);
+
+  const badDel = await fetchRaw("DELETE", `/api/settings/${tag}`, {
+    cookie: cookieHeader(jar),
+  });
+  if (badDel.status !== 404) {
+    fail(
+      `DELETE /api/settings/${tag} (authed, non-whitelisted) -> ${badDel.status} expected 404`
+    );
+  }
+  log(`ok - DEL  /api/settings/${tag}  -> 404 (not whitelisted)`);
+
+  // (b) Self-restoring round-trip on a whitelisted key. Uses
+  // year_established (kind text) so any string is valid; the prior
+  // value is restored afterwards so the smoke leaves no residue.
+  const roundKey = "year_established";
+  const beforeRow = await readJson(
+    await fetchRaw("GET", `/api/settings/${roundKey}`, {
+      cookie: cookieHeader(jar),
+    })
+  );
+  const beforeValue =
+    beforeRow && typeof beforeRow.value === "string" ? beforeRow.value : null;
   const value = `ts-smoke-${tag}`;
 
-  const putRaw = await fetchRaw("PUT", `/api/settings/${tag}`, {
+  const putRaw = await fetchRaw("PUT", `/api/settings/${roundKey}`, {
     cookie: cookieHeader(jar),
     body: { value },
   });
   if (putRaw.status !== 200) {
     const j = await readJson(putRaw);
     fail(
-      `PUT /api/settings/${tag} (authed) -> ${putRaw.status} expected 200 (${JSON.stringify(j)})`
+      `PUT /api/settings/${roundKey} (authed) -> ${putRaw.status} expected 200 (${JSON.stringify(j)})`
     );
   }
-  log(`ok - PUT  /api/settings/${tag}  -> 200`);
+  log(`ok - PUT  /api/settings/${roundKey}  -> 200`);
 
-  const getRaw = await fetchRaw("GET", `/api/settings/${tag}`, {
+  const getRaw = await fetchRaw("GET", `/api/settings/${roundKey}`, {
     cookie: cookieHeader(jar),
   });
-  if (getRaw.status !== 200) {
-    fail(
-      `GET /api/settings/${tag} (authed, post-put) -> ${getRaw.status} expected 200`
-    );
-  }
   const row = await readJson(getRaw);
   if (!row || row.value !== value) {
     fail(
       `authed GET did not return expected row: got ${JSON.stringify(row)}`
     );
   }
-  log(`ok - GET  /api/settings/${tag}  -> 200 (round-trip clean)`);
+  log(`ok - GET  /api/settings/${roundKey}  -> 200 (round-trip clean)`);
 
-  const delRaw = await fetchRaw("DELETE", `/api/settings/${tag}`, {
-    cookie: cookieHeader(jar),
-  });
-  if (delRaw.status !== 200) {
-    fail(`DELETE /api/settings/${tag} (authed) -> ${delRaw.status}`);
+  // Restore the original value (or delete if the row was absent).
+  if (beforeValue === null) {
+    const delRaw = await fetchRaw("DELETE", `/api/settings/${roundKey}`, {
+      cookie: cookieHeader(jar),
+    });
+    if (delRaw.status !== 200) {
+      fail(`DELETE /api/settings/${roundKey} (restore) -> ${delRaw.status}`);
+    }
+    log(`ok - DEL  /api/settings/${roundKey}  -> 200 (restored: absent)`);
+  } else {
+    const restoreRaw = await fetchRaw("PUT", `/api/settings/${roundKey}`, {
+      cookie: cookieHeader(jar),
+      body: { value: beforeValue },
+    });
+    if (restoreRaw.status !== 200) {
+      fail(`PUT /api/settings/${roundKey} (restore) -> ${restoreRaw.status}`);
+    }
+    log(`ok - PUT  /api/settings/${roundKey}  -> 200 (restored: ${beforeValue})`);
   }
-  log(`ok - DEL  /api/settings/${tag}  -> 200`);
-
-  const get404 = await fetchRaw("GET", `/api/settings/${tag}`, {
-    cookie: cookieHeader(jar),
-  });
-  if (get404.status !== 404) {
-    fail(
-      `GET /api/settings/${tag} (authed, post-delete) -> ${get404.status} expected 404`
-    );
-  }
-  log(`ok - GET  /api/settings/${tag}  -> 404 (deleted)`);
 
   // 4) audit_log assertion. The operator API exposes
   // /api/operator/audit; for Phase A we tolerate either the
@@ -257,11 +303,11 @@ async function adminGated() {
       (l) =>
         (l?.kind === "settings.update" || l?.kind === "settings.delete") &&
         typeof l?.message === "string" &&
-        l.message.includes(tag)
+        l.message.includes(roundKey)
     );
     if (!match) {
       fail(
-        `audit_log did not record a settings.update or settings.delete entry for ${tag}`
+        `audit_log did not record a settings.update or settings.delete entry for ${roundKey}`
       );
     }
     log(`ok - audit_log has matching entry (kind=${match.kind})`);

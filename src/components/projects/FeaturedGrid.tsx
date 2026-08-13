@@ -13,8 +13,10 @@ type Props = {
  *   - NO 3-column equal feature cards (Section 9.C ban). Hero
  *     featured card spans 8/12 cols on desktop and the bento
  *     rest is 2/3/3/4 asymmetric spread (never equal columns).
- *   - Real images via picsum.photos fallbacks with descriptive
- *     slug seeds so admins can swap to real photography later.
+ *   - Images come from the DB (before_image) or the configured
+ *     Unsplash fallback resolved in /projects - never picsum, whose
+ *     hostname is not a next/image remotePattern (that 500'd the
+ *     route; the v2 pages already enforce this).
  *   - data-tile / data-cat / data-year attributes are wired so
  *     the filter pill row above (ProjectsClient) can toggle a CSS
  *     hide without re-rendering the array.
@@ -56,9 +58,8 @@ export default function FeaturedGrid({ items }: Props) {
             data-year={featured.year}
             className="md:col-span-8 group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/9]"
           >
-            {/* TODO: real asset path slug=featured-hero */}
             <Image
-              src={`https://picsum.photos/seed/featured-${featured.slug}/1600/900`}
+              src={featured.image}
               alt={featured.title}
               fill
               sizes="(min-width: 768px) 66vw, 100vw"
@@ -96,9 +97,8 @@ export default function FeaturedGrid({ items }: Props) {
                       : "md:col-span-12 aspect-[16/6]"
               }`}
             >
-              {/* TODO: real asset path slug=featured-bento */}
               <Image
-                src={`https://picsum.photos/seed/bento-${p.slug}/1200/800`}
+                src={p.image}
                 alt={p.title}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"

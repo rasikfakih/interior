@@ -15,7 +15,7 @@ const defaults: SiteSettings = {
   contact_phone: "+91 99999 99999",
   studio_address: "4F, above ICICI Bank, Kalyan West 421301",
   calendly_url: "https://calendly.com/etihadinteriors/intro",
-  site_seo_title: "Etihad Interiors — Residential Design Studio",
+  site_seo_title: "Etihad Interiors - Residential Design Studio",
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
