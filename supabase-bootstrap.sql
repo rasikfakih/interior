@@ -262,6 +262,16 @@ CREATE TABLE IF NOT EXISTS license_log (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Durable license store (singleton row). The signed license document
+-- lives here so stamp-advance / re-issue persist on serverless hosts
+-- where the deployed bundle is read-only. The legacy data/license.json
+-- remains a localhost authoring surface and a first-read import source.
+CREATE TABLE IF NOT EXISTS license_doc (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  data TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS announcements (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,

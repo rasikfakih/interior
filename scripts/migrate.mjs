@@ -441,6 +441,18 @@ const TABLES = [
     )`,
     columns: [],
   },
+  {
+    // Durable license store (singleton row id=1). Mirrors the
+    // supabase-bootstrap.sql license_doc table for the local SQLite
+    // dev path. The signed license document is stored whole in `data`.
+    name: "license_doc",
+    create: `CREATE TABLE license_doc (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      data TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    columns: [],
+  },
 ];
 
 console.log("Migration: declarative run");

@@ -21,9 +21,10 @@
  * and PUT returns 503. Both are tolerated by the smoke (we assert
  * the gating, not the write).
  *
- * If a license IS present (postinstall path on local dev / future
- * distributed install on Vercel), the PUT advances installedAt and
- * the smoke asserts the rotatedAt field is refreshed.
+ * If a license IS present and the store is writable, the PUT advances
+ * installedAt, the smoke asserts the rotatedAt field is refreshed, and
+ * a follow-up GET asserts the advance actually persisted (durable
+ * Postgres-backed store - no ephemeral filesystem write).
  *
  * Exit 1 on any failed assertion.
  */
@@ -204,7 +205,24 @@ async function main() {
     `ok - PUT /api/install/stamp  -> 200 installedAt ${beforeInstalledAt} -> ${after.license.installedAt}`
   );
 
-  // 5) audit_log assertion.
+  // 5) Persistence assert: a fresh GET must return the advanced
+  //    installedAt. The store is Postgres-backed, so the advance must
+  //    survive a separate read - an ephemeral write would fail here.
+  const get2Raw = await fetchRaw("GET", "/api/install/stamp", {
+    cookie: cookieHeader(jar),
+  });
+  if (get2Raw.status !== 200) {
+    fail(`GET /api/install/stamp (post-advance) -> ${get2Raw.status} expected 200`);
+  }
+  const persisted = await readJson(get2Raw);
+  if (persisted?.license?.installedAt !== after.license.installedAt) {
+    fail(
+      `advance did not persist: GET returns ${persisted?.license?.installedAt ?? "<none>"} but PUT returned ${after.license.installedAt}`
+    );
+  }
+  log(`ok - advance persisted (GET ${persisted.license.installedAt})`);
+
+  // 6) audit_log assertion.
   const auditPaths = ["/api/operator/audit", "/api/admin/audit"];
   let lines = null;
   for (const p of auditPaths) {

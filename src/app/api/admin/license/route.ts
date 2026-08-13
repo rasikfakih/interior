@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLicense, requireSuperadmin } from "@/lib/license-gate";
-import { readLicense, appendAudit } from "@/lib/license";
-import path from "path";
+import { readLicense, writeLicense, appendAudit } from "@/lib/license";
 
 export async function GET() {
   try {
@@ -9,7 +8,7 @@ export async function GET() {
     if (!gate.ok) {
       return NextResponse.json({ error: gate.reason, code: gate.code }, { status: gate.code });
     }
-    const license = readLicense();
+    const license = await readLicense();
     return NextResponse.json({
       license,
       server: process.env.LICENSE_SERVER_URL || null,
@@ -57,14 +56,7 @@ export async function POST(req: NextRequest) {
     } as any;
     const sig = signLicense(body);
     const license = { ...body, signature: sig };
-    const fs = await import("fs/promises");
-    const fsSync = await import("fs");
-    const file = process.env.VERCEL
-      ? "/tmp/license.json"
-      : path.join(process.cwd(), "data", "license.json");
-    const dir = path.dirname(file);
-    if (!fsSync.existsSync(dir)) fsSync.mkdirSync(dir, { recursive: true });
-    await fs.writeFile(file, JSON.stringify(license, null, 2), "utf8");
+    await writeLicense(license);
     await appendAudit(
       "license.reinstalled",
       `License re-installed on ${license.domain}, tier=${license.tier}`

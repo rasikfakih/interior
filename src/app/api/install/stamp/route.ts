@@ -1,60 +1,15 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
-import { appendAudit } from "@/lib/license";
+import {
+  readLicense,
+  writeLicense,
+  appendAudit,
+  type License,
+} from "@/lib/license";
 import { bump } from "@/lib/revalidate";
 import crypto from "crypto";
-import fs from "fs";
-import path from "path";
 
-const LICENSE_FILE = path.join(process.cwd(), "data", "license.json");
 const HMAC_KEY_ENV = process.env.LICENSE_HMAC_KEY || "";
-
-// Serverless hosts (Vercel lambdas) mount the deployed bundle
-// read-only, so writeLicense() would throw. Detect writability once
-// per module instance (each lambda is fresh anyway) with a probe
-// write+unlink; the GET reports canAdvance=false and the PUT refuses
-// with a structured 503 instead of an unhandled 500.
-let _licenseDirWritable: boolean | null = null;
-function licenseDirWritable(): boolean {
-  if (_licenseDirWritable !== null) return _licenseDirWritable;
-  try {
-    const dir = path.dirname(LICENSE_FILE);
-    fs.mkdirSync(dir, { recursive: true });
-    const probe = path.join(dir, `.write-probe-${process.pid}-${Date.now()}`);
-    fs.writeFileSync(probe, "ok");
-    fs.unlinkSync(probe);
-    _licenseDirWritable = true;
-  } catch {
-    _licenseDirWritable = false;
-  }
-  return _licenseDirWritable;
-}
-
-type License = {
-  purchaseCode: string;
-  domain: string;
-  tier: "personal" | "business" | string;
-  installedAt: string;
-  expiresAt: string;
-  features: Record<string, boolean>;
-  signature: string;
-  issuedBy?: string;
-};
-
-function readLicense(): License | null {
-  try {
-    if (!fs.existsSync(LICENSE_FILE)) return null;
-    const raw = fs.readFileSync(LICENSE_FILE, "utf8");
-    return JSON.parse(raw) as License;
-  } catch {
-    return null;
-  }
-}
-
-function writeLicense(license: License) {
-  fs.mkdirSync(path.dirname(LICENSE_FILE), { recursive: true });
-  fs.writeFileSync(LICENSE_FILE, JSON.stringify(license, null, 2), "utf8");
-}
 
 function reSign(license: License): License {
   if (!HMAC_KEY_ENV) {
@@ -79,25 +34,27 @@ function reSign(license: License): License {
 }
 
 /**
- * GET /api/install/stamp            -> admin session, returns the
- *                                       current license.json shape
- *                                       with an `available` flag
- *                                       telling the editor whether
- *                                       the env can issue / advance.
- * DELETE /api/install/stamp         -> 405 (preserves the install
- *                                       surface; no operator path)
- * PUT /api/install/stamp            -> admin session. Advance stamp
- *                                       semantics: re-stamp the
- *                                       installedAt forward to
- *                                       `Date.now()` while preserving
- *                                       purchaseCode, domain, tier,
- *                                       features, and expiresAt.
- *                                       Re-signs the HMAC so the next
- *                                       /api/install/stamp POST
- *                                       matches. Audit-log entry.
+ * License stamp surface.
  *
- * POST is preserved as the original first-install / re-install path
- * from /install/InstallForm. POST remains gated only by LICENSE_HMAC_KEY.
+ * POST /api/install/stamp     -> first install / re-install from the
+ *                                /install form. Gated only by
+ *                                LICENSE_HMAC_KEY. Writes the signed
+ *                                license to the durable Postgres store
+ *                                (license_doc) so it persists on
+ *                                serverless hosts.
+ * GET  /api/install/stamp     -> admin session. Returns the active
+ *                                license shape plus availability
+ *                                flags. canAdvance is true whenever a
+ *                                license exists and LICENSE_HMAC_KEY
+ *                                is configured - the store is durable,
+ *                                so there is no filesystem gate.
+ * PUT  /api/install/stamp     -> admin session. Advance stamp
+ *                                semantics: re-stamp installedAt
+ *                                forward to `Date.now()` while
+ *                                preserving purchaseCode, domain,
+ *                                tier, features, and expiresAt.
+ *                                Re-signs the HMAC and persists to
+ *                                the durable store. Audit-log entry.
  *
  * The cryptographic HMAC rotation (rotate-hmac) is intentionally NOT
  * reachable from this route. That path stays on /superadmin via
@@ -105,20 +62,113 @@ function reSign(license: License): License {
  * admin session cannot rotate the buyer's HMAC.
  */
 
+export async function POST(req: Request) {
+  if (!HMAC_KEY_ENV) {
+    return NextResponse.json(
+      {
+        error: "license_stamp_unavailable",
+        detail: "this server has no LICENSE_HMAC_KEY configured",
+      },
+      { status: 503 }
+    );
+  }
+
+  const body = await req.json().catch(() => ({}));
+  const purchaseCode = (body.purchaseCode || "").toString().trim();
+  const domain = (body.domain || "").toString().trim().toLowerCase();
+  const tier = body.tier === "personal" ? "personal" : "business";
+  const daysValid = Number(body.daysValid || process.env.STAMP_DAYS_VALID || 365);
+
+  if (!purchaseCode || !domain) {
+    return NextResponse.json(
+      { error: "missing_fields", detail: "purchaseCode and domain required" },
+      { status: 400 }
+    );
+  }
+
+  const features =
+    tier === "business"
+      ? {
+          "feature.3d-viewer": true,
+          "feature.multilingual": true,
+          "feature.unlimited-pages": true,
+          "feature.unlimited-media": true,
+          "feature.multi-domain": true,
+        }
+      : {
+          "feature.3d-viewer": false,
+          "feature.multilingual": false,
+          "feature.unlimited-pages": false,
+          "feature.unlimited-media": false,
+          "feature.multi-domain": false,
+        };
+
+  const installedAt = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + daysValid * 86400e3).toISOString();
+  const canonicalBody = [
+    purchaseCode,
+    domain,
+    tier,
+    installedAt,
+    expiresAt,
+    Object.entries(features)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}=${v}`)
+      .join(","),
+  ].join("|");
+
+  const signature = crypto
+    .createHmac("sha256", HMAC_KEY_ENV)
+    .update(canonicalBody)
+    .digest("hex");
+
+  const license: License = {
+    purchaseCode,
+    domain,
+    tier,
+    installedAt,
+    expiresAt,
+    features,
+    signature,
+    issuedBy: "api-install-route",
+  };
+
+  try {
+    await writeLicense(license);
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "license_stamp_write_failed",
+        detail: `could not persist license: ${(err as Error)?.message ?? err}`,
+      },
+      { status: 503 }
+    );
+  }
+
+  await appendAudit(
+    "install.first_install",
+    `License installed on ${domain}, tier=${tier}`,
+    { purchaseCode, domain, tier, role: "install-form" }
+  );
+  bump({ kind: "install" });
+
+  return NextResponse.json({ ok: true, license });
+}
+
 export async function GET() {
   const gate = await requireAdminSession();
   if (!gate.ok) {
     return new NextResponse(gate.response.body, gate.response);
   }
-  const license = readLicense();
+  const license = await readLicense();
   return NextResponse.json({
     license,
     rotatedAt: license?.installedAt ?? null,
     available: Boolean(license),
-    // Advance needs a license AND a writable filesystem; on
-    // serverless the bundle is read-only, so the editor must not
-    // offer an action that can never persist.
-    canAdvance: Boolean(license) && licenseDirWritable(),
+    // Storage is Postgres-backed (durable on serverless), so advance
+    // is available whenever a license exists and the HMAC key is
+    // configured - there is no read-only filesystem gate anymore.
+    canAdvance: Boolean(license) && Boolean(HMAC_KEY_ENV),
     canRotate: Boolean(HMAC_KEY_ENV),
   });
 }
@@ -137,30 +187,11 @@ export async function PUT() {
       { status: 503 }
     );
   }
-  const license = readLicense();
+  const license = await readLicense();
   if (!license) {
     return NextResponse.json(
       { error: "no_license_present", detail: "POST /api/install/stamp must run first" },
       { status: 404 }
-    );
-  }
-
-  if (!licenseDirWritable()) {
-    await appendAudit(
-      "install.stamp_advance_unavailable",
-      "install stamp advance refused: server filesystem is read-only (serverless)",
-      { role: gate.role }
-    );
-    return NextResponse.json(
-      {
-        error: "license_stamp_serverless_ro",
-        detail:
-          "this host's filesystem is read-only (serverless deployment); " +
-          "stamp advance cannot persist here. Advance the stamp where " +
-          "the license file is writable, or move license storage to a " +
-          "durable surface.",
-      },
-      { status: 503 }
     );
   }
 
@@ -172,10 +203,9 @@ export async function PUT() {
   };
   const signed = reSign(advanced);
   try {
-    writeLicense(signed);
+    await writeLicense(signed);
   } catch (err) {
-    // Defense in depth: the probe can pass while the real write
-    // still fails (layered mounts). Fail structured, never raw 500.
+    // Defense in depth: fail structured, never raw 500.
     await appendAudit(
       "install.stamp_advance_failed",
       `install stamp advance write failed: ${(err as Error)?.message ?? err}`,
@@ -184,7 +214,7 @@ export async function PUT() {
     return NextResponse.json(
       {
         error: "license_stamp_write_failed",
-        detail: `could not write ${LICENSE_FILE}: ${(err as Error)?.message ?? err}`,
+        detail: `could not persist license: ${(err as Error)?.message ?? err}`,
       },
       { status: 503 }
     );

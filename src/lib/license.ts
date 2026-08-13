@@ -45,7 +45,7 @@ export const TIER_FEATURES: Record<LicenseTier, Record<string, boolean>> = {
   },
 };
 
-export function readLicense(): License | null {
+function readLicenseFile(): License | null {
   try {
     if (!fs.existsSync(LICENSE_FILE)) return null;
     const raw = fs.readFileSync(LICENSE_FILE, "utf8");
@@ -54,6 +54,51 @@ export function readLicense(): License | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Durable license store. Postgres `license_doc` (singleton row id=1)
+ * is canonical: stamp-advance and re-issue persist on serverless hosts
+ * where the deployed bundle is read-only. The legacy
+ * data/license.json remains (a) a localhost authoring surface and
+ * (b) a first-read import source, so a build-time stamped file
+ * migrates into the DB automatically on the first read. A DB failure
+ * degrades to the file rather than taking the license down.
+ */
+export async function readLicense(): Promise<License | null> {
+  let fromDb: License | null = null;
+  try {
+    const { ensureMigrated, pgOne } = await import("@/lib/pg");
+    await ensureMigrated();
+    const row = await pgOne<{ data: string }>(
+      "SELECT data FROM license_doc WHERE id = 1"
+    );
+    if (row && typeof row.data === "string" && row.data) {
+      fromDb = JSON.parse(row.data) as License;
+    }
+  } catch (err) {
+    console.error(
+      "[license] DB read failed, falling back to file:",
+      (err as Error)?.message ?? err
+    );
+  }
+  if (fromDb) return fromDb;
+
+  const fileLicense = readLicenseFile();
+  if (fileLicense) {
+    // One-time migration: seed the durable store from the legacy file
+    // so advance / re-issue persist from here on. Best-effort; a
+    // failed import never masks the file license.
+    try {
+      await writeLicense(fileLicense);
+    } catch (err) {
+      console.error(
+        "[license] DB import from file failed:",
+        (err as Error)?.message ?? err
+      );
+    }
+  }
+  return fileLicense;
 }
 
 export function isLicenseFresh(license: License | null): boolean {
@@ -118,7 +163,7 @@ export type LicenseCheckResult =
   | { ok: false; reason: "missing" | "expired" | "domain-mismatch" | "tampered" | "no-signature" };
 
 export async function checkLicense(): Promise<LicenseCheckResult> {
-  const license = readLicense();
+  const license = await readLicense();
   if (!license) return { ok: false, reason: "missing" };
   if (!license.signature) return { ok: false, reason: "no-signature" };
   if (!isLicenseFresh(license)) return { ok: false, reason: "expired" };
@@ -147,9 +192,25 @@ export async function assertLicense(opts?: {
   return check;
 }
 
-export function writeLicense(license: License) {
-  fs.mkdirSync(path.dirname(LICENSE_FILE), { recursive: true });
-  fs.writeFileSync(LICENSE_FILE, JSON.stringify(license, null, 2), "utf8");
+export async function writeLicense(license: License) {
+  const { ensureMigrated, pgQuery } = await import("@/lib/pg");
+  await ensureMigrated();
+  await pgQuery(
+    `INSERT INTO license_doc (id, data, updated_at)
+     VALUES (1, $1, CURRENT_TIMESTAMP)
+     ON CONFLICT (id) DO UPDATE
+       SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP`,
+    [JSON.stringify(license)]
+  );
+  // Best-effort file mirror keeps localhost tooling (and humans
+  // inspecting data/) in sync. Serverless read-only mounts throw;
+  // the DB write above is the source of truth there, so swallow.
+  try {
+    fs.mkdirSync(path.dirname(LICENSE_FILE), { recursive: true });
+    fs.writeFileSync(LICENSE_FILE, JSON.stringify(license, null, 2), "utf8");
+  } catch {
+    // ignore - DB is canonical on read-only hosts
+  }
 }
 
 export async function appendAudit(

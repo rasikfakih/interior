@@ -119,7 +119,7 @@ export default function AdminInstallView({ role }: { role: string }) {
             Stamp & HMAC.
           </h1>
           <p className="text-ink-mute text-sm mt-2">
-            Read-only view of the active license stamp.{" "}
+            View of the active license stamp.{" "}
             <span className="font-mono text-xs">Advance stamp</span> rolls
             installedAt forward and re-signs the HMAC; seat usage and
             tier are preserved. HMAC rotation (cryptographic reset)
@@ -217,10 +217,11 @@ export default function AdminInstallView({ role }: { role: string }) {
             <div className="space-y-2">
               <p className={LABEL_CLS}>No active license</p>
               <p className="text-sm text-ink-mute">
-                This server has no <span className="font-mono text-xs">data/license.json</span>.
-                Run <span className="font-mono text-xs">POST /api/install/stamp</span> with
-                purchase code + domain to issue one. The advance action
-                gets you 404 until then.
+                This server has no active license. Issue one from{" "}
+                <span className="font-mono text-xs">/install</span> or{" "}
+                <span className="font-mono text-xs">POST /api/install/stamp</span>{" "}
+                with purchase code + domain. The advance action gets
+                you 404 until then.
               </p>
             </div>
           )}
@@ -236,7 +237,7 @@ export default function AdminInstallView({ role }: { role: string }) {
                   {data?.canAdvance
                     ? "yes"
                     : data?.available
-                      ? "read-only host"
+                      ? "no HMAC key"
                       : "no license"}
                 </span>
               </li>

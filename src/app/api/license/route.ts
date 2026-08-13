@@ -9,7 +9,7 @@ export async function GET() {
   }
   const { readLicense } = await import("@/lib/license");
   return NextResponse.json({
-    license: readLicense(),
+    license: await readLicense(),
     server: process.env.LICENSE_SERVER_URL || null,
   });
 }
