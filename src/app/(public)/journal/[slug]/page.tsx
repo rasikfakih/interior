@@ -34,7 +34,11 @@ export default async function JournalEntryPage({
        FROM journal_posts WHERE slug = $1 LIMIT 1`,
       [slug]
     );
-  } catch {}
+  } catch (err) {
+    // DB failure is a 500, never a 404 (see projects/[slug]).
+    console.error(`[journal/${slug}] read failed:`, (err as Error)?.message ?? err);
+    throw err;
+  }
 
   if (!entry) notFound();
 

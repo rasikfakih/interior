@@ -42,8 +42,12 @@ export default async function ProjectDetailPage({
        FROM projects WHERE slug = $1 LIMIT 1`,
       [slug]
     );
-  } catch {
-    row = null;
+  } catch (err) {
+    // A DB failure is a 500, never a 404: notFound() here would
+    // silently turn a pool/connection outage into "route missing",
+    // which misleads crawlers, users, and the contrast walker alike.
+    console.error(`[projects/${slug}] read failed:`, (err as Error)?.message ?? err);
+    throw err;
   }
 
   if (!row || row.is_published === false) notFound();

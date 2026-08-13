@@ -61,8 +61,18 @@ export function getPool(): pg.Pool {
     ssl: url.includes('supabase.com') || url.includes('sslmode=require')
       ? { rejectUnauthorized: false }
       : undefined,
-    max: 10,
+    // Neon serverless caps pooled connections at 15 sessions total.
+    // Each warm Vercel lambda owns its own module-singleton pool, so
+    // max:10 per lambda meant two concurrent warm lambdas (>15) blew
+    // the limit and the detail pages' catch->notFound() surfaced that
+    // as flapping 404s during the deploy rollout. max:1 serializes
+    // queries within a lambda (requests are effectively sequential)
+    // and caps total sessions at the number of warm lambdas. The
+    // connection timeout makes pool exhaustion fail fast and loud
+    // instead of hanging a request on an unavailable session.
+    max: 1,
     idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
   });
   return _pool;
 }

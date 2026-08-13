@@ -42,8 +42,10 @@ async function getProject(slug: string): Promise<ProjectRow | null> {
        FROM projects WHERE slug = $1 LIMIT 1`,
       [slug]
     );
-  } catch {
-    return null;
+  } catch (err) {
+    // DB failure is a 500, never a 404 (see projects/[slug]).
+    console.error(`[projects-v2/${slug}] read failed:`, (err as Error)?.message ?? err);
+    throw err;
   }
 }
 
@@ -81,7 +83,9 @@ async function getRooms(projectId: number) {
       order_index: r.order_index,
       is_published: true,
     }));
-  } catch {
+  } catch (err) {
+    // Secondary section: degrade to empty, but never silently.
+    console.error(`[projects-v2] rooms read failed (project_id=${projectId}):`, (err as Error)?.message ?? err);
     return [];
   }
 }
@@ -117,7 +121,9 @@ async function getRelated(category: string, currentSlug: string) {
       scope: r.scope || r.category || "Residential",
       image: r.before_image || FALLBACK,
     }));
-  } catch {
+  } catch (err) {
+    // Secondary section: degrade to empty, but never silently.
+    console.error(`[projects-v2/${currentSlug}] related read failed:`, (err as Error)?.message ?? err);
     return [];
   }
 }
