@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
@@ -88,11 +89,12 @@ export default async function VoicesServer({
                 </blockquote>
                 <figcaption className="mt-auto flex items-center gap-3 pt-4 border-t hairline">
                   {photo ? (
-                    <img
+                    <Image
                       src={photo}
                       alt=""
+                      width={44}
+                      height={44}
                       className="w-11 h-11 rounded-full object-cover"
-                      loading="lazy"
                     />
                   ) : (
                     <span

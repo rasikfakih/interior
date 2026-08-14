@@ -4049,3 +4049,22 @@ hyphen `-`), replaced every em-dash on operator/admin surfaces:
 
 Verified: 0 em-dashes remain in src/, `tsc --noEmit` 0, `verify:deploy`
 green. 16 files, +21/-21. Uncommitted, ready for the user's commit.
+
+### 2026-08-14 - StudioServer/VoicesServer: raw img -> next/image
+
+Converted the two remaining raw `<img>` tags on public marketing
+surfaces to next/image (closes the strongest item from the audit's
+raw-img finding; Model3DViewer/three-runtime/RichTextRenderer remain
+untouched as documented-defensible).
+
+remotePatterns policy decision: no config change. Demo avatars live
+on https://images.unsplash.com (already whitelisted, verified live
+in the SQLite seed: photo-1600596542815 etc); same-origin /uploads
+media from the media library needs no pattern; ethinterior.vercel.app
+stays for absolute self-references. Buyers on custom domains add
+their own hostname per the next.config comment. Fixed intrinsic
+sizes (80x80 team, 44x44 voices) with object-cover rounding.
+
+Verified: tsc 0, build green; local server renders team avatars
+through /_next/image?url= (no raw <img src=unsplash), /voices has
+zero <img> (null photos fall back to initial tiles). 2 files, +5/-3.

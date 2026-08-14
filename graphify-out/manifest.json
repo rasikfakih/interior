@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786715761.4152384,
-    "ast_hash": "7db2e27d22b9496437e10771d8a3cf59",
+    "mtime": 1786716596.6068907,
+    "ast_hash": "d854df9ed21f8908f94d6c5aa9d0f5f9",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1230,13 +1230,13 @@
     "semantic_hash": ""
   },
   "src/components/StudioServer.tsx": {
-    "mtime": 1786615428.8975701,
-    "ast_hash": "b6e1047caa6216152b8cfb07f7737444",
+    "mtime": 1786716533.795292,
+    "ast_hash": "fd57af00ad8c6e6b1b273acf578dc7a5",
     "semantic_hash": ""
   },
   "src/components/VoicesServer.tsx": {
-    "mtime": 1786615428.8955727,
-    "ast_hash": "f05492755eb4582ad4951d3d74abe0a5",
+    "mtime": 1786716533.7972212,
+    "ast_hash": "71e1f14cebe9a7cdcf8f325af30942c1",
     "semantic_hash": ""
   },
   "scripts/probe-media.mjs": {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 
 type Row = {
@@ -53,11 +54,12 @@ export default async function StudioServer() {
                 className="surface-tile p-6 md:p-7 flex flex-col gap-4"
               >
                 {photo ? (
-                  <img
+                  <Image
                     src={photo}
                     alt=""
+                    width={80}
+                    height={80}
                     className="w-20 h-20 rounded-full object-cover"
-                    loading="lazy"
                   />
                 ) : (
                   <span
