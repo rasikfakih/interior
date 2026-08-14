@@ -4028,3 +4028,24 @@ demo is 2026-08-15); em-dash sweep; raw <img> in
 StudioServer/VoicesServer/Model3DViewer/three-runtime/
 RichTextRenderer; orphan src/components/AdminProjectForm.tsx;
 graphify update runs at session close per protocol.
+
+### 2026-08-14 - em-dash sweep: 21 instances across 16 operator/admin files
+
+Per the skill rule (no em-dashes in user-visible text; use regular
+hyphen `-`), replaced every em-dash on operator/admin surfaces:
+
+- Prose separators -> ` - `: superadmin announcements/backup/health/
+  issue/metrics page headers, admin export-import page header,
+  AdminExportImport copy (x2), AdminModelPreview idle hint,
+  AdminShell blockedMsg, BackupBoard copy (x3), LicenseWizard revoke
+  confirm, plus comments in AdminPageHeader and pg.ts.
+- Empty-cell placeholders -> `"-"` (matches existing convention in
+  LicenseWizard/AdminTheme/ProjectHeader): tenants table (owner,
+  domain, expires), HealthBoard latency cell, AdminForms payload
+  fallback (this one was the escaped `\u2014` form and was missed by
+  the original audit's literal-character scan - 21st instance).
+- No en-dashes present in src. Docs files untouched (internal, not
+  user-visible).
+
+Verified: 0 em-dashes remain in src/, `tsc --noEmit` 0, `verify:deploy`
+green. 16 files, +21/-21. Uncommitted, ready for the user's commit.

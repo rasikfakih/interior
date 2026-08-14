@@ -16,7 +16,7 @@ export default async function BackupPage() {
       <AdminPageHeader
         eyebrow="Platform"
         title="Backups"
-        desc="Full-table snapshots — same contract as scripts/export-postgres.mjs."
+        desc="Full-table snapshots - same contract as scripts/export-postgres.mjs."
       />
       <BackupBoard />
     </section>

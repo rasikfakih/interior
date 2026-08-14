@@ -20,7 +20,7 @@
  * When DATABASE_URL is set, only Postgres runs. When unset,
  * local SQLite is used. The cool-down timer for the SQLite
  * Vercel hot-copy is gone because Phase 1 made Postgres the
- * only durable surface — but a local SQLite devpath keeps
+ * only durable surface - but a local SQLite devpath keeps
  * `npm run dev` and the localhost dev experience working.
  */
 

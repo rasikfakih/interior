@@ -141,7 +141,7 @@ export default function MetricsPage() {
             <div className="mt-5">
               <p className="op-label">By tier</p>
               {(m?.revenueByTier ?? []).length === 0 ? (
-                <p className="text-sm text-ink-mute">No ledger entries yet — amounts are recorded from the license wizard.</p>
+                <p className="text-sm text-ink-mute">No ledger entries yet - amounts are recorded from the license wizard.</p>
               ) : (
                 <ul className="divide-y divide-[var(--line)]">
                   {m!.revenueByTier.map((r) => (

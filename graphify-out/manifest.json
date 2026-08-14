@@ -395,8 +395,8 @@
     "semantic_hash": ""
   },
   "src/app/superadmin/issue/page.tsx": {
-    "mtime": 1786569646.398787,
-    "ast_hash": "0cf9256e3bcab202f8fb2d3db5716cc4",
+    "mtime": 1786715737.4292965,
+    "ast_hash": "658ef02b875eae37dc6846210c49b211",
     "semantic_hash": ""
   },
   "src/app/superadmin/layout.tsx": {
@@ -405,8 +405,8 @@
     "semantic_hash": ""
   },
   "src/app/superadmin/metrics/page.tsx": {
-    "mtime": 1786569026.9918594,
-    "ast_hash": "5150bc37504d388fa384a2e3b108926b",
+    "mtime": 1786715737.4322958,
+    "ast_hash": "42c0c636f103e903cbf34dd8d8881e91",
     "semantic_hash": ""
   },
   "src/app/superadmin/page.tsx": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "src/app/superadmin/tenants/page.tsx": {
-    "mtime": 1786569646.3867776,
-    "ast_hash": "5272e826e1e4b484ce83a77411fdfb84",
+    "mtime": 1786715737.4332957,
+    "ast_hash": "e0c7c80d6668c1adeac552a02f23e571",
     "semantic_hash": ""
   },
   "src/app/superadmin/theme/page.tsx": {
@@ -585,8 +585,8 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminShell.tsx": {
-    "mtime": 1786619179.283985,
-    "ast_hash": "385122f2f4a4d411e17fb6070bb6fac4",
+    "mtime": 1786715737.4393065,
+    "ast_hash": "d6d1d7031c238cafd2ff1f7a6aac02b9",
     "semantic_hash": ""
   },
   "src/components/admin/BlockPicker.tsx": {
@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786711947.4753692,
-    "ast_hash": "dbfbcb1fafd35d3e476f82cb5e19b9bb",
+    "mtime": 1786715761.4152384,
+    "ast_hash": "7db2e27d22b9496437e10771d8a3cf59",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1050,8 +1050,8 @@
     "semantic_hash": ""
   },
   "src/lib/pg.ts": {
-    "mtime": 1786629152.5678873,
-    "ast_hash": "2abb6559a3d0881b66e2344b93807cf9",
+    "mtime": 1786715737.4482975,
+    "ast_hash": "d7cac2528f1ebf8b6adc7716f54abc44",
     "semantic_hash": ""
   },
   "scripts/smoke.mjs": {
@@ -1675,8 +1675,8 @@
     "semantic_hash": ""
   },
   "src/app/admin/export-import/page.tsx": {
-    "mtime": 1786569693.2866573,
-    "ast_hash": "0af47a75b275cd915954379c621b7e0a",
+    "mtime": 1786715737.4092994,
+    "ast_hash": "098117ca1632e9a57c12f4b07dae1435",
     "semantic_hash": ""
   },
   "src/app/admin/forms/page.tsx": {
@@ -1860,23 +1860,23 @@
     "semantic_hash": ""
   },
   "src/app/superadmin/announcements/page.tsx": {
-    "mtime": 1786569646.4017782,
-    "ast_hash": "fda56b283862b40f6ce445f7506e2f92",
+    "mtime": 1786715737.4112961,
+    "ast_hash": "60dcdf66df6854d28ac3c60235729889",
     "semantic_hash": ""
   },
   "src/app/superadmin/backup/page.tsx": {
-    "mtime": 1786569646.4037738,
-    "ast_hash": "8faad2410e0e8d79c863e1cbd06f5ac1",
+    "mtime": 1786715737.4132953,
+    "ast_hash": "67729327234e553b2e787762097db711",
     "semantic_hash": ""
   },
   "src/app/superadmin/health/page.tsx": {
-    "mtime": 1786569646.3957736,
-    "ast_hash": "78ac09696438ebdcdc4b704e72b9b985",
+    "mtime": 1786715737.4253066,
+    "ast_hash": "600491accfaad4668edc29aee27aae18",
     "semantic_hash": ""
   },
   "src/components/AdminPageHeader.tsx": {
-    "mtime": 1786569605.802812,
-    "ast_hash": "799c402c1bc00a32980ad9e9a346b11a",
+    "mtime": 1786715737.440393,
+    "ast_hash": "fcdb170dea57d5d504fc4ddc8d04571a",
     "semantic_hash": ""
   },
   "src/components/AnnouncementBar.tsx": {
@@ -1905,13 +1905,13 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminExportImport.tsx": {
-    "mtime": 1786619190.200455,
-    "ast_hash": "c48f3c376d48d74b0289ee38949ed987",
+    "mtime": 1786715737.435297,
+    "ast_hash": "39e0caf674afa1ed543cc6ce7af1f886",
     "semantic_hash": ""
   },
   "src/components/admin/AdminForms.tsx": {
-    "mtime": 1786619190.1864457,
-    "ast_hash": "f0e88609ba7b4bfc816d9846826e6398",
+    "mtime": 1786715737.4492958,
+    "ast_hash": "07027786985d53185a05b5316a2c8e83",
     "semantic_hash": ""
   },
   "src/components/admin/AdminMenus.tsx": {
@@ -1920,8 +1920,8 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminModelPreview.tsx": {
-    "mtime": 1786570637.7829242,
-    "ast_hash": "45c91c88359b4107095a0d1ee8b6f548",
+    "mtime": 1786715737.436296,
+    "ast_hash": "173c8e86a9dfd7ff7488e075a1cf7555",
     "semantic_hash": ""
   },
   "src/components/admin/AdminPageShell.tsx": {
@@ -1965,18 +1965,18 @@
     "semantic_hash": ""
   },
   "src/components/operator/BackupBoard.tsx": {
-    "mtime": 1786569078.735909,
-    "ast_hash": "465a739f054e526b25e50c55d37609a0",
+    "mtime": 1786715737.444315,
+    "ast_hash": "f4cb7cf376300ca6154bec1d60effa1b",
     "semantic_hash": ""
   },
   "src/components/operator/HealthBoard.tsx": {
-    "mtime": 1786569065.2193818,
-    "ast_hash": "81c86a40f6969a9a77e6d262102900f6",
+    "mtime": 1786715737.4453177,
+    "ast_hash": "da577d7bdae30b396e5015c7381f5316",
     "semantic_hash": ""
   },
   "src/components/operator/LicenseWizard.tsx": {
-    "mtime": 1786569121.3116753,
-    "ast_hash": "bb3d339396da5e7063bfdb9b1e849923",
+    "mtime": 1786715737.4472966,
+    "ast_hash": "4eaad7215eb8262094f2100afc7add15",
     "semantic_hash": ""
   },
   "src/components/projects-v2/ProjectRooms.tsx": {

@@ -16,7 +16,7 @@ export default async function HealthPage() {
       <AdminPageHeader
         eyebrow="Operations"
         title="Tenant health"
-        desc="Uptime board — reuses the same /api/health contract as the uptime checker."
+        desc="Uptime board - reuses the same /api/health contract as the uptime checker."
       />
       <HealthBoard />
     </section>

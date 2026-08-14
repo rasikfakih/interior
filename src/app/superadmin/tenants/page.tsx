@@ -55,8 +55,8 @@ export default async function TenantsPage() {
                   <td className="op-td font-mono text-xs text-ink-mute">{t.id}</td>
                   <td className="op-td font-mono text-xs text-ink-mute">{t.slug}</td>
                   <td className="op-td text-sm">{t.studio_name}</td>
-                  <td className="op-td text-sm text-ink-mute">{t.owner_email || "—"}</td>
-                  <td className="op-td font-mono text-xs text-ink-mute">{t.domain || "—"}</td>
+                  <td className="op-td text-sm text-ink-mute">{t.owner_email || "-"}</td>
+                  <td className="op-td font-mono text-xs text-ink-mute">{t.domain || "-"}</td>
                   <td className="op-td">
                     <span className={`op-chip ${t.tier === "business" ? "op-chip--warn" : ""}`}>
                       {t.tier}
@@ -76,7 +76,7 @@ export default async function TenantsPage() {
                     </span>
                   </td>
                   <td className="op-td font-mono text-xs text-ink-mute">
-                    {t.expires_at ? t.expires_at.split("T")[0] : "—"}
+                    {t.expires_at ? t.expires_at.split("T")[0] : "-"}
                   </td>
                   <td className="op-td text-right">
                     <Link href={`/superadmin/tenants/${t.id}`} className="op-link">

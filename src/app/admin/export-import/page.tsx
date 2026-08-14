@@ -15,7 +15,7 @@ export default async function ExportImportPage() {
       <AdminPageHeader
         eyebrow="System"
         title="Export / Import"
-        desc="JSON backup of every content table and full restore — the WordPress-parity import/export surface."
+        desc="JSON backup of every content table and full restore - the WordPress-parity import/export surface."
       />
       <AdminExportImport />
     </AdminPageShell>

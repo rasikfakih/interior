@@ -191,7 +191,7 @@ function TabPanel({ tab, role }: { tab: Tab; role: string }) {
         probe="/api/export"
         push="/admin/export-import"
         blocked={role === "editor"}
-        blockedMsg="Editors cannot export or import content — ask an admin."
+        blockedMsg="Editors cannot export or import content - ask an admin."
       />
     );
   if (tab === "settings") return <RoutePanel title="Settings" probe="/api/settings" push="/admin/settings" />;

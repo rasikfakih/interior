@@ -597,7 +597,7 @@ function Inbox({
                             {f.label}
                           </span>
                           <span className="text-ink break-all">
-                            {s.payload[f.key] || "\u2014"}
+                            {s.payload[f.key] || "-"}
                           </span>
                         </span>
                       ))}

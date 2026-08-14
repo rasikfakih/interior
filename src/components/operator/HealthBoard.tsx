@@ -171,7 +171,7 @@ export function HealthBoard() {
                       {r.probe?.base ?? (r.domain ? `https://${r.domain}` : "studio origin")}
                     </td>
                     <td className="op-td font-mono text-xs text-ink-mute">
-                      {r.probe?.ms != null ? `${r.probe.ms}ms` : "—"}
+                      {r.probe?.ms != null ? `${r.probe.ms}ms` : "-"}
                     </td>
                     <td className="op-td font-mono text-[11px] text-ink-soft">
                       {(r.probe?.ts ?? r.last_health_at) ?? null

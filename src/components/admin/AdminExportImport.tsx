@@ -122,7 +122,7 @@ export default function AdminExportImport() {
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
           Downloads every content table (pages + blocks, projects + rooms,
           journal, testimonials, team, media metadata, settings, menus, forms,
-          redirects) as one JSON file — restorable on this site or another
+          redirects) as one JSON file - restorable on this site or another
           install via Import.
         </p>
         <button
@@ -141,7 +141,7 @@ export default function AdminExportImport() {
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
           Paste an export file or pick one from disk. Import{" "}
           <span className="font-semibold text-ink">replaces</span> the content
-          of every table present in the file — pages, projects, forms and the
+          of every table present in the file - pages, projects, forms and the
           rest are overwritten, not merged.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">

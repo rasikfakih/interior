@@ -16,7 +16,7 @@ export default async function AnnouncementsPage() {
       <AdminPageHeader
         eyebrow="Platform"
         title="Announcements"
-        desc="Platform notices — rendered as a dismissible bar on public pages."
+        desc="Platform notices - rendered as a dismissible bar on public pages."
       />
       <AdminAnnouncements />
     </section>

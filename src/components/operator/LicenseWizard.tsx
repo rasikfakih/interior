@@ -182,7 +182,7 @@ export function LicenseWizard({ tenants }: { tenants: Tenant[] }) {
             />
             <span>
               I confirm revoking{" "}
-              <span className="font-mono font-medium">{selected?.slug}</span> — this
+              <span className="font-mono font-medium">{selected?.slug}</span> - this
               immediately blocks admin access and tier features.
             </span>
           </label>

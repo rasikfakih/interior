@@ -1,7 +1,7 @@
 /**
  * Shared console page header: mono eyebrow rule, display title,
  * mono description, optional trailing action. Server-safe (no hooks).
- * Used by tenant admin editors and superadmin pages alike — both
+ * Used by tenant admin editors and superadmin pages alike - both
  * consume the same brand tokens, so one component frames both.
  */
 export function AdminPageHeader({

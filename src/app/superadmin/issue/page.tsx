@@ -18,7 +18,7 @@ export default async function IssuePage() {
       <AdminPageHeader
         eyebrow="Operations"
         title="License wizard"
-        desc="Issue, extend, or revoke a tenant license — with email handoff and install code."
+        desc="Issue, extend, or revoke a tenant license - with email handoff and install code."
       />
       <LicenseWizard tenants={tenants} />
     </section>

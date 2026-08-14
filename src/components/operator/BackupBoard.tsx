@@ -113,7 +113,7 @@ export function BackupBoard() {
               Full-table snapshot
             </h2>
             <p className="mt-1 max-w-xl text-sm text-ink-mute">
-              Walks every public table through the shared data layer — works on
+              Walks every public table through the shared data layer - works on
               live Postgres and the local SQLite fallback. On serverless, use{" "}
               <span className="font-mono text-xs">Run + download</span> so the
               snapshot comes back in the response (disk is ephemeral there).
@@ -140,7 +140,7 @@ export function BackupBoard() {
         </div>
         {last && (
           <div className="op-banner op-banner--good mt-4 font-mono text-xs">
-            Snapshot {last.generated_at} — {last.rows.toLocaleString()} rows,{" "}
+            Snapshot {last.generated_at} - {last.rows.toLocaleString()} rows,{" "}
             {fmtBytes(last.bytes)}
             {last.persisted ? ` · persisted as ${last.persisted}` : " · not persisted (serverless)"}
           </div>
@@ -158,7 +158,7 @@ export function BackupBoard() {
           <div className="px-4 py-6 text-center text-sm text-ink-mute">Loading…</div>
         ) : items.length === 0 ? (
           <div className="px-4 py-6 text-center text-sm text-ink-mute">
-            No persisted backups yet — run one above (persists when the runtime
+            No persisted backups yet - run one above (persists when the runtime
             has a writable disk, e.g. self-hosted or local).
           </div>
         ) : (

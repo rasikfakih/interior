@@ -94,7 +94,7 @@ export default function AdminModelPreview({
         ) : phase === "idle" ? (
           <div className="flex h-full items-center justify-center">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">
-              No model URL — add one above to preview
+              No model URL - add one above to preview
             </p>
           </div>
         ) : phase === "failed" ? (
