@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786736970.8354485,
-    "ast_hash": "edc29f6dbc324be903c396dfaabbb59f",
+    "mtime": 1786737661.876958,
+    "ast_hash": "961be0e5242efde02f9be721d235e6c0",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "src/lib/pg.ts": {
-    "mtime": 1786721364.9311738,
-    "ast_hash": "ede110b87133184e74ea4f5d280bc2d3",
+    "mtime": 1786737491.4833608,
+    "ast_hash": "007338351153157e9e1cff6adb9f1ff6",
     "semantic_hash": ""
   },
   "scripts/smoke.mjs": {
@@ -1395,8 +1395,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1786721833.0841098,
-    "ast_hash": "7f7245a35ddc5a63bd43b4d93a25df0a",
+    "mtime": 1786737655.2020698,
+    "ast_hash": "bea52189951c1ddf06449ce346bfd1fa",
     "semantic_hash": ""
   },
   "src/app/api/settings/[key]/route.ts": {

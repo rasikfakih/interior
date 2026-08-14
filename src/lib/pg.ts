@@ -413,42 +413,55 @@ function loadBootstrapDdl(): string {
 export async function ensureMigrated(): Promise<void> {
   if (_ensureMigrated) return _ensureMigrated;
   _ensureMigrated = (async () => {
-    if (isLocalDevPath() || isVercelFallbackPath()) {
-      // SQLite fallback: rely on scripts/migrate.mjs (run via
-      // postinstall) to declare the schema. Just ensure the file
-      // is reachable.
-      const dbPath = isVercelFallbackPath()
-        ? getVercelHotCopyPath()
-        : path.join(process.cwd(), 'data', 'etihad.db');
-      if (isVercelFallbackPath()) {
-        ensureHotCopy();
-      } else {
-        const dir = path.dirname(dbPath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      }
-      if (!fs.existsSync(dbPath)) {
-        new Database(dbPath).close();
-      }
-      return;
-    }
-    const pool = getPool();
-    const client = await pool.connect();
     try {
-      await client.query(
-        'SELECT pg_advisory_xact_lock(7421971972240957)'
-      );
-      const ddl = loadBootstrapDdl();
-      await client.query(ddl);
-      // Additive Postgres migrations: CREATE TABLE IF NOT EXISTS never
-      // alters an existing table, so older live tables miss columns that
-      // the code expects. `tenant_data.kind` is required by operator-store
-      // (SELECT/UPDATE/INSERT ... kind = 'distro'); the shipped bootstrap
-      // DDL omitted it. Each ADD COLUMN IF NOT EXISTS is idempotent.
-      await client.query(
-        `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'distro'`
-      );
-    } finally {
-      client.release();
+      if (isLocalDevPath() || isVercelFallbackPath()) {
+        // SQLite fallback: rely on scripts/migrate.mjs (run via
+        // postinstall) to declare the schema. Just ensure the file
+        // is reachable.
+        const dbPath = isVercelFallbackPath()
+          ? getVercelHotCopyPath()
+          : path.join(process.cwd(), 'data', 'etihad.db');
+        if (isVercelFallbackPath()) {
+          ensureHotCopy();
+        } else {
+          const dir = path.dirname(dbPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        }
+        if (!fs.existsSync(dbPath)) {
+          new Database(dbPath).close();
+        }
+        return;
+      }
+      const pool = getPool();
+      const client = await pool.connect();
+      try {
+        await client.query(
+          'SELECT pg_advisory_xact_lock(7421971972240957)'
+        );
+        const ddl = loadBootstrapDdl();
+        await client.query(ddl);
+        // Additive Postgres migrations: CREATE TABLE IF NOT EXISTS never
+        // alters an existing table, so older live tables miss columns that
+        // the code expects. `tenant_data.kind` is required by operator-store
+        // (SELECT/UPDATE/INSERT ... kind = 'distro'); the shipped bootstrap
+        // DDL omitted it. Each ADD COLUMN IF NOT EXISTS is idempotent.
+        await client.query(
+          `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'distro'`
+        );
+      } finally {
+        client.release();
+      }
+    } catch (err) {
+      // Never cache a failed migration. The promise is stored in
+      // _ensureMigrated so concurrent first-callers share one run, but a
+      // rejection must not be memoized: one transient blip (cold-start
+      // connect, pooler turbulence during a deploy rollout) would poison
+      // this lambda for life, keeping /api/health red and every gated
+      // call rethrowing until the lambda is recycled. Reset so the next
+      // caller retries. A genuinely broken schema fails loud on every
+      // call, which is what the health canary is for.
+      _ensureMigrated = null;
+      throw err;
     }
   })();
   return _ensureMigrated;

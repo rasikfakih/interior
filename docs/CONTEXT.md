@@ -4272,3 +4272,27 @@ Verified: tsc 0, build green, verify:deploy green. 6 files deleted
 - Voice rules held (0 em-dashes, 0 emojis in all six files).
   verify:deploy 19/19 green. docs/ historical files (CONTEXT,
   SESSION-TODO, PLAN-*) intentionally untouched - append-only.
+### 2026-08-14 - TS-ID-021: ensureMigrated retry fix (poisoned lambda)
+
+- Trigger: after the docs push (84773bc) the live /api/health went
+  red (503 db=error). Diagnosis: NOT an env gap (health/db showed
+  DATABASE_URL set to the session pooler aws-1-ap-south-1.pooler.
+  supabase.com:5432, and the full ensureMigrated SQL sequence was
+  replayed successfully from the dev machine against the same pooler).
+  The mechanism: one transient pooler failure during the deploy
+  rollout, then ensureMigrated caches its rejected promise in
+  _ensureMigrated forever -> the lambda reports db=error with ms=0
+  until recycled. The health canary is the operator's per-buyer-site
+  monitor, so this is a real robustness bug, not just cosmetics.
+- Fix (src/lib/pg.ts): ensureMigrated body wrapped in try/catch; the
+  catch resets _ensureMigrated = null before rethrowing, so the next
+  caller retries. In-flight dedupe for concurrent first callers is
+  preserved (cache only on success). Comment documents the rationale.
+- Verified: functional test patching pg.Pool.prototype.connect with a
+  failing DATABASE_URL: two calls now produce two connect attempts
+  (was one cached rejection). SQLite fallback path still resolves with
+  the in-flight cache held. tsc 0, eslint clean, lint:changed green,
+  build green (58/58).
+- Live state at session close: check:uptime 1/1 (200 db=ok),
+  verify-brand-v190 13/13. Change is uncommitted (freeze surface,
+  operator-requested fix), tracked as TS-ID-021 @inprogress.

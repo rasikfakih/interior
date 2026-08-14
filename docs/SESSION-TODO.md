@@ -1179,6 +1179,27 @@ already shipped.)
   all scripts, `npm run verify:deploy` green, `npm run lint:changed`
   green (160 files vs origin/main), full lint 0/0 repo-wide.
 
+### TS-ID-021 - ensureMigrated retry: don't cache migration rejections
+- Status: @done 2026-08-14 (closed by commit)
+- Owner: freebuff (user request: "Fix the poisoned-lambda bug: make
+  ensureMigrated retry after a failed migration instead of caching the
+  rejection forever, so a transient DB blip can't permanently red the
+  health canary")
+- Opened: 2026-08-14
+- Scope: src/lib/pg.ts ensureMigrated only. Root cause of the
+  post-deploy /api/health 503s after the 84773bc push: one transient
+  pooler failure during the rollout poisoned the lambda (cached
+  rejected promise -> db=error with ms=0 for the lambda's lifetime).
+- Fix: catch inside ensureMigrated resets _ensureMigrated = null
+  before rethrowing, so the next caller retries. Success path
+  unchanged - the in-flight promise still dedupes concurrent first
+  callers.
+- Verified: functional test (patch pg.Pool.prototype.connect, failing
+  DATABASE_URL) shows 2 connect attempts across two calls (was 1
+  cached); SQLite fallback path still resolves with in-flight cache
+  held; tsc 0; eslint clean; lint:changed green; build green (58/58).
+- Acceptance: closed by commit, pushed to origin/main.
+
 ---
 
 ## Pending escalation
