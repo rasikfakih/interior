@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function GlobalAdminError({
   error,
   reset,
@@ -27,7 +29,7 @@ export default function GlobalAdminError({
         ) : null}
         <div className="mt-6 flex gap-3">
           <button onClick={reset} className="btn-primary">Try again</button>
-          <a href="/superadmin" className="btn-ghost">Sign in</a>
+          <Link href="/superadmin" className="btn-ghost">Sign in</Link>
         </div>
       </div>
     </section>

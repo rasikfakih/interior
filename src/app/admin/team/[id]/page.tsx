@@ -1,5 +1,7 @@
 import { ensureMigrated, pgOne } from "@/lib/pg";
-import AdminTeamForm from "@/components/admin/AdminTeamForm";
+import AdminTeamForm, {
+  type TeamFormInitial,
+} from "@/components/admin/AdminTeamForm";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { getAdminIdentity } from "../../identity";
 
@@ -17,13 +19,13 @@ export default async function AdminTeamEditor({
   const { id } = await params;
   const isNew = id === "new";
   const { email, role } = await getAdminIdentity();
-  let initial: any = undefined;
+  let initial: TeamFormInitial | undefined = undefined;
 
   if (!isNew) {
     const numericId = Number(id);
     if (Number.isFinite(numericId)) {
       await ensureMigrated();
-      const row = await pgOne(
+      const row = await pgOne<TeamFormInitial>(
         `SELECT id, name, role, bio, photo, "order", is_published
          FROM team_members WHERE id = $1 LIMIT 1`,
         [numericId]

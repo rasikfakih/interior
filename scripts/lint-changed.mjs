@@ -22,6 +22,7 @@
  *   - origin/main if it resolves, else HEAD~1.
  */
 import { execSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { ESLint } from "eslint";
 
@@ -48,7 +49,10 @@ function changedFiles(base) {
   });
   return [...new Set([...tracked.split("\n"), ...untracked.split("\n")])]
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    // Deleted files appear in `git diff --name-only` but have nothing
+    // to lint; eslint.lintFiles throws NoFilesFoundError on them.
+    .filter((f) => fs.existsSync(f));
 }
 
 function isUntracked(file) {

@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Phase = {
+export type Phase = {
   number: string;
   title: string;
   body: string;
@@ -22,20 +23,18 @@ const defaultPhases: Phase[] = [
   { number: "05", title: "Handover", body: "Furniture placed, art hung, lighting tuned.", deliverable: "As-built manual, vendor contacts", duration: "Final week" },
 ];
 
-export default function ProcessStickyStack({ data }: { data?: any }) {
+export type ProcessStickyStackData = {
+  phases?: Phase[];
+  eyebrow?: string;
+  title?: string;
+};
+
+export default function ProcessStickyStack({ data }: { data?: ProcessStickyStackData }) {
   const phases: Phase[] = data?.phases || defaultPhases;
   const eyebrow = data?.eyebrow || "How we work";
   const title = data?.title || "Five phases. Twenty-four weeks. One team.";
   const ref = useRef<HTMLDivElement>(null);
-  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mql.matches);
-    const onChange = () => setReduceMotion(mql.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (reduceMotion || !ref.current || phases.length < 2) return;

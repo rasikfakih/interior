@@ -1,14 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MediaPicker from "./MediaPicker";
+
+export type TestimonialFormInitial = {
+  id?: number;
+  name?: string;
+  role?: string | null;
+  quote?: string;
+  photo?: string | null;
+  isPublished?: boolean;
+};
 
 export default function AdminTestimonialForm({
   initial,
   onSaved,
 }: {
-  initial?: any;
+  initial?: TestimonialFormInitial;
   onSaved?: () => void;
 }) {
   const router = useRouter();
@@ -123,12 +133,13 @@ export default function AdminTestimonialForm({
           </div>
         </div>
         {form.photo && /^https?:\/\//.test(form.photo) && (
-          <div className="mt-3 surface-tile overflow-hidden">
-            <img
+          <div className="mt-3 surface-tile overflow-hidden relative h-44">
+            <Image
               src={form.photo}
               alt=""
-              className="w-full h-44 object-cover"
-              loading="lazy"
+              fill
+              unoptimized
+              className="object-cover"
             />
           </div>
         )}

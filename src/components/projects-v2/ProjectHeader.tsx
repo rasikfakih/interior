@@ -36,7 +36,6 @@ type Props = {
  *     zero check.
  */
 export default function ProjectHeaderV2({
-  slug: _slug,
   title,
   year,
   location,
@@ -52,7 +51,7 @@ export default function ProjectHeaderV2({
     description && description.trim().length > 0 ? description : null;
   const descriptionRich = description_json as
     | string
-    | Record<string, any>
+    | Record<string, unknown>
     | null
     | undefined;
 
@@ -101,7 +100,7 @@ export default function ProjectHeaderV2({
           <div className="md:col-span-5 md:pt-3 flex flex-col gap-6">
             {descriptionRich || descriptionText ? (
               <RichTextRenderer
-                json={descriptionRich as any}
+                json={descriptionRich}
                 fallbackText={descriptionText}
               />
             ) : (

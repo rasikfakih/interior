@@ -3,9 +3,18 @@ import crypto from "crypto";
 
 const HMAC_KEY = process.env.LICENSE_HMAC_KEY || "etihad-interiors-license-fallback-2026";
 
+type LicenseBody = {
+  purchaseCode?: string;
+  domain?: string;
+  tier?: string;
+  installedAt?: string;
+  expiresAt?: string;
+  features?: Record<string, unknown>;
+};
+
 export function testVerify<T extends { signature: string }>(license: T): boolean {
   try {
-    const body = canonicalBody(license as any);
+    const body = canonicalBody(license as unknown as LicenseBody);
     const expected = crypto
       .createHmac("sha256", HMAC_KEY)
       .update(body)
@@ -16,7 +25,7 @@ export function testVerify<T extends { signature: string }>(license: T): boolean
   }
 }
 
-function canonicalBody(l: any) {
+function canonicalBody(l: LicenseBody) {
   return `${l.purchaseCode ?? ""}|${l.domain ?? ""}|${l.tier ?? ""}|${
     l.installedAt ?? ""
   }|${l.expiresAt ?? "null"}|${Object.entries(l.features ?? {})
@@ -26,6 +35,6 @@ function canonicalBody(l: any) {
 }
 
 export function signLicense<T extends { signature: string }>(license: T): string {
-  const body = canonicalBody(license as any);
+  const body = canonicalBody(license as unknown as LicenseBody);
   return crypto.createHmac("sha256", HMAC_KEY).update(body).digest("hex");
 }

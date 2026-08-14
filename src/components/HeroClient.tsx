@@ -11,7 +11,7 @@ import Magnetic from "@/components/Magnetic";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type HeroData = {
+export type HeroData = {
   eyebrow?: string;
   headlinePlain?: string;
   headlineItalic?: string;

@@ -49,16 +49,18 @@ const seed: Item[] = [
   },
 ];
 
+export type SpatialWalkthroughsData = {
+  projectSlugs?: string[];
+  eyebrow?: string;
+  title?: string;
+  lede?: string;
+};
+
 export default function SpatialWalkthroughs({
   data,
   compact = false,
 }: {
-  data?: {
-    projectSlugs?: string[];
-    eyebrow?: string;
-    title?: string;
-    lede?: string;
-  };
+  data?: SpatialWalkthroughsData;
   compact?: boolean;
 }) {
   const slugs: string[] = data?.projectSlugs || seed.map((s) => s.slug);

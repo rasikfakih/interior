@@ -27,9 +27,9 @@ export type ArraySchemaKind =
 
 export type ArraySchema = {
   label: string;
-  itemLabel?: (item: any, idx: number) => string;
+  itemLabel?: (item: unknown, idx: number) => string;
   fields: FieldSchema[];
-  defaults: () => any;
+  defaults: () => unknown;
   max?: number;
 };
 
@@ -37,7 +37,7 @@ export type BlockSchema = {
   type: BlockType;
   scalars: FieldSchema[];
   arrays: Record<string, ArraySchema>;
-  defaults: () => any;
+  defaults: () => Record<string, unknown>;
 };
 
 function scalar(
@@ -53,7 +53,7 @@ function arr(
   _key: string,
   label: string,
   fields: FieldSchema[],
-  defaults: () => any,
+  defaults: () => unknown,
   extras: Partial<ArraySchema> = {}
 ): ArraySchema {
   return { label, fields, defaults, ...extras };
@@ -414,6 +414,6 @@ export function getSchema(type: BlockType): BlockSchema {
         defaults: () => ({}),
         scalars: [],
         arrays: {},
-      } as any;
+      } as BlockSchema;
   }
 }

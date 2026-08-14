@@ -15,9 +15,9 @@ export function DistroForm({ tenants, example }: { tenants: TenantRow[]; example
   function applyPreset(slug: string) {
     const preset = THEME_PRESETS.find((p) => p.slug === slug);
     if (!preset) return;
-    let distro: any;
+    let distro: Record<string, unknown>;
     try {
-      distro = json.trim() ? JSON.parse(json) : {};
+      distro = json.trim() ? (JSON.parse(json) as Record<string, unknown>) : {};
     } catch {
       distro = {};
     }
@@ -31,8 +31,8 @@ export function DistroForm({ tenants, example }: { tenants: TenantRow[]; example
     setBusy(true);
     setMsg("");
     try {
-      let distro: any;
-      try { distro = JSON.parse(json); }
+      let distro: Record<string, unknown>;
+      try { distro = JSON.parse(json) as Record<string, unknown>; }
       catch { setMsg("invalid JSON"); setBusy(false); return; }
       const r = await fetch(`/api/operator/tenants/${id}`, {
         method: "PATCH",

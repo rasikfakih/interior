@@ -20,8 +20,8 @@ export async function GET() {
       `SELECT ${PAGE_COLUMNS} FROM pages ORDER BY id ASC`
     );
     return NextResponse.json(rows);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 500 });
   }
 }
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const id = r.rows?.[0]?.id ?? null;
     bump({ kind: "pages", pageSlug: d.slug, slug: d.slug });
     return NextResponse.json({ success: true, id });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
 }

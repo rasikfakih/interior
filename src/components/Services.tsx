@@ -44,7 +44,7 @@ const capabilities = [
 ];
 
 export default function Services() {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -97,7 +97,7 @@ export default function Services() {
 
   return (
     <section
-      ref={ref as any}
+      ref={ref}
       className="bg-elev py-24 md:py-36"
       aria-label="What we do"
     >
@@ -111,7 +111,7 @@ export default function Services() {
           </div>
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute text-base md:text-lg leading-relaxed">
-              Four capabilities. An interior studio that doesn't farm out
+              Four capabilities. An interior studio that doesn&apos;t farm out
               drawings or hand off a material board at week six and disappear.
             </p>
           </div>

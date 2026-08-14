@@ -69,7 +69,7 @@ export default async function JournalPage() {
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute">
               Long-form entries on materials, process, and the parts of the
-              work that don't end up in a photograph.
+              work that don&apos;t end up in a photograph.
             </p>
           </div>
         </div>

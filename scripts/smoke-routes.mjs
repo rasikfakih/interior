@@ -84,7 +84,8 @@ async function adminLogin() {
     "/voices",
   ]) {
     const r = await fetch(BASE + u);
-    r.status === 200 ? ok(u) : bad(u, r.status);
+    if (r.status === 200) ok(u);
+    else bad(u, r.status);
   }
 
   head("Public write APIs");
@@ -98,14 +99,16 @@ async function adminLogin() {
       subject: "theme",
     }),
   });
-  cf.status === 200 ? ok("/api/contact") : bad("/api/contact", cf.status);
+  if (cf.status === 200) ok("/api/contact");
+  else bad("/api/contact", cf.status);
   const ts = Date.now();
   const nl = await fetch(BASE + "/api/newsletter", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: `smoke_${ts}@t.local` }),
   });
-  nl.status === 200 ? ok("/api/newsletter") : bad("/api/newsletter", nl.status);
+  if (nl.status === 200) ok("/api/newsletter");
+  else bad("/api/newsletter", nl.status);
 
   head("Public read APIs");
   for (const u of [
@@ -119,7 +122,8 @@ async function adminLogin() {
     "/api/sitemap",
   ]) {
     const r = await fetch(BASE + u);
-    r.status === 200 ? ok(u) : bad(u, r.status);
+    if (r.status === 200) ok(u);
+    else bad(u, r.status);
   }
 
   head("Admin surface (logged in as studio@)");
@@ -135,7 +139,8 @@ async function adminLogin() {
     "/admin/media",
   ]) {
     const r = await fetch(BASE + u, { headers: { Cookie: ck } });
-    r.status === 200 ? ok(u) : bad(u, r.status);
+    if (r.status === 200) ok(u);
+    else bad(u, r.status);
   }
 
   head("Operator surface (env-auth as operator@)");
@@ -147,14 +152,16 @@ async function adminLogin() {
       password: "vsnx3ItSHmqvxAhuXeyOBJZ0",
     }),
   });
-  op.status === 200 ? ok("/api/operator/login") : bad("/api/operator/login", op.status);
+  if (op.status === 200) ok("/api/operator/login");
+  else bad("/api/operator/login", op.status);
   const opCookie = (op.headers.get("set-cookie") || "").split(";")[0];
   for (const u of [
     "/api/operator/tenants",
     "/api/operator/metrics",
   ]) {
     const r = await fetch(BASE + u, { headers: { Cookie: opCookie } });
-    r.status === 200 ? ok(u) : bad(u, r.status);
+    if (r.status === 200) ok(u);
+    else bad(u, r.status);
   }
   for (const u of [
     "/superadmin",
@@ -163,7 +170,8 @@ async function adminLogin() {
     "/superadmin/metrics",
   ]) {
     const r = await fetch(BASE + u, { headers: { Cookie: opCookie } });
-    r.status === 200 ? ok(u) : bad(u, r.status);
+    if (r.status === 200) ok(u);
+    else bad(u, r.status);
   }
 
   head("Summary");

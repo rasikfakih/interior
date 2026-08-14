@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type TenantUser = {
@@ -39,19 +39,27 @@ export function TenantDetailClient({
   const [expires_at, setExpiresAt] = useState(tenant.expires_at ? tenant.expires_at.slice(0, 10) : "");
 
   const [distroJson, setDistroJson] = useState(JSON.stringify(distro || defaultDistro(studio_name), null, 2));
-  const [issue, setIssue] = useState<any>(null);
+  const [issue, setIssue] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
 
-  useEffect(() => {
-    if (!distro) setDistroJson((s) => defaultDistro(studio_name) as any);
-  }, [studio_name]);
+  // When the studio slug changes and the tenant has no distro, seed the
+  // editor with a default. Render-phase adjustment (React's documented
+  // prop-change pattern) instead of setState in an effect. On mount the
+  // useState initializer already covers the no-distro case, so this only
+  // reacts to later slug changes - and it fixes the latent bug where the
+  // old effect wrote an object into the string-typed distroJson state.
+  const [prevStudio, setPrevStudio] = useState(studio_name);
+  if (prevStudio !== studio_name) {
+    setPrevStudio(studio_name);
+    if (!distro) setDistroJson(JSON.stringify(defaultDistro(studio_name), null, 2));
+  }
 
   async function save() {
     setBusy(true);
     setMsg("");
     try {
-      const body: any = { studio_name, owner_email, domain, tier, state, expires_at: expires_at ? new Date(expires_at).toISOString() : null };
+      const body: Record<string, unknown> = { studio_name, owner_email, domain, tier, state, expires_at: expires_at ? new Date(expires_at).toISOString() : null };
       try { body.distro = JSON.parse(distroJson); } catch { setMsg("distro JSON invalid"); setBusy(false); return; }
       const r = await fetch(`/api/operator/tenants/${tenant.id}`, {
         method: "PATCH",
@@ -187,7 +195,7 @@ export function TenantDetailClient({
           <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-mute">Issued license payload</h2>
           <pre className="op-code">{JSON.stringify(issue, null, 2)}</pre>
           <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
-            Save to data/license.json at the buyer's install or relay via email.
+            Save to data/license.json at the buyer&apos;s install or relay via email.
           </p>
         </div>
       ) : null}

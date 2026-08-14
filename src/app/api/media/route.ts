@@ -63,14 +63,14 @@ export async function GET(req: NextRequest) {
   try {
     const items = await listMedia({ q, kind, limit: 200 });
     return NextResponse.json(items);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const gate = await requireLicense("admin");
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
       size: file.size,
       mime,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Upload failed" }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error).message || "Upload failed" }, { status: 500 });
   }
 }

@@ -5,7 +5,6 @@
  */
 import fs from "fs";
 import path from "path";
-import { spawnSync } from "child_process";
 import { createRequire } from "module";
 
 const checks = [];

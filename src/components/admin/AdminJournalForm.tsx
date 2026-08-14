@@ -13,17 +13,34 @@ function slugify(input: string): string {
     .replace(/\s+/g, "-");
 }
 
+export type JournalFormInitial = {
+  id?: number;
+  title?: string;
+  slug?: string;
+  excerpt?: string | null;
+  category?: string | null;
+  author_name?: string | null;
+  authorName?: string;
+  cover_image?: string | null;
+  coverImage?: string;
+  content?: string;
+  content_json?: string | null;
+  contentJson?: string | null;
+  is_published?: boolean;
+  isPublished?: boolean;
+};
+
 export default function AdminJournalForm({
   initial,
   onSaved,
 }: {
-  initial?: any;
+  initial?: JournalFormInitial;
   onSaved?: () => void;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(() => {
-    const r = (initial ?? {}) as any;
+    const r = initial ?? {};
     return {
       title: r.title ?? "",
       slug: r.slug ?? "",
@@ -119,7 +136,7 @@ export default function AdminJournalForm({
                 setForm({ ...form, slug: slugFromTitle })
               }
             >
-              Use "{slugFromTitle}"
+              Use &quot;{slugFromTitle}&quot;
             </button>
           )}
         </label>

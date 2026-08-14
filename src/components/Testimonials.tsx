@@ -7,7 +7,7 @@ import { useGSAP, useReducedMotion } from "@/lib/use-gsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Quote = {
+export type Quote = {
   body: string;
   name: string;
   role: string;
@@ -65,7 +65,13 @@ function MonogramCircle({
   );
 }
 
-export default function Testimonials({ data }: { data?: any }) {
+export type TestimonialsData = {
+  items?: Quote[];
+  title?: string;
+  lede?: string;
+};
+
+export default function Testimonials({ data }: { data?: TestimonialsData }) {
   const reduce = useReducedMotion();
   // Animations need "invisible until entrance" initial; under
   // reduced-motion useGSAP short-circuits, so cards must render
@@ -73,7 +79,7 @@ export default function Testimonials({ data }: { data?: any }) {
   const initialHidden = { opacity: 0 };
   const visibleAtRest = {};
   const quotes: Quote[] = (data?.items || defaultQuotes).map(
-    (q: Quote, i: number) => ({
+    (q: Quote) => ({
       ...q,
       initial: q.initial ?? ((q.name?.charAt(0) || "·").toUpperCase()),
       tone: q.tone ?? "var(--accent-deep)",
@@ -82,7 +88,7 @@ export default function Testimonials({ data }: { data?: any }) {
   const title = data?.title ?? "Words from the homes.";
   const lede = data?.lede ?? "Three clients, three completions. Names abbreviated on request.";
 
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -142,7 +148,7 @@ export default function Testimonials({ data }: { data?: any }) {
 
   return (
     <section
-      ref={ref as any}
+      ref={ref}
       className="py-24 md:py-36"
       aria-label="Client voices"
     >
@@ -159,7 +165,7 @@ export default function Testimonials({ data }: { data?: any }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {quotes.map((q, i) => (
+          {quotes.map((q) => (
             <figure
               key={q.name}
               className="ei-quote surface-tile p-7 md:p-8 flex flex-col gap-6"

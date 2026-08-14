@@ -6,7 +6,7 @@ import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
-  return Boolean((session?.user as any)?.id);
+  return Boolean(session?.user?.id);
 }
 
 const COLUMN_MAP: Record<string, string> = {
@@ -96,9 +96,9 @@ export async function PUT(
     }
     bump({ kind: "projects", slug: row?.slug ?? null });
     return NextResponse.json({ success: true, project: row });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
-      { error: err?.message || "Update failed" },
+      { error: (err as Error)?.message || "Update failed" },
       { status: 400 }
     );
   }

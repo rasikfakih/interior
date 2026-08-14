@@ -147,8 +147,8 @@ function getSqlite(): Database.Database {
   for (const ddl of SQLITE_FALLBACK_DDL) {
     try {
       db.exec(ddl);
-    } catch (e: any) {
-      console.error('[pg.ts] fallback DDL error:', e?.message ?? String(e));
+    } catch (e: unknown) {
+      console.error('[pg.ts] fallback DDL error:', (e as Error)?.message ?? String(e));
     }
   }
   _sqlite = db;
@@ -196,13 +196,13 @@ function applyFallbackAdditiveMigrations(db: Database.Database) {
           `ALTER TABLE ${a.table} ADD COLUMN ${a.column} ${a.def}`
         );
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       // best-effort; missing table means the DDL pass hasn't run for
       // this row yet (e.g. cold-start race), in which case the next
       // open will retry.
       console.error(
         `[pg.ts] additive migration ${a.table}.${a.column} error:`,
-        e?.message ?? String(e)
+        (e as Error)?.message ?? String(e)
       );
     }
   }
@@ -274,6 +274,7 @@ async function sqliteExec(text: string, params: ReadonlyArray<unknown>): Promise
   return [out];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic default; call sites pass concrete Row types
 export async function pgQuery<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
@@ -288,6 +289,7 @@ export async function pgQuery<Row = any>(
   return { rows: res.rows as Row[], rowCount: res.rowCount ?? 0 };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic default; call sites pass concrete Row types
 export async function pgOne<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
@@ -306,6 +308,7 @@ export async function pgOne<Row = any>(
   return rows[0] ?? null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic default; call sites pass concrete Row types
 export async function pgMany<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
@@ -366,7 +369,7 @@ export async function withPgTx<T>(
     // evaporate anyway). Transactions on a readonly handle are
     // a no-op. Run the callback synchronously.
     const synthetic = {
-      async query(_text: any, ..._args: any[]) {
+      async query() {
         return { rows: [], rowCount: 0 };
       },
     } as unknown as pg.PoolClient;

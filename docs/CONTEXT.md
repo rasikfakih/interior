@@ -4131,3 +4131,93 @@ FREEZE-MARKER updated: initDb + tenant-brand retired from the
 carve-out lists, v1.18.0 increment bullet records the deletions.
 Verified: tsc 0, build green, verify:deploy green. 6 files deleted
 (-1102 lines). TS-ID-019 opened (pending commit).
+
+### 2026-08-14 - lint debt grind: 260 errors to zero (TS-ID-020)
+- Full-lint sweep of the `lint:changed`-gated legacy debt. Starting
+  state: 335 problems (260 errors, 75 warnings), dominated by
+  `@typescript-eslint/no-explicit-any` (206).
+- Non-any buckets cleared first: `react/no-unescaped-entities` (18,
+  apostrophes in 16 files), `@next/next/no-html-link-for-pages` (8,
+  a > Link), `no-require-imports` (1; dev-archive/ excluded from the
+  lint gate as kept-for-history), `react-hooks/purity` (1),
+  `react-hooks/set-state-in-effect` (20, matchMedia via
+  useSyncExternalStore + deferred init patterns), plus `--fix` grabs.
+- `no-explicit-any` grind highlights: next-auth module augmentation
+  (src/types/next-auth.d.ts) killed 25 `(session?.user as any)` sites;
+  31 `catch (e: any)` -> unknown + `(e as Error).message`; drizzle
+  casts in schema.ts were unnecessary (0.45 types them); ref-cast
+  sweep (useRef<HTMLElement>(null) drops `as any`); block-JSON domain
+  typed as Record<string, unknown> with per-block data types exported
+  from HeroClient/Testimonials/Principles/JournalPreview/ClosingCTA/
+  ProcessStickyStack/SpatialWalkthroughs and cast at the PageRenderer
+  wrapper boundary; BlockEditor/block-schemas/PageBuilder typed with a
+  Json alias; pg.ts generic `any` defaults kept with justified
+  suppressions (deliberate escape hatch).
+- BONUS FIND: `src/lib/settings.ts` routed through the runtime-throwing
+  db.ts proxy, so getSiteSettings ALWAYS returned defaults (contact
+  page + Footer silently wrong). Ported to pgMany + ensureMigrated and
+  deleted db.ts (last importer gone) - a real live-bug fix in the
+  middle of the lint sweep.
+- Last error (react-hooks/refs in Reveal.tsx, dynamic `as` tag) is a
+  provable false positive: `as` is constrained to keyof
+  JSX.IntrinsicElements, so the ref target is always a host element;
+  scoped eslint-disable with justification, matching pg.ts convention.
+- GATE BUG FIXED: `scripts/lint-changed.mjs` crashed with
+  NoFilesFoundError on deleted files (git diff --name-only lists them;
+  eslint.lintFiles throws). Added an existsSync filter.
+- End state: `tsc --noEmit` 0 errors, `npm run build` green,
+  `npm run lint:changed` green (135 files vs origin/main), full lint
+  0 errors / 78 pre-existing warnings (unused vars + img-element).
+  TS-ID-020 opened (pending commit).
+
+### 2026-08-14 - TS-ID-020 follow-up: src warnings to zero
+- Follow-up sweep on the lint grind: all 51 remaining src warnings
+  cleared (full lint now 0 errors / 27 warnings, and every one of the
+  27 is in scripts/*.mjs; src is completely clean).
+- Unused imports removed (17 files): API routes (export/import
+  CONTENT_* consts, menus/duplicate/save pgQuery, tenants signLicense,
+  settings SETTINGS_WHITELIST), libs (schema real, operator-store
+  safeJson), components (Suspense, useState x4, useEffect x2,
+  ReactElement, Reveal+Link in PageRenderer, kindFromMime x2).
+- Dead vars removed: AnnouncementBar write-only `hidden` state,
+  Navbar unused `t` + focus-trap `last`, CalendlyBadgeWidget unused
+  `url` prop, ProjectHeader unused `slug` destructure, demo-reset
+  unused `req` param, newsletter empty catch, three unused map-index
+  params, pg.ts synthetic-client query params.
+- 10 raw <img> tags converted to next/image with `unoptimized`:
+  BlockEditor (2), AdminTeamForm, AdminTestimonialForm, GLBThumb,
+  MediaGrid, MediaPicker, Model3DViewer, RichTextRenderer,
+  three-runtime. Policy rationale: these srcs are runtime-arbitrary
+  (media library rows, user-picked URLs, editor content), so
+  `unoptimized` serves src as-is and never calls the loader -
+  confirmed in get-img-props.js (generateImgAttrs short-circuits
+  before the loader), so no remotePatterns widening needed. All
+  parents verified positioned for fill; RichTextRenderer uses
+  explicit 1600x900 + w-full h-auto (no positioned parent).
+- icons.tsx: phosphor `Image` renamed to `PhosphorImage` - the
+  next/core-web-vitals jsx-a11y settings map `Image` -> `img`, which
+  was falsely flagging the SVG icon component for missing alt.
+
+### 2026-08-14 - TS-ID-020 final sweep: scripts to zero, full lint clean
+- Closed the last 27 warnings (all in scripts/*.mjs): full lint is now
+  0 errors / 0 warnings repo-wide.
+- Dead helpers removed after grep-confirmed zero callers:
+  parseSetCookie (4 identical copies in smoke-api / smoke-live-
+  revalidate / smoke-role / smoke-save), update() in smoke-api,
+  exists() in seed-pages, safeJson-style rows() in seed-content,
+  N() in gen-glb-reception, SERIF const in gen-demo-assets,
+  baseBack in smoke-projects-v2-detail, tag in smoke-coldstart,
+  unused spawnSync imports in smoke.mjs + verify-deploy.mjs.
+- Dead vars: migrate.mjs empty catch (e), smoke-api round-trip loop
+  id binding (body only reads path), seed-content journal `order`
+  (insertJournal takes no order arg) and two FORCE loops collapsed
+  (same DELETE statements, deduplicated - behavior identical).
+- migrate-to-supabase: removed only the dead `cols` const; the
+  `columns` PARAM stays - callers pass it positionally (5th arg), and
+  eslint's default args:"after-used" is why it was never flagged.
+  Caught and reverted an initial signature change that would have
+  shifted map/opts for every caller.
+- smoke-routes: 8 `cond ? ok() : bad()` ternary statements converted
+  to if/else (no-unused-expressions).
+- Verified: node --check all scripts, npm run verify:deploy green,
+  tsc 0, build green, lint:changed green, full lint 0/0.

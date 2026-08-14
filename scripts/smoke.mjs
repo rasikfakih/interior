@@ -30,7 +30,6 @@
  */
 
 import pg from "pg";
-import { spawnSync } from "child_process";
 
 function ts() {
   return new Date().toISOString().slice(11, 19);

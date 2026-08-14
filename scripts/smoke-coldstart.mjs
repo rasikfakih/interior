@@ -165,7 +165,6 @@ async function sleep(ms) {
 
   head("Step 2 - POST tagged row");
   const stamp = Date.now();
-  const tag = `coldstart-${stamp}`;
   const slug = `coldstart-probe-${stamp}`;
   const created = await postProbe(jar, `Coldstart probe ${stamp}`, slug);
   if (created.status !== 200 && created.status !== 201) {

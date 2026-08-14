@@ -13,10 +13,10 @@ import { authOptions } from "@/lib/auth";
  */
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const role = (session?.user as any)?.role || "admin";
+  const role = session?.user?.role || "admin";
   if (role !== "superadmin") {
     return NextResponse.json(
       {
@@ -29,7 +29,7 @@ export async function GET() {
   }
   return NextResponse.json({
     role,
-    email: (session?.user as any)?.email || "",
+    email: session?.user?.email || "",
     ok: true,
   });
 }

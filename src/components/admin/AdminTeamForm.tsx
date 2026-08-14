@@ -1,14 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MediaPicker from "./MediaPicker";
+
+export type TeamFormInitial = {
+  id?: number;
+  name?: string;
+  role?: string | null;
+  bio?: string | null;
+  photo?: string | null;
+  order?: number | null;
+  isPublished?: boolean;
+};
 
 export default function AdminTeamForm({
   initial,
   onSaved,
 }: {
-  initial?: any;
+  initial?: TeamFormInitial;
   onSaved?: () => void;
 }) {
   const router = useRouter();
@@ -146,12 +157,13 @@ export default function AdminTeamForm({
           </div>
         </div>
         {form.photo && /^https?:\/\//.test(form.photo) && (
-          <div className="mt-3 surface-tile overflow-hidden">
-            <img
+          <div className="mt-3 surface-tile overflow-hidden relative h-44">
+            <Image
               src={form.photo}
               alt=""
-              className="w-full h-44 object-cover"
-              loading="lazy"
+              fill
+              unoptimized
+              className="object-cover"
             />
           </div>
         )}

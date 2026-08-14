@@ -11,6 +11,20 @@ function getSqlite() {
 }
 
 export type MediaKind = "image" | "model" | "document" | "other";
+type MediaRow = {
+  id: number;
+  kind: MediaKind;
+  mime: string;
+  size: number;
+  original_name: string;
+  storage_path: string;
+  url: string;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  created_at: string | null;
+};
+
 export type MediaItem = {
   id: number;
   kind: MediaKind;
@@ -38,7 +52,7 @@ export async function listMedia(filters: MediaListFilters = {}): Promise<MediaIt
       const limit = Math.min(filters.limit ?? 200, 500);
       const rows = sqlite
         .prepare("SELECT * FROM media ORDER BY id DESC LIMIT ?")
-        .all(limit) as any[];
+        .all(limit) as MediaRow[];
       sqlite.close();
       const filtered = rows.filter((r) => {
         const q = filters.q?.toLowerCase().trim();
@@ -52,7 +66,7 @@ export async function listMedia(filters: MediaListFilters = {}): Promise<MediaIt
         return kindOk && qOk;
       });
       resolve(
-        filtered.map((r: any) => ({
+        filtered.map((r: MediaRow) => ({
           id: r.id,
           kind: r.kind,
           mime: r.mime,
@@ -76,7 +90,7 @@ export async function getMediaById(id: number): Promise<MediaItem | null> {
   return new Promise((resolve, reject) => {
     try {
       const sqlite = getSqlite();
-      const r = sqlite.prepare("SELECT * FROM media WHERE id = ?").get(id) as any;
+      const r = sqlite.prepare("SELECT * FROM media WHERE id = ?").get(id) as MediaRow | undefined;
       sqlite.close();
       if (!r) return resolve(null);
       resolve({
@@ -143,7 +157,9 @@ export async function deleteMedia(id: number) {
   return new Promise<{ ok: boolean; file?: string }>((resolve, reject) => {
     try {
       const sqlite = getSqlite();
-      const row = sqlite.prepare("SELECT storage_path FROM media WHERE id = ?").get(id) as any;
+      const row = sqlite
+        .prepare("SELECT storage_path FROM media WHERE id = ?")
+        .get(id) as { storage_path: string } | undefined;
       if (!row) {
         sqlite.close();
         return resolve({ ok: false });
@@ -163,7 +179,7 @@ export async function countMediaByKind() {
       const sqlite = getSqlite();
       const rows = sqlite
         .prepare("SELECT kind, COUNT(*) AS c FROM media GROUP BY kind")
-        .all() as any[];
+        .all() as { kind: string; c: number }[];
       sqlite.close();
       const out: Record<string, number> = {};
       rows.forEach((r) => (out[r.kind] = r.c));

@@ -1,10 +1,11 @@
+import Image from "next/image";
 import { Fragment } from "react";
 
-type Mark = { type: string; attrs?: Record<string, any> };
+type Mark = { type: string; attrs?: Record<string, unknown> };
 type TextNode = { type: "text"; text: string; marks?: Mark[] };
 type Node = {
   type: string;
-  attrs?: Record<string, any>;
+  attrs?: Record<string, unknown>;
   marks?: Mark[];
   text?: string;
   content?: Node[];
@@ -21,8 +22,8 @@ function renderMark(node: TextNode, key: string) {
       el = (
         <a
           key={`${key}-a`}
-          href={m.attrs?.href}
-          target={m.attrs?.target || "_self"}
+          href={m.attrs?.href as string | undefined}
+          target={(m.attrs?.target as string | undefined) || "_self"}
           rel={
             m.attrs?.target === "_blank"
               ? "noopener noreferrer"
@@ -49,11 +50,13 @@ function renderInline(nodes: Node[], keyPrefix: string): React.ReactNode[] {
           key={`${keyPrefix}-img-${i}`}
           className="block my-4"
         >
-          <img
-            src={n.attrs?.src}
-            alt={n.attrs?.alt || ""}
+          <Image
+            src={(n.attrs?.src as string | undefined) || ""}
+            alt={(n.attrs?.alt as string | undefined) || ""}
+            width={1600}
+            height={900}
+            unoptimized
             className="w-full h-auto rounded-[var(--radius-card)]"
-            loading="lazy"
           />
         </span>
       );
@@ -80,7 +83,7 @@ function renderBlock(node: Node, key: string): React.ReactNode {
         level === 2
           ? "text-2xl md:text-3xl tracking-tight mt-8 mb-3"
           : "text-xl md:text-2xl tracking-tight mt-6 mb-2";
-      const Tag: any = `h${level}`;
+      const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
       return (
         <Tag key={key} className={cls}>
           {node.content ? renderInline(node.content, key) : null}
@@ -140,7 +143,7 @@ function renderBlock(node: Node, key: string): React.ReactNode {
 }
 
 export type RichTextRendererProps = {
-  json: string | Record<string, any> | null | undefined;
+  json: string | Record<string, unknown> | null | undefined;
   fallbackText?: string | null;
 };
 

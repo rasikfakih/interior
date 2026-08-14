@@ -18,7 +18,6 @@ type Announcement = {
  */
 export default function AnnouncementBar() {
   const [items, setItems] = useState<Announcement[]>([]);
-  const [hidden, setHidden] = useState<Record<number, boolean>>({});
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
@@ -36,7 +35,6 @@ export default function AnnouncementBar() {
             hid[it.id] = true;
           }
         }
-        setHidden(hid);
         setItems(list.filter((it) => !hid[it.id]).slice(0, 1));
       } catch {
         /* announcement bar is non-critical - never break the page */

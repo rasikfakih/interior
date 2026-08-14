@@ -25,16 +25,21 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("ei-theme") as Theme | null;
-    if (stored === "dark" || stored === "light") {
-      setTheme(stored);
-    } else if (typeof window !== "undefined") {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      setTheme(prefersDark ? "dark" : "light");
-    }
-    setMounted(true);
+    // Deferred a tick so the hydration render stays server-identical;
+    // localStorage and matchMedia are only readable after mount.
+    const t = setTimeout(() => {
+      const stored = localStorage.getItem("ei-theme") as Theme | null;
+      if (stored === "dark" || stored === "light") {
+        setTheme(stored);
+      } else if (typeof window !== "undefined") {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        setTheme(prefersDark ? "dark" : "light");
+      }
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {

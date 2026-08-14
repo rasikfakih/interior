@@ -125,13 +125,13 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.sub as string,
           role: token.role as string,
-        } as any;
+        };
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role;
+        token.role = user.role;
       }
       return token;
     },

@@ -81,8 +81,8 @@ export async function PUT(
     });
     bump({ kind: "settings" });
     return NextResponse.json({ success: true, item: row });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
   }
 }
 

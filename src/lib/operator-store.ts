@@ -1,14 +1,6 @@
 import crypto from "crypto";
 import { ensureMigrated, pgMany, pgOne, withPgTx } from "@/lib/pg";
 
-function safeJson(s: unknown) {
-  if (s == null) return null;
-  if (typeof s === "string") {
-    try { return JSON.parse(s); } catch { return null; }
-  }
-  return s;
-}
-
 export async function listTenants() {
   try {
     await ensureMigrated();

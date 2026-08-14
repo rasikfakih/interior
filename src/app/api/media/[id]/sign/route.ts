@@ -40,9 +40,9 @@ export async function GET(
       url: signed.url,
       expiresIn: signed.expiresIn,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? 'sign failed' },
+      { error: (e as Error).message ?? 'sign failed' },
       { status: 500 }
     );
   }

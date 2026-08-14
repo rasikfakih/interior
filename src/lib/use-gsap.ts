@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { gsap } from "gsap";
 
 /**
- * Read prefers-reduced-motion once with a subscription.
+ * Live prefers-reduced-motion flag via useSyncExternalStore: no
+ * setState-in-effect, SSR-safe (server snapshot is false), and the
+ * value updates when the user toggles the OS setting.
  */
+const reduceMotionMql = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)");
+
 export function useReducedMotion(): boolean {
-  const [reduce, setReduce] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduce(mql.matches);
-    const onChange = () => setReduce(mql.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-  return reduce;
+  return useSyncExternalStore(
+    (onChange) => {
+      const mql = reduceMotionMql();
+      mql.addEventListener("change", onChange);
+      return () => mql.removeEventListener("change", onChange);
+    },
+    () => reduceMotionMql().matches,
+    () => false
+  );
 }
 
 /**

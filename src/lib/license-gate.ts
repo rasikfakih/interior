@@ -1,4 +1,4 @@
-import { checkLicense, TIER_FEATURES, LicenseTier } from "@/lib/license";
+import { checkLicense, TIER_FEATURES, LicenseTier, type License } from "@/lib/license";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
@@ -29,7 +29,7 @@ export async function requireAdminSession(): Promise<
   | { ok: false; response: Response }
 > {
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
+  const userId = session?.user?.id;
   if (!userId) {
     return {
       ok: false,
@@ -46,7 +46,7 @@ export async function requireAdminSession(): Promise<
       ),
     };
   }
-  const role = (session?.user as any)?.role ?? "admin";
+  const role = session?.user?.role ?? "admin";
   return { ok: true, role };
 }
 
@@ -68,7 +68,7 @@ export async function requireSuperadmin(): Promise<
   | { ok: false; response: Response }
 > {
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
+  const userId = session?.user?.id;
   if (!userId) {
     return {
       ok: false,
@@ -85,7 +85,7 @@ export async function requireSuperadmin(): Promise<
       ),
     };
   }
-  const role = (session?.user as any)?.role ?? "admin";
+  const role = session?.user?.role ?? "admin";
   if (role !== "superadmin") {
     return {
       ok: false,
@@ -143,7 +143,7 @@ export async function requireLicense(
   return { ok: true };
 }
 
-export function missingCount(license: any) {
+export function missingCount(license: License | null) {
   const out: LicenseTier[] = [];
   const keys = Object.keys(TIER_FEATURES.personal) as Array<keyof typeof TIER_FEATURES.personal>;
   keys.forEach((f) => {

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import Reveal from "@/components/Reveal";
+import { useReducedMotion } from "@/lib/use-gsap";
 
 type Props = {
   title: string;
@@ -48,20 +48,7 @@ export default function ProjectBeforeAfterV2({
   afterAlt,
   caption,
 }: Props) {
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mql.matches);
-    const handler = (ev: MediaQueryListEvent) => setReduceMotion(ev.matches);
-    if (typeof mql.addEventListener === "function") {
-      mql.addEventListener("change", handler);
-      return () => mql.removeEventListener("change", handler);
-    }
-    mql.addListener(handler);
-    return () => mql.removeListener(handler);
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   const hasBoth = Boolean(beforeSrc) && Boolean(afterSrc);
   const onlyBefore = Boolean(beforeSrc) && !hasBoth;

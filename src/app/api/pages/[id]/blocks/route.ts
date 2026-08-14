@@ -23,8 +23,8 @@ export async function GET(
       [pageId]
     );
     return NextResponse.json({ blocks: rows });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 500 });
   }
 }
 
@@ -46,7 +46,7 @@ export async function PUT(
       const insert =
         "INSERT INTO page_blocks (page_id, type, data, order_index) VALUES ($1, $2, $3::jsonb, $4)";
       for (let i = 0; i < blocks.length; i++) {
-        const b: any = blocks[i];
+        const b = blocks[i] as { type?: unknown; data?: unknown } | undefined;
         if (typeof b?.type !== "string") continue;
         const data =
           typeof b.data === "string" ? b.data : JSON.stringify(b.data ?? {});
@@ -70,7 +70,7 @@ export async function PUT(
     }
     await snapshotPage(pageId);
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 400 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 400 });
   }
 }

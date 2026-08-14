@@ -56,17 +56,6 @@ const JRN_SLUG = `smoke-jrn-${STAMP}`;
 const TEST_NAME = `Smoke T ${STAMP}`;
 const TEAM_NAME = `Smoke TM ${STAMP}`;
 
-function parseSetCookie(setCookie, name) {
-  if (!setCookie) return null;
-  const raw = Array.isArray(setCookie) ? setCookie.join(",") : String(setCookie);
-  for (const piece of raw.split(/,\s+/)) {
-    if (piece.startsWith(`${name}=`)) {
-      return piece.split(";")[0].slice(name.length + 1);
-    }
-  }
-  return null;
-}
-
 function mergeCookies(jar, setCookie) {
   if (!setCookie) return;
   for (const piece of String(setCookie).split(/,\s+/)) {
@@ -159,19 +148,6 @@ async function write(path, body, jar) {
   const res = await authed(
     path,
     { method: "POST", body: JSON.stringify(body) },
-    jar
-  );
-  let json = null;
-  try {
-    json = await res.json();
-  } catch {}
-  return { status: res.status, json };
-}
-
-async function update(path, body, jar) {
-  const res = await authed(
-    path,
-    { method: "PUT", body: JSON.stringify(body) },
     jar
   );
   let json = null;
@@ -374,7 +350,7 @@ async function main() {
 
   // Round-trip: read by id via the GET endpoints that Phase 5/6/7 added.
   log("step 8 - row-level GET round-trip");
-  for (const [path, id] of [
+  for (const [path] of [
     [`/api/projects/${projectId}`, projectId],
     [`/api/journal/${journalId}`, journalId],
     [`/api/testimonials/${testimonialId}`, testimonialId],

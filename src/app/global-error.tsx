@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function GlobalError({
   error,
   reset,
@@ -39,7 +41,7 @@ export default function GlobalError({
           </h1>
           <p style={{ color: "#7a6e58", marginTop: "1rem", lineHeight: 1.6 }}>
             A server error happened while rendering this route. Common causes: a missing
-            environment variable, a stale deploy, or a crash inside the route's data
+            environment variable, a stale deploy, or a crash inside the route&apos;s data
             fetcher.
           </p>
           {error?.digest ? (
@@ -68,12 +70,12 @@ export default function GlobalError({
             >
               Try again
             </button>
-            <a
+            <Link
               href="/"
               style={{ padding: "0.5rem 1rem", border: "1px solid #1a1814", color: "#1a1814", textDecoration: "none" }}
             >
               View site
-            </a>
+            </Link>
           </div>
         </div>
       </body>

@@ -134,7 +134,6 @@ async function buildGlb() {
 
   // Vertices for each face (4 verts per face, 24 total)
   // Each entry: [x, y, z, nx, ny, nz, u, v]
-  const N = (n) => n.join(',');
 
   // face vertices for a unit cube centered at origin (sz=2 so corners at +-1)
   const s = 1.5;

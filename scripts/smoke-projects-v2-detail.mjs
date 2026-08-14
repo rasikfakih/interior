@@ -39,7 +39,6 @@ async function get(path) {
 }
 
 function perPageAssertions(slug, html) {
-  const baseBack = `Back to selected work / slug ${slug}`;
   const pageOk =
     html.includes(slug) || html.includes(SLUGS.find((s) => html.includes(s.replace(/-/g, " "))) || "");
   check(`[${slug}] page reachable and renders slug-identifying content`, pageOk, "");

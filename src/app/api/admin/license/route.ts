@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLicense, requireSuperadmin } from "@/lib/license-gate";
-import { readLicense, writeLicense, appendAudit } from "@/lib/license";
+import { readLicense, writeLicense, appendAudit, type License } from "@/lib/license";
 
 export async function GET() {
   try {
@@ -13,8 +13,8 @@ export async function GET() {
       license,
       server: process.env.LICENSE_SERVER_URL || null,
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "license error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "license error" }, { status: 500 });
   }
 }
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     const expiresAt =
       d.expiresAt || new Date(Date.now() + 365 * 86400e3).toISOString();
-    const body = {
+    const body: License = {
       purchaseCode: String(d.purchaseCode).slice(0, 80),
       domain: String(d.domain).slice(0, 200),
       tier: d.tier,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             }),
       signature: "",
       issuedBy: "offline-hmac",
-    } as any;
+    };
     const sig = signLicense(body);
     const license = { ...body, signature: sig };
     await writeLicense(license);
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       `License re-installed on ${license.domain}, tier=${license.tier}`
     );
     return NextResponse.json({ success: true, license });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "license error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "license error" }, { status: 500 });
   }
 }

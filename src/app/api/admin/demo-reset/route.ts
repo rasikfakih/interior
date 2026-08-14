@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { requireSuperadmin } from "@/lib/license-gate";
 import { ensureMigrated, withPgTx } from "@/lib/pg";
 import { bumpAll } from "@/lib/revalidate";
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const gate = await requireSuperadmin();
   if (!gate.ok) return gate.response;
   if (process.env.NODE_ENV === "production") {
@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Demo data reset. Pages, media, blocks cleared.",
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message || "Reset failed" },
+      { error: (e as Error).message || "Reset failed" },
       { status: 500 }
     );
   }

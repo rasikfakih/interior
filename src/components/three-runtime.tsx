@@ -10,6 +10,7 @@ import {
   type ComponentRef,
   type ReactNode,
 } from "react";
+import Image from "next/image";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -20,7 +21,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-interface Props {
+export interface Props {
   modelUrl: string;
   posterUrl?: string;
   reducedMotion: boolean;
@@ -119,10 +120,12 @@ export default function ThreeRuntime({
       style={fullscreen ? { height: "100dvh" } : undefined}
     >
       {posterUrl && failed && (
-        <img
+        <Image
           src={posterUrl}
           alt="Project spatial preview"
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          unoptimized
+          className="object-cover"
         />
       )}
 

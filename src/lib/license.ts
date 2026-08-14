@@ -216,7 +216,7 @@ export async function writeLicense(license: License) {
 export async function appendAudit(
   kind: string,
   message: string,
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
 ) {
   try {
     const { ensureMigrated, pgQuery } = await import("@/lib/pg");

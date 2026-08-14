@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
     bumpAll();
     return NextResponse.json({ message: "Successfully subscribed!" });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Subscription failed" }, { status: 500 });
   }
 }

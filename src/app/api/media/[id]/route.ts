@@ -20,7 +20,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const { id } = await params;
@@ -61,9 +61,9 @@ export async function PATCH(
     }
     bump({ kind: "media" });
     return NextResponse.json({ success: true, row: q });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? 'update failed' },
+      { error: (e as Error).message ?? 'update failed' },
       { status: 500 }
     );
   }
@@ -83,7 +83,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   const { id } = await params;
@@ -102,8 +102,8 @@ export async function DELETE(
     }
     try {
       await storageRemove(row.storage_path);
-    } catch (e: any) {
-      console.error('[media/delete] storage remove:', e?.message);
+    } catch (e: unknown) {
+      console.error('[media/delete] storage remove:', (e as Error)?.message);
     }
     await pgOne(
       `DELETE FROM media WHERE id = $1`,
@@ -111,9 +111,9 @@ export async function DELETE(
     );
     bump({ kind: "media" });
     return NextResponse.json({ ok: true });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? 'delete failed' },
+      { error: (e as Error).message ?? 'delete failed' },
       { status: 500 }
     );
   }

@@ -45,7 +45,7 @@ if (fs.existsSync(DB_PATH)) {
         }
       }
     }
-  } catch (e) {
+  } catch {
     // best-effort
   }
 }

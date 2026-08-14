@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
-import { ensureMigrated, pgMany, pgOne, pgQuery } from "@/lib/pg";
+import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
 import { bump } from "@/lib/revalidate";
 import { withPgTx } from "@/lib/pg";
 

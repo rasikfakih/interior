@@ -48,6 +48,13 @@ const defaultEntries: Entry[] = [
   },
 ];
 
+export type JournalPreviewData = {
+  sectionTitle?: string;
+  sectionTitleEm?: string;
+  lede?: string;
+  count?: number;
+};
+
 export default function JournalPreview({
   title = "Studio Journal",
   titleEm = "Studio",
@@ -59,8 +66,9 @@ export default function JournalPreview({
   titleEm?: string;
   lede?: string;
   count?: number;
-  data?: any;
+  data?: JournalPreviewData;
 }) {
+
   const cfg = (data && (data.sectionTitle || data.lede || data.count || data.sectionTitleEm))
     ? {
         title: data.sectionTitle ?? title,
@@ -73,7 +81,7 @@ export default function JournalPreview({
     0,
     Math.max(1, Math.min(cfg.count, defaultEntries.length))
   );
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -134,7 +142,7 @@ export default function JournalPreview({
 
   return (
     <section
-      ref={ref as any}
+      ref={ref}
       className="py-24 md:py-36 bg-elev"
       aria-label="Journal"
     >
@@ -156,7 +164,7 @@ export default function JournalPreview({
         </div>
 
         <div className="divide-y hairline">
-          {entries.map((e, i) => (
+          {entries.map((e) => (
             <article
               key={e.slug}
               className="ei-news-row relative grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-10 py-8 md:py-10"

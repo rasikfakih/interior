@@ -11,9 +11,14 @@ export default function InstallForm() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setDomain(window.location.host);
-    }
+    // Deferred so the hydration render stays server-identical; the
+    // host is only known after mount.
+    const t = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        setDomain(window.location.host);
+      }
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   async function submit(e: React.FormEvent) {

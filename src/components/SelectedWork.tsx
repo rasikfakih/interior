@@ -61,7 +61,7 @@ export default function SelectedWork({
         .filter((p): p is Project => Boolean(p))
     : seed;
 
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -144,7 +144,7 @@ export default function SelectedWork({
 
   return (
     <section
-      ref={ref as any}
+      ref={ref}
       className="py-24 md:py-36"
       aria-label="Selected work"
     >

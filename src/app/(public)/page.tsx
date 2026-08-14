@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import PageRenderer from "@/components/PageRenderer";
-import { getFrontPage } from "@/lib/pages";
+import { getFrontPage, type BlockRow } from "@/lib/pages";
 
 // WordPress-grade live update: every page that depends on
 // admin-edited data renders dynamically. Admin writes call
@@ -26,9 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const { page, blocks } = await getFrontPage();
+  const { blocks } = await getFrontPage();
   const pageBlocks = blocks.length
-    ? blocks.map((b: any) => ({
+    ? blocks.map((b: BlockRow) => ({
         id: b.id,
         type: b.type,
         data: safeParse(b.data),
@@ -46,12 +46,15 @@ export default async function Home() {
   );
 }
 
-function safeParse(json: unknown): any {
+function safeParse(json: unknown): Record<string, unknown> {
   if (json == null) return {};
-  if (typeof json === "object") return json;
+  if (typeof json === "object") return json as Record<string, unknown>;
   if (typeof json !== "string") return {};
   try {
-    return JSON.parse(json);
+    const parsed = JSON.parse(json) as unknown;
+    return parsed != null && typeof parsed === "object"
+      ? (parsed as Record<string, unknown>)
+      : {};
   } catch {
     return {};
   }

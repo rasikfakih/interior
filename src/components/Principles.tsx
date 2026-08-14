@@ -14,14 +14,20 @@ const defaultItems = [
   { label: "No catalogue swap", body: "Materials are specified against the brief. Substitutions need a conversation." },
 ];
 
-export default function Principles({ data }: { data?: any }) {
+export type PrinciplesData = {
+  items?: { label: string; body: string }[];
+  title?: string;
+  lede?: string;
+};
+
+export default function Principles({ data }: { data?: PrinciplesData }) {
   const items = data?.items || defaultItems;
   const title = data?.title ?? "Four standards we hold ourselves to.";
   const lede =
     data?.lede ??
     "Drawn from the studio's first seven years. Decisions and standards, not copy.";
 
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -67,7 +73,7 @@ export default function Principles({ data }: { data?: any }) {
 
   return (
     <section
-      ref={ref as any}
+      ref={ref}
       className="py-20 md:py-28 bg-elev border-y hairline"
       aria-label="Studio principles"
     >
@@ -82,7 +88,7 @@ export default function Principles({ data }: { data?: any }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--line)] border hairline rounded-[var(--radius-card)] overflow-hidden">
-          {items.map((p: any, i: number) => (
+          {items.map((p, i: number) => (
             <article key={i} className="ei-prin bg-canvas p-6 md:p-7">
               <p className="ei-prin-num font-mono text-[10px] tracking-[0.22em] uppercase text-ink">
                 0{i + 1}

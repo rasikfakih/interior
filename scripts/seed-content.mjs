@@ -436,7 +436,6 @@ async function seedSqlite() {
   db.pragma("journal_mode = WAL");
 
   const prep = (sql) => db.prepare(sql);
-  const rows = (sql) => prep(sql).all();
   const firstN = (sql) => {
     const r = prep(sql).get();
     return r ? Number(r.n) : 0;
@@ -476,11 +475,9 @@ async function seedSqlite() {
   );
 
   if (FORCE) {
-    for (const slug of PROJECTS.map((p) => p.slug)) {
-      try {
-        prep(`DELETE FROM page_blocks WHERE page_id IS NULL`).run();
-      } catch {}
-    }
+    try {
+      prep(`DELETE FROM page_blocks WHERE page_id IS NULL`).run();
+    } catch {}
     prep(`DELETE FROM projects`).run();
     counts.projects = 0;
   }
@@ -557,15 +554,12 @@ async function seedSqlite() {
     console.log(`+ rooms seeded for ${pr.slug} (${pr.rooms.length})`);
   }
   if (FORCE) {
-    for (const slug of JOURNAL.map((j) => j.slug)) {
-      try {
-        prep(`DELETE FROM journal_posts`).run();
-      } catch {}
-    }
+    try {
+      prep(`DELETE FROM journal_posts`).run();
+    } catch {}
     counts.journal_posts = 0;
   }
   if (FORCE || counts.journal_posts === 0) {
-    let order = 0;
     const txn = db.transaction(() => {
       for (const j of JOURNAL) {
         insertJournal.run(

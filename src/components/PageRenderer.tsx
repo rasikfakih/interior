@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Reveal from "./Reveal";
-import Link from "next/link";
 import Image from "next/image";
 import ProcessStickyStack from "./ProcessStickyStack";
 import RichTextRenderer from "./RichTextRenderer";
@@ -14,14 +12,23 @@ import Principles from "./Principles";
 import JournalPreview from "./JournalPreview";
 import ClosingCTA from "./ClosingCTA";
 import FormBlock from "./FormBlock";
-import HeroClient from "./HeroClient";
+import HeroClient, { type HeroData } from "./HeroClient";
+import { type TestimonialsData } from "./Testimonials";
+import { type PrinciplesData } from "./Principles";
+import { type ClosingCTAData } from "./ClosingCTA";
+import { type ProcessStickyStackData } from "./ProcessStickyStack";
+import { type SpatialWalkthroughsData } from "./SpatialWalkthroughs";
 import { useReducedMotion } from "@/lib/use-gsap";
 
 type Block = {
   id: number;
   type: string;
-  data: any;
+  data: BlockData;
 };
+
+type BlockData = Record<string, unknown>;
+
+type ImageGridImage = { url: string; alt?: string };
 
 export default function PageRenderer({ blocks }: { blocks: Block[] }) {
   return (
@@ -50,24 +57,27 @@ function BlockRenderer({ block }: { block: Block }) {
     case "journal-preview":
       return <JournalPreviewBlock data={block.data} />;
     case "spatial-walkthroughs":
-      return <SpatialWalkthroughs data={block.data} />;
+      return <SpatialWalkthroughs data={block.data as SpatialWalkthroughsData} />;
     case "closing-cta":
       return <ClosingCTABlock data={block.data} />;
     case "rich-text":
-      return <section className="py-12"><div className="container-page max-w-3xl"><RichTextRenderer json={block.data?.body} /></div></section>;
-    case "image":
+      return <section className="py-12"><div className="container-page max-w-3xl"><RichTextRenderer json={block.data?.body as string} /></div></section>;
+    case "image": {
+      const img = block.data as { url?: string; alt?: string; aspect?: string };
       return (
         <section className="py-8 container-page">
-          <figure className={`relative w-full aspect-[${block.data?.aspect || "16/9"}] overflow-hidden rounded-[var(--radius-card)]`}>
-            <Image src={block.data?.url} alt={block.data?.alt || ""} fill sizes="(min-width: 768px) 1320px, 100vw" className="object-cover" loading="lazy" />
+          <figure className={`relative w-full aspect-[${img.aspect || "16/9"}] overflow-hidden rounded-[var(--radius-card)]`}>
+            <Image src={img.url ?? ""} alt={img.alt || ""} fill sizes="(min-width: 768px) 1320px, 100vw" className="object-cover" loading="lazy" />
           </figure>
         </section>
       );
-    case "image-grid":
+    }
+    case "image-grid": {
+      const images = (block.data?.images ?? []) as ImageGridImage[];
       return (
         <section className="py-12 container-page">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-            {(block.data?.images || []).map((img: any, i: number) => (
+            {images.map((img, i) => (
               <div key={i} className="aspect-[16/10] relative overflow-hidden rounded-[var(--radius-card)]">
                 <Image src={img.url} alt={img.alt || ""} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" loading="lazy" />
               </div>
@@ -75,8 +85,9 @@ function BlockRenderer({ block }: { block: Block }) {
           </div>
         </section>
       );
+    }
     case "form":
-      return <FormBlock formSlug={block.data?.formSlug} />;
+      return <FormBlock formSlug={(block.data?.formSlug ?? "") as string} />;
     case "divider":
       return <div className="py-6 container-page"><div className="chrome-rule" /></div>;
     case "spacer":
@@ -86,27 +97,31 @@ function BlockRenderer({ block }: { block: Block }) {
   }
 }
 
-let step = 0;
-function i_delay(n: number) { return 0; }
+type ServiceCell = {
+  title: string;
+  body: string;
+  photo: string;
+};
 
-function HeroBlock({ data }: any) {
-  return <HeroClient data={data} />;
+function HeroBlock({ data }: { data: BlockData }) {
+  return <HeroClient data={data as HeroData} />;
 }
 
-function PrinciplesBlock({ data }: any) {
-  return <Principles data={data} />;
+function PrinciplesBlock({ data }: { data: BlockData }) {
+  return <Principles data={data as PrinciplesData} />;
 }
 
-function ServicesBlock({ data }: any) {
+function ServicesBlock({ data }: { data: BlockData }) {
   // Render the GSAP-backed Services client component. If the block was
   // authored with a custom title/lede/cells we fall back to inline
   // shape that matches Services DOM (so seeded pages survive without
   // re-authoring).
-  const cells = data?.cells;
-  if (Array.isArray(cells) && cells.length > 0) {
-    const title = data?.title || "A studio that draws, specifies, and";
-    const titleEm = data?.titleEm || "builds";
-    const lede = data?.lede || "";
+  const cells = Array.isArray(data?.cells) ? (data?.cells as ServiceCell[]) : [];
+  if (cells.length > 0) {
+    const title = (data?.title as string) || "A studio that draws, specifies, and";
+    const titleEm = (data?.titleEm as string) || "builds";
+    const lede = (data?.lede as string) || "";
+    const afterEm = data?.afterEm as string | undefined;
     return (
       <section className="bg-elev py-24 md:py-36" aria-label="What we do">
         <div className="container-page">
@@ -115,7 +130,7 @@ function ServicesBlock({ data }: any) {
               <h2 className="text-4xl md:text-[3.5rem] tracking-tighter">
                 {title}{" "}
                 <em className="text-ink not-italic font-medium">{titleEm}</em>
-                {data?.afterEm ? `, ${data.afterEm}` : "."}
+                {afterEm ? `, ${afterEm}` : "."}
               </h2>
             </div>
             <div className="md:col-span-5 md:pt-3">
@@ -132,12 +147,12 @@ function ServicesBlock({ data }: any) {
   return <Services />;
 }
 
-function ServicesTsxCells({ cells }: { cells: any[] }) {
-  const ref = useRef<HTMLDivElement | null>(null);
+function ServicesTsxCells({ cells }: { cells: ServiceCell[] }) {
+  const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   useEffect(() => {
     if (reduce || typeof window === "undefined") return;
-    let ctx: any = null;
+    let ctx: { revert: () => void } | null = null;
     let cleanup: (() => void) | undefined;
     (async () => {
       const { gsap } = await import("gsap");
@@ -178,7 +193,7 @@ function ServicesTsxCells({ cells }: { cells: any[] }) {
     return () => cleanup && cleanup();
   }, [reduce]);
   return (
-    <div ref={ref as any} className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
+    <div ref={ref} className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
       {cells.map((c, i) => (
         <article
           key={c.title || i}
@@ -214,31 +229,35 @@ function ServicesTsxCells({ cells }: { cells: any[] }) {
   );
 }
 
-function SelectedWorkBlock({ data }: any) {
+function SelectedWorkBlock({ data }: { data: BlockData }) {
   return (
-    <SelectedWork slugs={data?.projectSlugs} title={data?.sectionTitle} lede={data?.lede} />
-  );
-}
-
-function ProcessBlock({ data }: any) {
-  return <ProcessStickyStack data={data} />;
-}
-
-function TestimonialsBlock({ data }: any) {
-  return <Testimonials data={data} />;
-}
-
-function JournalPreviewBlock({ data }: any) {
-  return (
-    <JournalPreview
-      title={data?.sectionTitle}
-      titleEm={data?.sectionTitleEm}
-      lede={data?.lede}
-      count={data?.count || 3}
+    <SelectedWork
+      slugs={data?.projectSlugs as string[] | undefined}
+      title={data?.sectionTitle as string | undefined}
+      lede={data?.lede as string | undefined}
     />
   );
 }
 
-function ClosingCTABlock({ data }: any) {
-  return <ClosingCTA data={data} />;
+function ProcessBlock({ data }: { data: BlockData }) {
+  return <ProcessStickyStack data={data as ProcessStickyStackData} />;
+}
+
+function TestimonialsBlock({ data }: { data: BlockData }) {
+  return <Testimonials data={data as TestimonialsData} />;
+}
+
+function JournalPreviewBlock({ data }: { data: BlockData }) {
+  return (
+    <JournalPreview
+      title={data?.sectionTitle as string | undefined}
+      titleEm={data?.sectionTitleEm as string | undefined}
+      lede={data?.lede as string | undefined}
+      count={(data?.count as number | undefined) || 3}
+    />
+  );
+}
+
+function ClosingCTABlock({ data }: { data: BlockData }) {
+  return <ClosingCTA data={data as ClosingCTAData} />;
 }

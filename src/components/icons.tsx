@@ -15,7 +15,7 @@ import {
   Gauge,
   GearSix,
   IdentificationBadge,
-  Image,
+  Image as PhosphorImage,
   Key,
   LinkSimple,
   List,
@@ -111,7 +111,7 @@ export function IconLink(props: IconProps) {
 }
 
 export function IconImage(props: IconProps) {
-  return <Image weight="duotone" {...props} />;
+  return <PhosphorImage weight="duotone" {...props} />;
 }
 
 export function IconParagraph(props: IconProps) {
@@ -155,7 +155,7 @@ export type NavIconName =
 
 const NAV_GLYPHS: Record<NavIconName, ComponentType<IconProps>> = {
   pages: SquaresFour,
-  media: Image,
+  media: PhosphorImage,
   projects: FrameCorners,
   journal: BookOpen,
   testimonials: Quotes,

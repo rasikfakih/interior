@@ -1,6 +1,7 @@
 "use client";
 
-import { type ReactElement, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 interface GLBThumbProps {
   modelUrl: string;
@@ -28,8 +29,8 @@ export default function GLBThumb({ modelUrl, posterUrl, alt }: GLBThumbProps) {
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
-      setShouldMount(true);
-      return;
+      const t = setTimeout(() => setShouldMount(true), 0);
+      return () => clearTimeout(t);
     }
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -52,11 +53,12 @@ export default function GLBThumb({ modelUrl, posterUrl, alt }: GLBThumbProps) {
       aria-label={alt}
     >
       {posterUrl && (
-        <img
+        <Image
           src={posterUrl}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
+          fill
+          unoptimized
+          className="object-cover"
           aria-hidden="true"
         />
       )}
@@ -97,7 +99,20 @@ function LazyThree({
     let cancelled = false;
     import("../three-runtime")
       .then((m) => {
-        if (!cancelled) setMod(() => (m as { default: any }).default);
+        if (!cancelled)
+          setMod(
+            () =>
+              (
+                m as {
+                  default: (p: {
+                    modelUrl: string;
+                    posterUrl?: string | null;
+                    reducedMotion: boolean;
+                    onReady: () => void;
+                  }) => React.ReactElement;
+                }
+              ).default
+          );
       })
       .catch(() => {});
     return () => {

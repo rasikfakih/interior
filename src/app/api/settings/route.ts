@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import {
   isWhitelisted,
   getCreateableEntries,
-  SETTINGS_WHITELIST,
 } from "@/lib/settings-whitelist";
 import { bump } from "@/lib/revalidate";
 
@@ -16,13 +15,13 @@ export async function GET() {
   // ships whitelisted keys. Unknown keys present in the table
   // (legacy / drift) are skipped so an editor client doesn't expose
   // them.
-  const filtered = (rows ?? []).filter((r: any) => isWhitelisted(r.key));
+  const filtered = (rows ?? []).filter((r) => isWhitelisted(r.key));
   return NextResponse.json(filtered);
 }
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
@@ -81,7 +80,7 @@ export async function POST(req: NextRequest) {
     );
     bump({ kind: "settings" });
     return NextResponse.json({ success: true, item: r.rows?.[0] ?? null });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
   }
 }

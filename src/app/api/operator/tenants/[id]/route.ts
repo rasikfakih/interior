@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOperatorSession } from "@/lib/operator-auth";
-import { getTenant, updateTenant, revokeTenant, applyDistro, signLicense } from "@/lib/operator-store";
+import { getTenant, updateTenant, revokeTenant, applyDistro } from "@/lib/operator-store";
 import { bumpAll } from "@/lib/revalidate";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -26,7 +26,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (body.distro && typeof body.distro === "object") {
     await applyDistro(numericId, body.distro);
   }
-  const tPatch: Record<string, any> = {};
+  const tPatch: Record<string, unknown> = {};
   for (const k of ["studio_name", "owner_email", "domain", "tier", "state", "expires_at"]) {
     if (body[k] !== undefined) tPatch[k] = body[k];
   }

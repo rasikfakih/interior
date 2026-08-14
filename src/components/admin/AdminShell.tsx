@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { IconNav, type NavIconName } from "@/components/icons";
 import { AdminTopbar } from "./AdminTopbar";
+import PagesAdmin from "./PagesAdmin";
 
 type Tab =
   | "pages"
@@ -274,13 +275,12 @@ function RoutePanel({
 
 // PagesPanel holds the page list routed via /admin/pages/[id] via Next.js routes.
 function PagesPanel() {
-  const Pages = require("@/components/admin/PagesAdmin").default;
-  return <Pages />;
+  return <PagesAdmin />;
 }
 
 // Each CRUD tab goes to /admin/[k] which is a server-statically-included page.
 function Dynamic({ mount }: { mount: string }) {
-  const [Content, setContent] = useState<any>(null);
+  const [Content, setContent] = useState<ReactNode | null>(null);
   useEffect(() => {
     fetch(mount, { headers: { Accept: "text/html" } })
       .then((r) => r.text())

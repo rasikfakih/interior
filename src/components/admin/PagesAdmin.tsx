@@ -32,7 +32,8 @@ export default function PagesAdmin() {
   }
 
   useEffect(() => {
-    load();
+    const t = setTimeout(load, 0);
+    return () => clearTimeout(t);
   }, []);
 
   async function create(e: React.FormEvent) {

@@ -30,7 +30,7 @@ export async function PUT(req: NextRequest) {
     );
   }
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   const url = new URL(req.url);
@@ -53,9 +53,9 @@ export async function PUT(req: NextRequest) {
   }
   try {
     await localWrite(storagePath, buf);
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: `local write failed: ${e?.message ?? "unknown"}` },
+      { error: `local write failed: ${(e as Error)?.message ?? "unknown"}` },
       { status: 500 }
     );
   }

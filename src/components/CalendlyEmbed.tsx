@@ -26,7 +26,7 @@ export default function CalendlyEmbed({ url }: CalendlyEmbedProps) {
   )
 }
 
-export function CalendlyBadgeWidget({ url }: CalendlyEmbedProps) {
+export function CalendlyBadgeWidget() {
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://assets.calendly.com/assets/external/widget.js'

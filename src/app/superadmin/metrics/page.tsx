@@ -25,7 +25,7 @@ type AuditEvent = {
   id: number;
   kind: string;
   message: string;
-  meta?: any;
+  meta?: unknown;
   created_at: string;
 };
 
@@ -76,9 +76,9 @@ export default function MetricsPage() {
           topPaths: Array.isArray(j.topPaths) ? j.topPaths : [],
         });
         setAudit(Array.isArray(j.audit) ? j.audit : []);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (cancelled) return;
-        setError(e?.message ?? "metrics unavailable");
+        setError((e as Error)?.message ?? "metrics unavailable");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -111,7 +111,7 @@ export default function MetricsPage() {
 
       {error && (
         <div role="alert" className="op-banner op-banner--bad">
-          Couldn't load metrics: {error}
+          Couldn&apos;t load metrics: {error}
         </div>
       )}
 

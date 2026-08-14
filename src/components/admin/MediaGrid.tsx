@@ -7,11 +7,11 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 import GLBThumb from "@/components/admin/GLBThumb";
 import { AdminPageHeader } from "@/components/AdminPageHeader";
 import {
   formatBytes,
-  kindFromMime,
   MAX_BYTES,
   MEDIATYPE_LABEL,
   type MediaKind,
@@ -55,27 +55,35 @@ export default function MediaGrid() {
         const body = (await r.json()) as MediaListResponse;
         setItems((prev) => (cursor ? [...prev, ...body.rows] : body.rows));
         setNextBefore(body.nextBefore);
-      } catch (e: any) {
-        setActionError(`list error: ${e?.message ?? "network"}`);
+      } catch (e: unknown) {
+        setActionError(`list error: ${(e as Error)?.message ?? "network"}`);
       }
     },
     [kind]
   );
 
   useEffect(() => {
-    setLoading(true);
-    setItems([]);
-    setNextBefore(null);
-    void (async () => {
-      try {
-        await loadPage();
-      } finally {
-        // Always clear the skeleton, even if loadPage hit an exception
-        // path the edit mutators did not always cover. Without this the
-        // grid sticks on SkeletonGrid forever on the first failed fetch.
-        setLoading(false);
-      }
-    })();
+    let alive = true;
+    const t = setTimeout(() => {
+      if (!alive) return;
+      setLoading(true);
+      setItems([]);
+      setNextBefore(null);
+      void (async () => {
+        try {
+          await loadPage();
+        } finally {
+          // Always clear the skeleton, even if loadPage hit an exception
+          // path the edit mutators did not always cover. Without this the
+          // grid sticks on SkeletonGrid forever on the first failed fetch.
+          if (alive) setLoading(false);
+        }
+      })();
+    }, 0);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
   }, [loadPage]);
 
   async function load() {
@@ -367,11 +375,12 @@ function MediaTile({
     <li className="surface-tile overflow-hidden flex flex-col">
       <div className="aspect-[16/10] relative bg-elev">
         {kind === "image" && url && (
-          <img
+          <Image
             src={url}
             alt={item.alt || item.original_name}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
+            fill
+            unoptimized
+            className="object-cover"
           />
         )}
         {kind === "glb" && (

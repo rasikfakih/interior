@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "@/lib/use-gsap";
 
 const STAGES: { label: string; hours: string; note: string }[] = [
   {
@@ -42,19 +43,7 @@ const STAGES: { label: string; hours: string; note: string }[] = [
  */
 export default function ProcessStripV2() {
   const ref = useRef<HTMLDivElement>(null);
-  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(media.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
-    if ("addEventListener" in media) {
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    }
-    return undefined;
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (typeof window === "undefined") return;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ensureMigrated, pgQuery, withPgTx } from "@/lib/pg";
+import { ensureMigrated, withPgTx } from "@/lib/pg";
 import { requireAdminSession } from "@/lib/license-gate";
 import { appendAudit } from "@/lib/license";
 import { bump } from "@/lib/revalidate";
@@ -105,7 +105,7 @@ export async function POST(
         const insert =
           "INSERT INTO page_blocks (page_id, type, data, order_index) VALUES ($1, $2, $3::jsonb, $4)";
         for (let i = 0; i < (blocksIn as unknown[]).length; i++) {
-          const b: any = (blocksIn as any[])[i];
+          const b = blocksIn[i] as { type?: unknown; data?: unknown } | undefined;
           if (typeof b?.type !== "string") continue;
           const data =
             typeof b.data === "string"
@@ -157,9 +157,9 @@ export async function POST(
         ? { kind: auditKind, message: auditMessage }
         : null,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? "db error" },
+      { error: (e as Error).message ?? "db error" },
       { status: 400 }
     );
   }

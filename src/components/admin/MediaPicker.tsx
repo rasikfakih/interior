@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   formatBytes,
-  kindFromMime,
   MAX_BYTES,
   MEDIATYPE_LABEL,
   type MediaKind,
@@ -12,7 +12,7 @@ import {
   type UploadIntent,
 } from "@/components/admin/media-types";
 
-type PickedItem = {
+export type PickedItem = {
   item: MediaRow;
   signedUrl: string | null;
 };
@@ -46,32 +46,46 @@ export default function MediaPicker({
   const [selected, setSelected] = useState<Record<number, PickedItem>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    setKind(accept);
-    setSelected({});
-  }, [accept, open]);
+  // Reset kind + selection when the picker opens: render-phase
+  // adjustment (React's documented pattern for prop-change resets)
+  // instead of setState in an effect.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (prevOpen !== open) {
+    setPrevOpen(open);
+    if (open) {
+      setKind(accept);
+      setSelected({});
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
-    setLoading(true);
-    setError(null);
-    const qp = new URLSearchParams({ limit: "60" });
-    if (kind !== "all") qp.set("kind", kind);
-    (async () => {
-      try {
-        const r = await fetch(`/api/media/list?${qp.toString()}`, {
-          credentials: "include",
-        });
-        if (!r.ok) throw new Error(`list ${r.status}`);
-        const body = (await r.json()) as MediaListResponse;
-        setItems(body.rows);
-      } catch (e: any) {
-        setError(e.message ?? "list failed");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    let alive = true;
+    const t = setTimeout(() => {
+      if (!alive) return;
+      setLoading(true);
+      setError(null);
+      const qp = new URLSearchParams({ limit: "60" });
+      if (kind !== "all") qp.set("kind", kind);
+      (async () => {
+        try {
+          const r = await fetch(`/api/media/list?${qp.toString()}`, {
+            credentials: "include",
+          });
+          if (!r.ok) throw new Error(`list ${r.status}`);
+          const body = (await r.json()) as MediaListResponse;
+          if (alive) setItems(body.rows);
+        } catch (e: unknown) {
+          if (alive) setError((e as Error).message ?? "list failed");
+        } finally {
+          if (alive) setLoading(false);
+        }
+      })();
+    }, 0);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
   }, [kind, open]);
 
   async function resolveUrl(item: MediaRow): Promise<string | null> {
@@ -334,11 +348,12 @@ export default function MediaPicker({
                             </span>
                           )}
                           {m.kind === "image" && m.url && (
-                            <img
+                            <Image
                               src={m.url}
                               alt=""
-                              className="absolute inset-0 w-full h-full object-cover"
-                              loading="lazy"
+                              fill
+                              unoptimized
+                              className="object-cover"
                               aria-hidden="true"
                             />
                           )}

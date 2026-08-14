@@ -67,7 +67,6 @@ async function replayTable(pool, sqlite, table, pKey, columns, map, opts = {}) {
     console.log(`-- ${table}: 0 rows, skipping`);
     return;
   }
-  const cols = includeId ? ['id', ...columns] : columns;
   let inserted = 0;
   for (const r of rows) {
     const raw = map(r);

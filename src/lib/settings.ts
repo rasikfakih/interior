@@ -1,6 +1,5 @@
 import "server-only";
-import { db } from "@/lib/db";
-import { settings } from "@/lib/schema";
+import { ensureMigrated, pgMany } from "@/lib/pg";
 
 export type SiteSettings = {
   contact_email: string;
@@ -20,8 +19,11 @@ const defaults: SiteSettings = {
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
-    const rows = await db.select().from(settings);
-    const map = Object.fromEntries(rows.map((r: any) => [r.key, r.value]));
+    await ensureMigrated();
+    const rows = await pgMany<{ key: string; value: string }>(
+      `SELECT key, value FROM settings ORDER BY key ASC`
+    );
+    const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
     return {
       contact_email: map.contact_email || defaults.contact_email,
       contact_phone: map.contact_phone || defaults.contact_phone,

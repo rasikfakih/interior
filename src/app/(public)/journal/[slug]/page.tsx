@@ -14,7 +14,18 @@ export default async function JournalEntryPage({
 }) {
   const { slug } = await params;
 
-  let entry: any = null;
+  let entry: {
+    slug: string;
+    title: string;
+    excerpt: string | null;
+    content: string;
+    content_json: string | Record<string, unknown> | null;
+    cover_image: string | null;
+    category: string | null;
+    author_name: string | null;
+    created_at: string | Date;
+    is_published: boolean;
+  } | null = null;
   try {
     await ensureMigrated();
     entry = await pgOne<{
@@ -22,7 +33,7 @@ export default async function JournalEntryPage({
       title: string;
       excerpt: string | null;
       content: string;
-      content_json: unknown | null;
+      content_json: string | Record<string, unknown> | null;
       cover_image: string | null;
       category: string | null;
       author_name: string | null;
@@ -43,7 +54,7 @@ export default async function JournalEntryPage({
   if (!entry) notFound();
 
   const dateLabel = entry.created_at
-    ? new Date(entry.created_at as any).toLocaleDateString("en-US", {
+    ? new Date(entry.created_at).toLocaleDateString("en-US", {
         month: "short",
         year: "numeric",
       })

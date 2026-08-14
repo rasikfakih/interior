@@ -32,15 +32,16 @@ export default function AdminTestimonialsIndex() {
       if (!r.ok) throw new Error(`list ${r.status}`);
       const data = await r.json();
       setRows(Array.isArray(data) ? data : []);
-    } catch (e: any) {
-      setError(e?.message ?? "load failed");
+    } catch (e: unknown) {
+      setError((e as Error)?.message ?? "load failed");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    load();
+    const t = setTimeout(load, 0);
+    return () => clearTimeout(t);
   }, []);
 
   async function publishToggle(r: Row) {
@@ -186,7 +187,7 @@ export default function AdminTestimonialsIndex() {
                     {r.role || "no role"}
                   </p>
                   <p className="text-sm text-ink-mute mt-2 line-clamp-2 italic">
-                    "{r.quote}"
+                    &quot;{r.quote}&quot;
                   </p>
                 </div>
                 <div className="md:col-span-2">

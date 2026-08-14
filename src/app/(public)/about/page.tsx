@@ -47,7 +47,7 @@ export default async function AboutPage() {
             </div>
             <div className="md:col-span-5 md:pt-3">
               <p className="text-ink-mute text-base md:text-lg leading-relaxed">
-                We started in 2017 from a one-room office above a tailor's shop.
+                We started in 2017 from a one-room office above a tailor&apos;s shop.
                 Eight years later we are a studio of five, four designers and a
                 full-time site supervisor, drawing every project to scale and
                 staying through handover.
@@ -91,7 +91,7 @@ export default async function AboutPage() {
               The team
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-              {team.map((m: any) => {
+              {team.map((m) => {
                 const initial = (m.name || "·").charAt(0).toUpperCase();
                 const photo =
                   m.photo && String(m.photo).trim() ? String(m.photo) : null;

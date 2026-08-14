@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Kept-for-history archive (see scripts/dev-archive/README.md);
+    // not subject to the lint gate.
+    "scripts/dev-archive/**",
   ]),
 ]);
 

@@ -39,7 +39,7 @@ export default async function StudioServer() {
           </div>
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute">
-              The team drawn from the studio's first seven years. Each row
+              The team drawn from the studio&apos;s first seven years. Each row
               below is a real current or past contributor.
             </p>
           </div>

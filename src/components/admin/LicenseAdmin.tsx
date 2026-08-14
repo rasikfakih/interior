@@ -14,6 +14,14 @@ type License = {
   issuedBy?: string;
 };
 
+type AuditEvent = {
+  id: number;
+  kind: string;
+  message: string;
+  meta?: unknown;
+  created_at: string;
+};
+
 export default function LicenseAdmin() {
   const [license, setLicense] = useState<License | null>(null);
   const [server, setServer] = useState<string | null>(null);
@@ -21,8 +29,9 @@ export default function LicenseAdmin() {
   const [domain, setDomain] = useState("");
   const [tier, setTier] = useState<"personal" | "business">("business");
   const [busy, setBusy] = useState(false);
-  const [audit, setAudit] = useState<any[]>([]);
+  const [audit, setAudit] = useState<AuditEvent[]>([]);
   const [msg, setMsg] = useState("");
+  const [expired, setExpired] = useState(false);
 
   async function load() {
     const r = await fetch("/api/admin/license");
@@ -30,6 +39,9 @@ export default function LicenseAdmin() {
       const j = await r.json();
       setLicense(j.license);
       setServer(j.server);
+      // Date.now() lives in the fetch path (not render) so the expiry
+      // check stays pure per react-hooks/purity.
+      setExpired(!!j.license?.expiresAt && Date.parse(j.license.expiresAt) < Date.now());
       if (j.license?.domain) setDomain(j.license.domain);
       if (j.license?.purchaseCode) setPurchaseCode(j.license.purchaseCode);
       if (j.license?.tier) setTier(j.license.tier);
@@ -41,7 +53,8 @@ export default function LicenseAdmin() {
   }
 
   useEffect(() => {
-    load();
+    const t = setTimeout(load, 0);
+    return () => clearTimeout(t);
   }, []);
 
   async function stamp(e: React.FormEvent) {
@@ -63,7 +76,6 @@ export default function LicenseAdmin() {
     }
   }
 
-  const expired = license?.expiresAt && Date.parse(license.expiresAt) < Date.now();
 
   return (
     <div className="space-y-10">
@@ -219,7 +231,7 @@ export default function LicenseAdmin() {
           <p className="text-ink-mute text-sm">No license events yet.</p>
         )}
         <ul className="divide-y hairline">
-          {audit.map((a: any) => (
+          {audit.map((a) => (
             <li
               key={a.id}
               className="grid grid-cols-1 md:grid-cols-12 gap-2 py-3 text-sm"

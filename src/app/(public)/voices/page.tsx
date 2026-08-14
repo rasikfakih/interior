@@ -25,7 +25,7 @@ export default function VoicesPage() {
           </div>
           <div className="md:col-span-5 md:pt-3">
             <p className="text-ink-mute">
-              The homeowner's view, then the studio that built it. Edits
+              The homeowner&apos;s view, then the studio that built it. Edits
               live in <Link href="/admin/testimonials" className="text-ink border-b border-[var(--accent-soft)]">/admin/testimonials</Link> and
               {" "}<Link href="/admin/team" className="text-ink border-b border-[var(--accent-soft)]">/admin/team</Link>.
             </p>

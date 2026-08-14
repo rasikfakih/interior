@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 type CheckResult =
-  | { ok: true; license: any }
+  | { ok: true; license?: unknown }
   | { ok: false; reason: string };
 
 const reasonText: Record<string, string> = {
@@ -23,9 +25,9 @@ export default function SafeLicenseBanner({ check }: { check: CheckResult }) {
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink mr-3">
             {reasonText[check.reason] || "License issue"}
           </span>
-          <a className="underline decoration-1 hairline-strong underline-offset-4" href="/admin/license">
+          <Link className="underline decoration-1 hairline-strong underline-offset-4" href="/admin/license">
             Restore license at /admin/license
-          </a>
+          </Link>
         </p>
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-mute">
           Public reads remain open

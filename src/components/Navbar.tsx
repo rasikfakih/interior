@@ -25,7 +25,7 @@ const DEFAULT_LINKS: NavLink[] = [
  */
 export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) => {
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useI18n();
+  const { language, setLanguage } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const progressRef = useRef<HTMLDivElement | null>(null);
   // Taste-skill §5.D: no window scroll listeners. The scrolled flag is
@@ -93,7 +93,6 @@ export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) =
         ).filter((el) => !el.hasAttribute("aria-hidden"));
 
       const first = focusables()[0];
-      const last = focusables()[focusables().length - 1];
       first?.focus();
 
       const onKey = (e: KeyboardEvent) => {

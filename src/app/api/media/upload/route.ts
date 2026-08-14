@@ -29,7 +29,7 @@ import { bump } from '@/lib/revalidate';
  */
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   try {
@@ -119,9 +119,9 @@ export async function POST(req: NextRequest) {
       size: row.size,
       kind: row.kind,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? 'upload init failed' },
+      { error: (e as Error).message ?? 'upload init failed' },
       { status: 500 }
     );
   }

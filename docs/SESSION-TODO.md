@@ -1130,6 +1130,55 @@ already shipped.)
 - Acceptance met: `tsc --noEmit` exit 0, `npm run build` green,
   `npm run verify:deploy` green.
 
+### TS-ID-020 - Lint debt grind: 260 errors to zero
+- Status: @inprogress 2026-08-14 (pending commit)
+- Owner: freebuff (user request: "Tackle the 279 legacy lint
+  errors gated by lint:changed, highest-severity first")
+- Opened: 2026-08-14
+- Scope: full-lint legacy debt, 335 problems (260 errors / 75
+  warnings) -> 0 errors / 78 warnings at session close.
+- Non-any buckets: react/no-unescaped-entities (18), no-html-link
+  (8, a > Link), no-require-imports (1 + dev-archive gate
+  exclusion), react-hooks/purity (1), react-hooks/set-state-in-
+  effect (20), plus --fix auto-fixables.
+- no-explicit-any (206): next-auth session augmentation
+  (src/types/next-auth.d.ts, 25 sites); catch(e: any) -> unknown
+  (31 sites); schema.ts drizzle casts dropped; useRef<T>(null)
+  ref sweep; block-JSON domain typed (Record<string, unknown> +
+  per-block data types exported from consumer components,
+  BlockEditor/block-schemas/PageBuilder Json alias); pg.ts
+  generic any defaults kept with justified suppressions.
+- BONUS FIND: settings.ts routed through the runtime-throwing
+  db.ts proxy, so getSiteSettings always returned defaults
+  (contact page + Footer silently wrong). Ported to pgMany +
+  ensureMigrated; db.ts deleted (last importer gone).
+- GATE FIX: scripts/lint-changed.mjs crashed with
+  NoFilesFoundError on deleted-file paths (git diff lists them,
+  eslint.lintFiles throws). existsSync filter added.
+- Last error (react-hooks/refs, Reveal.tsx dynamic `as` tag):
+  false positive (as constrained to keyof JSX.IntrinsicElements),
+  scoped eslint-disable with justification.
+- Follow-up (same TS-ID): all 51 remaining src warnings cleared.
+  17 unused-import removals, dead vars (AnnouncementBar hidden
+  state, Navbar t/last, CalendlyBadgeWidget url, ProjectHeader
+  slug, demo-reset req, pg.ts synthetic query params), and 10 raw
+  <img> tags converted to next/image with `unoptimized`
+  (runtime-arbitrary srcs; loader bypass verified in
+  get-img-props.js, so remotePatterns unchanged). icons.tsx
+  phosphor Image renamed to PhosphorImage (jsx-a11y Image->img
+  mapping false positive).
+- Final sweep (same TS-ID): last 27 warnings (all scripts/*.mjs)
+  closed. Dead helpers removed (parseSetCookie x4, smoke-api
+  update(), seed-pages exists(), seed-content rows(), gen-glb N(),
+  gen-demo SERIF, baseBack, tag, spawnSync x2); seed-content FORCE
+  loops collapsed; 8 ternary statements in smoke-routes converted
+  to if/else. migrate-to-supabase `columns` param kept (positional
+  callers) - only the dead `cols` const removed. Full lint now
+  0 errors / 0 warnings repo-wide.
+- Acceptance: `tsc --noEmit` 0, `npm run build` green, `node --check`
+  all scripts, `npm run verify:deploy` green, `npm run lint:changed`
+  green (160 files vs origin/main), full lint 0/0 repo-wide.
+
 ---
 
 ## Pending escalation

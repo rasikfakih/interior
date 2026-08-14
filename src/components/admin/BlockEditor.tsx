@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import RichTextEditor from "@/components/admin/RichTextEditor";
-import MediaPicker from "@/components/admin/MediaPicker";
+import MediaPicker, { type PickedItem } from "@/components/admin/MediaPicker";
 import {
   getSchema,
   type ArraySchema,
@@ -10,27 +10,34 @@ import {
   type FieldSchema,
 } from "@/components/admin/block-schemas";
 
+type Json = Record<string, unknown>;
+
 type Props = {
   type: BlockSchema["type"];
-  value: any;
-  onChange: (next: any) => void;
+  value: Json;
+  onChange: (next: Json) => void;
 };
 
-function get(obj: any, path: string) {
-  return path.split(".").reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
+function get(obj: Json, path: string): unknown {
+  return path.split(".").reduce<unknown>((acc, k) => {
+    if (acc == null) return acc;
+    if (typeof acc !== "object") return undefined;
+    return (acc as Record<string, unknown>)[k];
+  }, obj);
 }
 
-function setAt(obj: any, path: string, value: any): any {
+function setAt(obj: Json, path: string, value: unknown): Json {
   const keys = path.split(".");
   const root = { ...obj };
-  let cursor: any = root;
+  let cursor: Json = root;
   for (let i = 0; i < keys.length - 1; i++) {
     const k = keys[i];
+    const existing = cursor[k];
     cursor[k] =
-      cursor[k] && typeof cursor[k] === "object"
-        ? { ...cursor[k] }
+      existing && typeof existing === "object"
+        ? { ...(existing as Json) }
         : {};
-    cursor = cursor[k];
+    cursor = cursor[k] as Json;
   }
   cursor[keys[keys.length - 1]] = value;
   return root;
@@ -47,11 +54,11 @@ function Field({
   onChange,
 }: {
   schema: FieldSchema;
-  value: any;
-  onChange: (next: any) => void;
+  value: unknown;
+  onChange: (next: unknown) => void;
 }) {
   const v = value ?? "";
-  function update(n: any) {
+  function update(n: unknown) {
     onChange(n);
   }
   const labelEl = (
@@ -71,7 +78,7 @@ function Field({
         {labelEl}
         <input
           className="input-line"
-          value={v}
+          value={v as string}
           placeholder={schema.placeholder}
           maxLength={schema.max}
           onChange={(e) => update(e.target.value)}
@@ -86,7 +93,7 @@ function Field({
         {labelEl}
         <textarea
           className="input-line w-full resize-y min-h-[120px] py-3"
-          value={v}
+          value={v as string}
           placeholder={schema.placeholder}
           maxLength={schema.max}
           onChange={(e) => update(e.target.value)}
@@ -102,7 +109,7 @@ function Field({
         <input
           className="input-line"
           type="number"
-          value={v ?? 0}
+          value={(v as number) ?? 0}
           max={schema.max}
           onChange={(e) => update(Number(e.target.value))}
         />
@@ -116,7 +123,7 @@ function Field({
         {labelEl}
         <select
           className="input-line bg-transparent"
-          value={v ?? ""}
+          value={v as string}
           onChange={(e) => update(e.target.value)}
         >
           {(schema.options ?? []).map((opt) => (
@@ -148,7 +155,7 @@ function Field({
       <div>
         {labelEl}
         <RichTextEditor
-          value={v}
+          value={v as string}
           onChange={(json) => update(json)}
           placeholder={schema.placeholder || "Write here..."}
         />
@@ -164,7 +171,7 @@ function Field({
           <div className="md:col-span-9">
             <input
               className="input-line"
-              value={v}
+              value={v as string}
               placeholder="/uploads/images/..."
               onChange={(e) => update(e.target.value)}
             />
@@ -179,13 +186,14 @@ function Field({
             />
           </div>
         </div>
-        {v && /^https?:\/\//.test(v) && (
-          <div className="mt-3 surface-tile overflow-hidden">
-            <img
-              src={v}
+        {typeof v === "string" && /^https?:\/\//.test(v) && (
+          <div className="mt-3 surface-tile overflow-hidden relative h-44">
+            <Image
+              src={v as string}
               alt=""
-              className="w-full h-44 object-cover"
-              loading="lazy"
+              fill
+              unoptimized
+              className="object-cover"
             />
           </div>
         )}
@@ -205,11 +213,12 @@ function Field({
               className="aspect-[16/10] relative surface-tile overflow-hidden"
             >
               {/^https?:\/\//.test(url) ? (
-                <img
+                <Image
                   src={url}
                   alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
+                  fill
+                  unoptimized
+                  className="object-cover"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
@@ -240,9 +249,9 @@ function Field({
           label="Pick images"
           accept="image"
           multi
-          onPick={(picks: any) => {
+          onPick={(picks: PickedItem[]) => {
             const incoming = (Array.isArray(picks)
-              ? picks.map((p: any) => p?.signedUrl ?? p?.item?.url ?? "")
+              ? picks.map((p: PickedItem) => p?.signedUrl ?? p?.item?.url ?? "")
               : []
             ).filter(Boolean);
             const merged = Array.from(
@@ -266,12 +275,12 @@ function ArrayEditor({
 }: {
   name: string;
   schema: ArraySchema;
-  value: any[];
-  onChange: (next: any[]) => void;
+  value: unknown[];
+  onChange: (next: unknown[]) => void;
 }) {
-  const items: any[] = Array.isArray(value) ? value : [];
+  const items: unknown[] = Array.isArray(value) ? value : [];
 
-  function updateItem(idx: number, newItem: any) {
+  function updateItem(idx: number, newItem: unknown) {
     const next = items.slice();
     next[idx] = newItem;
     onChange(next);
@@ -346,7 +355,7 @@ function ArrayEditor({
             </header>
             <div className="space-y-3">
               {schema.fields.map((f) => {
-                const currentValue = isStringEntry ? item : get(item, f.path);
+                const currentValue = isStringEntry ? item : get(item as Json, f.path);
                 return (
                   <Field
                     key={f.path}
@@ -356,7 +365,7 @@ function ArrayEditor({
                       if (isStringEntry) {
                         updateItem(idx, clamp(String(v), f.max));
                       } else {
-                        const next = setAt(item, f.path, v);
+                        const next = setAt(item as Json, f.path, v);
                         const clamped =
                           f.max != null && typeof v === "string"
                             ? clamp(v, f.max)
@@ -385,10 +394,10 @@ function ArrayEditor({
 export default function BlockEditor({ type, value, onChange }: Props) {
   const schema = getSchema(type);
   const safeValue = value ?? schema.defaults();
-  function scalarChange(path: string, v: any) {
+  function scalarChange(path: string, v: unknown) {
     onChange(setAt(safeValue, path, v));
   }
-  function arrayChange(key: string, next: any[]) {
+  function arrayChange(key: string, next: unknown[]) {
     onChange({ ...safeValue, [key]: next });
   }
 
@@ -413,7 +422,7 @@ export default function BlockEditor({ type, value, onChange }: Props) {
           key={key}
           name={key}
           schema={arrSchema}
-          value={safeValue[key]}
+          value={safeValue[key] as unknown[]}
           onChange={(next) => arrayChange(key, next)}
         />
       ))}

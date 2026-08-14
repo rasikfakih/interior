@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const license = await signLicense(tenantId, body.expires_at || null);
     bump({ kind: "install" });
     return NextResponse.json({ ok: true, license });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e.message }, { status: 400 });
+  } catch (e: unknown) {
+    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 400 });
   }
 }

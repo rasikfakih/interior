@@ -6,7 +6,7 @@ import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
-  return Boolean((session?.user as any)?.id);
+  return Boolean(session?.user?.id);
 }
 
 export async function GET() {
@@ -60,9 +60,9 @@ export async function POST(req: NextRequest) {
     );
     bump({ kind: "projects", slug: slug });
     return NextResponse.json({ success: true, project: inserted });
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
-      { error: err?.message || "Insert failed" },
+      { error: (err as Error)?.message || "Insert failed" },
       { status: 400 }
     );
   }

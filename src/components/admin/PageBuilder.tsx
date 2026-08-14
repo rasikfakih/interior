@@ -24,7 +24,7 @@ import { BLOCK_REGISTRY, type BlockType } from "@/cms/blocks/registry";
 type Block = {
   id?: number;
   type: BlockType;
-  data: any;
+  data: Record<string, unknown>;
 };
 
 type RevisionRow = {
@@ -196,7 +196,7 @@ export default function PageBuilder({
     setOpenIdx(blocks.length);
   }
 
-  function updateBlockData(idx: number, data: any) {
+  function updateBlockData(idx: number, data: Record<string, unknown>) {
     setBlocks((prev) => {
       const cp = [...prev];
       cp[idx] = { ...cp[idx], data };
@@ -447,7 +447,7 @@ function SortableBlock({
   onToggle: () => void;
   onDuplicate: () => void;
   onRemove: () => void;
-  onChange: (data: any) => void;
+  onChange: (data: Record<string, unknown>) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });

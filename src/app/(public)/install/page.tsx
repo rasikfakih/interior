@@ -24,7 +24,7 @@ export default async function InstallPage() {
         </h1>
         <p className="text-ink-mute mb-10 max-w-[60ch]">
           Enter your Envato purchase code and the domain this build will live on.
-          We'll stamp a signed license into <code className="font-mono text-xs">/data/license.json</code>.
+          We&apos;ll stamp a signed license into <code className="font-mono text-xs">/data/license.json</code>.
           Public pages keep working even without a license - admin and 3D gated until reactivated.
         </p>
         <InstallForm />

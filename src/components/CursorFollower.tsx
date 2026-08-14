@@ -1,19 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { gsap } from "gsap";
+
+function useCursorEnabled(): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const fine = window.matchMedia("(pointer: fine)");
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      fine.addEventListener("change", onChange);
+      reduce.addEventListener("change", onChange);
+      return () => {
+        fine.removeEventListener("change", onChange);
+        reduce.removeEventListener("change", onChange);
+      };
+    },
+    () =>
+      window.matchMedia("(pointer: fine)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false
+  );
+}
 
 export default function CursorFollower() {
   const ring = useRef<HTMLDivElement | null>(null);
   const dot = useRef<HTMLDivElement | null>(null);
-  const [enabled, setEnabled] = useState(false);
+  const enabled = useCursorEnabled();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!fine || reduce) return;
-    setEnabled(true);
+    if (!enabled) return;
 
     const ringEl = ring.current;
     const dotEl = dot.current;
@@ -71,7 +86,7 @@ export default function CursorFollower() {
       window.removeEventListener("mouseover", onHoverTarget);
       document.body.removeEventListener("mouseleave", onLeave);
     };
-  }, []);
+  }, [enabled]);
 
   if (!enabled) return null;
 

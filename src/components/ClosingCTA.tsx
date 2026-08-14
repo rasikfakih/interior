@@ -8,9 +8,16 @@ import { IconArrowRight } from "./icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ClosingCTA({ data }: { data?: any } = {}) {
-  const ref = useRef<HTMLElement | null>(null);
-  const btnRef = useRef<HTMLAnchorElement | null>(null);
+export type ClosingCTAData = {
+  text?: string;
+  em?: string;
+  buttonLabel?: string;
+  buttonHref?: string;
+};
+
+export default function ClosingCTA({ data }: { data?: ClosingCTAData } = {}) {
+  const ref = useRef<HTMLElement>(null);
+  const btnRef = useRef<HTMLAnchorElement>(null);
   const reduce = useReducedMotion();
 
   const text = data?.text || "A home you'll live in for twenty years. Let's start with a kitchen table conversation.";
@@ -89,7 +96,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
   );
 
   return (
-    <section ref={ref as any} className="py-24 md:py-40" aria-label="Start a project">
+    <section ref={ref} className="py-24 md:py-40" aria-label="Start a project">
       <div className="container-page">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-9">
@@ -126,7 +133,7 @@ export default function ClosingCTA({ data }: { data?: any } = {}) {
           </div>
           <div className="md:col-span-3 md:pt-3 flex md:justify-end">
             <a
-              ref={btnRef as any}
+              ref={btnRef}
               href={buttonHref}
               className="btn-primary w-fit"
             >

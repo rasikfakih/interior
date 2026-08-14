@@ -50,7 +50,7 @@ export default async function TenantsPage() {
                 </td>
               </tr>
             ) : (
-              rows.map((t: any) => (
+              rows.map((t) => (
                 <tr key={t.id}>
                   <td className="op-td font-mono text-xs text-ink-mute">{t.id}</td>
                   <td className="op-td font-mono text-xs text-ink-mute">{t.slug}</td>

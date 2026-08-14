@@ -15,7 +15,9 @@ export type BlockType =
   | "spacer"
   | "form";
 
-export type BlockDefinition<T = any> = {
+export type BlockData = Record<string, unknown>;
+
+export type BlockDefinition<T = BlockData> = {
   type: BlockType;
   label: string;
   description: string;

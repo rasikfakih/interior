@@ -6,7 +6,7 @@ import { bump } from "@/lib/revalidate";
 
 async function isAuthorized() {
   const session = await getServerSession(authOptions);
-  return Boolean((session?.user as any)?.id);
+  return Boolean(session?.user?.id);
 }
 
 export async function GET(
@@ -55,8 +55,8 @@ export async function PUT(
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
     bump({ kind: "team" });
     return NextResponse.json({ success: true, item: row });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
   }
 }
 

@@ -1,4 +1,5 @@
 import { ensureMigrated, pgMany, pgOne } from "@/lib/pg";
+import type { BlockType } from "@/cms/blocks/types";
 import PageBuilder from "@/components/admin/PageBuilder";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { getAdminIdentity } from "../../identity";
@@ -44,8 +45,11 @@ export default async function PageEditor({
     [pageId]
   );
   const initialBlocks = rows.map((r) => ({
-    type: r.type as any,
-    data: typeof r.data === "string" ? safeJson(r.data) : r.data ?? {},
+    type: r.type as BlockType,
+    data: (typeof r.data === "string" ? safeJson(r.data) : (r.data ?? {})) as Record<
+      string,
+      unknown
+    >,
   }));
   return (
     <AdminPageShell email={email} role={role}>
@@ -62,9 +66,12 @@ export default async function PageEditor({
   );
 }
 
-function safeJson(s: string): any {
+function safeJson(s: string): Record<string, unknown> {
   try {
-    return JSON.parse(s);
+    const parsed = JSON.parse(s) as unknown;
+    return parsed != null && typeof parsed === "object"
+      ? (parsed as Record<string, unknown>)
+      : {};
   } catch {
     return {};
   }

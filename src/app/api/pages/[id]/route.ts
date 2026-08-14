@@ -34,8 +34,8 @@ export async function GET(
     );
     if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ page, blocks });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 500 });
   }
 }
 
@@ -102,8 +102,8 @@ export async function PUT(
     bump({ kind: "pages", pageSlug: pageSlug?.slug ?? null, slug: pageSlug?.slug ?? null });
     await snapshotPage(numericId);
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
 }
 
@@ -127,7 +127,7 @@ export async function DELETE(
     }
     bump({ kind: "pages" });
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 500 });
   }
 }

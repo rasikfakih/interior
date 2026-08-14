@@ -8,7 +8,7 @@ import { ensureMigrated, pgMany } from "@/lib/pg";
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!(session?.user as any)?.id) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     }
     const gate = await requireLicense("admin");
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
            ORDER BY id DESC LIMIT 100`
         );
     return NextResponse.json(rows);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message ?? "db error" }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message ?? "db error" }, { status: 500 });
   }
 }

@@ -22,29 +22,29 @@ export async function POST(req: Request) {
     }
   }
 
-  let payload: any;
+  let payload: Record<string, unknown>;
   try {
-    payload = JSON.parse(raw);
+    payload = JSON.parse(raw) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "invalid JSON" }, { status: 400 });
   }
 
-  const purchaseCode = (payload.purchase_code || payload.code || "").toString().trim();
-  const buyerEmail = (payload.buyer_email || payload.email || "").toString().trim();
-  const studioName = (payload.studio_name || payload.item_name || `Envato install ${Date.now()}`).toString().trim();
+  const purchaseCode = String(payload.purchase_code || payload.code || "").trim();
+  const buyerEmail = String(payload.buyer_email || payload.email || "").trim();
+  const studioName = String(payload.studio_name || payload.item_name || `Envato install ${Date.now()}`).trim();
 
   if (!purchaseCode || !buyerEmail) {
     return NextResponse.json({ error: "purchase_code and buyer_email required" }, { status: 400 });
   }
 
   const slug = `envato-${purchaseCode.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").slice(0, 48)}`;
-  const tier = (payload.tier || "personal").toLowerCase() === "business" ? "business" : "personal";
+  const tier = String(payload.tier || "personal").toLowerCase() === "business" ? "business" : "personal";
 
   try {
     const id = await createTenant({ slug, studio_name: studioName, owner_email: buyerEmail, tier });
     return NextResponse.json({ ok: true, tenant_id: id, slug, state: "pending" });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e.message }, { status: 400 });
+  } catch (e: unknown) {
+    return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 400 });
   }
 }
 

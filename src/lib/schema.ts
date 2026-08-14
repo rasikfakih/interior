@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 
 export const projects = sqliteTable("projects", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -18,8 +18,8 @@ export const projects = sqliteTable("projects", {
   posterMediaId: integer("poster_media_id"),
   isPublished: integer("is_published", { mode: "boolean" }).default(true),
   orderIndex: integer("order_index").default(0),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -33,8 +33,8 @@ export const testimonials = sqliteTable("testimonials", {
   quoteJson: text("quote_json"),
   isPublished: integer("is_published", { mode: "boolean" }).default(true),
   orderIndex: integer("order_index").default(0),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -63,8 +63,8 @@ export const journalPosts = sqliteTable("journal_posts", {
   category: text("category"),
   authorName: text("author_name"),
   isPublished: integer("is_published", { mode: "boolean" }).default(true),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -92,8 +92,8 @@ export const media = sqliteTable("media", {
   alt: text("alt"),
   width: integer("width"),
   height: integer("height"),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -106,10 +106,10 @@ export const pages = sqliteTable("pages", {
   seoDescription: text("seo_description"),
   ogMediaId: integer("og_media_id"),
   isFront: integer("is_front", { mode: "boolean" }).default(false),
-  publishedAt: integer("published_at", { mode: "timestamp" } as any)
+  publishedAt: integer("published_at", { mode: "timestamp" })
     .$type<Date>(),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -161,8 +161,8 @@ export const revisions = sqliteTable("revisions", {
   entityId: integer("entity_id").notNull(),
   payload: text("payload").notNull(),
   savedById: integer("saved_by_id"),
-  savedAt: integer("saved_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  savedAt: integer("saved_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });
 
@@ -171,7 +171,7 @@ export const auditLog = sqliteTable("audit_log", {
   kind: text("kind").notNull(),
   message: text("message").notNull(),
   meta: text("meta"),
-  createdAt: integer("created_at", { mode: "timestamp" } as any)
-    .$defaultFn(() => new Date() as any)
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
     .$type<Date>(),
 });

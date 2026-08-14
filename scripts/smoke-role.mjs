@@ -44,17 +44,6 @@ if (!EMAIL || !PASSWORD) {
   process.exit(2);
 }
 
-function parseSetCookie(setCookie, name) {
-  if (!setCookie) return null;
-  const raw = Array.isArray(setCookie) ? setCookie.join(",") : String(setCookie);
-  for (const piece of raw.split(/,\s+/)) {
-    if (piece.startsWith(`${name}=`)) {
-      return piece.split(";")[0].slice(name.length + 1);
-    }
-  }
-  return null;
-}
-
 function mergeCookies(jar, setCookie) {
   if (!setCookie) return;
   for (const piece of String(setCookie).split(/,\s+/)) {

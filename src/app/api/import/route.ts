@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/license-gate";
-import { importTenantContent, CONTENT_FORMAT, CONTENT_VERSION } from "@/lib/content-export";
+import { importTenantContent } from "@/lib/content-export";
 import { appendAudit } from "@/lib/license";
 import { bump } from "@/lib/revalidate";
 

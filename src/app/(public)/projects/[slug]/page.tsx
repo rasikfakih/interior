@@ -83,7 +83,7 @@ export default async function ProjectDetailPage({
           </div>
           <div className="md:col-span-5 md:pt-3">
             <RichTextRenderer
-              json={row.description_json as any}
+              json={row.description_json as string | Record<string, unknown> | null | undefined}
               fallbackText={row.description}
             />
             {row.scope && (
@@ -169,7 +169,7 @@ async function VoicesSeed({ slug }: { slug: string }) {
             className="surface-tile p-6 md:p-7 flex flex-col gap-3"
           >
             <blockquote className="text-base md:text-lg leading-relaxed text-ink">
-              "{q.quote}"
+              &quot;{q.quote}&quot;
             </blockquote>
             <figcaption className="mt-auto pt-4 border-t hairline text-sm">
               <p className="font-medium">{q.name}</p>

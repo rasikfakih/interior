@@ -18,7 +18,6 @@ const W = 1280;
 const H = 853;
 
 const FONT = "'Cabinet Grotesk', 'Geist', system-ui, sans-serif";
-const SERIF = "'PP Editorial New', 'Tiempos Headline', serif";
 
 const PALETTES = {
   living: {

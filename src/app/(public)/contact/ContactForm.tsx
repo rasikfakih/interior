@@ -65,12 +65,12 @@ export default function ContactForm({
           <div className="md:col-span-7">
             <p className="chrome-pill mb-6 inline-flex">Contact</p>
             <h1 className="text-[clamp(2.4rem,5.5vw,4.5rem)] tracking-[-0.025em] leading-[1]">
-              Start at the kitchen table. We'll bring plans, not catalogues.
+              Start at the kitchen table. We&apos;ll bring plans, not catalogues.
             </h1>
           </div>
           <div className="md:col-span-5 md:pt-3 space-y-3 text-ink-mute">
             <p>
-              Send a short note. We'll respond the same week with two or three
+              Send a short note. We&apos;ll respond the same week with two or three
               questions about the site, the family, and the months ahead.
             </p>
             <p className="font-mono text-xs uppercase tracking-[0.18em]">
@@ -95,16 +95,16 @@ export default function ContactForm({
               Sent
             </p>
             <h2 className="text-3xl md:text-4xl tracking-tighter mt-3 mb-3">
-              Thanks - we'll write back this week.
+              Thanks - we&apos;ll write back this week.
             </h2>
             <p className="text-ink-mute">
               In the meantime, check the{" "}
-              <a
+              <Link
                 href="/journal"
                 className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
               >
                 journal
-              </a>{" "}
+              </Link>{" "}
               for our field notes, or{" "}
               <Link
                 href="/projects-v2"

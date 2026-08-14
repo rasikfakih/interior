@@ -25,17 +25,42 @@ type FormState = {
   isPublished: boolean;
 };
 
+export type ProjectFormInitial = {
+  id?: number;
+  title?: string;
+  slug?: string;
+  category?: string;
+  location?: string | null;
+  year?: string | null;
+  scope?: string | null;
+  description?: string;
+  description_json?: string | null;
+  descriptionJson?: string | null;
+  before_image?: string | null;
+  beforeImage?: string | null;
+  after_image?: string | null;
+  afterImage?: string | null;
+  poster_media_id?: number | null;
+  posterMediaId?: number | null;
+  gallery_media_ids?: number[] | string | null;
+  galleryMediaIds?: number[] | string | null;
+  model_3d?: string | null;
+  model3d?: string | null;
+  is_published?: boolean;
+  isPublished?: boolean;
+};
+
 export default function AdminProjectForm({
   initial,
   onSaved,
 }: {
-  initial?: any;
+  initial?: ProjectFormInitial;
   onSaved?: () => void;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState<FormState>(() => {
-    const r = (initial ?? {}) as any;
+    const r = initial ?? {};
     return {
       title: r.title ?? "",
       slug: r.slug ?? "",

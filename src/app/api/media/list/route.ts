@@ -12,7 +12,7 @@ import { ensureMigrated, pgMany } from '@/lib/pg';
  */
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
   try {
@@ -58,9 +58,9 @@ export async function GET(req: NextRequest) {
       rows,
       nextBefore: rows.length === limit ? rows[rows.length - 1].id : null,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     return NextResponse.json(
-      { error: e.message ?? 'list failed' },
+      { error: (e as Error).message ?? 'list failed' },
       { status: 500 }
     );
   }

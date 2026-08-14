@@ -1,6 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import type { Props as ThreeRuntimeProps } from "./three-runtime";
+import { useReducedMotion } from "@/lib/use-gsap";
 
 interface Model3DViewerProps {
   modelUrl: string;
@@ -16,20 +19,19 @@ export default function Model3DViewer({
   const ref = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [shouldMount, setShouldMount] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
     if (!el) {
-      setShouldMount(true);
-      return;
+      // Ref is attached before effects run, so this is a defensive
+      // path; mount on the next tick rather than in the effect body.
+      const t = setTimeout(() => setShouldMount(true), 0);
+      return () => clearTimeout(t);
     }
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReducedMotion(reduce);
-
-    if (reduce) {
-      setShouldMount(true);
-      return;
+    if (reducedMotion) {
+      const t = setTimeout(() => setShouldMount(true), 0);
+      return () => clearTimeout(t);
     }
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -42,18 +44,19 @@ export default function Model3DViewer({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [reducedMotion]);
 
   const height = compact ? "h-[320px]" : "h-[500px]";
 
   return (
     <div ref={ref} className={`w-full ${height} relative`}>
       {posterUrl && !shouldMount && (
-        <img
+        <Image
           src={posterUrl}
           alt="Project spatial preview"
-          className="absolute inset-0 w-full h-full object-cover rounded-[var(--radius-card)]"
-          loading="lazy"
+          fill
+          unoptimized
+          className="object-cover rounded-[var(--radius-card)]"
         />
       )}
 
@@ -86,7 +89,7 @@ function LazyCanvas({
   reducedMotion: boolean;
   onReady: () => void;
 }) {
-  const [Mod, setMod] = useState<any>(null);
+  const [Mod, setMod] = useState<ComponentType<ThreeRuntimeProps> | null>(null);
   useEffect(() => {
     let cancelled = false;
     import("./three-runtime")

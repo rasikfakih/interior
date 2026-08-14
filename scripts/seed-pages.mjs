@@ -10,10 +10,6 @@ const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
 const sqlite = new Database(DB_PATH);
 sqlite.pragma("journal_mode = WAL");
 
-function exists(rows) {
-  return rows && rows.length > 0;
-}
-
 let pageRow = sqlite
   .prepare("SELECT id FROM pages WHERE slug = 'home'")
   .get();
