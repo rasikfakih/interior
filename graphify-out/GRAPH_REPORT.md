@@ -1,16 +1,16 @@
-# Graph Report - etihad-interiors-website  (2026-08-14)
+# Graph Report - etihad-interiors-website  (2026-08-15)
 
 ## Corpus Check
-- 367 files · ~263,776 words
+- 369 files · ~270,107 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2303 nodes · 4279 edges · 188 communities (164 shown, 24 thin omitted)
+- 2347 nodes · 4321 edges · 187 communities (164 shown, 23 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8286b16f`
+- Built from commit: `f5d0e77c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -183,7 +183,6 @@
 - [[_COMMUNITY_AdminPageShell.tsx|AdminPageShell.tsx]]
 - [[_COMMUNITY_v1.18.0 - 2026-08-14 - Post-StudioOS hardening console polish, WCAG AA gate, Neon infra, durable install|v1.18.0 - 2026-08-14 - Post-StudioOS hardening: console polish, WCAG AA gate, Neon infra, durable install]]
 - [[_COMMUNITY_next-auth.d.ts|next-auth.d.ts]]
-- [[_COMMUNITY_AGENTS|AGENTS.md]]
 - [[_COMMUNITY_v1.17.0 - 2026-08-12 - StudioOS multi-tenant SaaS (Phases 0-6)|v1.17.0 - 2026-08-12 - StudioOS: multi-tenant SaaS (Phases 0-6)]]
 - [[_COMMUNITY_v1.9.0 - 2026-08-12 - Forest & Bone recalibration (palette + Newsreader + 3D seed)|v1.9.0 - 2026-08-12 - Forest & Bone recalibration (palette + Newsreader + 3D seed)]]
 - [[_COMMUNITY_v1.8.0 - 2026-08-03 - TS-014 bugfix encoding + media storage SDK|v1.8.0 - 2026-08-03 - TS-014 bugfix: encoding + media storage SDK]]
@@ -204,7 +203,7 @@
 4. `requireAdminSession()` - 83 edges
 5. `pgMany()` - 70 edges
 6. `bump()` - 68 edges
-7. `9. Last session log` - 66 edges
+7. `9. Last session log` - 67 edges
 8. `getAdminIdentity()` - 47 edges
 9. `pgQuery()` - 38 edges
 10. `withPgTx()` - 35 edges
@@ -224,15 +223,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (188 total, 24 thin omitted)
+## Communities (187 total, 23 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.18
-Nodes (16): POST(), GET(), PUT(), applyFallbackAdditiveMigrations(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath() (+8 more)
+Cohesion: 0.20
+Nodes (13): applyFallbackAdditiveMigrations(), ensureHotCopy(), getPool(), getSqlite(), getVercelHotCopyPath(), isLocalDevPath(), isVercel(), isVercelFallbackPath() (+5 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.15
-Nodes (14): GET(), POST(), ProbeResult, metadata, RotatePage(), metadata, TenantsPage(), metadata (+6 more)
+Cohesion: 0.17
+Nodes (13): GET(), POST(), ProbeResult, metadata, RotatePage(), TenantsPage(), metadata, ThemePage() (+5 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
@@ -263,16 +262,16 @@ Cohesion: 0.08
 Nodes (34): Ctx, DELETE(), GET(), getForm(), parseFields(), PUT(), rowToDto(), Ctx (+26 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.18
-Nodes (18): DELETE(), GET(), isAuthorized(), PUT(), COLUMN_MAP, DELETE(), GET(), isAuthorized() (+10 more)
+Cohesion: 0.09
+Nodes (40): POST(), DELETE(), GET(), isAuthorized(), PUT(), DELETE(), PATCH(), POST() (+32 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.80
 Nodes (4): fail(), log(), main(), ts()
 
 ### Community 11 - "Community 11"
-Cohesion: 0.22
-Nodes (14): arr(), ArraySchema, ArraySchemaKind, BlockSchema, FieldSchema, getSchema(), scalar(), ArrayEditor() (+6 more)
+Cohesion: 0.06
+Nodes (30): 10. The freeze marker (what you may not touch casually), 11. Environment variables (canonical list), 12. How to work on this project (session protocol), 13. Glossary of internal names, 14.1 System map, 14.2 Editable-page data flow, 14.3 Deployment topology, 14.4 License lifecycle (+22 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.12
@@ -280,7 +279,7 @@ Nodes (16): 10. Operator console: superadmin, 11. Curl smoke for operator, 12. D
 
 ### Community 13 - "Community 13"
 Cohesion: 0.03
-Nodes (66): 2026-06-23 - mega-deploy v1.1.0, 2026-06-25 — final doc + graph refresh, 2026-06-25 — Graphify install + session protocol wiring, 2026-06-25 — migration plan drafted (v1.1.2 / Supabase swap), 2026-06-25 — Phase 1 connectivity landed + admin seed + abandoned CSRF chain, 2026-06-25 — post-deploy bugfix sweep (v1.1.0 follow-up), 2026-06-26 — diagnosis + probe hardening (no deploy), 2026-06-27 — operator credentials verified, login green (+58 more)
+Nodes (67): 2026-06-23 - mega-deploy v1.1.0, 2026-06-25 — final doc + graph refresh, 2026-06-25 — Graphify install + session protocol wiring, 2026-06-25 — migration plan drafted (v1.1.2 / Supabase swap), 2026-06-25 — Phase 1 connectivity landed + admin seed + abandoned CSRF chain, 2026-06-25 — post-deploy bugfix sweep (v1.1.0 follow-up), 2026-06-26 — diagnosis + probe hardening (no deploy), 2026-06-27 — operator credentials verified, login green (+59 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.08
@@ -296,11 +295,11 @@ Nodes (3): __dirname, PROJECTS, repoRoot
 
 ### Community 17 - "Community 17"
 Cohesion: 0.18
-Nodes (23): GET(), NOTE: this route is intentionally not gated by NextAuth, POST(), ensureBucket(), getClient(), getStorageConfig(), head(), HeadResult (+15 more)
+Nodes (24): GET(), NOTE: this route is intentionally not gated by NextAuth, PUT(), POST(), ensureBucket(), getClient(), getStorageConfig(), head() (+16 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.11
-Nodes (24): InstallPage(), metadata, LicenseBanner(), CheckResult, reasonText, SafeLicenseBanner(), assertLicense(), canonicalBody() (+16 more)
+Cohesion: 0.15
+Nodes (18): InstallPage(), metadata, LicenseBanner(), CheckResult, reasonText, SafeLicenseBanner(), assertLicense(), canonicalBody() (+10 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.15
@@ -319,8 +318,8 @@ Cohesion: 0.24
 Nodes (11): columnsOf(), DB_PATH, ensureColumn(), run(), seedDefaultAdmin(), seedDefaultSettings(), seedMenus(), sid (+3 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.13
-Nodes (8): GLBThumbProps, LazyThree(), CameraPreset, CameraRig(), easeInOutCubic(), ModelErrorBoundary, PRESETS, ThreeRuntime()
+Cohesion: 0.12
+Nodes (10): AdminModelPreview(), usePrefersReducedMotion(), GLBThumbProps, LazyThree(), CameraPreset, CameraRig(), easeInOutCubic(), ModelErrorBoundary (+2 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.12
@@ -335,8 +334,8 @@ Cohesion: 0.25
 Nodes (16): EMPTY_DOC, RichTextEditor(), RichTextEditorProps, safeParse(), Toolbar, IconImage(), IconLink(), IconListBullets() (+8 more)
 
 ### Community 27 - "Community 27"
-Cohesion: 0.18
-Nodes (8): lenis, Announcement, AnnouncementBar(), CursorFollower(), useCursorEnabled(), NavLink, SmoothScroll(), UsageBeacon()
+Cohesion: 0.16
+Nodes (11): lenis, PublicLayout(), Announcement, AnnouncementBar(), CursorFollower(), useCursorEnabled(), SmoothScroll(), UsageBeacon() (+3 more)
 
 ### Community 28 - "Community 28"
 Cohesion: 0.33
@@ -367,16 +366,16 @@ Cohesion: 0.22
 Nodes (8): aboutPage, blockCount, contactPage, DB_PATH, journal, pageRow, projectsPage, sqlite
 
 ### Community 35 - "Community 35"
-Cohesion: 0.21
-Nodes (8): BLOCK_REGISTRY, BLOCK_TYPES, BlockData, BlockDefinition, BlockType, Block, RevisionRow, SEO_ROBOTS_OPTIONS
+Cohesion: 0.17
+Nodes (14): CustomizerPatch, DENSITIES, PalettePatch, parseDistroData(), RADIUS_SCALES, validatePatch(), contrast(), DEFAULT_PALETTE (+6 more)
 
 ### Community 36 - "Community 36"
 Cohesion: 0.09
 Nodes (22): DbProjectRow, getDbProjects(), metadata, ProjectsPage(), CtaBand(), FAQS, ProjectsHero(), Props (+14 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.11
-Nodes (22): GET(), POST(), POST(), gateOrFail(), GET(), POST(), ALLOWED_FOLDERS, ALLOWED_IMAGE_MIME (+14 more)
+Cohesion: 0.16
+Nodes (14): GET(), GET(), POST(), ALLOWED_FOLDERS, ALLOWED_IMAGE_MIME, ALLOWED_MODEL_MIME, EXT_BY_MIME, POST() (+6 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.20
@@ -384,15 +383,15 @@ Nodes (9): File location, Forbidden keys (rejected at submit), Future (v1.8+), H
 
 ### Community 39 - "Community 39"
 Cohesion: 0.08
-Nodes (34): GET(), GET(), csvCell(), Ctx, GET(), parseFields(), parsePayload(), GET() (+26 more)
+Nodes (34): GET(), GET(), GET(), isAuthorized(), POST(), asBool(), GET(), GET() (+26 more)
 
 ### Community 40 - "Community 40"
 Cohesion: 0.25
 Nodes (8): main(), OUT_DIR, PALETTES, scene, svg(), TASKS, UP_DIR, UPLOAD_COPIES
 
 ### Community 41 - "Community 41"
-Cohesion: 0.09
-Nodes (26): ClosingCTA(), ClosingCTAData, HeroClient(), HeroData, normalizeTail(), IconArrowRight(), IconArrowUpRight(), defaultEntries (+18 more)
+Cohesion: 0.14
+Nodes (13): ClosingCTA(), ClosingCTAData, IconArrowRight(), defaultEntries, Entry, JournalPreview(), JournalPreviewData, Project (+5 more)
 
 ### Community 42 - "Community 42"
 Cohesion: 0.25
@@ -400,35 +399,35 @@ Nodes (7): body, DB_LICENSE, expiresAt, installedAt, license, signature, VALID_D
 
 ### Community 43 - "Community 43"
 Cohesion: 0.08
-Nodes (15): Block, BlockData, ImageGridImage, ServiceCell, defaultItems, Principles(), PrinciplesData, defaultPhases (+7 more)
+Nodes (13): Block, BlockData, ImageGridImage, ServiceCell, ServicesTsxCells(), defaultItems, Principles(), PrinciplesData (+5 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.15
-Nodes (19): Ctx, POST(), Ctx, GET(), parsePayload(), DELETE(), PATCH(), DELETE() (+11 more)
+Cohesion: 0.16
+Nodes (19): csvCell(), Ctx, GET(), parseFields(), parsePayload(), Ctx, GET(), parsePayload() (+11 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.22
 Nodes (13): Ctx, PUT(), rowToDto(), Ctx, GET(), getProject(), POST(), rowToDto() (+5 more)
 
 ### Community 46 - "Community 46"
-Cohesion: 0.15
-Nodes (11): DbProjectRow, getDbProjects(), metadata, ProjectsV2Page(), Magnetic(), CtaBandV2(), FAQS, ProjectsHeroV2() (+3 more)
+Cohesion: 0.12
+Nodes (15): DbProjectRow, getDbProjects(), metadata, ProjectsV2Page(), HeroClient(), HeroData, normalizeTail(), IconArrowUpRight() (+7 more)
 
 ### Community 47 - "Community 47"
 Cohesion: 0.36
 Nodes (6): cookieHeader(), csrfAndCookie(), del(), get(), login(), post()
 
 ### Community 48 - "Community 48"
-Cohesion: 0.15
-Nodes (27): POST(), DEFAULT_ITEMS, GET(), MenuItem, PUT(), shapeItem(), DELETE(), PATCH() (+19 more)
+Cohesion: 0.09
+Nodes (37): Ctx, POST(), DEFAULT_ITEMS, GET(), MenuItem, PUT(), shapeItem(), GET() (+29 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.12
 Nodes (15): auditLog, journalPosts, media, menuItems, menus, pageBlocks, pages, projects (+7 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.23
-Nodes (18): DELETE(), PATCH(), POST(), DELETE(), GET(), PATCH(), applyDistro(), auditOn() (+10 more)
+Cohesion: 0.13
+Nodes (35): DELETE(), PATCH(), GET(), POST(), POST(), POST(), POST(), GET() (+27 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.40
@@ -443,8 +442,8 @@ Cohesion: 0.21
 Nodes (13): generateMetadata(), Home(), safeParse(), metadata, PreviewPage(), safeParse(), BlockRow, getFrontPage() (+5 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.22
-Nodes (10): AdminSettingsPage(), metadata, AdminSettings(), Row, Toast, getWhitelistEntry(), SETTINGS_WHITELIST, SettingsKind (+2 more)
+Cohesion: 0.23
+Nodes (9): AdminSettingsPage(), metadata, AdminSettings(), Row, Toast, SETTINGS_WHITELIST, SettingsKind, shapeRowsForEditor() (+1 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.62
@@ -471,24 +470,28 @@ Cohesion: 0.67
 Nodes (5): expectStatus(), fail(), log(), main(), ts()
 
 ### Community 62 - "Community 62"
-Cohesion: 0.20
-Nodes (12): formatBytes(), MAX_BYTES, MediaKind, MediaListResponse, MediaRow, MEDIATYPE_LABEL, UploadIntent, KIND_FILTERS (+4 more)
+Cohesion: 0.07
+Nodes (34): BLOCK_REGISTRY, BLOCK_TYPES, BlockData, BlockDefinition, BlockType, arr(), ArraySchema, ArraySchemaKind (+26 more)
 
 ### Community 63 - "Community 63"
 Cohesion: 0.15
 Nodes (12): Frame, Phase 0 - export + plan doc (this session landing), Phase 1 - Postgres-only runtime, Phase 2 - Media pipeline, Phase 3 - Media library UI, Phase 4 - Pages builder (TipTap), Phase 5 - Project CRUD, Phase 6 - Journal CRUD (+4 more)
+
+### Community 65 - "Community 65"
+Cohesion: 0.17
+Nodes (13): args, contrast(), db, DB_PATH, dirtyPath(), distro, errors, existing (+5 more)
 
 ### Community 66 - "Community 66"
 Cohesion: 0.18
 Nodes (13): GET(), GET(), POST(), ALL_TABLES, CHILD_TABLES, ContentExport, exportTenantContent(), ImportResult (+5 more)
 
 ### Community 67 - "Community 67"
-Cohesion: 0.33
-Nodes (3): ProjectDetailPage(), Row, Props
+Cohesion: 0.11
+Nodes (18): Props, LazyCanvas(), Model3DViewer(), Model3DViewerProps, defaultPhases, Phase, ProcessStickyStack(), ProcessStripV2() (+10 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.06
-Nodes (54): args, contrast(), db, DB_PATH, dirtyPath(), distro, errors, existing (+46 more)
+Cohesion: 0.16
+Nodes (20): metadata, ThemesPage(), BODY_FONT_STACKS, customizerVars(), deriveThemeVars(), DISPLAY_FONT_STACKS, hexToRgb(), isFontToken() (+12 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.22
@@ -515,20 +518,20 @@ Cohesion: 0.26
 Nodes (9): CATALOG, contrast(), cv1, cv2, deriveThemeVars(), hexToRgb(), luminance(), mix() (+1 more)
 
 ### Community 79 - "Community 79"
-Cohesion: 0.24
-Nodes (4): Props, Props, ProjectItemV2, Spotlight()
+Cohesion: 0.18
+Nodes (10): The demo story (the soul in four beats), The design soul: Forest & Bone, and why it is not a template, The founding conviction, The idea in one line, The product soul: hosted, supported, white-label, The Soul and Idea of This Project, The soul checklist (use this for every decision), The soul: the studio the theme was built from (+2 more)
 
 ### Community 80 - "LogoWall.tsx"
 Cohesion: 0.27
 Nodes (7): metadata, TenantDetailPage(), defaultDistro(), TenantDetailClient(), TenantShape, TenantUser, listTenantUsers()
 
 ### Community 81 - "Community 81"
-Cohesion: 0.17
-Nodes (11): JournalEntryPage(), IconArrowLeft(), Props, Mark, Node, renderBlock(), renderInline(), renderMark() (+3 more)
+Cohesion: 0.16
+Nodes (12): ProjectDetailPage(), Row, IconArrowLeft(), Props, Mark, Node, renderBlock(), renderInline() (+4 more)
 
 ### Community 82 - "Community 82"
-Cohesion: 0.31
-Nodes (7): useI18n(), DEFAULT_LINKS, Navbar(), Theme, ThemeContext, ThemeContextType, useTheme()
+Cohesion: 0.36
+Nodes (7): ALLOWED_ACCENT, ALLOWED_FIELDS, AllowedField, GET(), PUT(), shape(), SiteIdentity
 
 ### Community 85 - "Community 85"
 Cohesion: 0.29
@@ -551,8 +554,8 @@ Cohesion: 0.12
 Nodes (14): BASE_URL, checks, ctaH2, dbImageMarkers, eyebrowInFeatured, eyebrowInHero, eyebrowInNumbers, eyebrowInProcess (+6 more)
 
 ### Community 91 - "AdminPageHeader.tsx"
-Cohesion: 0.11
-Nodes (11): ExportImportPage(), metadata, metadata, metadata, Row, Sort, PageRow, AdminPageHeader() (+3 more)
+Cohesion: 0.13
+Nodes (8): metadata, metadata, metadata, Row, Sort, PageRow, AdminPageHeader(), NewTenantForm()
 
 ### Community 92 - "route.ts"
 Cohesion: 0.24
@@ -567,12 +570,12 @@ Cohesion: 0.38
 Nodes (6): dumpTable(), main(), OUT_DIR, SOURCE, TABLES, todayStamp()
 
 ### Community 95 - "Community 95"
-Cohesion: 0.18
-Nodes (7): Props, LazyCanvas(), Model3DViewer(), Model3DViewerProps, Props, ProjectItem, Props
+Cohesion: 0.32
+Nodes (3): Props, Props, ProjectItem
 
 ### Community 97 - "page.tsx"
-Cohesion: 0.13
-Nodes (15): handler, GET(), isAuthorized(), POST(), GET(), PUT(), GET(), isAuthorized() (+7 more)
+Cohesion: 0.22
+Nodes (8): handler, GET(), authOptions, findUserByEmail(), findUserByEmailLegacy(), getVercelHotCopy(), isVercelSqlitePath(), UserRow
 
 ### Community 98 - "Community 98"
 Cohesion: 0.25
@@ -595,12 +598,12 @@ Cohesion: 0.29
 Nodes (4): AdminTestimonialsPage(), metadata, Row, Sort
 
 ### Community 103 - "getOperatorSession"
-Cohesion: 0.18
-Nodes (15): GET(), POST(), POST(), POST(), GET(), POST(), GET(), POST() (+7 more)
+Cohesion: 0.40
+Nodes (3): metadata, AdminAnnouncements(), Announcement
 
 ### Community 104 - "Community 104"
-Cohesion: 0.12
-Nodes (19): generateMetadata(), getProject(), getRelated(), getRooms(), ProjectRow, ProjectV2DetailPage(), DetailCtaBandV2(), ProjectBeforeAfterV2() (+11 more)
+Cohesion: 0.09
+Nodes (21): generateMetadata(), getProject(), getRelated(), getRooms(), ProjectRow, ProjectV2DetailPage(), DetailCtaBandV2(), Props (+13 more)
 
 ### Community 105 - "Community 105"
 Cohesion: 0.18
@@ -627,12 +630,12 @@ Cohesion: 0.67
 Nodes (3): cookieHeader(), cookies, login()
 
 ### Community 111 - "route.ts"
-Cohesion: 0.32
-Nodes (10): GET(), POST(), GET(), PUT(), reSign(), requireSuperadmin(), License, readLicense() (+2 more)
+Cohesion: 0.29
+Nodes (11): GET(), POST(), GET(), POST(), PUT(), reSign(), requireSuperadmin(), License (+3 more)
 
 ### Community 112 - "Community 112"
-Cohesion: 0.15
-Nodes (18): POST(), POST(), GET(), adminOnlyOrFail(), DELETE(), gateOrFail(), GET(), PUT() (+10 more)
+Cohesion: 0.40
+Nodes (4): graphify, Session protocol (read before any change), The map and the compass (read first), This is NOT the Next.js you know
 
 ### Community 113 - "Community 113"
 Cohesion: 0.18
@@ -699,8 +702,8 @@ Cohesion: 0.33
 Nodes (6): Operating notes, Status, v1.2.0 - 2026-06-30 (DEPLOYED) - Production-grade persistence + admin operator polish, Verification, What does NOT change in v1.2, What landed
 
 ### Community 140 - "route.ts"
-Cohesion: 0.15
-Nodes (19): AdminFormsPage(), metadata, getAdminIdentity(), AdminInstallPage(), metadata, AdminMediaPage(), metadata, AdminMenusPage() (+11 more)
+Cohesion: 0.14
+Nodes (20): AdminFormsPage(), metadata, getAdminIdentity(), AdminInstallPage(), metadata, AdminMediaPage(), metadata, AdminMenusPage() (+12 more)
 
 ### Community 141 - "AdminInstallView.tsx"
 Cohesion: 0.38
@@ -767,12 +770,12 @@ Cohesion: 0.50
 Nodes (4): Status, v1.4.0 - 2026-07-10 (DEPLOYED) - Make-everything-editable admin pack, Verification, What landed
 
 ### Community 157 - "Testimonials.tsx"
-Cohesion: 0.12
-Nodes (13): geist, geistMono, interTight, metadata, newsreader, spaceGrotesk, GA4Script(), I18nContext (+5 more)
+Cohesion: 0.09
+Nodes (21): geist, geistMono, interTight, metadata, newsreader, spaceGrotesk, GA4Script(), I18nContext (+13 more)
 
 ### Community 158 - "createTenant"
-Cohesion: 0.83
-Nodes (3): POST(), timingSafeHexEq(), createTenant()
+Cohesion: 0.60
+Nodes (4): canonicalBody(), LicenseBody, signLicense(), testVerify()
 
 ### Community 159 - "ProcessStrip.tsx"
 Cohesion: 0.40
@@ -807,16 +810,16 @@ Cohesion: 0.38
 Nodes (5): AdminJournalEditor(), metadata, AdminJournalForm(), JournalFormInitial, slugify()
 
 ### Community 168 - "page.tsx"
-Cohesion: 0.50
-Nodes (4): AdminExportImport(), fmtRows(), ImportResult, ImportTable
+Cohesion: 0.29
+Nodes (6): ExportImportPage(), metadata, AdminExportImport(), fmtRows(), ImportResult, ImportTable
 
 ### Community 169 - "page.tsx"
 Cohesion: 0.25
 Nodes (5): AdminRedirectsPage(), metadata, EMPTY, RedirectRow, Toast
 
 ### Community 171 - "page.tsx"
-Cohesion: 0.32
-Nodes (5): metadata, BackupBoard(), BackupFile, fmtBytes(), TriggerResult
+Cohesion: 0.50
+Nodes (4): BackupBoard(), BackupFile, fmtBytes(), TriggerResult
 
 ### Community 173 - "verify-brand-v190.mjs"
 Cohesion: 0.33
@@ -834,10 +837,6 @@ Nodes (6): Notes, Status, v1.18.0 - 2026-08-14 - Post-StudioOS hardening: consol
 Cohesion: 0.50
 Nodes (3): next-auth, Session, User
 
-### Community 182 - "AGENTS.md"
-Cohesion: 0.50
-Nodes (3): graphify, Session protocol (read before any change), This is NOT the Next.js you know
-
 ### Community 183 - "v1.17.0 - 2026-08-12 - StudioOS: multi-tenant SaaS (Phases 0-6)"
 Cohesion: 0.50
 Nodes (4): Notes, Status, v1.17.0 - 2026-08-12 - StudioOS: multi-tenant SaaS (Phases 0-6), What landed
@@ -851,25 +850,25 @@ Cohesion: 0.50
 Nodes (4): Status, v1.8.0 - 2026-08-03 - TS-014 bugfix: encoding + media storage SDK, Verification, What landed
 
 ### Community 192 - "check-uptime.mjs"
-Cohesion: 0.17
-Nodes (10): probe(), urls, __dirname, json(), JSON_COLUMNS, main(), replayTable(), repoRoot (+2 more)
+Cohesion: 0.14
+Nodes (12): probe(), urls, __dirname, json(), JSON_COLUMNS, main(), replayTable(), repoRoot (+4 more)
 
 ## Knowledge Gaps
-- **944 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+939 more)
+- **982 isolated node(s):** `$schema`, `plugin`, `eslintConfig`, `install.sh script`, `config` (+977 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Json` connect `check-uptime.mjs` to `Community 0`, `Community 6`, `smoke-install.mjs`, `smoke-newsletter.mjs`, `smoke-site-identity.mjs`, `Community 8`, `Community 9`, `route.ts`, `Community 11`, `Community 15`, `Community 17`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `createTenant`, `Community 33`, `Community 36`, `Community 39`, `Community 44`, `verify-brand-v190.mjs`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 53`, `Community 55`, `Community 61`, `Community 66`, `Community 68`, `page.tsx`, `Community 76`, `LogoWall.tsx`, `Community 81`, `Community 94`, `page.tsx`, `Community 99`, `Community 100`, `Community 108`, `Community 109`, `route.ts`, `Community 112`, `Community 115`, `Community 116`?**
-  _High betweenness centrality (0.156) - this node is a cross-community bridge._
-- **Why does `ensureMigrated()` connect `Community 39` to `Community 0`, `Community 1`, `Community 3`, `Community 8`, `Community 9`, `route.ts`, `LicenseBanner.tsx`, `AdminSiteIdentity.tsx`, `Community 17`, `Community 27`, `createTenant`, `ProcessStrip.tsx`, `Community 36`, `Community 37`, `AdminJournalForm.tsx`, `Community 44`, `Community 45`, `Community 46`, `Community 48`, `Community 50`, `Community 53`, `Community 54`, `Community 66`, `Community 67`, `Community 68`, `page.tsx`, `LogoWall.tsx`, `Community 81`, `route.ts`, `page.tsx`, `page.tsx`, `getOperatorSession`, `Community 104`, `Community 112`, `route.ts`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
+- **Why does `Json` connect `check-uptime.mjs` to `Community 6`, `smoke-install.mjs`, `smoke-newsletter.mjs`, `smoke-site-identity.mjs`, `Community 8`, `Community 9`, `route.ts`, `Community 15`, `Community 17`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 33`, `Community 35`, `Community 36`, `Community 39`, `Community 44`, `verify-brand-v190.mjs`, `Community 45`, `Community 47`, `Community 48`, `Community 50`, `Community 51`, `Community 53`, `Community 55`, `Community 61`, `Community 62`, `Community 66`, `Community 68`, `page.tsx`, `Community 76`, `LogoWall.tsx`, `Community 81`, `Community 94`, `Community 99`, `Community 100`, `Community 108`, `Community 109`, `route.ts`, `Community 115`, `Community 116`?**
+  _High betweenness centrality (0.153) - this node is a cross-community bridge._
+- **Why does `ensureMigrated()` connect `Community 39` to `Community 0`, `Community 1`, `Community 3`, `Community 8`, `Community 9`, `route.ts`, `LicenseBanner.tsx`, `AdminSiteIdentity.tsx`, `Community 17`, `Community 27`, `ProcessStrip.tsx`, `Community 35`, `Community 36`, `Community 37`, `AdminJournalForm.tsx`, `Community 44`, `Community 45`, `Community 46`, `Community 48`, `Community 50`, `Community 53`, `Community 54`, `Community 66`, `Community 68`, `page.tsx`, `LogoWall.tsx`, `Community 81`, `Community 82`, `route.ts`, `page.tsx`, `page.tsx`, `Community 104`, `route.ts`?**
+  _High betweenness centrality (0.108) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `Community 5` to `Community 27`, `Community 7`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **What connects `$schema`, `plugin`, `IMPORTANT: keep the reminder string free of backticks and $(...) constructs.` to the rest of the system?**
-  _947 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _985 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.041666666666666664 - nodes in this community are weakly interconnected._
 - **Should `Community 5` be split into smaller, more focused modules?**

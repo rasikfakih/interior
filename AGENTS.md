@@ -23,6 +23,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
     `docs/CONTEXT.md` §9 remains the prose narrative.
 <!-- END:nextjs-agent-rules -->
 
+# The map and the compass (read first)
+
+Before any code, docs, or questions, read these two orientation files at the repo root:
+
+- `masterinterior.md` - the technical map. What this project is, why it exists, how it is built (stack, architecture, API surface, scripts, gates), the full release history, current state, open items, and the freeze marker. Section 14 holds the Mermaid architecture diagrams (system map, editable-page data flow, deployment topology, license lifecycle, block CMS).
+- `PROJECT-SOUL.md` - the compass. The conviction, taste, and voice underneath the build. Read it when a decision needs more than a checklist.
+
+They are the fast orientation layer above `docs/CONTEXT.md` (the append-only session narrative), which remains the authoritative history.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

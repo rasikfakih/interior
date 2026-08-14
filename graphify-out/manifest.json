@@ -715,8 +715,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1783344907.264589,
-    "ast_hash": "4277de1b14bc9d08db68e07638ff1516",
+    "mtime": 1786735433.0533667,
+    "ast_hash": "a1954d5b803c2698087874a1779ea52f",
     "semantic_hash": ""
   },
   "AGENT_BEST_PRACTICES.md": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786721827.8054638,
-    "ast_hash": "d9928800f5f9adaaae50374ec0485145",
+    "mtime": 1786735441.2705536,
+    "ast_hash": "2bed4c3828ab626f0135cd1c308d3739",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1987,6 +1987,16 @@
   "src/types/next-auth.d.ts": {
     "mtime": 1786718863.5686688,
     "ast_hash": "d77a2d743b5eef8ad64b32732e781484",
+    "semantic_hash": ""
+  },
+  "PROJECT-SOUL.md": {
+    "mtime": 1786723167.473896,
+    "ast_hash": "e8f116837f6643b7ca644203326297ed",
+    "semantic_hash": ""
+  },
+  "masterinterior.md": {
+    "mtime": 1786735429.538915,
+    "ast_hash": "a42bb11c16c90ad23404f6a9f599e0e5",
     "semantic_hash": ""
   }
 }

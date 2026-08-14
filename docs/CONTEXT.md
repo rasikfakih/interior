@@ -4221,3 +4221,23 @@ Verified: tsc 0, build green, verify:deploy green. 6 files deleted
   to if/else (no-unused-expressions).
 - Verified: node --check all scripts, npm run verify:deploy green,
   tsc 0, build green, lint:changed green, full lint 0/0.
+### 2026-08-14 - master docs: Mermaid architecture diagrams + AGENTS.md links
+
+- Appended section 14 to `masterinterior.md`: five Mermaid diagrams, all
+  grounded in sections 3-5 (no new facts, only the existing architecture
+  drawn). 14.1 system map (browser -> route groups -> src/lib services ->
+  data stores), 14.2 editable-page data flow (sequence: force-dynamic page
+  -> pg.ts -> theme.ts -> revalidate contract, plus the admin save path),
+  14.3 deployment topology (CI -> Vercel prod -> Supabase Postgres/Storage,
+  local SQLite dev parity), 14.4 license lifecycle (sequence: Envato
+  webhook -> PENDING_TENANT -> operator issue -> install.sh -> gate
+  verification), 14.5 block CMS editor-to-render path.
+- Added pointer lines in the header paragraph and under section 4 so the
+  diagrams are discoverable from the prose they visualize.
+- AGENTS.md: new "The map and the compass (read first)" section between the
+  nextjs-agent-rules block and the graphify section, linking
+  `masterinterior.md` (map) and `PROJECT-SOUL.md` (compass) as the
+  orientation layer above docs/CONTEXT.md.
+- Voice rules held: diagram labels and prose use ASCII hyphens, no emojis.
+  Both root docs are still uncommitted alongside this change; CONTEXT and
+  AGENTS.md edits are uncommitted too. Docs-only change, no TS-ID opened.
