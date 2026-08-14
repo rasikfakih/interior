@@ -654,34 +654,14 @@
     "ast_hash": "79504ee1869f42653f6fc04e47dba983",
     "semantic_hash": ""
   },
-  "src/lib/api-guard.ts": {
-    "mtime": 1783344907.5569277,
-    "ast_hash": "a52d9f7ee95aaaa55830fa0f27d5be80",
-    "semantic_hash": ""
-  },
   "src/lib/auth.ts": {
     "mtime": 1783344907.557901,
     "ast_hash": "e95d959c26b6e0f72c721d7b15d159f9",
     "semantic_hash": ""
   },
-  "src/lib/blob-adapter.ts": {
-    "mtime": 1783344907.558873,
-    "ast_hash": "7567f6fc1f70e084ad1a3cdd29e0a673",
-    "semantic_hash": ""
-  },
   "src/lib/db.ts": {
     "mtime": 1783344907.5608175,
     "ast_hash": "c8c26adfc5cb9ab57a924cb4dbff1ae2",
-    "semantic_hash": ""
-  },
-  "src/lib/i18n.ts": {
-    "mtime": 1783344907.561793,
-    "ast_hash": "a15047bd58e17ac8aa4a793f94f3d674",
-    "semantic_hash": ""
-  },
-  "src/lib/initDb.ts": {
-    "mtime": 1786611617.7578804,
-    "ast_hash": "8853e1018a2aacd5dc1e34a76e15a880",
     "semantic_hash": ""
   },
   "src/lib/license-gate.ts": {
@@ -727,11 +707,6 @@
   "src/lib/settings.ts": {
     "mtime": 1786611617.7548978,
     "ast_hash": "86f18a9e2190c26eb08c6c5dd31461d4",
-    "semantic_hash": ""
-  },
-  "src/lib/tenant-brand.ts": {
-    "mtime": 1785671800.9105601,
-    "ast_hash": "649a31fc4ae2b11e83924e94795b9f5d",
     "semantic_hash": ""
   },
   "tsconfig.json": {
@@ -800,8 +775,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786717075.7099655,
-    "ast_hash": "be1fad266be75cd6128949251684f518",
+    "mtime": 1786717545.5672927,
+    "ast_hash": "bd28d24f9089480753276177056e2523",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1002,11 +977,6 @@
   "scripts/migrate-to-supabase.mjs": {
     "mtime": 1783344907.3676753,
     "ast_hash": "ed783cf064c50f4a47289e8455292e97",
-    "semantic_hash": ""
-  },
-  "src/lib/db-postgres.ts": {
-    "mtime": 1783344907.559847,
-    "ast_hash": "bd184561c3476b2c614911017559e69a",
     "semantic_hash": ""
   },
   "supabase-bootstrap.sql": {
@@ -1430,8 +1400,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1786717068.072636,
-    "ast_hash": "35f9b78f2b185f20b5dfbe7bf41023d4",
+    "mtime": 1786717538.5024207,
+    "ast_hash": "6c9a65cffcbd60ac1f3f69a009dc0960",
     "semantic_hash": ""
   },
   "src/app/api/settings/[key]/route.ts": {
@@ -1625,8 +1595,8 @@
     "semantic_hash": ""
   },
   "scripts/check-contrast.mjs": {
-    "mtime": 1786631031.5177948,
-    "ast_hash": "7ff1f5b077098d395e54fce093db0bc9",
+    "mtime": 1786717464.2451394,
+    "ast_hash": "526448e18f51c4463dcec0ec155cf07c",
     "semantic_hash": ""
   },
   "scripts/check-uptime.mjs": {

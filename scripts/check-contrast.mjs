@@ -27,9 +27,9 @@
  *   CONTRAST_ADMIN_EMAIL / CONTRAST_ADMIN_PASSWORD
  *                        tenant-admin creds for the NextAuth login.
  *                        Defaults to the repo's committed dev seed
- *                        (admin@etihadinteriors.com / admin123) from
- *                        src/lib/initDb.ts, which also exists on the
- *                        live DB unless the operator changed it.
+ *                        (admin@etihadinteriors.com / admin123) seeded
+ *                        by scripts/migrate.mjs, which also exists on
+ *                        the live DB unless the operator changed it.
  *   CONTRAST_CREDS_FILE  path to a JSON file { "email", "password" }
  *                        for secrets-backed runs (nightly/live audits
  *                        in CI). Env vars above win over the file.

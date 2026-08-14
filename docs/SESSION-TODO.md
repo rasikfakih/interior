@@ -1098,6 +1098,38 @@ already shipped.)
   lib files (see CONTEXT 2026-08-14 entry).
 - Acceptance met: `tsc --noEmit` exit 0, `npm run build` green.
 
+### TS-ID-019 - Dead-lib audit: six unreferenced src/lib modules
+- Status: @done 2026-08-14 (pending commit)
+- Outcome: dedicated audit of the six src/lib files flagged
+  never-imported by the TS-ID-018 scan. Resolver scan (277 src
+  files) + whole-repo grep (src, scripts, root configs, middleware,
+  .opencode) + exported-symbol grep (gateAdmin, getBlobAdapter,
+  drizzlePostgres, readBrandFor, findTenant) found zero consumers
+  for each. Verdict: all six dead, all deleted:
+    - `src/lib/initDb.ts` - pre-Postgres SQLite bootstrap with
+      module-load side effects; dev admin seed lives in
+      scripts/migrate.mjs (seedDefaultAdmin). check-contrast.mjs
+      comment re-pointed to migrate.mjs.
+    - `src/lib/i18n.ts` - i18next init; superseded by
+      I18nProvider.tsx context i18n (which imports the same JSON
+      locale files directly). i18next / react-i18next /
+      i18next-http-backend deps now removable (follow-up).
+    - `src/lib/api-guard.ts` - gateAdmin never consumed; routes
+      use their own auth guards.
+    - `src/lib/blob-adapter.ts` - unwired storage scaffolding
+      ("Wired up in Week 7"); storage.ts + media.ts supersede.
+    - `src/lib/db-postgres.ts` - drizzle pg-core mirror; runtime
+      uses raw pg helpers (pg.ts). schema.ts (sqlite-core) stays
+      live, so drizzle deps remain.
+    - `src/lib/tenant-brand.ts` - legacy shim importing the
+      throwing db.ts proxy; claimed twin tenant-brand.pg.ts never
+      existed; theme distro surface lives in operator-store.ts +
+      theme.ts.
+  FREEZE-MARKER: initDb + tenant-brand entries retired from
+  carve-out lists; v1.18.0 increment records the deletions.
+- Acceptance met: `tsc --noEmit` exit 0, `npm run build` green,
+  `npm run verify:deploy` green.
+
 ---
 
 ## Pending escalation

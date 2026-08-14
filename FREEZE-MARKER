@@ -176,7 +176,6 @@ What v1.4.0 adds on top of v1.3.0, also frozen:
       - `src/components/admin/AdminInstallView.tsx`
       - `src/lib/settings-whitelist.ts`
       - `src/lib/sqlite-fallback-ddl.ts` (additive column adds)
-      - `src/lib/initDb.ts` (additive column adds)
       - `src/lib/pg.ts` (`applyFallbackAdditiveMigrations`)
       - `supabase-bootstrap.sql` (additive ALTER TABLE IF NOT
         EXISTS)
@@ -426,7 +425,6 @@ superadmin console and Envato onboarding without breaking the buyer promise:
   - `src/components/operator/**` (operator-only components)
   - `src/lib/operator-store.ts` (operator data layer)
   - `src/lib/operator-auth.ts` (operator cookie session)
-  - `src/lib/tenant-brand.ts` (tenant brand + palette reader)
 
 These surfaces are gated by `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD` env vars.
 Buyers do not see them.
@@ -647,6 +645,18 @@ rules as the increments below. Seven follow-up commits from
     DB-canonical readLicense/writeLicense with first-read import
     from data/license.json + best-effort file mirror; DB failures
     degrade to the file (0008766).
+  - Dead-lib deletions (2026-08-14, TS-ID-019, zero importers
+    repo-wide): `src/lib/initDb.ts` (pre-Postgres SQLite bootstrap;
+    migrate.mjs seeds the dev admin), `src/lib/i18n.ts` (i18next
+    init superseded by I18nProvider's context i18n),
+    `src/lib/api-guard.ts` (gateAdmin never consumed),
+    `src/lib/blob-adapter.ts` (unwired storage scaffolding),
+    `src/lib/db-postgres.ts` (drizzle pg-core mirror; runtime uses
+    raw pg helpers), `src/lib/tenant-brand.ts` (legacy SQLite shim
+    whose claimed .pg.ts twin never existed; theme distro surface
+    lives in operator-store.ts + theme.ts). `src/lib/**` frozen
+    manifest entries for initDb + tenant-brand retired with the
+    deletions.
 
 Tier-gate preserved. No buyer-facing route slug, nav label, or
 behavior changed. The v1.18.0 carve-out names exactly the files
