@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1786711873.4292116,
-    "ast_hash": "8f048b084e0f392e82f8abdc19db036e",
+    "mtime": 1786738120.1184347,
+    "ast_hash": "33e0547bfaaf23b56220ba140e09d8b3",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786737661.876958,
-    "ast_hash": "961be0e5242efde02f9be721d235e6c0",
+    "mtime": 1786738206.175154,
+    "ast_hash": "602aa9ea2f7badedfb3eb1d4ce962bda",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1395,8 +1395,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1786737655.2020698,
-    "ast_hash": "bea52189951c1ddf06449ce346bfd1fa",
+    "mtime": 1786738201.1203172,
+    "ast_hash": "cd15cade286331ae1d54975efe20a550",
     "semantic_hash": ""
   },
   "src/app/api/settings/[key]/route.ts": {
@@ -1997,6 +1997,16 @@
   "masterinterior.md": {
     "mtime": 1786735429.538915,
     "ast_hash": "a42bb11c16c90ad23404f6a9f599e0e5",
+    "semantic_hash": ""
+  },
+  "src/lib/pg-ensure-migrated.test.ts": {
+    "mtime": 1786738185.1064048,
+    "ast_hash": "b8896ff232b3e44d755c2f7fc79614e1",
+    "semantic_hash": ""
+  },
+  "vitest.config.ts": {
+    "mtime": 1786738133.1679122,
+    "ast_hash": "52a8098a0019e6e68fc9ef23ee792229",
     "semantic_hash": ""
   }
 }

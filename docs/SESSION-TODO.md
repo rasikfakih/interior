@@ -1200,6 +1200,26 @@ already shipped.)
   held; tsc 0; eslint clean; lint:changed green; build green (58/58).
 - Acceptance: closed by commit, pushed to origin/main.
 
+### TS-ID-022 - vitest regression test for ensureMigrated retry
+- Status: @done 2026-08-14 (closed by commit)
+- Owner: freebuff (user request: "Add a permanent regression test for
+  the ensureMigrated retry behavior under vitest")
+- Opened: 2026-08-14
+- Scope: new test infra + one regression suite. vitest 4.1.10 added as
+  a devDependency (first test runner in the repo), `npm test` script
+  (vitest run), vitest.config.ts with the @ -> src alias + node env
+  (license-key.test.ts excluded: it imports server-only and is not a
+  vitest suite).
+- Test file: src/lib/pg-ensure-migrated.test.ts, 3 cases driving the
+  Postgres path with pg.Pool.prototype.connect patched to count
+  attempts (no network, no fs): (1) two failing calls = two connect
+  attempts (the cached-rejection bug gave 1); (2) self-heal - success
+  after failure resolves for the next caller; (3) concurrent first
+  callers still share one in-flight run (dedupe preserved).
+- Verified: npm test 3/3, tsc 0, eslint clean on new files, build
+  green (58/58).
+- Acceptance: closed by commit.
+
 ---
 
 ## Pending escalation

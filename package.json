@@ -30,6 +30,7 @@
     "smoke:live": "node scripts/smoke-live-revalidate.mjs",
     "check:themes": "node scripts/check-theme-presets.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "test": "vitest run",
     "postinstall": "node scripts/migrate.mjs && node scripts/seed-pages.mjs && node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json && node scripts/stamp-demo-license.mjs --allow-skip"
   },
   "dependencies": {
@@ -75,7 +76,8 @@
     "eslint-config-next": "16.2.9",
     "playwright": "^1.62.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   },
   "allowScripts": {
     "better-sqlite3@12.11.1": true

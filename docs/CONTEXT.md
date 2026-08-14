@@ -4296,3 +4296,22 @@ Verified: tsc 0, build green, verify:deploy green. 6 files deleted
 - Live state at session close: check:uptime 1/1 (200 db=ok),
   verify-brand-v190 13/13. Change is uncommitted (freeze surface,
   operator-requested fix), tracked as TS-ID-021 @inprogress.
+### 2026-08-14 - TS-ID-022: vitest regression test for ensureMigrated retry
+
+- First test runner in the repo: vitest 4.1.10 added as a devDependency,
+  `npm test` script (vitest run), vitest.config.ts (alias @ -> src,
+  node environment). license-key.test.ts excluded from the runner - it
+  imports Next's server-only marker and is a standalone demo helper, not
+  a suite.
+- src/lib/pg-ensure-migrated.test.ts: 3 cases, all driving the Postgres
+  path with pg.Pool.prototype.connect patched to count attempts (no
+  network, no fs writes). (1) Two failing calls produce two connect
+  attempts - the TS-ID-021 regression (cached-rejection bug gave one).
+  (2) Self-heal: a success after a failure is served to the next caller.
+  (3) Concurrent first callers still share one in-flight run, so the
+  success-path dedupe is locked in too.
+- Verified: npm test 3/3, tsc 0, eslint clean on the new files, build
+  green (58/58). Uncommitted, tracked as TS-ID-022 @inprogress.
+- Not wired into CI yet (ci.yml runs tsc/check:themes/build/verify:
+  deploy/lint:changed); adding `npm test` to the CI steps is a natural
+  follow-up.
