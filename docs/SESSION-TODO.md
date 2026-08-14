@@ -1082,6 +1082,22 @@ already shipped.)
   - i18n content editing explicitly deferred to v2.0 per operator
     decision; demo on 2026-08-15.
 
+### TS-ID-018 - Drop orphaned components (root AdminProjectForm + operator IssueForm)
+- Status: @done 2026-08-14 (pending commit)
+- Outcome: resolver-based import scan over all 277 src files
+  (tsconfig `@/*` alias + relative paths, `from`/`import(`
+  literals) found two components with zero importers:
+  `src/components/AdminProjectForm.tsx` (v1.0.0-era root-level
+  orphan, long-documented TRACKED candidate; canonical twin at
+  `src/components/admin/AdminProjectForm.tsx` stays) and
+  `src/components/operator/IssueForm.tsx` (superseded by
+  `LicenseWizard`, which `src/app/superadmin/issue/page.tsx`
+  imports). Both `git rm`'d. Scan also confirms every other
+  src/components file is imported; never-imported remainder is
+  only app pages/API routes (Next.js file-convention routes) and
+  lib files (see CONTEXT 2026-08-14 entry).
+- Acceptance met: `tsc --noEmit` exit 0, `npm run build` green.
+
 ---
 
 ## Pending escalation

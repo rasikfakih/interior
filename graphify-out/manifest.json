@@ -449,11 +449,6 @@
     "ast_hash": "ee97363fa46c6b1819cc6add5ed1b556",
     "semantic_hash": ""
   },
-  "src/components/AdminProjectForm.tsx": {
-    "mtime": 1783344907.4664059,
-    "ast_hash": "41266f94c19c20197dc2da08a60423d2",
-    "semantic_hash": ""
-  },
   "src/components/CalendlyEmbed.tsx": {
     "mtime": 1783344907.4683516,
     "ast_hash": "88c6104ce351299f2fe7ef2ea3de425c",
@@ -634,11 +629,6 @@
     "ast_hash": "960037a625190d133a337571e0c1ebe7",
     "semantic_hash": ""
   },
-  "src/components/operator/IssueForm.tsx": {
-    "mtime": 1786569032.5999863,
-    "ast_hash": "6b46437e551efe39fecab7a681d6bbbe",
-    "semantic_hash": ""
-  },
   "src/components/operator/NewTenantForm.tsx": {
     "mtime": 1786569044.4562194,
     "ast_hash": "ba8aa6360849c28a69e0ecd2a30ea0ac",
@@ -810,8 +800,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786716596.6068907,
-    "ast_hash": "d854df9ed21f8908f94d6c5aa9d0f5f9",
+    "mtime": 1786717075.7099655,
+    "ast_hash": "be1fad266be75cd6128949251684f518",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1440,8 +1430,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1786565643.2016537,
-    "ast_hash": "5e4ce4f3b82738a0f2c92605cf9121b8",
+    "mtime": 1786717068.072636,
+    "ast_hash": "35f9b78f2b185f20b5dfbe7bf41023d4",
     "semantic_hash": ""
   },
   "src/app/api/settings/[key]/route.ts": {

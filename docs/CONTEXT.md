@@ -4068,3 +4068,30 @@ sizes (80x80 team, 44x44 voices) with object-cover rounding.
 Verified: tsc 0, build green; local server renders team avatars
 through /_next/image?url= (no raw <img src=unsplash), /voices has
 zero <img> (null photos fall back to initial tiles). 2 files, +5/-3.
+
+### 2026-08-14 - dead-component deletion + full import scan (TS-ID-018)
+
+Deleted two components with zero importers, verified by a
+resolver-based scan of all 277 src files (resolves tsconfig @/*
+alias and relative paths for every `from "..."` / `import("...")`
+literal):
+
+- `src/components/AdminProjectForm.tsx` - the v1.0.0-era root-level
+  orphan documented since 2026-07-06 findings. Canonical twin
+  `src/components/admin/AdminProjectForm.tsx` (imported by
+  `src/app/admin/projects/[id]/page.tsx`) untouched.
+- `src/components/operator/IssueForm.tsx` - superseded by
+  `LicenseWizard`; `src/app/superadmin/issue/page.tsx` imports
+  LicenseWizard, so the delete is safe. New finding from this scan.
+
+Scan methodology detail: naive basename greps are unreliable (the
+root and admin twins share a basename); the resolver scan disambiguates
+by path. Every other src/components file is imported. The remaining
+136 never-imported files are app pages + API routes (Next.js
+file-convention routing) and lib modules (initDb, i18n, api-guard,
+blob-adapter, db-postgres, tenant-brand) whose importers may live in
+scripts or which are legacy shims - recorded, not deleted, pending a
+dedicated dead-lib audit.
+
+Verified: tsc 0, build green. TS-ID-018 opened in SESSION-TODO
+(pending commit). 2 files deleted, -249 lines.
