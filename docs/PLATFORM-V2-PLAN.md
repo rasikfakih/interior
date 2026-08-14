@@ -282,15 +282,19 @@ Phase ordering rationale: foundations first (0), then the WordPress-parity admin
 
 | # | Question | Recommendation | Rasik answer |
 |---|---|---|---|
-| 1 | Platform name | StudioOS (working title) | |
-| 2 | Per-room 3D assets for the 3 demo projects | I ship a procedural placeholder room generator now; you or your 3D artist supply real GLBs later (upload path ready) | |
-| 3 | Visual direction | Keep Forest & Bone, push cinematic (section 0) | |
-| 4 | Analytics source for superadmin metrics | Lightweight self-hosted `usage_events` + keep GA4 for marketing | |
-| 5 | Tier feature matrix (seats, storage caps, custom domain, locales) | personal: 1 seat, 2 GB, no custom domain; business: 3 seats, 10 GB, custom domain, locales | |
-| 6 | Transactional email provider | Resend (needs an account + API key from Rasik) for license emails, invites, form notifications | |
-| 7 | Bundled fonts for the customizer | Newsreader + Geist (current) + 2 additions (Inter Tight, Space Grotesk) bundled via next/font | |
-| 8 | WordPress import | JSON export/import first; XML importer after v2.0 | |
-| 9 | Demo date | Keep Aug 15 with Phases 0/1/3/4; full back office lands after | |
-| 10 | Backup cadence | Daily snapshot via cron + manual trigger in superadmin | |
+| 1 | Platform name | StudioOS (working title) | StudioOS (confirmed - shipped as the v1.17.0 release name) |
+| 2 | Per-room 3D assets for the 3 demo projects | I ship a procedural placeholder room generator now; you or your 3D artist supply real GLBs later (upload path ready) | SHIPPED - placeholder room generator (Phase 3, 4 GLBs) + media-library GLB upload path; real models swap in with no code change |
+| 3 | Visual direction | Keep Forest & Bone, push cinematic (section 0) | SHIPPED - Forest & Bone (muted aligned to #56605A for the AA contrast gate) + cinematic immersion (Phases 3-4) |
+| 4 | Analytics source for superadmin metrics | Lightweight self-hosted `usage_events` + keep GA4 for marketing | SHIPPED - usage_events (pageviews, model_3d_load, form_submit) surfaced on /superadmin/metrics; GA4 stays for marketing |
+| 5 | Tier feature matrix (seats, storage caps, custom domain, locales) | personal: 1 seat, 2 GB, no custom domain; business: 3 seats, 10 GB, custom domain, locales | PARTIAL - tiers ship as license labels (personal/business); seats / storage caps / custom-domain / locales are NOT enforced in code yet. Enforcement deferred to v2.0 - operator to confirm scope |
+| 6 | Transactional email provider | Resend (needs an account + API key from Rasik) for license emails, invites, form notifications | PENDING - license emails still copy-paste handoff from the wizard response; needs a Resend account + API key from operator before v2.0 |
+| 7 | Bundled fonts for the customizer | Newsreader + Geist (current) + 2 additions (Inter Tight, Space Grotesk) bundled via next/font | SHIPPED - Newsreader + Geist + Inter Tight + Space Grotesk bundled; customizer font tokens resolve them |
+| 8 | WordPress import | JSON export/import first; XML importer after v2.0 | SHIPPED - versioned JSON envelope export/import (Phase 6); XML importer deferred post-v2.0 |
+| 9 | Demo date | Keep Aug 15 with Phases 0/1/3/4; full back office lands after | CONFIRMED - Aug 15 demo; Phases 0-6 all landed, back office included |
+| 10 | Backup cadence | Daily snapshot via cron + manual trigger in superadmin | PARTIAL - manual trigger + download shipped (/superadmin/backup, npm run backup:postgres); daily cron not wired (no cron infra configured) - cadence decision pending |
 
-Answers to this ledger are the kick to Phase 0 execution. Items 2, 5, 6 are the only hard blockers; everything else has a safe default.
+Answers to this ledger are the kick to Phase 0 execution. Updated
+2026-08-14 (v1.18.0 stamp): Q1-Q4, Q7-Q9 answered by shipped
+evidence; Q2 shipped; Q5 / Q6 / Q10 flagged PARTIAL / PENDING with
+the operator input required. Items 5, 6, 10 are the remaining open
+tracks before v2.0.

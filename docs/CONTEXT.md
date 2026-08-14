@@ -3855,3 +3855,176 @@ Shipped the last core phase: tenant content export/import, the operator backup c
 **Validation.** `tsc` / `build` / `check:themes` / `lint:changed` / `verify:deploy` green. Authenticated E2E on the local SQLite runtime **30/30 PASS**: gates; backup trigger/list/download/attachment/traversal-404; export envelope well-formed; import applies + persists + rejects unknown tables and wrong format; model_3d_load/form_submit records 204 + metrics counts; restore-back-to-original verified. One lint catch: a sync `setBusy(false)` in the ExportImportRoutePanel effect was replaced by deriving the initial phase from the role. All local state restored.
 
 Phases 0-6 complete and uncommitted. Next: commit + deploy (v1.17.0), then Phase 7 (i18n, parked) and the demo on 2026-08-15.
+
+### 2026-08-14 - demo checklist completion + live palette divergence (RED)
+
+Operator confirmed the pre-demo checklist in
+`docs/DEMO-WALKTHROUGH-2026-08-15.md` complete. Independently
+verified from the repo (this session, audit turn):
+
+- `npx tsc --noEmit` exit 0. `npm run verify:deploy` 19/19.
+  `npm run check:themes` PASS 8. `npm run build` green (~60
+  dynamic routes). `npm run lint:changed` clean (working tree
+  was clean at session start).
+- Live probes: `/`, `/projects-v2`, `/projects-v2/casa-mira`,
+  `/admin`, `/superadmin`, `/themes`, `/voices` all HTTP 200.
+  `/api/health` 200 db=ok 2ms. `npm run check:uptime` 1/1.
+- `data/backups/postgres-2026-08-12.json` present (43,705 bytes).
+
+RED item: `node scripts/verify-brand-v190.mjs` returns pass=4
+fail=9 on the live URL. Newsreader PASS on every page, but the
+recalibrated Forest & Bone palette (ink #122a20 / paper #ecece6
+/ accent #c0964f / muted #626d66) is NOT served. Root cause:
+the live tenant 1 distro row (updated 2026-08-13, during the
+post-v1.17.0 console/contrast commits) carries the cold-luxury
+preset palette (ink #1c2127 / paper #eef1f4 / accent #5b7d9e,
+matching theme-presets.ts cold-luxury). The theme engine
+resolves the distro row before studio-brand.json, so the live
+home + /projects render blue-grey, not Forest & Bone.
+data/theme.distro.json + data/studio-brand.json still ship the
+forest palette. Demo beat 1 ("Forest & Bone look") currently
+does not match the on-screen look.
+
+Open decision: (a) re-apply the forest distro to tenant 1
+(operator console /superadmin/theme or scripts/apply-distro.mjs
+with DATABASE_URL set) to restore the recalibrated brand and
+flip the probe to 13/13, or (b) adopt cold-luxury as the demo
+look and realign the walkthrough doc + distro files + probe.
+Not resolved this session - operator call, demo is 2026-08-15.
+
+Docs-only change this session (docs/DEMO-WALKTHROUGH-2026-08-15.md
+checklist marked complete with the RED flag + completion log).
+No AST churn, so graphify update skipped per the docs-only
+precedent (2026-07-02 entry); next code change rebuilds.
+
+Unchanged carry-forwards from the audit turn: the seven
+2026-08-13 commits (bae674e..0008766) still lack a CONTEXT
+section 9 entry, CHANGELOG stamp, FREEZE-MARKER roll, and
+version bump (package.json still 1.17.0, FREEZE status PENDING
+DEPLOY); 20 em-dashes across admin/superadmin surfaces; raw
+`<img>` in StudioServer/VoicesServer/Model3DViewer/
+three-runtime/RichTextRenderer; orphan
+`src/components/AdminProjectForm.tsx`; PLATFORM-V2-PLAN
+decision ledger rows 1/3/4/7/8/9/10 unanswered; i18n switcher
+still near-decorative (open item 1 of the demo doc).
+
+### 2026-08-14 - Forest & Bone re-applied to live tenant 1 (RED closed, verify-brand 13/13)
+
+Follow-up to the 2026-08-14 demo-checklist entry. Operator chose
+Forest & Bone as the demo look; the cold-luxury palette on the
+live tenant 1 distro row was the divergence.
+
+- Verified (read-only) before touching: live tenants table has
+  exactly one row (id=1 slug=studio). The tenant 1 distro row
+  (updated 2026-08-13, during the post-v1.17.0 console/contrast
+  commits) carried palette ink #1c2127 / muted #5c6770 / paper
+  #eef1f4 / accent #5b7d9e (cold-luxury preset family) while every
+  other key matched the shipped data/theme.distro.json. The
+  `_comment` still said "Forest & Bone recalibrated (v1.9.0)",
+  so only the four palette hexes had been swapped.
+- Applied: UPDATE tenant_data SET data = <data/theme.distro.json
+  forest distro>::jsonb, updated_at = NOW() WHERE tenant_id = 1
+  AND kind = 'distro' (mirrors operator-console applyDistro,
+  including an audit_log kind='distro.apply' entry). Pre-change
+  rows backed up (gitignored data/backups/):
+    distro-tenant1-pre-forest-2026-08-14T12-41-38.json
+    distro-tenant1-pre-muted-align-2026-08-14T12-42-03.json
+- Aligned data/theme.distro.json muted #56605A -> #626D66. The
+  shipped distro file had diverged from studio-brand.json + the
+  v1.9.0 documented recalibrated muted value; now all palette
+  sources (distro file, brand file, probe, live row) agree.
+  #626D66 passes the AA gate vs paper (4.54:1, per v1.9.0 log).
+- verify-brand-v190: pass=13 fail=0. Home + /projects serve
+  Newsreader + ink #122a20 / paper #ecece6 / accent #c0964f /
+  muted #626d66; live distro row check green. Served HTML
+  confirmed directly (--ink:#122A20 in the injected theme style).
+- Docs updated: docs/DEMO-WALKTHROUGH-2026-08-15.md checklist item
+  1 flipped to GREEN with the resolution log; docs/CONTEXT.md this
+  entry. Working tree: 3 modified files (data/theme.distro.json,
+  docs/CONTEXT.md, docs/DEMO-WALKTHROUGH-2026-08-15.md), nothing
+  staged, no code change. graphify update skipped (JSON + docs
+  only, no AST churn, per the docs-only precedent).
+
+Still open (unchanged): i18n switcher (demo doc open item 1);
+the seven 2026-08-13 commits without CONTEXT/CHANGELOG/FREEZE/
+version stamp; em-dash sweep; raw <img> surfaces; orphan
+AdminProjectForm.tsx; PLATFORM-V2-PLAN ledger rows.
+
+### 2026-08-14 - v1.18.0 stamp: seven 08-13 commits + Forest muted alignment
+
+The seven post-v1.17.0 commits (2026-08-13, bae674e..0008766) were
+never documented. Stamped as v1.18.0 this session:
+
+- `bae674e` feat(icons): Phosphor duotone icon surface across
+  public / admin / superadmin (src/components/icons.tsx + 15
+  consumers incl. RichTextEditor toolbar rewrite).
+- `359f69a` feat(console): unified admin/operator console chrome +
+  WCAG AA contrast gate. scripts/check-contrast.mjs (618-line
+  computed-style walker, CI gate) + scripts/check-boolean-sql.mjs
+  (Postgres boolean guard) + playwright devDep + npm run
+  check:contrast. Token recalibration (ink-mute/ink-soft split,
+  accent-deep mix 0.42, ::placeholder fix); distro muted synced to
+  #56605A.
+- `3d0224c` fix(infra): Neon pool max 10 -> max 1 per lambda +
+  connectionTimeoutMillis 10s (Neon 15-session pooled cap); detail
+  pages (projects, projects-v2, journal) render honest 500s on DB
+  failure instead of flapping 404s via catch->notFound().
+- `37798af` fix(ci): check-contrast admin login hardened, creds via
+  env or secrets-backed creds file.
+- `c901be5` feat(taste): smoke-settings + smoke-editable-crossc
+  rewritten to the settings-whitelist contract (v1.4.0
+  assertion-vs-design mismatch CLOSED), Navbar taste pass, metadata
+  cleanup, .gitignore additions.
+- `8f0d94f` fix(install): stamp-advance refuses cleanly on
+  serverless read-only hosts.
+- `0008766` feat(install): durable Postgres-backed license store -
+  license_doc singleton table (all three schema surfaces + pg.ts
+  additive), async DB-canonical readLicense/writeLicense with
+  first-read import from data/license.json + best-effort file
+  mirror, DB failure degrades to file. Stamp route drops the
+  read-only filesystem probe and restores the POST first-install
+  handler.
+
+Muted correction (this session, surfaced by the demo prep):
+- The v1.9.0 recalibration set muted #626D66, but the v1.17.0
+  contrast walker measures #626D66 at 4.06-4.22:1 on the elevated
+  surfaces (bg-elev #dfe0da / surface-tile) and fails AA. 359f69a
+  had already synced the distro muted to #56605A (5.51:1 vs paper,
+  4.73-5.10:1 elevated) but six other palette sources stayed on
+  #626D66: data/studio-brand.json, src/lib/theme.ts
+  DEFAULT_PALETTE, src/lib/studio-brand.ts DEFAULTS, the forest
+  preset in theme-presets.ts, check-theme-presets.mjs CATALOG, and
+  the verify-brand-v190 expectation. All aligned to #56605A this
+  session. NOTE: an earlier session entry in this log (2026-08-14
+  forest re-apply) mentioned muted #626D66 - that was superseded
+  within the same day once the walker measured the elevated
+  surfaces; #56605A is canonical.
+- Local runtime gotcha re-learned: `next start` loads .env.local,
+  so local walker/probe runs read the LIVE Postgres distro row, not
+  the local SQLite. apply-distro.mjs only touches the local SQLite
+  file; a live-row change requires the operator-console applyDistro
+  path or a direct tenant_data UPDATE (done here, with backups).
+- Live tenant 1 distro row re-applied with the aligned file:
+  ink #122A20 / paper #ECECE6 / accent #C0964F / muted #56605A.
+  Pre-change backups in data/backups/
+  (distro-tenant1-pre-forest-*, pre-muted-align-*,
+  pre-56605a-2026-08-14T12-50-07.json). audit_log distro.apply
+  entries recorded.
+
+Verification this session: tsc 0; verify:deploy 19/19; check:themes
+PASS 8; build green; lint:changed clean; verify-brand-v190 13/13
+live; check-contrast public surfaces 26 pass 0 fail; live routes
+all 200.
+
+Doc rolls: package.json 1.17.0 -> 1.18.0; CHANGELOG v1.18.0 entry
+prepended; FREEZE-MARKER rolled to v1.18.0 (increment section,
+current state, procedural signature 1.17.0 -> 1.18.0);
+PLATFORM-V2-PLAN decision ledger answered from shipped evidence
+(Q1-Q4, Q7-Q9), Q2 shipped, Q5/Q6/Q10 flagged PARTIAL/PENDING;
+docs/DEMO-WALKTHROUGH item 1 note corrected to muted #56605A.
+
+Carry-forward unchanged: i18n switcher (demo doc open item 1,
+demo is 2026-08-15); em-dash sweep; raw <img> in
+StudioServer/VoicesServer/Model3DViewer/three-runtime/
+RichTextRenderer; orphan src/components/AdminProjectForm.tsx;
+graphify update runs at session close per protocol.

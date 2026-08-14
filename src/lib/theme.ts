@@ -56,7 +56,7 @@ export const DEFAULT_PALETTE: ThemePalette = {
   ink: "#122a20",
   paper: "#ecece6",
   accent: "#c0964f",
-  muted: "#626d66",
+  muted: "#56605a",
 };
 
 export const FONT_TOKENS: ThemeFontToken[] = [

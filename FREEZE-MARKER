@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.17.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v1.18.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.17.0. Until
+This file is the authoritative freeze marker for v1.18.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -596,31 +596,91 @@ rules as the phases below (each phase's file list is recorded in
     schema surfaces (`scripts/migrate.mjs`, `supabase-bootstrap.sql`,
     `src/lib/sqlite-fallback-ddl.ts`, pg.ts additive ALTERs).
 
+## v1.18.0 increment (post-StudioOS hardening + palette consistency)
+
+What v1.18.0 adds on top of v1.17.0, frozen under the same carve-out
+rules as the increments below. Seven follow-up commits from
+2026-08-13 (bae674e..0008766) plus the 2026-08-14 stamp session:
+
+  - `src/components/icons.tsx` (new) - Phosphor duotone icon surface
+    wired across public / admin / superadmin chrome; RichTextEditor
+    toolbar rewrite (bae674e).
+  - `src/components/admin/AdminMenus.tsx`,
+    `src/components/admin/ProjectRoomsManager.tsx`,
+    `src/components/AdminPageHeader.tsx` + admin page shells,
+    `src/app/admin/identity.ts` (new) - unified admin/operator
+    console chrome (359f69a).
+  - `scripts/check-contrast.mjs` (new, 618 lines) - computed-style
+    WCAG AA walker over public + admin + superadmin routes in both
+    themes; CI gate. `scripts/check-boolean-sql.mjs` (new) -
+    Postgres boolean-column guard; CI gate. `npm run check:contrast`
+    script + playwright devDependency (359f69a, hardened in
+    37798af).
+  - `src/lib/theme.ts` / `src/lib/studio-brand.ts` /
+    `src/lib/theme-presets.ts` / `scripts/check-theme-presets.mjs` /
+    `data/studio-brand.json` / `data/theme.distro.json` /
+    `scripts/verify-brand-v190.mjs` - Forest & Bone `muted` aligned
+    to `#56605A` in every palette source (was `#626D66` in six of
+    them) so the WCAG AA contrast gate and the brand probe agree
+    (2026-08-14 stamp).
+  - `src/lib/pg.ts` - Neon pooled pool sizing (`max: 1` per lambda,
+    `connectionTimeoutMillis: 10s`) + detail pages render honest
+    500s on DB read failure instead of flapping 404s (3d0224c).
+  - `src/app/(public)/projects/[slug]/page.tsx`,
+    `src/app/(public)/projects-v2/[slug]/page.tsx`,
+    `src/app/(public)/journal/[slug]/page.tsx` - honest 500 paths
+    (3d0224c).
+  - `scripts/smoke-settings.mjs`, `scripts/smoke-editable-crossc.mjs`
+    - rewritten to the settings-whitelist contract (v1.4.0 mismatch
+    closed); `src/components/Navbar.tsx` taste pass; `src/app/layout.tsx`
+    metadata cleanup (c901be5).
+  - `src/app/api/install/stamp/route.ts` +
+    `src/components/admin/AdminInstallView.tsx` +
+    `scripts/smoke-install.mjs` - stamp-advance refuses cleanly on
+    serverless read-only hosts; first-install POST restored
+    (8f0d94f, 0008766).
+  - `src/lib/license.ts`, `src/app/api/install/stamp/route.ts`,
+    `src/app/api/admin/license/route.ts`, `src/app/api/license/route.ts`
+    - durable Postgres-backed license store: new `license_doc`
+    singleton table (supabase-bootstrap.sql +
+    sqlite-fallback-ddl.ts + pg.ts additive ALTER), async
+    DB-canonical readLicense/writeLicense with first-read import
+    from data/license.json + best-effort file mirror; DB failures
+    degrade to the file (0008766).
+
+Tier-gate preserved. No buyer-facing route slug, nav label, or
+behavior changed. The v1.18.0 carve-out names exactly the files
+above; everything else under `src/**` / `scripts/**` stays frozen
+per the inherited manifest.
+
 ## Current state
 
-  - **Frozen since**: 2026-08-12 (rolled forward from v1.9.0
-    2026-08-12, v1.8.0 2026-08-03, v1.7.0 2026-08-02,
-    v1.6.0 2026-07-13, v1.5.0 2026-07-13, v1.4.4 2026-07-13,
-    v1.4.3 2026-07-11, v1.4.2 2026-07-11, v1.4.1 2026-07-11,
-    v1.4.0 2026-07-09, v1.3.0 2026-07-01, v1.2.0 2026-06-30,
-    v1.1.2 2026-06-28, v1.1.0 2026-06-23, v1.0.0 2026-06-18)
-  - **Version**: 1.17.0
+  - **Frozen since**: 2026-08-14 (rolled forward from v1.17.0
+    2026-08-12, v1.9.0 2026-08-12, v1.8.0 2026-08-03,
+    v1.7.0 2026-08-02, v1.6.0 2026-07-13, v1.5.0 2026-07-13,
+    v1.4.4 2026-07-13, v1.4.3 2026-07-11, v1.4.2 2026-07-11,
+    v1.4.1 2026-07-11, v1.4.0 2026-07-09, v1.3.0 2026-07-01,
+    v1.2.0 2026-06-30, v1.1.2 2026-06-28, v1.1.0 2026-06-23,
+    v1.0.0 2026-06-18)
+  - **Version**: 1.18.0
   - **Live URL**: https://ethinterior.vercel.app
-  - **Status**: PENDING DEPLOY 2026-08-12. StudioOS v1.17.0: the
-    hosted multi-tenant SaaS build (Phases 0-6) - WordPress-grade
-    tenant admin, per-room 3D walkthroughs, public immersion pass,
-    and the superadmin back office (license wizard, health board,
-    revenue + usage metrics, login-as, announcements, backup,
-    import/export). `npx tsc --noEmit` exit 0. `npm run check:themes`
-    PASS 8. `npm run verify:deploy` green. Phase E2E on the local
-    SQLite runtime: 16/16, 43/43, 26/26, 35/35, 30/30.
+  - **Status**: STAMPED 2026-08-14, PENDING DEPLOY. v1.18.0: the
+    seven post-StudioOS follow-up commits (icons, unified console +
+    WCAG AA contrast gate, Neon pool sizing + honest 500s, CI
+    hardening, taste pass + smoke fixes, serverless-safe
+    stamp-advance, durable Postgres license store) plus the Forest
+    & Bone `muted` alignment to `#56605A` across every palette
+    source and the live tenant 1 re-apply. `npx tsc --noEmit` exit
+    0. `npm run check:themes` PASS 8. `npm run verify:deploy`
+    19/19. `verify-brand-v190` 13/13 (live). `check-contrast`
+    (public surfaces) 26 pass, 0 fail.
 
 ## Procedural signature
 
 Freeze marker is changed only via:
 
-  - Bumping `package.json` version from `1.9.0` to `1.17.0`
-  - Adding a v1.17.0 entry to `CHANGELOG.md`
+  - Bumping `package.json` version from `1.17.0` to `1.18.0`
+  - Adding a v1.18.0 entry to `CHANGELOG.md`
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.

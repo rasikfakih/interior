@@ -29,7 +29,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     name: "Forest",
     family: "Deep green / bone / amber",
     description: "The studio default. Calm naturalist read.",
-    palette: { ink: "#122a20", paper: "#ecece6", accent: "#c0964f", muted: "#626d66" },
+    palette: { ink: "#122a20", paper: "#ecece6", accent: "#c0964f", muted: "#56605a" },
   },
   {
     slug: "cold-luxury",

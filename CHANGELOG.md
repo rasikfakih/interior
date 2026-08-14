@@ -2,6 +2,121 @@ CHANGELOG
 
 # Etihad Interiors Theme - Built For Sale + Resell
 
+## v1.18.0 - 2026-08-14 - Post-StudioOS hardening: console polish, WCAG AA gate, Neon infra, durable install
+
+### Status
+
+Seven follow-up commits landed on `main` on 2026-08-13, right after
+v1.17.0, and were never stamped (no CHANGELOG entry, no freeze roll,
+no version bump). This release rolls the version and documents them,
+plus a palette consistency fix surfaced during demo prep on
+2026-08-14: the Forest & Bone `muted` token is now `#56605A` in every
+palette source so the WCAG AA contrast gate (CI) and the brand probe
+(`verify-brand-v190`) agree. The live tenant 1 distro row is
+re-applied to match.
+
+### What landed (commits bae674e..0008766, 2026-08-13)
+
+- **Phosphor duotone icon surface (`bae674e`).** New
+  `src/components/icons.tsx` icon set applied across public, tenant
+  admin, and superadmin chrome (ContactForm, InstallForm, journal /
+  projects detail, Footer, HeroClient, JournalPreview, SelectedWork,
+  SpatialWalkthroughs, RichTextEditor toolbar rewrite, AdminMenus,
+  ProjectRoomsManager, ProjectHeader).
+- **Unified admin/operator console + WCAG AA contrast gate
+  (`359f69a`).** Shared admin page shell (AdminShell + sticky
+  topbar), operator console primitives (op-*, StudioOS login,
+  status chips), extended icon surface, and 3D viewer `trackUsage`
+  opt-out so operator previews never inflate public usage metrics.
+  New `scripts/check-contrast.mjs` computed-style WCAG AA walker
+  (84 routes x 2 themes, alpha-composited backdrops, fails the build
+  below AA) wired into CI, plus `scripts/check-boolean-sql.mjs`
+  (rejects `= 1` on boolean columns; announcement / newsletter
+  queries rewritten to TRUE literals). Token recalibration to match:
+  light `ink-mute` / `ink-soft`, `accent-deep` role-split
+  (mix 0.42) with real `.text-accent-deep` / `.text-ink-soft`
+  classes, dark `ink-soft`, global `::placeholder` fix, distro
+  `muted` synced to `#56605A`. Playwright devDependency added;
+  `npm run check:contrast` script.
+- **Neon pooled pool sizing + honest 500s (`3d0224c`).** `getPool`
+  `max: 10` -> `max: 1` per lambda with `connectionTimeoutMillis:
+  10s`: two concurrent warm lambdas at max:10 exceeded Neon's
+  15-session pooled limit during the deploy rollout and surfaced as
+  flapping 404s on the detail pages. Detail pages now log and render
+  a real 500 on pool/connection failure; `notFound()` is reserved
+  for a genuinely missing or unpublished row. Secondary sections
+  (rooms, related) degrade to empty but log.
+- **CI hardening for the contrast walker (`37798af`).** Admin login
+  flow in `check-contrast.mjs` hardened; creds come from env
+  (`CONTRAST_ADMIN_EMAIL` / `CONTRAST_ADMIN_PASSWORD`) or a
+  secrets-backed creds file instead of hardcoded defaults.
+- **Taste pass + smoke fixes (`c901be5`).** `smoke-settings.mjs` and
+  `smoke-editable-crossc.mjs` rewritten to match the
+  settings-whitelist contract (the v1.4.0 assertion-vs-design
+  mismatch is closed); Navbar taste pass; metadata cleanup;
+  `.gitignore` additions (logs, dated graph backups).
+- **Serverless-safe stamp-advance (`8f0d94f`).** The install
+  stamp-advance route refuses cleanly on serverless read-only hosts
+  instead of a confusing 503; smoke updated.
+- **Durable Postgres-backed license store (`0008766`).** The
+  signed license document moved out of `data/license.json` into a
+  new `license_doc` singleton table so stamp-advance, first-install,
+  and superadmin re-issue persist on serverless hosts with read-only
+  bundles. `readLicense` / `writeLicense` are async and
+  DB-canonical with a first-read import from the legacy file and a
+  best-effort file mirror for localhost tooling; DB failures degrade
+  to the file rather than killing the license gate. The stamp route
+  drops the read-only filesystem probe (no more serverless 503 when
+  a license + HMAC key exist), restores the POST first-install
+  handler, and reports `canAdvance` from store durability. Schema:
+  `license_doc(id, data, updated_at)` added to
+  `supabase-bootstrap.sql` + `sqlite-fallback-ddl.ts` + pg.ts
+  additive ALTER.
+
+### What landed (2026-08-14 stamp session)
+
+- **Forest `muted` aligned to `#56605A` everywhere.** The v1.9.0
+  recalibration set muted to `#626D66`; the v1.17.0 contrast walker
+  measures `#626D66` at 4.06-4.22:1 on the elevated surfaces
+  (`bg-elev` / `surface-tile`) and fails AA, which is why `359f69a`
+  synced the distro to `#56605A`. `studio-brand.json`, the distro
+  file, `theme.ts` DEFAULT_PALETTE, `studio-brand.ts` DEFAULTS, the
+  `forest` preset + `check-theme-presets.mjs` CATALOG, and the
+  `verify-brand-v190` expectation were still on `#626D66`; all now
+  carry `#56605A` (5.51:1 vs paper, 4.73-5.10:1 on elevated
+  surfaces). `globals.css` already had `#56605a`.
+- **Live demo tenant re-applied.** The tenant 1 distro row had
+  drifted to the cold-luxury palette (updated 2026-08-13); the
+  Forest & Bone distro was re-applied directly (tenant_data JSONB
+  UPDATE + audit_log `distro.apply`), with pre-change rows backed up
+  in `data/backups/` (`distro-tenant1-pre-forest-*`,
+  `distro-tenant1-pre-muted-align-*`, `distro-tenant1-pre-56605a-*`).
+
+### Verification
+
+- `npx tsc --noEmit` exit 0
+- `npm run verify:deploy` 19/19 green
+- `npm run check:themes` PASS 8
+- `npm run build` green
+- `npm run lint:changed` clean
+- `node scripts/verify-brand-v190.mjs` pass=13 fail=0 (live)
+- `scripts/check-contrast.mjs` (public surfaces, light + dark):
+  26 pass, 0 fail
+- Live routes probed 2026-08-14: `/`, `/projects-v2`,
+  `/projects-v2/casa-mira`, `/admin`, `/superadmin`, `/themes`,
+  `/voices` all 200; `/api/health` db=ok
+
+### Notes
+
+- Freeze carve-out: this release touches frozen paths
+  (`src/lib/**`, `src/app/**`, `src/components/**`, data files)
+  under the v1.18.0 carve-out exactly as enumerated in
+  FREEZE-MARKER. No buyer-facing route slug, nav label, or behavior
+  changed; tier-gate preserved.
+- The `verify-brand-v190.mjs` muted expectation moved from
+  `#626d66` to `#56605a` to match the contrast gate; the v1.9.0
+  CHANGELOG text above is history and not rewritten.
+
 ## v1.17.0 - 2026-08-12 - StudioOS: multi-tenant SaaS (Phases 0-6)
 
 ### Status

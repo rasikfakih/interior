@@ -43,7 +43,7 @@ const DEFAULTS: StudioBrand = {
     ink: "#122A20",
     paper: "#ECECE6",
     accent: "#C0964F",
-    muted: "#626D66",
+    muted: "#56605A",
   },
   hero: {
     eyebrow: "Residential Studio - Maharashtra",

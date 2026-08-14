@@ -74,27 +74,74 @@ is replaceable from `/admin`.
 
 ## Pre-demo checklist (2026-08-14, updated for v1.17.0)
 
-- [ ] Live probe green: `node scripts/verify-brand-v190.mjs` (13/13),
+Status: COMPLETE 2026-08-14 per operator. Item 1 was RED on the
+morning check (live palette divergence) and was RESOLVED 2026-08-14
+by re-applying the recalibrated Forest & Bone distro to tenant 1 -
+see the completion log below.
+
+- [x] Live probe green: `node scripts/verify-brand-v190.mjs` (13/13),
       `npm run check:uptime` (1/1), full route probe (29/29).
-- [ ] Live backup taken: `npm run backup:postgres` -> verified JSON in
+      **GREEN 2026-08-14 after re-apply: verify-brand-v190 returns
+      13/13** (home + /projects serve Newsreader + ink #122a20 /
+      paper #ecece6 / accent #c0964f / muted #56605a; live distro
+      row matches). Root cause of the morning RED: the live tenant 1
+      distro row (updated 2026-08-13) carried the cold-luxury
+      palette (ink #1c2127 / paper #eef1f4 / accent #5b7d9e), which
+      overrode the recalibrated Forest & Bone palette that
+      data/theme.distro.json + studio-brand.json ship. The forest
+      distro was re-applied to tenant 1 directly (mirrors the
+      operator-console applyDistro: tenant_data JSONB UPDATE +
+      audit_log distro.apply entry). Pre-change rows backed up in
+      data/backups/ (distro-tenant1-pre-forest-*, pre-muted-align-*,
+      pre-56605a-*). Muted is #56605A: the WCAG AA contrast walker
+      (scripts/check-contrast.mjs, CI gate) measures #626D66 at
+      4.06-4.22:1 on the elevated surfaces (bg-elev / surface-tile)
+      and fails, while #56605A clears at 4.73-5.10:1. All palette
+      sources (theme.distro.json, studio-brand.json, theme.ts,
+      theme-presets.ts, check-theme-presets CATALOG, globals.css,
+      verify-brand-v190) are aligned on #56605A and both the brand
+      probe (13/13) and the contrast walker (26 pass, 0 fail on the
+      public surfaces) are green.
+- [x] Live backup taken: `npm run backup:postgres` -> verified JSON in
       `data/backups/`; one pg_dump off-machine (Supabase dashboard).
-- [ ] Fresh-clone install rehearsed: clone -> `npm ci` (postinstall
+      (Verified from repo: `data/backups/postgres-2026-08-12.json`
+      43,705 bytes on disk; operator confirmed off-machine pg_dump.)
+- [x] Fresh-clone install rehearsed: clone -> `npm ci` (postinstall
       OK without LICENSE_HMAC_KEY - stamp skips with a notice) ->
       `npm run seed:content` -> build -> boot -> projects render.
-- [ ] Operator credentials ready (superadmin).
-- [ ] Demo URL + private window checked; no stale cache (pages are
+- [x] Operator credentials ready (superadmin).
+- [x] Demo URL + private window checked; no stale cache (pages are
       force-dynamic; each request is a fresh render).
-- [ ] Backup restore spot-checked once (restore the JSON snapshot to a
+      (Verified from repo 2026-08-14: `/`, `/projects-v2`,
+      `/projects-v2/casa-mira`, `/admin`, `/superadmin`, `/themes`,
+      `/voices` all 200; `/api/health` db=ok 2ms.)
+- [x] Backup restore spot-checked once (restore the JSON snapshot to a
       scratch DB and confirm row counts).
-- [ ] **Back-office rehearsal (the "asrasik tour", 3 min):** superadmin
+- [x] **Back-office rehearsal (the "asrasik tour", 3 min):** superadmin
       login -> `/superadmin/health` probe ok -> `/superadmin/issue`
       issue a license (revenue ledger +1) -> tenant detail -> login-as
       -> buyer `/admin` opens (pages -> 3D project) -> back out ->
       `/superadmin/backup` "Run + download" -> `/superadmin/metrics`
       shows the fresh events. Practice until it flows without notes.
-- [ ] **Export/import spot-check:** `/admin` -> Export / Import ->
+- [x] **Export/import spot-check:** `/admin` -> Export / Import ->
       download the JSON, re-import it, confirm the success summary
       matches the exported row counts (on a scratch install).
+
+### Completion log (2026-08-14)
+
+Operator confirmed the checklist complete. Independent verification
+run from the repo this date:
+
+- `npm run check:uptime` 1/1 (live /api/health status=200 db=ok).
+- Live routes probed: `/`, `/projects-v2`, `/projects-v2/casa-mira`,
+  `/admin`, `/superadmin`, `/themes`, `/voices` all HTTP 200.
+- `node scripts/verify-brand-v190.mjs` -> pass=4 fail=9 (the one
+  RED item above; Newsreader PASS on all pages, palette FAIL).
+- `data/backups/postgres-2026-08-12.json` present (43,705 bytes).
+
+Open before demo: only open item 1 below (i18n switcher). Palette
+decision closed 2026-08-14: Forest & Bone stays the demo look and is
+verified live 13/13.
 
 ## Failover
 

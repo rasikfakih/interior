@@ -11,7 +11,7 @@
  * Checks, in order:
  *   1. Display serif is Newsreader (cormorant absent from the page).
  *   2. The recalibrated palette hexes (ink #122a20 / paper #ecece6 /
- *      accent #c0964f / muted #626d66) appear in the served HTML.
+ *      accent #c0964f / muted #56605a) appear in the served HTML.
  *   3. The live Postgres distro row (when DATABASE_URL is reachable)
  *      matches the recalibrated palette. The theme engine resolves the
  *      distro row BEFORE studio-brand.json, so a stale distro row keeps
@@ -28,7 +28,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const BASE = process.env.BASE_URL || "https://ethinterior.vercel.app";
 
 // Expected recalibrated palette (must match data/studio-brand.json).
-const EXPECTED = { ink: "#122a20", paper: "#ecece6", accent: "#c0964f", muted: "#626d66" };
+const EXPECTED = { ink: "#122a20", paper: "#ecece6", accent: "#c0964f", muted: "#56605a" };
 
 function loadEnvLocal() {
   const envPath = path.join(repoRoot, ".env.local");
@@ -81,8 +81,8 @@ async function main() {
       "old accent #c28b3c likely still served"
     );
     check(
-      `${label} recalibrated muted #626d66`,
-      lower.includes("#626d66"),
+      `${label} recalibrated muted #56605a`,
+      lower.includes("#56605a"),
       "old muted #5a6b5f likely still served"
     );
   }
