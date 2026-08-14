@@ -4,9 +4,14 @@ A premium residential interior design theme. Sold on Envato. White-label
 for any studio buyer via `/admin` + `theme.distro.json`. Includes an
 operator console (`/superadmin`, gated) for the licensing studio.
 
-> **v1.1.0 - shipped.** See `CHANGELOG.md` for the v1.1 entry and the
-> `FREEZE-MARKER` for the operator carve-out.
-> Read `docs/CONTEXT.md` first in any new opencode session.
+> **Current: v1.18.0** (2026-08-14). See `CHANGELOG.md` for the release
+> history and `FREEZE-MARKER` for the frozen surfaces.
+>
+> **Read first in any new session** - the two master docs at the repo
+> root: `masterinterior.md` (the technical map: what/why/how, stack,
+> architecture with Mermaid diagrams in section 14, API surface, release
+> history, open items) and `PROJECT-SOUL.md` (the compass: conviction,
+> taste, and voice). Then `docs/CONTEXT.md` for the session narrative.
 
 ## Live demo
 
@@ -17,7 +22,7 @@ operator console (`/superadmin`, gated) for the licensing studio.
 
 | Surface | Audience | Visible to buyers? |
 | --- | --- | --- |
-| `/`, `/projects`, `/journal`, `/contact`, `/install` | Studio site visitors + Envato prospects | yes |
+| `/`, `/projects-v2`, `/projects-v2/[slug]`, `/journal`, `/contact`, `/install` | Studio site visitors + Envato prospects | yes |
 | `/superadmin/**` | Studio team only | no (gated by `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD`) |
 | `/api/envato/webhook` | Envato purchase events | no (server-to-server) |
 | `/admin` | The buyer's tenant admins once installed | yes |
@@ -28,8 +33,9 @@ distro row repaints the demo with `Your Studio` defaults.
 
 ## Deploy
 
-`npm run verify:deploy` is the gate. See `OPERATOR.md` (canonical env
-list), `DEPLOY.md` (long-form Vercel lifecycle), `SHIP.md` (demo-URL runbook).
+`npm run verify:deploy` is the pre-flight gate (19/19 checks). See
+`OPERATOR.md` (canonical env list), `DEPLOY.md` (Vercel lifecycle),
+`SHIP.md` (demo-URL runbook).
 
 ## Quick install for a buyer
 
@@ -43,7 +49,9 @@ npm start
 ```
 
 `/install` writes `data/license.json` keyed to the buyer's domain.
-`postinstall` runs `migrate.mjs` + `seed-pages.mjs`.
+`postinstall` runs `migrate.mjs` + `seed-pages.mjs` + `apply-distro.mjs`
++ `stamp-demo-license.mjs`. The data store is Supabase Postgres when
+`DATABASE_URL` is set (production), SQLite otherwise (local dev).
 
 ## Quick studio-side onboarding
 
@@ -60,42 +68,62 @@ npm start
 
 ## Stack
 
-- Next.js 16 App Router + TypeScript (RSC by default)
-- Tailwind v4 with theme tokens in `src/app/globals.css`
-- GSAP + Lenis (smooth scroll, scope-pinned hero)
-- three.js + `@react-three/fiber` (lazy-loaded under license gate)
-- Tiptap rich text editor (journal, project descriptions, page-block rich text)
-- NextAuth.js (credentials)
-- better-sqlite3 + drizzle ORM (local); Supabase Postgres port in v1.2
-- React-i18next + a CMS-backed translation table
+- Next.js 16.2.9 App Router + TypeScript (RSC by default; editable pages
+  render `force-dynamic` and revalidate on admin writes)
+- Tailwind v4, CSS-first config with theme tokens in `src/app/globals.css`
+- Motion (`motion/react`) for UI; GSAP + Lenis for scroll-pinned hero
+  and motion passes (reduced-motion aware)
+- three.js + `@react-three/fiber` v9 + drei (lazy-loaded under the
+  license gate) for 3D walkthroughs
+- TipTap rich text editor (journal, projects, page-block rich text)
+- NextAuth.js v4 (credentials, roles admin/editor/superadmin)
+- Supabase Postgres as the production data store (`src/lib/pg.ts`);
+  better-sqlite3 + drizzle ORM as the local-dev fallback
+- Supabase Storage for media in prod (signed URLs, per-kind size caps);
+  disk under `/uploads` locally
+- `I18nProvider` over JSON locale files (`public/locales/{en,hi,mr}`)
+- `@phosphor-icons/react` (duotone) icon surface
+- `@dnd-kit` for block reorder in the page builder
+- HMAC-SHA256 signed offline licenses, DB-backed via `license_doc`
 
 ## What's editable from `/admin` (the tenant-facing admin)
 
-- Projects (with rich text, gallery, 3D model upload, publish/unpublish)
+- Projects (rich text, gallery, 3D model upload, per-room walkthroughs,
+  publish/unpublish)
 - Journal (with categories, rich text body)
 - Testimonials, team
-- Pages (drag-reorder block builder, 13 block types)
-- Media library (DB-backed, alt text, picker)
-- Menus (primary + footer)
-- Site identity (brand name, logo, favicon)
-- Translations (per-locale)
-- Settings (contact, SEO, third-party links)
-- License (Envato purchase code, domain, tier)
+- Pages (drag-reorder block builder with 15 block types, revisions,
+  draft preview, per-page SEO, duplicate)
+- Media library (DB-backed, alt text, folders, pin, picker)
+- Menus (primary + footer, DB-driven navbar)
+- Forms (builder + submissions inbox + CSV export)
+- Redirects (301/302, DB-driven, no rebuild)
+- Users/roles (admin/editor/superadmin with self-protection rules)
+- Theme customizer (palette, fonts, density, radius, motion; 8 presets,
+  live WCAG AA contrast rows)
+- Site identity (brand name, logo, favicon), settings (contact, SEO,
+  third-party links), newsletter, license, export/import
 
 ## What's editable from `/superadmin` (the studio-only operator console)
 
-- Tenants row: edit studio name, owner email, domain, tier (personal/business),
-  state (active/pending/suspended/revoked), expiration date, HMAC key.
-- License issuance: tenant HMAC-signed offline license payload.
+- Tenants list + detail: edit studio name, owner email, domain, tier,
+  state, expiration, HMAC key; live health status
+- License wizard: issue/extend/revoke HMAC-signed licenses; revenue
+  ledger in cents
+- Health board: live per-tenant `/api/health` probes, persisted status
+- Metrics: tenants, revenue (total/30d/by-tier), usage (pageviews, 3D
+  loads, form submits), audit trail
+- Backup: snapshot every table to one JSON file; download
 - Theme distributor: paste or upload a `theme.distro.json` per tenant
-  (see `docs/theme-distro.schema.md`).
-- HMAC rotation: per-tenant key with auto-generated replacement.
-- Metrics: total tenants, by tier, expiring in 14 days, recent audit log.
+  (see `docs/theme-distro.schema.md`)
+- Announcements (CRUD + public banner)
+- Login-as (impersonate any tenant admin)
+- HMAC rotation, demo reset
 
 ## License + nulling posture
 
 See `LICENSE.md`. Public reads remain open without a license; admin
-and 3D are gated. Tier features (3D viewer, multilingual, etc.) return
+and 3D are gated. Tier features (3D viewer, multilingual) return
 423 when missing. Buyers on a fresh install with no distro applied see
 neutral defaults ("Your Studio", placeholders) until the operator
 applies a distro.
@@ -111,36 +139,52 @@ white-label fallback that ships with the bundle.
 
 ```
 src/
-  app/                  Next.js 16 app router pages + api
+  app/                  Next.js 16.2.9 app router pages + api
+    (public)/           buyer-facing site (Navbar, Footer, theme injection)
+    admin/              tenant admin console
     superadmin/         operator-only console (gated)
-    api/operator/        operator-only routes (gated)
-    api/envato/webhook   Envato purchase intake (server-to-server)
+    api/operator/       operator-only routes (gated)
+    api/envato/webhook  Envato purchase intake (server-to-server)
+  cms/blocks/           block registry (15 block types) + types
   components/
+    admin/              admin widgets (BlockEditor, PageBuilder, MediaPicker, ...)
     operator/           operator-only client components
-  cms/blocks/           block registry (PageRenderer)
+    projects-v2/        the current public projects experience
   lib/
-    operator-store.ts    tenant + license + distro data layer
-    operator-auth.ts    operator cookie session
-    tenant-brand.ts      per-tenant brand reader
+    pg.ts               runtime data layer (Postgres; SQLite fallback)
+    theme.ts            per-tenant distro palette -> CSS variables
+    license.ts / license-gate.ts   HMAC sign/verify
+    storage.ts / media.ts          Supabase Storage + media pipeline
+    revalidate.ts       bump / revalidatePath after admin writes
 data/
   theme.distro.json    studio demo's per-tenant override
   studio-brand.json    white-label fallback surface
 public/
-  demo/                  8 demo JPGs matching data/demo-media.json
+  demo/                  demo JPGs generated by scripts/gen-demo-assets.mjs
   models/seed/           reception-room.glb (real, ~259 KB)
-  uploads/images/        9 JPGs for block-registry defaults
+  models/rooms/          procedurally generated placeholder rooms
+  uploads/images/        JPGs for block-registry defaults
 scripts/
+  migrate.mjs            idempotent schema migration
+  seed-pages.mjs         seeds the default pages/blocks
   apply-distro.mjs       apply a theme.distro.json to a tenant
-  dev-archive/           v1.0.0 prototype scripts, kept for history
+  stamp-demo-license.mjs stamps the local demo license
+  verify-deploy.mjs      the 19-check pre-flight gate
+  lint-changed.mjs       diff-scoped eslint gate
+  check-theme-presets.mjs / check-contrast.mjs / check-uptime.mjs
+  seed-content.mjs       demo content seed (3 projects / journal / ...)
+  smoke-*.mjs            authed/no-auth probes against a running server
 docs/
-  CONTEXT.md             session continuity harness
-  envato-sales-brief.md  Envato one-pager
+  CONTEXT.md             append-only session narrative
+  SESSION-TODO.md        structured gate (TS-IDs trace changes to commits)
+  PLATFORM-V2-PLAN.md    the StudioOS platform plan + decision ledger
   theme-distro.schema.md  distro schema
   theme-distro.example.json
   CLIENT_HANDOFF.md      buyer runbook
   OPERATOR_QUICKREF.md   superadmin operator quick reference
   SALES_NOTES.md         sales primer
-  feature-decisions.md   buyer-request log (from v1.0.0 freeze)
+  feature-decisions.md   buyer-request log
+graphify-out/            knowledge graph (graphify update .)
 ```
 
 ## Demo assets
@@ -160,6 +204,11 @@ deterministic and replaceable: drop in real photographs and re-run
 
 ## File listings for studio team
 
+- `masterinterior.md` - the technical map (with Mermaid architecture
+  diagrams in section 14)
+- `PROJECT-SOUL.md` - the compass (conviction, taste, voice)
+- `AGENTS.md` - agent rules: session protocol, map/compass pointers,
+  graphify usage
 - `docs/OPERATOR_QUICKREF.md` - operator quick reference
 - `docs/CLIENT_HANDOFF.md` - per-buyer handoff procedure
 - `docs/SALES_NOTES.md` - what buyers hear

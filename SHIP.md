@@ -9,17 +9,17 @@ These are the exact steps to put the studio demo at
 npm run verify:deploy
 ```
 
-Should print `[OK]` eighteen times followed by `Ready for Vercel deploy.`.
+Should print `[OK]` nineteen times followed by `Ready for Vercel deploy.`.
 If any `[FAIL]` appears, fix that line first. **Do not skip this step.**
 
-The 18 checks include:
+The 19 checks include:
 
 1. node version >= 18
 2. node_modules installed
 3. .next build present
 4. vercel.json framework == `nextjs`
-5. Demo SQLite seeded
-6. tenants table present with at least one row
+5. Postgres runtime reachable when `DATABASE_URL` is set
+6. tenants table present (Postgres or local SQLite)
 7. .env.example present
 8. AGENT_BEST_PRACTICES.md present
 9. LICENSE.md present
@@ -32,6 +32,7 @@ The 18 checks include:
 16. public/models/seed/reception-room.glb > 1 KB (no stub)
 17. public/demo/*.jpg with at least 8 files
 18. public/uploads/images/{hero,services-1..4,grid-1..3,placeholder}.jpg present
+19. scripts/stamp-demo-license.mjs present
 
 ## 1. Vercel - import the repo
 
@@ -58,12 +59,14 @@ Set each via **Project -> Settings -> Environment Variables**, marked **Producti
 | `LICENSE_HMAC_KEY` | `openssl rand -hex 32` -> paste output |
 | `SUPERADMIN_EMAIL` | operator-only email |
 | `SUPERADMIN_PASSWORD` | 16+ char generated password (different from `ADMIN_PASSWORD`) |
+| `DATABASE_URL` | Supabase Postgres connection string (production store) |
+| `SUPABASE_URL` | Supabase project URL (Storage) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service-role key (Storage) |
 | `ENVATO_WEBHOOK_SECRET` | HMAC secret string set on Envato store side |
 
-Leave blank for v1.1.0: `LICENSE_SERVER_URL`, `LICENSE_PUBLIC_KEY`,
-`DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY`, `BLOB_READ_WRITE_TOKEN`,
-`NEXT_PUBLIC_GA4_ID`.
+Leave blank: `LICENSE_SERVER_URL`, `LICENSE_PUBLIC_KEY`,
+`BLOB_READ_WRITE_TOKEN` (legacy slots; unused since the Supabase port).
+`NEXT_PUBLIC_GA4_ID` is optional.
 
 ## 3. Domain attach
 
@@ -83,6 +86,7 @@ Click **Deploy**. Wait ~90s. Vercel prints the URL when done.
 Open the page in an **incognito window**.
 
 - [ ] Visit `https://ethinterior.vercel.app/` -> Studio home renders from `pages_blocks`.
+- [ ] Visit `https://ethinterior.vercel.app/projects-v2` and `/projects-v2/casa-mira` -> v2 surface + 3D render.
 - [ ] Visit `https://ethinterior.vercel.app/install` -> license form paints.
 - [ ] Enter a purchase code + domain + tier -> click Install. Bounce to `/admin`.
 - [ ] Sign in with the seeded admin email/password. Page builder tab loads.
@@ -96,7 +100,7 @@ Open the page in an **incognito window**.
 | --- | --- | --- |
 | Deploy fails at `next build` | repo has type errors or missing dep | re-run locally: `npm run build` |
 | `/install` shows but form 500s | env `NEXTAUTH_SECRET` missing | go back to step 2 |
-| `/` renders empty page | SQLite wasn't committed | rebuild with `node scripts/seed-pages.mjs && npm run build` step in prebuild hook |
+| `/` renders empty page | seed state missing | re-run `node scripts/seed-pages.mjs` and rebuild; check `DATABASE_URL` reachability in prod |
 | `/admin` returns 401 | license missing | finish step 5's install step |
 | `/superadmin` returns 401 | `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` env vars missing or wrong | go back to step 2 |
 | Tenants list says `tenants empty` | postinstall didn't run on the container | check `package.json` `postinstall` script is `node scripts/migrate.mjs && node scripts/seed-pages.mjs` |
@@ -104,23 +108,24 @@ Open the page in an **incognito window**.
 
 ## 7. After deploy
 
-- Open `CHANGELOG.md` and edit the line under `v1.1.0` deploying state:
+- Open `CHANGELOG.md` and add the deploying state under the current
+  version heading:
   ```
   ### Status
-  - Status: v1.1.0-DEPLOYED at <https://ethinterior.vercel.app> on YYYY-MM-DD HH:MM UTC.
+  - Status: v1.18.0-DEPLOYED at <https://ethinterior.vercel.app> on YYYY-MM-DD HH:MM UTC.
   ```
-- Replace `_PENDING_` in the operator-state line in `FREEZE-MARKER`.
-- Capture first-visit screenshots into `docs/thumbs/v110/` (8 thumbs).
+- Confirm the operator-state line in `FREEZE-MARKER` is not `_PENDING_`.
+- Capture first-visit screenshots into `docs/thumbs/`.
 - Hand off the live URL in your inbox.
 
 ## 8. After 4 weeks (acceptance window end)
 
 Open `docs/feature-decisions.md`, sort YES by counter, pick the top
-5-7 entries that have > 3 votes. Plan v1.2 from that set. Schedule
-the freeze review meeting for the 4-week-mark. If no YES has reached
-3 votes, ship no changes - the floor held.
+5-7 entries that have > 3 votes. Plan the next version from that set.
+Schedule the freeze review meeting for the 4-week-mark. If no YES has
+reached 3 votes, ship no changes - the floor held.
 
 ---
 
 When the deploy lands and the first-visit smoke passes, reply with
-the URL and the timestamp; I'll mark v1.1.0-DEPLOYED in the changelog.
+the URL and the timestamp; I'll mark v1.18.0-DEPLOYED in the changelog.

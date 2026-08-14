@@ -4241,3 +4241,34 @@ Verified: tsc 0, build green, verify:deploy green. 6 files deleted
 - Voice rules held: diagram labels and prose use ASCII hyphens, no emojis.
   Both root docs are still uncommitted alongside this change; CONTEXT and
   AGENTS.md edits are uncommitted too. Docs-only change, no TS-ID opened.
+### 2026-08-14 - docs refresh to v1.18.0 state + push to GitHub
+
+- Brought the six stale root docs up to the v1.18.0 reality (they were
+  v1.1.0-era).
+- README.md rewritten: version banner, map+compass links
+  (masterinterior.md / PROJECT-SOUL.md), corrected stack (Supabase
+  Postgres production store + SQLite local fallback, I18nProvider JSON
+  locales instead of i18next, Phosphor icons, next/image), full
+  /admin + /superadmin surface (StudioOS: theme customizer, forms,
+  redirects, users/roles, revisions, preview, 3D rooms, backup,
+  health, login-as), corrected structure (tenant-brand.ts gone, 15
+  block types).
+- INSTALL.md: title v1.18.0, postinstall chain
+  (migrate + seed-pages + apply-distro + stamp-demo-license),
+  env table (DATABASE_URL = prod store, SUPABASE_* = prod storage,
+  BLOB token dropped), verify:deploy 19 checks, stuck-table rows.
+- DEPLOY.md rewritten: SQLite-era claims replaced with Postgres
+  persistence, current env table, backup cadence, seed determinism.
+- LICENSE.md: current surface section, offline-mode default wording,
+  telemetry/license-store paragraph, freeze section bumped.
+- OPERATOR.md: env table (DATABASE_URL/SUPABASE_* required for prod,
+  legacy slots marked), DB persistence section (Postgres + db.ts
+  deletion in TS-ID-020), console surface (health/metrics/backup/
+  login-as/announcements/rotate), curl route fix
+  (/api/operator/issue -> /api/operator/license), Postgres cutover
+  section, smoke matrix (+ /themes /voices /projects-v2).
+- SHIP.md: 19 checks, env table, smoke list, error table, changelog
+  stamp v1.18.0-DEPLOYED.
+- Voice rules held (0 em-dashes, 0 emojis in all six files).
+  verify:deploy 19/19 green. docs/ historical files (CONTEXT,
+  SESSION-TODO, PLAN-*) intentionally untouched - append-only.

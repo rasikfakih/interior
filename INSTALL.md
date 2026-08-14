@@ -1,4 +1,4 @@
-# INSTALL - Etihad Interiors Theme v1.1.0
+# INSTALL - Etihad Interiors Theme v1.18.0
 
 ## One-line
 
@@ -9,9 +9,10 @@
 This:
 
 1. Installs npm deps if missing. `package.json` declares a `postinstall`
-   hook that runs `node scripts/migrate.mjs && node scripts/seed-pages.mjs`,
-   so the SQLite file (`data/etihad.db`) is **always** present after a
-   clean install.
+   hook that runs `migrate.mjs` + `seed-pages.mjs` + `apply-distro.mjs` +
+   `stamp-demo-license.mjs`, so the schema and seeded pages are **always**
+   present after a clean install (SQLite locally, Postgres when
+   `DATABASE_URL` is set).
 2. Runs the idempotent database migrations in `scripts/migrate.mjs`.
    Creates `tenants`, `tenant_data`, plus all legacy tables.
 3. Seeds the default `home` page with the studio's block composition.
@@ -60,8 +61,8 @@ npm start
 ```
 
 Then open `https://yourdomain.com/install` and enter the purchase code,
-domain, and tier. The page POSTs to `/api/license`, which signs and
-writes `data/license.json`, then bounces you to `/admin`.
+domain, and tier. The install flow signs and writes `data/license.json`
+(HMAC, via `POST /api/install/stamp`), then bounces you to `/admin`.
 
 ## White-label setup
 
@@ -99,19 +100,20 @@ Optional:
 
 - `NEXT_PUBLIC_SITE_URL` - used by `LicenseBanner` and sitemap
 - `NEXT_PUBLIC_GA4_ID`
-- `DATABASE_URL` - if present, indicates Postgres / Supabase mode (v1.2)
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` - v1.2
+- `DATABASE_URL` - production data store (Supabase Postgres); unset =
+  local SQLite dev
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` -
+  Supabase Storage for media in production
 - `ENVATO_WEBHOOK_SECRET` - HMAC secret for `/api/envato/webhook`
-- `BLOB_READ_WRITE_TOKEN` - Vercel Blob storage adapter
 
 ## What runs after install
 
 - `npm run build` - production Next.js build (output in `.next/`)
 - `npm run migrate` - idempotent schema migration every deploy
 - `npm run seed` - conditional seed of the `home` page
-- `npm run verify:deploy` - pre-flight gate (18 checks) before any Vercel deploy
-- `npm run apply:distro` - convenience alias (not yet wired; safe to drop)
-- `npm run lint` - ESLint
+- `npm run verify:deploy` - pre-flight gate (19 checks) before any Vercel deploy
+- `npm run check:themes` - validates the 8 theme presets (AA contrast)
+- `npm run lint` / `npm run lint:changed` - ESLint (full / diff-scoped gate)
 
 ## Unblocking an install that's stuck
 
@@ -121,7 +123,8 @@ Optional:
 | Admin login is 401 | License invalid. Re-stamp with same fix. |
 | 3D viewer returns 423 | Personal tier doesn't include `feature.3d-viewer`. Re-stamp as Business in `/admin/license` or `/superadmin/issue`. |
 | Multiple domains need access | Business tier only. Re-stamp per domain. |
-| Empty demo SQLite on first run | `npm run seed` rehydrates. Or `npm install` once and `postinstall` does it automatically. |
+| Empty data on first run | `npm run seed` rehydrates pages. Or `npm install` once and `postinstall` does it automatically. |
+| Postgres not reachable (prod) | `DATABASE_URL` unset or invalid; fix the env and re-run `npm run migrate`. |
 | Distro applied but site still shows neutral | Verify `data/theme.distro.json` parses; run `node scripts/apply-distro.mjs --tenant=studio --file=./data/theme.distro.json` and check exit code. |
 | Superadmin login says "Invalid credentials" | `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` env vars are not set, or they don't match. |
 

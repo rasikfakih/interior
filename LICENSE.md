@@ -3,16 +3,23 @@
 This template is sold on Envato. Each buyer receives a signed license
 bound to a purchase code and domain. The license is enforced server-side.
 
-## v1.1.0 surface
+## Current surface (v1.18.0)
 
-The v1.1.0 release adds:
+The v1.18.0 surface includes:
 
-- **operator console** at `/superadmin` for the studio (gated).
-- **tenant model** - every install is a row in `tenants`.
+- **operator console** at `/superadmin` for the studio (gated): tenants,
+  license wizard, health board, metrics, backup, theme distributor,
+  announcements, login-as, HMAC rotation.
+- **tenant model** - every install is a row in `tenants`; a distro row
+  in `tenant_data` paints each tenant's brand.
 - **theme.distro.json** - per-tenant white-label override.
 - **Envato webhook** - manual operator approval flow.
-
-The public buyer experience is unchanged from v1.0.0.
+- **StudioOS platform** - theme customizer, DB-driven menus, block CMS
+  (15 block types), page revisions + draft preview + SEO + duplicate,
+  forms builder + inbox, redirects manager, users/roles, per-room 3D
+  walkthroughs, export/import.
+- **Durable license store** - `license_doc` (Postgres-backed) is
+  canonical since v1.18.0, with `data/license.json` as mirror/fallback.
 
 ## Tiers
 
@@ -51,7 +58,7 @@ code and domain, the bundle re-signs and writes back. Operator console
 
 - **Online mode** - `LICENSE_PUBLIC_KEY` env var holds an RSA public key.
   Bundle verifies signatures against it.
-- **Offline mode (default v1.1.0)** - `LICENSE_HMAC_KEY` signs the license
+- **Offline mode (default)** - `LICENSE_HMAC_KEY` signs the license
   body on the install machine. The same key on the host verifies the
   signature. No internet required. Per-tenant keys are stored in
   `tenants.hmac_key`.
@@ -64,9 +71,11 @@ the buyer's `data/license.json`.
 - No code obfuscation is shipped. Buyers see clean source.
 - No telemetry beyond optional GA4 (`NEXT_PUBLIC_GA4_ID`).
 - License enforcement is server-side, not network access prevention.
-- No hosted license server ships in v1.1.0. License is HMAC-signed
-  offline at install time. The hosted-license-server slot is reserved
-  for v1.2.
+- No hosted license server ships. License is HMAC-signed offline at
+  install time and verified at request time by `license-gate.ts`
+  (missing/expired/domain-mismatch/tampered map to distinct 423/403
+  responses). The license document lives in the Postgres-backed
+  `license_doc` store with a `data/license.json` mirror.
 
 ## Envato Extended License note
 
@@ -98,14 +107,14 @@ Business tier.
 
 ## Scope freeze
 
-v1.1.0 carries an operator carve-out (see `FREEZE-MARKER`). Buyer-visible
-code paths are frozen against structural change. Operator surfaces
-(`/superadmin/**`, `/api/operator/**`, `/api/envato/**`) are explicitly
-outside the freeze.
+The v1.18.0 freeze carries an operator carve-out (see `FREEZE-MARKER`).
+Buyer-visible code paths are frozen against structural change. Operator
+surfaces (`/superadmin/**`, `/api/operator/**`, `/api/envato/**`) are
+explicitly outside the freeze.
 
-Buyer requests land in `docs/feature-decisions.md`, enter v1.2 or Room 2
-only after the per-feature counter clears 3 and the v1.1 acceptance
-window has elapsed.
+Buyer requests land in `docs/feature-decisions.md` and enter a future
+version only after the per-feature counter clears 3 (the 3-buyer rule
+in `AGENT_BEST_PRACTICES.md`).
 
 See `AGENT_BEST_PRACTICES.md` for the operating discipline and how a
 feature moves from "logged" to "merged" in this repo.

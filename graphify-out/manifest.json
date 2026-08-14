@@ -735,33 +735,33 @@
     "semantic_hash": ""
   },
   "DEPLOY.md": {
-    "mtime": 1783344907.2674377,
-    "ast_hash": "3caf92acf76239aee2d44f482ef03292",
+    "mtime": 1786736917.4496117,
+    "ast_hash": "bd77c894eca1962e83da46879a43c873",
     "semantic_hash": ""
   },
   "INSTALL.md": {
-    "mtime": 1783344907.2683983,
-    "ast_hash": "fc17b5f848c71d067f60b3a8669a3e4e",
+    "mtime": 1786736906.8682818,
+    "ast_hash": "0bfa5b52a41b517e1d578a6c47dcebf4",
     "semantic_hash": ""
   },
   "LICENSE.md": {
-    "mtime": 1783344907.2693725,
-    "ast_hash": "57ee18bb54811a4ff2dd150c72fc55a1",
+    "mtime": 1786736924.9055526,
+    "ast_hash": "aadbb1871de9c9983b928d8b79b5742a",
     "semantic_hash": ""
   },
   "OPERATOR.md": {
-    "mtime": 1786541185.5309014,
-    "ast_hash": "62c36f85cb5cb1660a20f054a528bc26",
+    "mtime": 1786736941.3263996,
+    "ast_hash": "0ad6ed0ef92158717f5b87004a7514a5",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1783344907.2703426,
-    "ast_hash": "019678248b6ddcb53d54d1aa2524f4aa",
+    "mtime": 1786736900.1685846,
+    "ast_hash": "44d3d8c4ba1efd7b04e16af0dd85c50e",
     "semantic_hash": ""
   },
   "SHIP.md": {
-    "mtime": 1783344907.2713172,
-    "ast_hash": "04196c680000d4473a892f5908fdba96",
+    "mtime": 1786736953.3376758,
+    "ast_hash": "e016cd06a0a659d7823d4134e7df336b",
     "semantic_hash": ""
   },
   "docs/CLIENT_HANDOFF.md": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786735441.2705536,
-    "ast_hash": "2bed4c3828ab626f0135cd1c308d3739",
+    "mtime": 1786736970.8354485,
+    "ast_hash": "edc29f6dbc324be903c396dfaabbb59f",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
