@@ -36,7 +36,11 @@ jobs:
       # Inlined at build; must match the license domain (localhost:3000).
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
+      # Full history: lint-changed diffs against github.event.before,
+      # which is absent from a default shallow (depth 1) checkout.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
