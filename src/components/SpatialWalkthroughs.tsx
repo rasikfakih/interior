@@ -198,7 +198,7 @@ function WalkthroughDeck({
           Each model rebuilds on load from the corresponding project page.
           See{" "}
           <Link
-            href="/projects"
+            href="/demo/work"
             className="text-accent-deep border-b border-[var(--accent-soft)] hover:text-accent transition-colors"
           >
             Selected work
@@ -296,7 +296,7 @@ function WalkthroughCard({
           <p className="text-base mt-1">{item.title}</p>
         </div>
         <Link
-          href={`/projects/${item.slug}`}
+          href={`/demo/work/${item.slug}`}
           className="text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1 shrink-0"
         >
           Dossier <IconArrowRight aria-hidden className="inline" />

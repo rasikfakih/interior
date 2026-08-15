@@ -17,7 +17,7 @@ import { useReducedMotion } from "@/lib/use-gsap";
 import { IMAGES } from "@/lib/images";
 import HorizontalProjects from "./HorizontalProjects";
 
-const FEATURES: { icon: typeof Kanban; title: string; body: string }[] = [
+export const FEATURES: { icon: typeof Kanban; title: string; body: string }[] = [
   {
     icon: Kanban,
     title: "Lead inbox",
@@ -138,13 +138,13 @@ function Hero() {
         <div data-reveal-line className="mt-8 flex flex-wrap items-center gap-4">
           <Link
             ref={ctaRef}
-            href="/projects"
+            href="/demo/work"
             className="inline-flex items-center gap-2 rounded-lg bg-[#C0964F] px-6 py-4 text-sm font-medium text-ink dark:text-[#122A20] transition-transform duration-200 will-change-transform"
           >
             See live demo <ArrowRight size={16} weight="bold" />
           </Link>
           <Link
-            href="/projects"
+            href="/demo/work"
             className="inline-flex items-center gap-2 rounded-lg border border-[var(--ink)] px-6 py-4 text-sm font-medium text-ink hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors"
           >
             Explore boards
@@ -256,7 +256,7 @@ function Features() {
   );
 }
 
-function Pricing({ plans }: { plans: HomePlan[] }) {
+export function Pricing({ plans }: { plans: HomePlan[] }) {
   const [inr, setInr] = useState(true);
   const fallback: HomePlan[] = [
     { id: "free", name: "Free", priceUsd: 0, priceInr: 0, projectLimit: 1, leadLimit: 25, boardLimit: 2, boqVersionLimit: 1, aiCreditsLimit: 20, features: { white_label: false } },

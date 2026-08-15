@@ -65,7 +65,7 @@ export default function HorizontalProjects({ projects }: { projects: HomeProject
             <ShaderHoverCard
               src={p.image}
               alt={p.title}
-              href={`/projects/${p.slug}`}
+              href={`/demo/work/${p.slug}`}
               className="aspect-[16/10] w-full"
             />
             <div className="mt-4 flex items-end justify-between gap-4">
@@ -78,7 +78,7 @@ export default function HorizontalProjects({ projects }: { projects: HomeProject
                 </h3>
               </div>
               <Link
-                href={`/projects/${p.slug}`}
+                href={`/demo/work/${p.slug}`}
                 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink border-b border-[var(--accent)] pb-0.5 hover:text-accent-deep transition-colors shrink-0"
               >
                 Open project

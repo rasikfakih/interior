@@ -31,7 +31,7 @@ export default function CtaBand() {
             </p>
           </div>
           <div className="md:col-span-3 flex md:justify-end">
-            <Link href="/contact" className="btn-primary">
+            <Link href="/demo/contact" className="btn-primary">
               Begin a project
             </Link>
           </div>

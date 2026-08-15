@@ -12,18 +12,26 @@ gsap.registerPlugin(ScrollTrigger);
 export type NavLink = { href: string; label: string; is_button?: boolean };
 
 const DEFAULT_LINKS: NavLink[] = [
-  { href: "/projects", label: "Selected work" },
-  { href: "/about", label: "Studio" },
-  { href: "/journal", label: "Journal" },
-  { href: "/contact", label: "Contact" },
+  { href: "/demo/work", label: "Selected work" },
+  { href: "/demo/about", label: "Studio" },
+  { href: "/demo/journal", label: "Journal" },
+  { href: "/demo/voices", label: "Voices" },
+  { href: "/demo/contact", label: "Contact" },
 ];
 
 /**
- * StudioOS Phase 1: the nav is DB-driven. (public)/layout.tsx reads
- * the primary menu row and passes it here; the hardcoded list is the
- * fallback when the menu table is empty or unreachable.
+ * M1 (2026-08-15): the Navbar is the agency frame, mounted by
+ * (demo)/demo/layout.tsx. The logo links to the agency home (/demo)
+ * by default; homeHref overrides it for other mounts. The nav is
+ * DB-driven when navLinks come from a layout, else DEFAULT_LINKS.
  */
-export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) => {
+export const Navbar = ({
+  navLinks = DEFAULT_LINKS,
+  homeHref = "/demo",
+}: {
+  navLinks?: NavLink[];
+  homeHref?: string;
+}) => {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -175,9 +183,9 @@ export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) =
       >
         <div className="container-page h-16 md:h-[72px] flex items-center justify-between">
           <Link
-            href="/"
+            href={homeHref}
             className="flex items-center gap-2 group"
-            aria-label="Etihad Interiors  home"
+            aria-label="Etihad Interiors home"
           >
             <span
               aria-hidden

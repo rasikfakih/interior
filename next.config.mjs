@@ -22,6 +22,16 @@ const config = {
         destination: "/projects/:path*",
         permanent: true,
       },
+      // M1 (2026-08-15): the agency site moved under /demo so the root
+      // serves the Studio OS SaaS marketing site. Old studio URLs keep
+      // working and pass their link equity to the new locations.
+      { source: "/projects", destination: "/demo/work", permanent: true },
+      { source: "/projects/:path*", destination: "/demo/work/:path*", permanent: true },
+      { source: "/about", destination: "/demo/about", permanent: true },
+      { source: "/contact", destination: "/demo/contact", permanent: true },
+      { source: "/journal", destination: "/demo/journal", permanent: true },
+      { source: "/voices", destination: "/demo/voices", permanent: true },
+      { source: "/themes", destination: "/demo/themes", permanent: true },
     ];
   },
   async headers() {

@@ -1,31 +1,19 @@
 import type { Metadata } from "next";
-import HomeV2 from "@/components/home/HomeV2";
-import { getFrontPage } from "@/lib/pages";
+import SaasHome from "@/components/saas/SaasHome";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 import { parseJsonCell } from "@/lib/json-cell";
 import { IMAGES } from "@/lib/images";
 
-// WordPress-grade live update: every page that depends on
-// admin-edited data renders dynamically. Admin writes call
-// revalidatePath() in src/lib/revalidate.ts to bust the
-// public cache so the next request sees the new state.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// Per-page SEO (StudioOS Phase 1): the SEO panel in the page editor
-// writes seo_title / seo_description / robots; this page serves them.
-export async function generateMetadata(): Promise<Metadata> {
-  const { page } = await getFrontPage();
-  if (!page) return {};
-  const title = page.seo_title || page.title || undefined;
-  const description = page.seo_description || undefined;
-  const noindex = page.robots ? page.robots.includes("noindex") : false;
-  return {
-    title: title || undefined,
-    description,
-    robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
-  };
-}
+// M1 (2026-08-15): the root is the Studio OS SaaS marketing site. The
+// Etihad Interiors agency showcase lives at /demo (see (demo)/demo).
+export const metadata: Metadata = {
+  title: "Studio OS - The operating system for interior studios",
+  description:
+    "Leads, proposals, boards, BOQ with live material costs, an offline site diary, and a client portal. One console for interior studios in India, from first call to handover.",
+};
 
 type DbProjectRow = {
   slug: string;
@@ -86,7 +74,7 @@ async function getProjects(): Promise<HomeProject[]> {
       category: r.category || "Residential",
       location: r.location || "Maharashtra",
       year: r.year || "",
-      image: r.before_image || r.after_image || "",
+      image: r.before_image || r.after_image || IMAGES.living,
     }));
   } catch {
     return [];
@@ -118,61 +106,7 @@ async function getPlans(): Promise<HomePlan[]> {
   }
 }
 
-const DEMO_PROJECTS: HomeProject[] = [
-  {
-    slug: "demo-living",
-    title: "Living Room",
-    category: "Apartment",
-    location: "Kalyan",
-    year: "2026",
-    image: IMAGES.living,
-  },
-  {
-    slug: "demo-bedroom",
-    title: "Master Bedroom",
-    category: "Apartment",
-    location: "Kalyan",
-    year: "2026",
-    image: IMAGES.bedroom,
-  },
-  {
-    slug: "demo-kitchen",
-    title: "Kitchen",
-    category: "Apartment",
-    location: "Kalyan",
-    year: "2026",
-    image: IMAGES.kitchen,
-  },
-  {
-    slug: "demo-bathroom",
-    title: "Bathroom",
-    category: "Apartment",
-    location: "Kalyan",
-    year: "2026",
-    image: IMAGES.bathroom,
-  },
-  {
-    slug: "demo-entry",
-    title: "Entry Hall",
-    category: "Villa",
-    location: "Kalyan",
-    year: "2025",
-    image: IMAGES.entry,
-  },
-  {
-    slug: "demo-outdoor",
-    title: "Outdoor Deck",
-    category: "Villa",
-    location: "Kalyan",
-    year: "2025",
-    image: IMAGES.outdoor,
-  },
-];
-
 export default async function Home() {
-  await getFrontPage();
   const [projects, plans] = await Promise.all([getProjects(), getPlans()]);
-  const homeProjects = projects.length > 0 ? projects : DEMO_PROJECTS;
-
-  return <HomeV2 projects={homeProjects} plans={plans} />;
+  return <SaasHome projects={projects} plans={plans} />;
 }

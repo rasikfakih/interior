@@ -223,12 +223,12 @@ export default function HeroClient({ data }: { data: HeroData }) {
               style={reduce ? visibleAtRest : initialHidden}
             >
               <Magnetic>
-                <Link href="/contact" className="btn-primary">
+                <Link href="/demo/contact" className="btn-primary">
                   Start a project
                   <IconArrowUpRight aria-hidden className="inline" />
                 </Link>
               </Magnetic>
-              <Link href="/projects" className="btn-ghost">
+              <Link href="/demo/work" className="btn-ghost">
                 See selected work
               </Link>
             </div>

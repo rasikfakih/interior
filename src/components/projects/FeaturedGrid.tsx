@@ -43,7 +43,7 @@ export default function FeaturedGrid({ items }: Props) {
             </h2>
           </div>
           <Link
-            href="/contact"
+            href="/demo/contact"
             className="hidden md:inline-flex text-xs font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
             Commission yours
@@ -52,7 +52,7 @@ export default function FeaturedGrid({ items }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
           <Link
-            href={`/projects/${featured.slug}`}
+            href={`/demo/work/${featured.slug}`}
             data-tile
             data-cat={featured.category}
             data-year={featured.year}
@@ -83,7 +83,7 @@ export default function FeaturedGrid({ items }: Props) {
           {bento.map((p, i) => (
             <Link
               key={p.slug}
-              href={`/projects/${p.slug}`}
+              href={`/demo/work/${p.slug}`}
               data-tile
               data-cat={p.category}
               data-year={p.year}
@@ -118,7 +118,7 @@ export default function FeaturedGrid({ items }: Props) {
 
           {items.length > 5 && (
             <Link
-              href="/journal"
+              href="/demo/journal"
               className="md:col-span-12 group flex items-center justify-between gap-4 p-6 md:p-8 border hairline rounded-[var(--radius-card)] hover:bg-canvas transition-colors"
             >
               <div>

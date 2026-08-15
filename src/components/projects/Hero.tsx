@@ -40,7 +40,7 @@ export default function ProjectsHero({ count }: Props) {
               {brand.studio_address}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/contact" className="btn-primary">
+              <Link href="/demo/contact" className="btn-primary">
                 Begin a project
               </Link>
               <Link href="#project-grid" className="btn-ghost">

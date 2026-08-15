@@ -156,7 +156,7 @@ export default function JournalPreview({
             <p className="mt-4 text-ink-mute max-w-[48ch]">{cfg.lede}</p>
           </div>
           <Link
-            href="/journal"
+            href="/demo/journal"
             className="text-sm font-mono uppercase tracking-[0.18em] border-b hairline-strong pb-1"
           >
             All entries <IconArrowRight aria-hidden className="inline" />

@@ -33,22 +33,27 @@ export const Footer = async () => {
             </p>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/projects" className="hover:text-ink">
+                <Link href="/demo/work" className="hover:text-ink">
                   Selected work
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-ink">
+                <Link href="/demo/about" className="hover:text-ink">
                   About the studio
                 </Link>
               </li>
               <li>
-                <Link href="/journal" className="hover:text-ink">
+                <Link href="/demo/journal" className="hover:text-ink">
                   Journal
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-ink">
+                <Link href="/demo/voices" className="hover:text-ink">
+                  Voices
+                </Link>
+              </li>
+              <li>
+                <Link href="/demo/contact" className="hover:text-ink">
                   Contact
                 </Link>
               </li>
@@ -105,7 +110,12 @@ export const Footer = async () => {
 
         <div className="mt-16 pt-6 border-t hairline flex flex-col md:flex-row gap-3 justify-between text-xs font-mono uppercase tracking-[0.16em] text-ink-mute">
           <p>© {currentYear} Etihad Interiors · All rights reserved</p>
-          <p>Designed + built in Kalyan, Maharashtra</p>
+          <p className="flex items-center gap-2">
+            Built on{" "}
+            <Link href="/" className="text-ink border-b border-[var(--accent)] hover:text-accent-deep transition-colors">
+              Studio OS
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

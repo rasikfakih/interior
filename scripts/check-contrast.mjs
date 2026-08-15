@@ -112,19 +112,19 @@ if (CREDS_FILE) {
 
 const PUBLIC_ROUTES = [
   "/",
-  "/projects",
-  "/projects-v2",
-  "/projects/casa-mira",
-  "/projects/nalanda-house",
-  "/projects/salt-flats",
-  "/projects-v2/casa-mira",
-  "/projects-v2/salt-flats",
-  "/journal",
-  "/journal/spatial-design-vs-interior",
-  "/about",
-  "/contact",
-  "/voices",
-  "/themes",
+  // M1 (2026-08-15): the agency site moved under /demo; the root is
+  // the Studio OS SaaS marketing site. Old paths 301 to /demo/*.
+  "/demo",
+  "/demo/work",
+  "/demo/work/casa-mira",
+  "/demo/work/nalanda-house",
+  "/demo/work/salt-flats",
+  "/demo/journal",
+  "/demo/journal/spatial-design-vs-interior",
+  "/demo/about",
+  "/demo/contact",
+  "/demo/voices",
+  "/demo/themes",
   "/this-page-does-not-exist-404",
 ];
 
