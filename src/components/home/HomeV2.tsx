@@ -122,7 +122,7 @@ function Hero() {
   return (
     <section ref={scope} className="relative grid min-h-dvh grid-cols-1 md:grid-cols-10 items-end md:items-center overflow-hidden">
       <div className="md:col-span-6 container-page pb-10 md:pb-0 z-10 relative">
-        <p className="eyebrow" data-reveal-line>
+        <p className="eyebrow dark:text-[#9AA89E]" data-reveal-line>
           Studio OS for interior designers - Kalyan, Maharashtra
         </p>
         <h1 className="font-hero mt-6 text-[13vw] md:text-[7.5vw] leading-[0.92] tracking-tight">
@@ -204,7 +204,7 @@ function Manifesto() {
       <div className="container-page grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-20 md:py-32">
         <div className="md:sticky md:top-28 self-start">
           <p className="eyebrow">The system</p>
-          <h2 className="font-hero mt-4 text-4xl md:text-[4.5rem] leading-[0.95] tracking-tight">
+          <h2 className="font-hero mt-4 text-4xl md:text-[4.5rem] leading-[0.95] tracking-tight text-[#122A20]">
             Excel is where good studios go to die.
           </h2>
         </div>
@@ -237,7 +237,7 @@ function Features() {
     <section className="bg-[#F5F3F0]">
       <div className="container-page py-20 md:py-28">
         <p className="eyebrow">What is inside</p>
-        <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight">
+        <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-[#122A20]">
           One console for the whole job.
         </h2>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -274,7 +274,7 @@ function Pricing({ plans }: { plans: HomePlan[] }) {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow">Pricing</p>
-            <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight">
+            <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-[#122A20]">
               Start free, scale when the jobs land.
             </h2>
           </div>

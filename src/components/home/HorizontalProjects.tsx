@@ -50,7 +50,7 @@ export default function HorizontalProjects({ projects }: { projects: HomeProject
   return (
     <section ref={scope} className="relative overflow-hidden bg-canvas">
       <div className="container-page pt-16 md:pt-24">
-        <p className="eyebrow">Selected work</p>
+        <p className="eyebrow dark:text-[#9AA89E]">Selected work</p>
         <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight">
           Rooms we have built.
         </h2>
