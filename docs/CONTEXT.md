@@ -4916,3 +4916,21 @@ switch, the edge-404s-unconfigured-hosts behavior, and updated the
 local host-simulation examples to the supported client-*.etha-interiors.com
 family. Sources: vercel.com/docs/domains/working-with-domains/add-a-domain
 and vercel.com/docs/platforms/multi-tenant-platforms/limits.
+
+### 2026-08-15 - Admin account reset (production)
+Operator reported issues with the admin account. Wiped public.users
+(3 old accounts: studio@/admin@ both admin role, rasikfakih2@gmail.com
+editor) and created exactly two fresh accounts with new strong
+passwords: admin@etihadinteriors.com (role admin) and
+superadmin@etihadinteriors.com (role superadmin). Rotated
+NEXTAUTH_SECRET on the Vercel project env + .env.local (JWT sessions
+are not DB-validated per request, so only a secret rotation kills
+existing sessions - verified: the pre-rotation session now 401s).
+Updated SUPERADMIN_EMAIL/SUPERADMIN_PASSWORD/ADMIN_EMAIL/ADMIN_PASSWORD
+on Vercel env for the /superadmin operator console (env-gated, returns
+{"ok":true}). Redeployed (2m). Verified live: admin login 200 role
+admin + /api/leads 200, superadmin login 200 role superadmin, operator
+login ok, old session 401. Credentials delivered to the operator in
+chat; .freebuff/creds.json temp file deleted. Note: auth.ts has a
+hardcoded fallback NEXTAUTH_SECRET ('etihad-interiors-secret-key-2026')
+used only when the env var is unset - worth removing eventually.
