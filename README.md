@@ -29,8 +29,10 @@ operator console (`/superadmin`, gated) for the licensing studio.
   <https://ethinterior.vercel.app/portal/demoPortal>
 - **Public install**: visit `/install`, enter purchase code + domain + tier.
 
-Run `node scripts/migrate.mjs && node scripts/seed-plans.mjs && node
-scripts/seed-demo.mjs` to create the demo rows the links above need.
+The proposal and portal links above resolve only when demo rows exist
+in the connected database (the demo seed was removed with the SQLite
+fallback in v2.0). Create a project + proposal + board + BOQ through the
+admin console to exercise those links.
 
 ## Studio OS (v2.0.0) - what's inside the console
 

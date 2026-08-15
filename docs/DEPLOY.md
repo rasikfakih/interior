@@ -44,10 +44,11 @@ host tagging, never Vercel-level rewrites.
 ## Environment variables (Vercel dashboard)
 
 Copy `.env.local.example` names. Required: `NEXTAUTH_SECRET`,
-`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LICENSE_HMAC_KEY` (+ `STAMP_*` if using
-the demo license stamp). For SQLite mode no `DATABASE_URL` is needed (the
-bundled `data/etihad.db` is hot-copied per region; writes evaporate on cold
-start - use Postgres for durability):
+`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LICENSE_HMAC_KEY`. Studio OS v2.0 is
+Supabase-only, so `DATABASE_URL` is required and must point at a reachable
+Postgres/Supabase project (postinstall runs scripts/migrate.mjs on every
+install and self-heals the schema; the deploy fails loudly if
+`DATABASE_URL` is missing):
 
 - `DATABASE_URL` (Postgres, recommended for production)
 - `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` +
@@ -61,7 +62,7 @@ start - use Postgres for durability):
 ## Local both-domain test (what the smoke covers)
 
 ```bash
-node scripts/migrate.mjs && node scripts/seed-plans.mjs && node scripts/seed-demo.mjs
+node scripts/migrate.mjs
 npm run build && npx next start -p 4173
 curl -s -o /dev/null -w "%{http_code}\n" -H "Host: client-demo.ethinterior.vercel.app" http://localhost:4173/portal/demoPortal   # 200
 curl -s -o /dev/null -w "%{http_code}\n" -H "Host: etha-interiors.com" http://localhost:4173/                                      # 200

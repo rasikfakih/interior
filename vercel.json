@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install && npm rebuild better-sqlite3",
+  "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["bom1"],
   "outputDirectory": ".next",
