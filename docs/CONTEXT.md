@@ -4845,3 +4845,8 @@ build failure re-ran green. Docker engine boots in this VM (took ~12
 min), so the full plain-Postgres path was reproduced locally: migrate,
 suite 9/9, contrast 72/0, verify:deploy, lint. Final: both workflows
 green on 8fc57d8.
+
+### 2026-08-15 - README status badges
+Added CI + Smoke suite badge links to README under the title
+(badge.svg?branch=main for both workflows; verified 200 image/svg+xml).
+Pushed as 722ce8d.
