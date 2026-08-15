@@ -210,8 +210,11 @@
   "208": "AdminWeeklyReport.tsx",
   "209": "LogoWall.tsx",
   "210": "page.tsx",
+  "211": "license-key.test.ts",
   "212": "license-key.test.ts",
+  "213": "package.json",
   "214": "smoke-phase2.mjs",
+  "215": "page.tsx",
   "216": "page.tsx",
   "217": "page.tsx",
   "218": "page.tsx",
@@ -219,6 +222,5 @@
   "220": "PWAInstall.tsx",
   "221": "page.tsx",
   "222": "Awwwards reel - 30s storyboard",
-  "223": "page.tsx",
-  "224": "AdminDiaryTabs.tsx"
+  "223": "page.tsx"
 }
