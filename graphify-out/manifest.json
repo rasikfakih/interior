@@ -640,8 +640,8 @@
     "semantic_hash": ""
   },
   "src/lib/auth.ts": {
-    "mtime": 1786789485.3735504,
-    "ast_hash": "5e0814efee6df94b55960b7f0597f5c8",
+    "mtime": 1786798167.105613,
+    "ast_hash": "7ab09e0cb6e51d0352fdac3954d79220",
     "semantic_hash": ""
   },
   "src/lib/license-gate.ts": {
@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786797977.019646,
-    "ast_hash": "d020123c8e64686e6f7510d2e3b73a75",
+    "mtime": 1786798248.003455,
+    "ast_hash": "af50ac901fe921b92549f42eba12f31c",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1605,8 +1605,8 @@
     "semantic_hash": ""
   },
   "src/app/api/operator/login-as/route.ts": {
-    "mtime": 1786549847.5653107,
-    "ast_hash": "74e98779fb93fa3ece9fafd87bc2321e",
+    "mtime": 1786798172.2529047,
+    "ast_hash": "7ae61fe4d990642adf4ec01bbcea995c",
     "semantic_hash": ""
   },
   "src/app/api/pages/[id]/duplicate/route.ts": {

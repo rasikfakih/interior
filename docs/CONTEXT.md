@@ -4934,3 +4934,13 @@ login ok, old session 401. Credentials delivered to the operator in
 chat; .freebuff/creds.json temp file deleted. Note: auth.ts has a
 hardcoded fallback NEXTAUTH_SECRET ('etihad-interiors-secret-key-2026')
 used only when the env var is unset - worth removing eventually.
+
+### 2026-08-15 - Removed hardcoded NEXTAUTH_SECRET fallback (4ffac0e)
+auth.ts and /api/operator/login-as both fell back to the
+source-visible 'etihad-interiors-secret-key-2026' when NEXTAUTH_SECRET
+was unset, allowing token forgery for anyone who read the repo.
+Removed both: auth.ts throws at import with a clear message (also
+prevents next-auth's dev-mode auto-secret), login-as returns 500.
+NEXTAUTH_SECRET is set in .env.local, smoke.yml/ci.yml, and the Vercel
+project env (rotated earlier this session), so the guard is inert in
+configured environments. tsc 0, tests 3/3, build green.
