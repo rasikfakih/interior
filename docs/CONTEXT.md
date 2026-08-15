@@ -4865,3 +4865,24 @@ better-sqlite3; now plain npm install so postinstall migrate
 self-heals and fails loudly without DATABASE_URL) and removed
 SQLite/seed-demo references from DEPLOY.md + README. Committed as
 bb06176.
+
+### 2026-08-15 - Vercel production deploy + verification
+Operator provided a VERCEL_TOKEN (vcp_...). Deployed main to the
+`interior` project: `vercel link --yes --project interior` then
+`vercel --prod --yes` - build green in 2m, production URL
+interior-30ixa3z4b-rasikfakih2-gmailcoms-projects.vercel.app aliased
+to ethinterior.vercel.app. Verified on the fresh deployment: homepage
+200 with v2 markers, login admin@etihadinteriors.com/admin123 against
+the real Supabase returns a session, /api/leads 200 with session,
+/api/billing/current 200, /portal/<unknown> and /proposal/<unknown>
+404, anon /api/leads 401. Domains state: ethinterior.vercel.app is the
+only project domain (verified via /v9/projects/interior/domains).
+Wildcard *.ethinterior.vercel.app not configured - CLI rejects it and
+the API returns alias_in_use; needs the dashboard Domains tab.
+etha-interiors.com is NOT on the account and its A record points at
+216.198.79.195 (an unknown third host) - left untouched pending the
+operator's decision. Note: `vercel link --yes` overwrote .env.local
+with the project's production env (no local-only keys present; the
+pulled DATABASE_URL is the same Supabase transaction pooler). No backup
+of the prior local env exists - if any local-only test keys were there,
+re-add them.
