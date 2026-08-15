@@ -98,7 +98,7 @@ async function getPlans(): Promise<HomePlan[]> {
     const rows = await pgMany<DbPlanRow>(
       `SELECT id, name, price_usd, price_inr, project_limit, lead_limit,
               board_limit, boq_version_limit, ai_credits_limit, features_json
-       FROM plans WHERE is_active = 1 ORDER BY price_usd ASC`
+       FROM plans WHERE is_active = TRUE ORDER BY price_usd ASC`
     );
     return rows.map((r) => ({
       id: r.id,
