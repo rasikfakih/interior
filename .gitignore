@@ -62,3 +62,6 @@ scripts/*.log
 # Graphify dated backup dirs (graphify update backs-up the curated graph).
 graphify-out/YYYY-MM-DD/
 graphify-out/2026-*/
+
+.vercel
+.env*
