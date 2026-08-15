@@ -9,9 +9,9 @@
  *
  *   node scripts/seed-plans.mjs
  *
- * Branches at runtime like seed-content.mjs:
- *   - DATABASE_URL set  ->  Postgres
- *   - DATABASE_URL unset ->  SQLite (data/etihad.db)
+ * Studio OS v2.0 is Supabase-only (Postgres; no SQLite fallback).
+ * Also importable: `await seedPlans()` - migrate.mjs calls it so the
+ * plan catalog is guaranteed present before billing gates read it.
  */
 import fs from "fs";
 import path from "path";
@@ -122,9 +122,16 @@ function planSqlArgs(p) {
 
 async function seedPostgres() {
   const { default: pg } = await import("pg");
+  const dbUrl = process.env.DATABASE_URL;
   const pool = new pg.Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    connectionString: dbUrl,
+    // SSL only where the server requires it (Supabase). A plain
+    // Postgres (CI service container, local install) must connect
+    // without SSL or pg rejects the connection.
+    ssl:
+      dbUrl.includes("supabase.com") || dbUrl.includes("sslmode=require")
+        ? { rejectUnauthorized: false }
+        : undefined,
   });
   for (const p of PLANS) {
     const a = planSqlArgs(p);
@@ -152,18 +159,24 @@ async function seedPostgres() {
   console.log(`plans seeded (postgres): ${PLANS.map((p) => p[0]).join(", ")}`);
 }
 
-async function main() {
+export async function seedPlans() {
   if (!process.env.DATABASE_URL) {
-    console.error(
+    throw new Error(
       "DATABASE_URL is not set. Studio OS v2.0 is Supabase-only; " +
         "set DATABASE_URL in .env.local or the environment."
     );
-    process.exit(2);
   }
   await seedPostgres();
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// CLI entry: `node scripts/seed-plans.mjs`. When imported (migrate.mjs),
+// the caller awaits seedPlans() instead so failures propagate.
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === url.fileURLToPath(import.meta.url)
+) {
+  seedPlans().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

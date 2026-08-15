@@ -5,26 +5,51 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: studioos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Shell env wins over any local .env.local. Override with a
+      # CI_DATABASE_URL secret to point at a disposable Supabase project.
+      DATABASE_URL: ${{ secrets.CI_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/studioos' }}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-smoke-secret-please-ignore
+      # Inlined at build; must match the license domain (localhost:3000).
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
-      # postinstall runs migrate + seed-pages + apply-distro against the
-      # local SQLite fallback, so the DB-dependent checks below work
-      # without secrets.
+      # postinstall runs scripts/migrate.mjs (bootstrap DDL + tenant +
+      # admin + plans) against the Postgres service container.
       - run: npm ci
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+      # Admin routes are license-gated; stamp the localhost HMAC license.
+      - name: Stamp the CI license
+        run: node scripts/smoke/ci-license.mjs
 
       # Playwright chromium for the contrast walker; cached so the
       # ~160MB download happens once per lockfile, not per run.
@@ -41,16 +66,16 @@ jobs:
       - run: npm run check:themes
 
       # Postgres boolean-column guard: rejects `col = 1` / `SET col = 0`
-      # against BOOLEAN columns (invalid in Postgres, silently accepted
-      # by SQLite) at merge time instead of on the deployed DB.
+      # against BOOLEAN columns (invalid in Postgres) at merge time.
       - run: node scripts/check-boolean-sql.mjs
 
       - run: npm run build
 
       # WCAG AA contrast walker: every rendered text surface on public,
       # tenant-admin, and superadmin routes in light + dark themes.
-      # Spawns `next start` against the freshly built .next; the
-      # postinstall seed provides the demo license + admin account.
+      # Spawns `next start` against the freshly built .next; migrate
+      # seeded the admin account (admin@etihadinteriors.com / admin123)
+      # and the license stamp above satisfies the admin gate.
       - run: node scripts/check-contrast.mjs
 
       - run: npm run verify:deploy

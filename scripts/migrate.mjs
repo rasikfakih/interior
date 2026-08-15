@@ -190,9 +190,12 @@ async function main() {
     console.log("= users present, keeping existing credentials");
   }
 
-  // 4. Freemium plans.
+  // 4. Freemium plans. seedPlans() is awaited so a seed failure is
+  // caught here (and fails the run) instead of surfacing after the
+  // pool closes - seed-plans.mjs only self-runs as a CLI.
   try {
-    await import("./seed-plans.mjs");
+    const { seedPlans } = await import("./seed-plans.mjs");
+    await seedPlans();
     console.log("+ plans seeded");
   } catch (e) {
     console.log(`- plans seed: ${e.message}`);
