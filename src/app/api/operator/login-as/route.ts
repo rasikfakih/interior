@@ -23,10 +23,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "user_id required" }, { status: 400 });
   }
 
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    // Fail closed - never mint sessions with a source-visible fallback.
+    return NextResponse.json(
+      { ok: false, error: "NEXTAUTH_SECRET not configured" },
+      { status: 500 }
+    );
+  }
+
   try {
     const user = await getLoginAsTarget(userId);
-    const secret =
-      process.env.NEXTAUTH_SECRET || "etihad-interiors-secret-key-2026";
     const maxAge = 30 * 86400;
     const sessionToken = await encode({
       token: {

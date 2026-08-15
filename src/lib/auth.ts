@@ -11,6 +11,21 @@ import { ensureMigrated, pgOne } from '@/lib/pg';
  * the pg surface, so there is no SQLite path anywhere in auth.
  */
 
+// Fail closed: there is intentionally NO hardcoded fallback secret.
+// A previously shipped fallback ('etihad-interiors-secret-key-2026')
+// lived in the source, so anyone who read the repo could forge session
+// tokens when the env var was missing. NEXTAUTH_SECRET is required in
+// .env.local / the deploy env; this throws at import time instead of
+// degrading. next-auth's own dev-mode auto-generation would otherwise
+// paper over a missing secret.
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
+if (!NEXTAUTH_SECRET) {
+  throw new Error(
+    "NEXTAUTH_SECRET is not set. Add it to .env.local (see .env.local.example) " +
+      "or the deploy environment before running the app."
+  );
+}
+
 type UserRow = {
   id: number | string;
   email: string;
@@ -82,5 +97,5 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || 'etihad-interiors-secret-key-2026',
+  secret: NEXTAUTH_SECRET,
 };
