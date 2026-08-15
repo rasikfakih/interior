@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786798248.003455,
-    "ast_hash": "af50ac901fe921b92549f42eba12f31c",
+    "mtime": 1786799235.0049005,
+    "ast_hash": "09d0772a1216a3b683cf12c68d1f2255",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -2597,6 +2597,11 @@
   ".github/workflows/smoke.yml": {
     "mtime": 1786792404.1939,
     "ast_hash": "f1d776aa500c349c76976beedb66cee5",
+    "semantic_hash": ""
+  },
+  "docs/AUDIT.md": {
+    "mtime": 1786799224.0550756,
+    "ast_hash": "a7d862614b33c884ee2c27934949ca81",
     "semantic_hash": ""
   }
 }
