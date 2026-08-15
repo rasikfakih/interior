@@ -4944,3 +4944,7 @@ prevents next-auth's dev-mode auto-secret), login-as returns 500.
 NEXTAUTH_SECRET is set in .env.local, smoke.yml/ci.yml, and the Vercel
 project env (rotated earlier this session), so the guard is inert in
 configured environments. tsc 0, tests 3/3, build green.
+
+### 2026-08-15 - Superadmin credential repair
+
+While verifying login after the fail-closed auth deploy (`4ffac0e`, READY/live), the superadmin login returned 401. Root cause: during the account reset, the `superadmin@etihadinteriors.com` row's bcrypt hash was created from an unknown third string, not the delivered password (admin hash was correct; neither delivered password matched the superadmin hash). The earlier "superadmin works" verification was flawed because the operator console is env-gated (`SUPERADMIN_PASSWORD`), not users-table-gated. Fixed by resetting the row's `password_hash` to bcrypt of the delivered password (id 8), verified bcrypt compare true, then confirmed live: admin -> role admin (id 7), superadmin -> role superadmin (id 8) via /api/auth/session. No env change needed (SUPERADMIN_PASSWORD already matched). Temp scripts removed.
