@@ -17,7 +17,7 @@ import { withPgTx } from "@/lib/pg";
  */
 
 const DEFAULT_ITEMS = [
-  { label: "Selected work", href: "/projects-v2", is_button: false },
+  { label: "Selected work", href: "/projects", is_button: false },
   { label: "Studio", href: "/about", is_button: false },
   { label: "Journal", href: "/journal", is_button: false },
   { label: "Contact", href: "/contact", is_button: false },

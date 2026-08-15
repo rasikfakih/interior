@@ -107,7 +107,7 @@ export default function ContactForm({
               </Link>{" "}
               for our field notes, or{" "}
               <Link
-                href="/projects-v2"
+                href="/projects"
                 className="underline decoration-1 hairline-strong underline-offset-4 hover:text-ink"
               >
                 browse selected work

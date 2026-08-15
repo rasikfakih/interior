@@ -13,6 +13,17 @@ const config = {
       { protocol: "https", hostname: "ethinterior.vercel.app" },
     ],
   },
+  async redirects() {
+    return [
+      // Module 12: /projects-v2 was a pre-launch duplicate of /projects.
+      // Canonical route is /projects; stale links and DB menu rows still work.
+      {
+        source: "/projects-v2/:path*",
+        destination: "/projects/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

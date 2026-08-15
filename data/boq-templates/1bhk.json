@@ -1,0 +1,37 @@
+{
+  "name": "1BHK Standard",
+  "categories": [
+    {
+      "category": "civil",
+      "items": [
+        { "item_name": "Site protection & cleaning", "unit": "lot", "qty": 1, "material_rate": 4000, "labour_rate": 2500 },
+        { "item_name": "Debris disposal", "unit": "lot", "qty": 1, "material_rate": 1500, "labour_rate": 1200 }
+      ]
+    },
+    {
+      "category": "carpentry",
+      "items": [
+        { "item_name": "Modular kitchen - base units", "unit": "rft", "qty": 8, "material_rate": 2200, "labour_rate": 400, "linked_material_category": "wood" },
+        { "item_name": "Wardrobe - hinged", "unit": "sqft", "qty": 50, "material_rate": 1800, "labour_rate": 300 }
+      ]
+    },
+    {
+      "category": "electrical",
+      "items": [
+        { "item_name": "Point wiring", "unit": "nos", "qty": 22, "material_rate": 350, "labour_rate": 150 }
+      ]
+    },
+    {
+      "category": "painting",
+      "items": [
+        { "item_name": "Wall painting - emulsion", "unit": "sqft", "qty": 850, "material_rate": 22, "labour_rate": 18 }
+      ]
+    },
+    {
+      "category": "flooring",
+      "items": [
+        { "item_name": "Vitrified tiles laying", "unit": "sqft", "qty": 450, "material_rate": 45, "labour_rate": 35 }
+      ]
+    }
+  ]
+}

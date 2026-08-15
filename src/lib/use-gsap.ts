@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import { gsap } from "gsap";
 
 /**
@@ -36,7 +36,13 @@ export function useGSAP(
   deps: unknown[] = []
 ) {
   const reduce = useReducedMotion();
-  useEffect(() => {
+  // Layout effect on purpose: GSAP pins move DOM nodes (the section is
+  // re-parented into a .pin-spacer at refresh, even at scroll 0). React's
+  // unmount then fails with "removeChild: node is not a child" because the
+  // fiber still thinks the old parent owns the node. Cleanup must run in
+  // the layout phase (ctx.revert() restores the DOM) BEFORE React deletes
+  // the subtree in commitMutationEffects.
+  useLayoutEffect(() => {
     if (reduce || !scopeRef.current) return;
     let cleanup: void | (() => void);
     const ctx = gsap.context(() => {

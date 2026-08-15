@@ -4,8 +4,11 @@ A premium residential interior design theme. Sold on Envato. White-label
 for any studio buyer via `/admin` + `theme.distro.json`. Includes an
 operator console (`/superadmin`, gated) for the licensing studio.
 
-> **Current: v1.18.0** (2026-08-14). See `CHANGELOG.md` for the release
-> history and `FREEZE-MARKER` for the frozen surfaces.
+> **Current: v2.0.0** (2026-08-15). Studio OS - the full studio
+> operating system: leads Kanban, proposals with tracking, materials +
+> BOQ, board canvas, offline diary, client portal on two domains, AI
+> weekly reports, social autopilot, freemium billing. See `CHANGELOG.md`
+> for the release history and `FREEZE-MARKER` for the frozen surfaces.
 >
 > **Read first in any new session** - the two master docs at the repo
 > root: `masterinterior.md` (the technical map: what/why/how, stack,
@@ -16,13 +19,35 @@ operator console (`/superadmin`, gated) for the licensing studio.
 ## Live demo
 
 - **Public URL**: <https://ethinterior.vercel.app>
+- **Admin demo**: <https://ethinterior.vercel.app/admin> (admin@example.com / demo)
+- **Proposal demo** (view tracking, boards, BOQ total):
+  <https://ethinterior.vercel.app/proposal/demo1234>
+- **Client portal demo** (approvals, comments, diary):
+  <https://ethinterior.vercel.app/portal/demoPortal>
 - **Public install**: visit `/install`, enter purchase code + domain + tier.
+
+Run `node scripts/migrate.mjs && node scripts/seed-plans.mjs && node
+scripts/seed-demo.mjs` to create the demo rows the links above need.
+
+## Studio OS (v2.0.0) - what's inside the console
+
+| Module | Surface | What it does |
+| --- | --- | --- |
+| Lead Inbox + Kanban | `/admin/leads`, `/admin/leads/board` | Six-status funnel, drag across columns, budget totals per stage |
+| Projects + Proposals | `/admin/client-projects/*` | Token proposal links with view counts, accept flow, WhatsApp share |
+| Material Library | `/admin/materials`, `/admin/vendors` | Live cost per unit, categories, stock status, image uploads |
+| Board Canvas | `/admin/client-projects/[id]/boards` | Freeform 2000x1500 moodboard, drag/resize/rotate, realtime |
+| BOQ Engine | `/admin/client-projects/[id]/boq` | Indian GST + wastage, live material rates, versioning, export |
+| Site Diary PWA | `/admin/client-projects/[id]/diary` | Offline-first logs, photo queue, voice notes, snag list |
+| Client Portal | `/portal/{token}` + client-* domains | Approvals, comments, boards, BOQ, photos - no login |
+| AI + Social | `/admin/ai`, `/admin/client-projects/[id]/social` | Weekly reports from site logs, caption autopilot, credit metering |
+| Plans + Billing | `/admin/billing` | Free/Starter/Pro/Studio limits, mock checkout, Stripe/Razorpay keys |
 
 ## Two products from one repo
 
 | Surface | Audience | Visible to buyers? |
 | --- | --- | --- |
-| `/`, `/projects-v2`, `/projects-v2/[slug]`, `/journal`, `/contact`, `/install` | Studio site visitors + Envato prospects | yes |
+| `/`, `/projects`, `/projects/[slug]`, `/journal`, `/contact`, `/install` | Studio site visitors + Envato prospects | yes |
 | `/superadmin/**` | Studio team only | no (gated by `SUPERADMIN_EMAIL` + `SUPERADMIN_PASSWORD`) |
 | `/api/envato/webhook` | Envato purchase events | no (server-to-server) |
 | `/admin` | The buyer's tenant admins once installed | yes |

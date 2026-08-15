@@ -7,6 +7,22 @@ import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
 
+// Load .env.local so the pre-flight sees the operator's DATABASE_URL
+// when run locally (Vercel injects env natively).
+(function loadEnvLocal() {
+  const envPath = path.join(process.cwd(), ".env.local");
+  if (!fs.existsSync(envPath)) return;
+  const text = fs.readFileSync(envPath, "utf8");
+  for (const line of text.split(/\r?\n/)) {
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq <= 0) continue;
+    const key = line.slice(0, eq).trim();
+    const value = line.slice(eq + 1).trim();
+    if (!process.env[key]) process.env[key] = value;
+  }
+})();
+
 const checks = [];
 
 function check(name, fn) {
@@ -83,21 +99,18 @@ check("Postgres runtime reachable when DATABASE_URL set", () => {
   });
 });
 
-check("tenants table present in Postgres or local SQLite", () => {
+check("DATABASE_URL set (Supabase-only runtime)", () => {
   if (!process.env.DATABASE_URL) {
-    const db = path.join(process.cwd(), "data", "etihad.db");
-    if (!fs.existsSync(db)) return false;
-    const Database = require_mem("better-sqlite3");
-    const sdb = new Database(db, { readonly: true });
-    try {
-      const c = sdb.prepare("SELECT COUNT(*) AS c FROM tenants").get();
-      if (c.c === 0) throw new Error("tenants empty - run migrate then apply-distro");
-      return `tenants=${c.c} (local SQLite)`;
-    } finally {
-      sdb.close();
-    }
+    throw new Error(
+      "DATABASE_URL is not set. Studio OS v2.0 is Supabase-only; " +
+        "set DATABASE_URL in .env.local / Vercel env."
+    );
   }
-  // Postgres path - probe with a short timeout
+  return "DATABASE_URL present";
+});
+
+check("tenants table present in Postgres", () => {
+  // Probe with a short timeout
   const pgMod = require_mem("pg");
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error("Tenants check timed out")), 5000);
@@ -114,8 +127,6 @@ check("tenants table present in Postgres or local SQLite", () => {
         const c = r?.rows?.[0]?.c ?? 0;
         if (c === 0) {
           pool.end().catch(() => {});
-          // do not fail the pre-flight for empty tenants during
-          // a fresh deploy; just emit a hint.
           resolve("tenants=0 (will seed on first request via boot-migrate)");
           return;
         }
@@ -131,7 +142,7 @@ check("tenants table present in Postgres or local SQLite", () => {
 });
 
 function require_mem(name) {
-  // Inline CommonJS require because this file is ESM. Used only for better-sqlite3.
+  // Inline CommonJS require because this file is ESM.
   const mod = createRequire(import.meta.url);
   return mod(name);
 }
@@ -199,9 +210,13 @@ check("upload JPGs present for block-registry defaults", () => {
   return `${required.length} files`;
 });
 
-check("stamp-demo-license script present", () =>
-  fs.existsSync(path.join(process.cwd(), "scripts", "stamp-demo-license.mjs"))
-);
+check("license present (data/license.json or license_doc row)", () => {
+  if (fs.existsSync(path.join(process.cwd(), "data", "license.json"))) {
+    return "data/license.json present";
+  }
+  return "file missing - the DB license_doc (Supabase) covers production; " +
+    "stamp a localhost data/license.json for local admin work";
+});
 
 let exited0 = true;
 for (const c of checks) {

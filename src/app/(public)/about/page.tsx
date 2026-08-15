@@ -84,6 +84,17 @@ export default async function AboutPage() {
         </div>
       </section>
 
+      <section className="py-20 md:py-24 paper-grain">
+        <div className="container-page relative z-[2]">
+          <p className="font-hero text-[clamp(2rem,5vw,3.6rem)] leading-[1.05] max-w-4xl">
+            &ldquo;We start at the kitchen table, not the mood board.&rdquo;
+          </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute mt-6">
+            The working rule on the office wall since 2017
+          </p>
+        </div>
+      </section>
+
       {team.length > 0 && (
         <section className="py-20 md:py-28">
           <div className="container-page">

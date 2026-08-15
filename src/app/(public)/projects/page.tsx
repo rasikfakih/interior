@@ -30,6 +30,15 @@ type DbProjectRow = {
   model_3d: string | null;
 };
 
+// Demo fallback so the marketing grid renders real images even before
+// the portfolio DB is seeded (same pattern as the homepage).
+const DEMO_ITEMS: DbProjectRow[] = [
+  { slug: "demo-living", title: "Living Room", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/living-room-1.jpg", after_image: null, model_3d: null },
+  { slug: "demo-bedroom", title: "Master Bedroom", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/bedroom-1.jpg", after_image: null, model_3d: null },
+  { slug: "demo-kitchen", title: "Kitchen", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/kitchen-1.jpg", after_image: null, model_3d: null },
+  { slug: "demo-entry", title: "Entry", category: "Villa", location: "Kalyan", year: "2025", scope: "Villa", before_image: "/demo/entry-1.jpg", after_image: null, model_3d: null },
+];
+
 async function getDbProjects() {
   try {
     await ensureMigrated();
@@ -49,14 +58,15 @@ export default async function ProjectsPage() {
   const FALLBACK =
     "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop";
 
-  const items = dbProjects.map((r) => ({
+  const src = dbProjects.length > 0 ? dbProjects : DEMO_ITEMS;
+  const items = src.map((r) => ({
     slug: r.slug,
     title: r.title,
     category: r.category || "Residential",
     location: r.location || "Maharashtra",
     year: r.year || "",
     scope: r.scope || r.category || "Residential",
-    image: r.before_image || FALLBACK,
+    image: r.before_image || r.after_image || FALLBACK,
     has3D: Boolean(r.model_3d),
     modelUrl: r.model_3d || null,
     posterUrl: r.before_image || null,

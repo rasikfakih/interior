@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Model3DViewer from "@/components/Model3DViewer";
+import ShaderHoverCard from "@/components/home/ShaderHoverCard";
 import type { ProjectItem } from "@/components/projects/types";
 
 type Props = {
@@ -101,23 +101,19 @@ export default function ProjectsClient({ items, categories, years }: Props) {
               data-year={p.year}
               className={`${i % 2 === 1 ? "md:mt-12" : ""}`}
             >
-              <Link
-                href={`/projects/${p.slug}`}
-                className="group block relative overflow-hidden rounded-[var(--radius-card)] aspect-[16/11]"
-              >
-                <Image
+              <div className="relative">
+                <ShaderHoverCard
                   src={p.image}
                   alt={p.title}
-                  fill
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  href={`/projects/${p.slug}`}
+                  className="aspect-[16/11]"
                 />
                 {p.has3D && (
-                  <span className="absolute top-3 left-3 chrome-pill">
+                  <span className="absolute top-3 left-3 chrome-pill bg-[var(--bg)] px-2 z-10">
                     3D - walk-through
                   </span>
                 )}
-              </Link>
+              </div>
               <div className="mt-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-2xl md:text-3xl tracking-tight">

@@ -1,5 +1,95 @@
 CHANGELOG
 
+## v2.0.0 - 2026-08-15 - Studio OS: the full studio operating system (Modules 1-12)
+
+### What this is
+
+v2.0.0 turns the theme from a marketing site + CMS into a complete
+studio operating system: leads funnel, client projects, token proposals,
+material library, moodboard canvas, Indian BOQ, offline site diary,
+client portal on two domains, AI weekly reports, social autopilot, and
+freemium billing - all on the same tables. One demo link walks a buyer
+through the whole loop: `/proposal/demo1234` (public proposal with view
+tracking, boards, and BOQ total) and `/portal/demoPortal` (client portal
+with approvals and comments).
+
+### Modules (all landed across TS-ID-024..034)
+
+- **Module 1 - Lead Inbox.** `leads` table (6-status funnel, source,
+  budget, score), stat cards, filters, Add Lead modal, contact form feeds
+  the funnel as `source=website`.
+- **Module 2 - Pipeline Kanban.** Board view at `/admin/leads/board` with
+  @dnd-kit drag across new/qualified/site_visit/quote_sent/won/lost,
+  column budget totals, quick status moves in the table view.
+- **Module 3 - Proposals.** `projects` + `proposals` tables, token links
+  (`/proposal/{token}`) with view counting, accept flow -> lead won,
+  proposal builder with WhatsApp share.
+- **Module 4 - Material + Vendor Library.** `vendors` + `materials` with
+  live cost per unit, storage uploads, categories, stock status.
+- **Module 5 - Moodboard Canvas.** `boards` + `board_items`, freeform
+  2000x1500 canvas with drag/resize/rotate/layers, Supabase realtime,
+  boards selectable inside proposals.
+- **Module 6 - BOQ Engine.** `boq_versions` + `boq_items` from the 2BHK
+  template, GST + wastage calculation, live material-rate linking,
+  versioning, export JSON/CSV.
+- **Module 7 - Site Diary PWA.** Offline-first `site_logs` with photo
+  queue + voice transcription, `snags` lifecycle, PWA manifest + sw.
+- **Module 8 - Client Portal.** Both domains (client-* subdomains and
+  tenant custom domains via the proxy) with approvals, comments, board
+  and BOQ visuals inside the public proposal.
+- **Module 9 - AI Weekly Report + Social Autopilot.** Deepseek-compatible
+  AI runner with mock fallback, `ai_generations` ledger, weekly report
+  with Share-to-Portal, 3 English + 1 Hinglish captions, draft -> publish.
+- **Module 10 - Freemium Plans + Billing.** `plans` (free/starter/pro/
+  studio) with 402 PLAN_LIMIT gates on every create flow, mock checkout,
+  Stripe/Razorpay webhooks with real keys, white-label gating.
+- **Module 11 - Awwwards Homepage.** Forest & Bone v2 tokens, Instrument
+  Serif hero with clip-path reveal, GSAP horizontal pin, three.js shader
+  hover cards, Lenis, ViewTransitions, magnetic CTA, pricing from the
+  plans table.
+- **Module 12 - Launch.** `/projects-v2` consolidated into `/projects`
+  (permanent redirect), demo seed (`node scripts/seed-demo.mjs`), perf
+  gate at 100/100/100/100, deploy guide for both domains, Awwwards reel
+  script, this changelog.
+
+### Breaking changes
+
+- New tables: `plans`, `subscriptions`, `ai_generations`, `social_posts`,
+  `client_portal_approvals`, `client_comments`, `vendors`, `materials`,
+  `boards`, `board_items`, `boq_versions`, `boq_items`, `site_logs`,
+  `snags`, `proposals`, `client_projects` (migrate idempotent via
+  `scripts/migrate.mjs`).
+- `tenants` gains plan/billing/AI columns (defaults keep old tenants on
+  the free plan).
+- `/projects-v2` is gone; canonical route is `/projects`.
+
+### New dependencies
+
+`three`, `@react-three/fiber`, `@react-three/drei`, `gsap`,
+`@gsap/react`, `lenis`, `@dnd-kit/core`, `@dnd-kit/sortable`,
+`@dnd-kit/utilities`, `better-sqlite3` (already present), `sharp` (Next
+image optimization).
+
+### New routes
+
+Public: `/projects` (+ `[slug]`), `/proposal/[token]`,
+`/portal/[token]`, `/manifest.ts`. Admin: `/admin/leads`,
+`/admin/leads/board`, `/admin/client-projects/*` (detail, boards, boq,
+diary, social, portal, proposal), `/admin/materials`, `/admin/vendors`,
+`/admin/ai`, `/admin/billing`. APIs: `/api/leads/*`, `/api/client-projects/*`,
+`/api/proposals/*`, `/api/vendors/*`, `/api/materials/*`, `/api/boards/*`,
+`/api/boq/*`, `/api/site-logs/*`, `/api/snags/*`, `/api/portal/*`,
+`/api/ai/*`, `/api/social/*`, `/api/billing/*`, `/api/tenants/[id]/domains`.
+
+### Demo links (after `node scripts/seed-demo.mjs`)
+
+- Public site: https://ethinterior.vercel.app
+- Admin demo: https://ethinterior.vercel.app/admin (admin@example.com / demo)
+- Proposal demo: https://ethinterior.vercel.app/proposal/demo1234
+- Portal demo: https://ethinterior.vercel.app/portal/demoPortal
+
+CHANGELOG
+
 # Etihad Interiors Theme - Built For Sale + Resell
 
 ## v1.18.0 - 2026-08-14 - Post-StudioOS hardening: console polish, WCAG AA gate, Neon infra, durable install

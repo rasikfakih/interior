@@ -1,0 +1,91 @@
+name: Smoke suite (Supabase backend)
+
+# Builds the app, boots it against a fresh Postgres, and runs the
+# Module 2-10 smoke suite (npm run smoke:modules) on every push.
+#
+# Database: by default an ephemeral Postgres service container (safe,
+# zero secrets, reproducible). To run against a real Supabase project
+# instead, add a CI_DATABASE_URL secret with a pooler URL for a
+# DISPOSABLE project - the smoke suite wipes module tables and resets
+# tenant 1, so never point it at a production database.
+#
+# License: admin routes are license-gated. CI stamps data/license.json
+# for the localhost domain with the offline HMAC fallback key
+# (scripts/smoke/ci-license.mjs) so every gated API passes.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: studioos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Shell env takes precedence over .env.local in Next.js and in
+      # scripts/migrate.mjs, so the service container wins over any
+      # local operator env that is not present in CI anyway.
+      DATABASE_URL: ${{ secrets.CI_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/studioos' }}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-smoke-secret-please-ignore
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # postinstall runs scripts/migrate.mjs, which applies
+      # supabase-bootstrap.sql and seeds tenant + admin + plans on a
+      # fresh database, so npm ci is also the migration step.
+      - name: Install dependencies (postinstall migrates the DB)
+        run: npm ci
+
+      - name: Stamp the CI license (localhost domain, HMAC fallback)
+        run: node scripts/smoke/ci-license.mjs
+
+      - name: Build
+        run: npm run build
+
+      # Server and smoke suite share one step: GitHub Actions kills
+      # background processes when a step ends, so the server must live
+      # inside the step that consumes it.
+      - name: Boot server and run the smoke suite
+        run: |
+          npm run start > /tmp/next.log 2>&1 &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000/api/auth/csrf > /dev/null 2>&1; then
+              echo "server ready after ${i} attempts"
+              break
+            fi
+            sleep 2
+          done
+          if ! curl -sf http://localhost:3000/api/auth/csrf > /dev/null 2>&1; then
+            echo "server failed to boot"
+            tail -80 /tmp/next.log
+            exit 1
+          fi
+          npm run smoke:modules

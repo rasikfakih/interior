@@ -119,6 +119,48 @@ async function ensureBucket(): Promise<void> {
 }
 
 /**
+ * Module 4 - materials image bucket. Public (catalog photos are not
+ * tenant secrets and will render in client-facing proposals later),
+ * so cards can load image_url directly without a per-image signed URL.
+ * Module 7 adds `site-photos` (public so diary photos can render in
+ * client-facing surfaces later) and reuses the same public path.
+ */
+async function ensurePublicBucket(bucket: string): Promise<void> {
+  const cfg = getStorageConfig();
+  if (cfg.mode !== "supabase") return;
+  const { error: listErr } = await getClient().storage.getBucket(bucket);
+  if (!listErr) return;
+  await getClient().storage.createBucket(bucket, { public: true });
+}
+
+/**
+ * Module 4 / 7 - one-shot upload of an image. Mirrors the media
+ * pipeline but targets a dedicated public bucket (supabase) or the
+ * local scratch (dev). Returns a displayable URL: public storage
+ * object URL in supabase mode, /api/uploads/local path in local mode.
+ */
+export async function uploadObject(
+  storagePath: string,
+  body: Buffer,
+  contentType: string,
+  bucket: string = "materials"
+): Promise<string> {
+  const cfg = getStorageConfig();
+  if (cfg.mode === "local") {
+    await localWrite(storagePath, body);
+    return localPublicPath(storagePath);
+  }
+  await ensurePublicBucket(bucket);
+  const { error } = await getClient()
+    .storage.from(bucket)
+    .upload(storagePath, body, { contentType, upsert: false });
+  if (error) {
+    throw new Error(`${bucket} upload failed: ${error.message}`);
+  }
+  return `${cfg.baseUrl}/storage/v1/object/public/${bucket}/${storagePath}`;
+}
+
+/**
  * Phase 2 - one-shot signed upload URL.
  *
  * In supabase mode: ask the SDK for a token-bound signed upload URL.

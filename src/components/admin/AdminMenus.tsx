@@ -142,7 +142,7 @@ export default function AdminMenus({
                   value={it.href}
                   onChange={(e) => setField(idx, "href", e.target.value)}
                   className={INPUT_CLS + " mt-1 font-mono text-xs"}
-                  placeholder="/projects-v2"
+                  placeholder="/projects"
                   maxLength={240}
                 />
               </div>

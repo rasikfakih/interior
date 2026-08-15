@@ -1,14 +1,5 @@
 import "server-only";
-import Database from "better-sqlite3";
-import path from "path";
-
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
-
-function getSqlite() {
-  const sqlite = new Database(DB_PATH, { readonly: false });
-  sqlite.pragma("journal_mode = WAL");
-  return sqlite;
-}
+import { pgMany, pgOne } from "@/lib/pg";
 
 export type MediaKind = "image" | "model" | "document" | "other";
 type MediaRow = {
@@ -45,147 +36,90 @@ export type MediaListFilters = {
   limit?: number;
 };
 
+function toItem(r: MediaRow): MediaItem {
+  return {
+    id: r.id,
+    kind: r.kind,
+    mime: r.mime,
+    size: r.size,
+    originalName: r.original_name,
+    storagePath: r.storage_path,
+    url: r.url,
+    alt: r.alt,
+    width: r.width,
+    height: r.height,
+    createdAt: r.created_at,
+  };
+}
+
 export async function listMedia(filters: MediaListFilters = {}): Promise<MediaItem[]> {
-  return new Promise((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      const limit = Math.min(filters.limit ?? 200, 500);
-      const rows = sqlite
-        .prepare("SELECT * FROM media ORDER BY id DESC LIMIT ?")
-        .all(limit) as MediaRow[];
-      sqlite.close();
-      const filtered = rows.filter((r) => {
-        const q = filters.q?.toLowerCase().trim();
-        const kindOk =
-          !filters.kind || filters.kind === "all" || r.kind === filters.kind;
-        const qOk =
-          !q ||
-          (r.original_name || "").toLowerCase().includes(q) ||
-          (r.alt || "").toLowerCase().includes(q) ||
-          (r.url || "").toLowerCase().includes(q);
-        return kindOk && qOk;
-      });
-      resolve(
-        filtered.map((r: MediaRow) => ({
-          id: r.id,
-          kind: r.kind,
-          mime: r.mime,
-          size: r.size,
-          originalName: r.original_name,
-          storagePath: r.storage_path,
-          url: r.url,
-          alt: r.alt,
-          width: r.width,
-          height: r.height,
-          createdAt: r.created_at,
-        }))
-      );
-    } catch (e) {
-      reject(e);
-    }
-  });
+  const limit = Math.min(filters.limit ?? 200, 500);
+  const q = filters.q?.toLowerCase().trim();
+  const clauses: string[] = [];
+  const params: unknown[] = [];
+  if (filters.kind && filters.kind !== "all") {
+    params.push(filters.kind);
+    clauses.push(`kind = $${params.length}`);
+  }
+  if (q) {
+    params.push(`%${q}%`);
+    clauses.push(
+      `(LOWER(COALESCE(original_name, '')) LIKE $${params.length} OR LOWER(COALESCE(alt, '')) LIKE $${params.length} OR LOWER(COALESCE(url, '')) LIKE $${params.length})`
+    );
+  }
+  const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+  params.push(limit);
+  const rows = await pgMany<MediaRow>(
+    `SELECT * FROM media ${where} ORDER BY id DESC LIMIT $${params.length}`,
+    params
+  );
+  return rows.map(toItem);
 }
 
 export async function getMediaById(id: number): Promise<MediaItem | null> {
-  return new Promise((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      const r = sqlite.prepare("SELECT * FROM media WHERE id = ?").get(id) as MediaRow | undefined;
-      sqlite.close();
-      if (!r) return resolve(null);
-      resolve({
-        id: r.id,
-        kind: r.kind,
-        mime: r.mime,
-        size: r.size,
-        originalName: r.original_name,
-        storagePath: r.storage_path,
-        url: r.url,
-        alt: r.alt,
-        width: r.width,
-        height: r.height,
-        createdAt: r.created_at,
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+  const r = await pgOne<MediaRow>(`SELECT * FROM media WHERE id = $1`, [id]);
+  return r ? toItem(r) : null;
 }
 
 export async function insertMedia(item: Omit<MediaItem, "id" | "createdAt">) {
-  return new Promise<number>((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      const r = sqlite
-        .prepare(
-          `INSERT INTO media (kind, mime, size, original_name, storage_path, url, alt, width, height)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        )
-        .run(
-          item.kind,
-          item.mime,
-          item.size,
-          item.originalName,
-          item.storagePath,
-          item.url,
-          item.alt,
-          item.width,
-          item.height
-        );
-      sqlite.close();
-      resolve(Number(r.lastInsertRowid));
-    } catch (e) {
-      reject(e);
-    }
-  });
+  const r = await pgOne<{ id: number }>(
+    `INSERT INTO media (kind, mime, size, original_name, storage_path, url, alt, width, height)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     RETURNING id`,
+    [
+      item.kind,
+      item.mime,
+      item.size,
+      item.originalName,
+      item.storagePath,
+      item.url,
+      item.alt,
+      item.width,
+      item.height,
+    ]
+  );
+  return Number(r?.id ?? 0);
 }
 
 export async function updateMediaAlt(id: number, alt: string | null) {
-  return new Promise<void>((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      sqlite.prepare(`UPDATE media SET alt = ? WHERE id = ?`).run(alt, id);
-      sqlite.close();
-      resolve();
-    } catch (e) {
-      reject(e);
-    }
-  });
+  await pgMany(`UPDATE media SET alt = $1 WHERE id = $2`, [alt, id]);
 }
 
 export async function deleteMedia(id: number) {
-  return new Promise<{ ok: boolean; file?: string }>((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      const row = sqlite
-        .prepare("SELECT storage_path FROM media WHERE id = ?")
-        .get(id) as { storage_path: string } | undefined;
-      if (!row) {
-        sqlite.close();
-        return resolve({ ok: false });
-      }
-      sqlite.prepare("DELETE FROM media WHERE id = ?").run(id);
-      sqlite.close();
-      resolve({ ok: true, file: row.storage_path });
-    } catch (e) {
-      reject(e);
-    }
-  });
+  const row = await pgOne<{ storage_path: string }>(
+    `SELECT storage_path FROM media WHERE id = $1`,
+    [id]
+  );
+  if (!row) return { ok: false };
+  await pgMany(`DELETE FROM media WHERE id = $1`, [id]);
+  return { ok: true, file: row.storage_path };
 }
 
 export async function countMediaByKind() {
-  return new Promise<Record<string, number>>((resolve, reject) => {
-    try {
-      const sqlite = getSqlite();
-      const rows = sqlite
-        .prepare("SELECT kind, COUNT(*) AS c FROM media GROUP BY kind")
-        .all() as { kind: string; c: number }[];
-      sqlite.close();
-      const out: Record<string, number> = {};
-      rows.forEach((r) => (out[r.kind] = r.c));
-      resolve(out);
-    } catch (e) {
-      reject(e);
-    }
-  });
+  const rows = await pgMany<{ kind: string; c: number }>(
+    `SELECT kind, COUNT(*) AS c FROM media GROUP BY kind`
+  );
+  const out: Record<string, number> = {};
+  rows.forEach((r) => (out[r.kind] = r.c));
+  return out;
 }

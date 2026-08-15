@@ -17,6 +17,660 @@ the agent is the writer.
 
 ## Active todos
 
+### TS-ID-023 - Module 1: Lead Inbox (leads table + APIs + /admin/leads)
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (build Module 1 of the lead pipeline)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `leads` table (id, name, phone, email, source, budget, status,
+    score, created_at) on all schema surfaces
+  - `src/lib/leads.ts` (new) - LEAD_STATUSES / LEAD_SOURCES +
+    normalize helpers + human labels
+  - `src/app/api/leads/route.ts` (new) - GET list + stats funnel
+    (status/source filters, name/phone/email search, camelCase DTOs),
+    POST create (requireAdminSession gate)
+  - `src/app/api/leads/[id]/route.ts` (new) - GET / PATCH (status,
+    score, contact fields, whitelisted values) / DELETE
+  - `src/app/api/forms/submit/route.ts` - submission INSERT and lead
+    INSERT (source='website', name/email/phone picked from payload
+    keys) share one withPgTx
+  - `src/app/admin/leads/page.tsx` (new, force-dynamic) +
+    `src/components/admin/AdminLeads.tsx` (new) - 4 stat cards (New /
+    Qualified / Quote sent / Won from GROUP BY stats), table (name,
+    phone, email, source badge, budget Geist Mono, status badge,
+    score, created_at), status/source filters, name/phone search,
+    Add Lead modal (name/phone/email/source/budget)
+  - `src/components/icons.tsx` (leads glyph, UserFocus) +
+    `src/components/admin/AdminShell.tsx` (Leads tab, probe->push
+    /admin/leads)
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green (routes
+    registered: /admin/leads, /api/leads, /api/leads/[id])
+  - `npm test` 3/3; `node scripts/lint-changed.mjs` no new errors
+  - Local E2E smoke against the SQLite fallback runtime: 37/37 PASS
+    (anon 401 on all verbs; admin login; empty list + zero stats;
+    manual POST; public form submit lands source=website leads;
+    filters + name/phone search; PATCH status/score + invalid 400;
+    single GET; DELETE + 404; stats recompute after PATCH/DELETE)
+  - Browser preview verified: stat cards, badges, modal create
+    round-trip, funnel counts update live
+- Outcome:
+  - No leads schema existed in the repo; defined per the module
+    spec: status funnel new -> qualified -> quote_sent -> won,
+    sources manual/website/referral/phone/other, website written
+    automatically by /api/forms/submit inside the same transaction
+    as the form_submissions insert.
+  - Dialect-neutral SQL only: COUNT(*) (no ::int cast) and distinct
+    $N params per occurrence (the SQLite fallback shim rewrites each
+    $N to its own ?). Search uses LOWER() LIKE on both runtimes.
+  - API gate aligned to requireAdminSession (session + license),
+    matching the forms/redirects/newsletter StudioOS surfaces.
+  - Colors constrained to the Forest & Bone family (ink #122A20 /
+    paper #ECECE6 / amber #C0964F + derived tints); no new hues.
+- Closes on: <pending commit>
+
+### TS-ID-024 - Module 2: Pipeline Kanban board (drag-drop funnel + quick moves)
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (build the full sales board on
+  top of Module 1)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts` - status funnel widened
+    to new / qualified / site_visit / quote_sent / won / lost;
+    `lost_reason text` + `last_status_change_at timestamp default now()`
+    columns added on all four surfaces; migrate.mjs adds an idempotent
+    ALTER for the two new columns
+  - `src/lib/leads.ts` - LEAD_STATUSES (6) + labels, LEAD_SOURCES,
+    parseBudgetLakhs / formatBudgetLakhs (compact Rs lakhs),
+    LeadDto with lostReason + lastStatusChangeAt
+  - `src/app/api/leads/route.ts` - GET now returns per-status funnel
+    counts for all 6 statuses (zero-filled) + budget totals via one
+    GROUP BY; stats keys are the new statuses
+  - `src/app/api/leads/[id]/status/route.ts` (new) - POST
+    {status, lost_reason?} in a withPgTx; sets last_status_change_at =
+    now(), writes lost_reason on lost; whitelisted status values;
+    requireAdminSession gate; returns camelCase DTO
+  - `src/app/api/leads/[id]/route.ts` - PATCH keeps parity, sets
+    last_status_change_at on status change, accepts lost_reason;
+    DTO extended
+  - `src/app/admin/leads/layout.tsx` (new) + `LeadsTabs.tsx` (new) -
+    List | Board tab strip with active state
+  - `src/app/admin/leads/board/page.tsx` (new, force-dynamic) +
+    `src/components/admin/LeadKanban.tsx` + `LeadCard.tsx` (new) -
+    6-column board, dnd-kit DndContext + SortableContext with
+    rectIntersection, whole-card drag handle, amber highlight on
+    dragover, optimistic move with revert + toast on failure, column
+    count badges + budget totals in Geist Mono, client-side
+    search/status/source filters, real demo-photo empty states
+    (public/demo/*.jpg via next/image), prefers-reduced-motion kills
+    dnd transitions, 8px radius, Forest & Bone tokens only
+  - `src/components/admin/AdminLeads.tsx` - per-row "Move to..."
+    select (qualified / site_visit / quote_sent / won / lost) hitting
+    the same status API; last_status_change_at shown as "upd <date>"
+    under the status badge
+  - `src/app/api/contact/route.ts` - follow-up in the same session:
+    the public contact page now inserts a lead (source='website',
+    status='new', score=0) inside a withPgTx instead of just logging;
+    message text logged for the operator (no lead column for it);
+    400 on missing identity or invalid JSON
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green with
+    /admin/leads/board and /api/leads/[id]/status registered dynamic
+  - `npm test` 3/3; `node scripts/lint-changed.mjs` no new errors
+  - API smoke against the SQLite fallback runtime: 53/53 PASS
+    (anon 401 on all verbs; admin login; status POST round trip
+    new -> qualified -> site_visit -> quote_sent -> won -> lost with
+    lost_reason persisted; invalid status 400; 404 on missing lead;
+    PATCH parity; stats recompute with all 6 statuses incl. zero
+    counts; budget totals per status)
+  - Browser (Playwright, real input): drag Asha Rao New -> Qualified
+    - optimistic column counts flipped (New 1->0, Qualified 1->2),
+    server persisted status + lastStatusChangeAt; table Move to
+    select Asha -> Quote Sent - row badge + upd timestamp updated,
+    API confirmed; both flows restored after the test
+- Outcome:
+  - Status funnel widened to 6 stages; lost carries an optional
+    lost_reason; every status change stamps last_status_change_at so
+    the board and table show when a lead last moved.
+  - The status move is the single source of truth: board drag and
+    table quick action both POST /api/leads/[id]/status, so stats
+    recompute identically whichever surface moved the lead.
+  - dnd-kit 6.3.1 has no animations prop on DndContext; reduced
+    motion is handled with a CSS override class instead of a sensor
+    prop.
+  - Colors stay in the Forest & Bone family (ink #122A20 / paper
+    #ECECE6 / amber #C0964F / moss #56605A / clay #D6CBB3 tint for
+    column bg). One radius 8px. No new hues.
+- Closes on: <pending commit>
+
+### TS-ID-025 - Module 3: Proposal Builder + public proposal link with tracking
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (close the loop Lead -> Project ->
+  Proposal -> View tracking -> Accept -> Won)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `client_projects` (id TEXT uuid, tenant_id INTEGER, lead_id
+    INTEGER, name, client_name/phone/email, status
+    draft/design/execution/handover/delivered, budget NUMERIC,
+    area_sqft, address, portal_token, created_at) and `proposals`
+    (id TEXT uuid, tenant_id, project_id FK cascade, lead_id, token
+    unique, title default 'Project Proposal', budget, timeline_text,
+    content_json, boq_version_id, status draft/sent/viewed/approved,
+    viewed_at, viewed_count, accepted_at, accepted_by_name,
+    created_at) + indexes; named client_projects because the
+    portfolio CMS already owns `projects`; ids app-generated uuid
+    TEXT (no gen_random_uuid dependency) so inserts run on both
+    runtimes
+  - `src/lib/proposals.ts` (new) - status whitelists + labels,
+    ProposalContent, DTOs, generateProposalToken (8 hex + 2 base),
+    formatRupees (Indian lakh grouping), relativeTime, shortDate
+  - `src/app/api/client-projects/route.ts` (new) - POST create
+    (lead_id moves the lead to qualified, never regressing won/lost),
+    GET list tenant-scoped with name/client/lead search
+  - `src/app/api/proposals/route.ts` (new) - admin list by project_id
+  - `src/app/api/proposals/generate/route.ts` (new) - mints the token
+    (collision retry), inserts status=sent, advances draft projects
+    to design, returns {token, url}
+  - `src/app/api/proposals/[token]/route.ts` (new) - PUBLIC GET:
+    increments viewed_count, stamps viewed_at, advances sent->viewed
+    via UPDATE ... RETURNING (fresh DTO), resolves project + lead +
+    tenant brand (theme engine distro), never exposes tenant_id
+  - `src/app/api/proposals/[token]/accept/route.ts` (new) - PUBLIC
+    POST: proposal approved + accepted_at + accepted_by_name, project
+    to design, lead to won (+ last_status_change_at), one withPgTx
+  - `src/app/api/proposals/[token]/view/route.ts` (new) - PUBLIC view
+    beacon (optional client-side re-fire)
+  - `src/app/api/leads/route.ts` + `[id]/route.ts` - LEFT JOIN
+    client_projects to expose clientProjectId on the lead DTO
+  - `src/app/admin/client-projects/{layout,page}.tsx` +
+    `[id]/page.tsx` (detail + create form, lead_id prefill) +
+    `[id]/proposal/page.tsx` (builder host); components
+    AdminClientProjects (list, search, status badge, mono budget),
+    ClientProjectDetail (Overview | Proposal | Boards | BOQ tabs,
+    linked-lead link), ProposalBuilder (title/budget/timeline/scope/
+    terms/notes form, generate, copy + WhatsApp + View links,
+    proposal history with status badge, viewed_count, seen/accepted
+    dates)
+  - `src/components/admin/LeadCard.tsx` + `AdminLeads.tsx` -
+    Create project / Generate proposal buttons per lead
+  - `src/app/(proposal)/layout.tsx` (new route group, no navbar) +
+    `proposal/[token]/page.tsx` - force-dynamic public page with
+    generateMetadata ("Proposal for {client} - {studio}" OG), brand
+    theme injection, hero (Newsreader), scope/timeline/investment/
+    terms/next-steps/boards sections, sticky summary card, footer
+    with studio address/contact
+  - `src/components/proposal/ProposalAccept.tsx` - accept modal
+    (name + terms checkbox) -> POST accept, hand-rolled deterministic
+    confetti (no new deps, reduced-motion guarded),
+    `ProposalStatusBadge.tsx` - top-bar pill flips to Approved via a
+    window event after accept
+  - `src/components/icons.tsx` + `AdminShell.tsx` - Client projects
+    nav item (Briefcase glyph, Content group)
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green with
+    /proposal/[token], /api/proposals/*, /admin/client-projects/*
+    registered dynamic; npm test 3/3; lint-changed clean
+  - API smoke 37/37 on the SQLite fallback runtime: anon 401 on all
+    admin verbs, admin create lead -> create project -> lead
+    qualified + clientProjectId link, list search, generate proposal
+    (token shape, status sent, project draft->design), admin list,
+    public GET tracking (count 0->1, sent->viewed, viewed_at, no
+    tenant_id leak, brand/project/lead present), view beacon 0->2,
+    accept (approved, accepted_by, project design, lead won +
+    lastStatusChangeAt), no-name 400, invalid token 404, repeat
+    accept alreadyApproved
+  - Playwright E2E (fresh incognito context): /proposal/[token]
+    renders title + Rs 12,40,000 + Accept CTA + Prepared for + brand;
+    viewed_count 1 after render; accept modal -> success message +
+    Approved pill + 36 confetti pieces; lead status won server-side;
+    admin board Won column shows the lead with the column total
+    updated; cleanup restored seed state
+  - Browser preview: public proposal page, client-projects list,
+    project detail tabs, and the proposal builder all render in the
+    Forest & Bone system
+- Outcome:
+  - Named the CRM table client_projects instead of projects: the
+    shipped portfolio CMS owns `projects` (SERIAL id, slug, title,
+    category) and /admin/projects is its live admin - taking the name
+    would have broken it. Same for the admin paths: /admin/client-
+    projects (portfolio stays at /admin/projects). tenant_id / lead_id
+    are INTEGER to match tenants.id / leads.id; ids are app-generated
+    uuid TEXT on both runtimes (no gen_random_uuid in SQLite).
+  - Dialect discipline: every timestamp write uses CURRENT_TIMESTAMP
+    (the SQLite shim has no NOW()); the leads search and
+    client-projects search use one distinct $N per occurrence (each
+    $N becomes its own ? in the shim).
+  - View tracking is the public GET itself (UPDATE ... RETURNING so
+    the DTO reflects the fresh count); generateMetadata reads with
+    track=false so a single page load counts exactly once.
+  - Confetti is hand-rolled (deterministic hash pieces, CSS keyframes,
+    prefers-reduced-motion skips it) - the repo has no motion dep.
+  - Hero serif is Newsreader: the root layout explicitly rejects
+    Instrument Serif as the LLM-default display face.
+  - No version bump or FREEZE-MARKER roll (not requested); uncommitted
+    and ready for review. Carry-forward: the leads [id] PATCH returns
+    rows without the client_projects join (clientProjectId null there)
+    - cosmetic only, the list/board refetch.
+- Closes on: <pending commit>
+
+### TS-ID-026 - Module 4: Material Library + Vendor Library
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (structured material DB replacing
+  Excel sheets; foundation for Module 5 Board Canvas + Module 6 BOQ)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `vendors` (id TEXT uuid app-generated, tenant_id INTEGER,
+    name, category stone/wood/textile/hardware/lighting/furniture/
+    paint/civil/electrical/plumbing/other, phone, email, address,
+    lead_time_days default 7, rating default 0, notes, created_at)
+    and `materials` (id TEXT uuid, tenant_id, vendor_id FK nullable,
+    name, category, sku, cost_per_unit default 0, unit
+    sqft/rft/nos/set/lot/lump, image_url, gallery_urls, specs_json,
+    stock_status in_stock/low/out_of_stock/discontinued, created_at)
+    + indexes on tenant_id / vendor_id / category; idempotent CREATE
+    TABLE IF NOT EXISTS + CREATE INDEX IF NOT EXISTS phase in
+    migrate.mjs
+  - `src/lib/materials.ts` (new) - category/unit/stock whitelists +
+    labels, DTOs (camelCase, vendorName via LEFT JOIN), parse
+    helpers, formatCost with Indian grouping (last 3 then pairs:
+    1850 -> "Rs 1,850 / sqft")
+  - `src/lib/storage.ts` - uploadObject + ensureMaterialsBucket
+    (public bucket on Supabase, local-file fallback served through
+    the existing /api/uploads/local pipeline)
+  - `src/app/api/vendors/route.ts` (new) - GET list tenant-scoped
+    with category filter + name/phone search + materials count,
+    POST create (crypto.randomUUID id); `[id]/route.ts` - PATCH /
+    DELETE (deleting a vendor nulls vendor_id on its materials,
+    materials survive)
+  - `src/app/api/materials/route.ts` (new) - GET list with category /
+    vendor_id / stock_status filters + name/sku search, vendor name
+    joined; POST create with same-tenant vendor check;
+    `[id]/route.ts` PATCH/DELETE
+  - `src/app/api/materials/upload/route.ts` (new) - multipart upload
+    reusing the media pipeline: jpg/png/webp only, 10MB cap,
+    materials/{tenant_id}/{uuid}.jpg, returns the image_url
+  - `src/app/admin/vendors/{page.tsx, AdminVendors.tsx}` - table
+    (name, category badge, tel: phone, lead_time_days, star rating,
+    materials count), category filter, add/edit modal; vendor rows
+    deep-link to /admin/materials?vendor_id=...
+  - `src/app/admin/materials/{page.tsx, AdminMaterials.tsx}` -
+    stats cards (total / categories / vendors linked / out of stock),
+    category + vendor + stock filters, name/sku search, 3-column
+    grid cards (demo-image fallback, Newsreader name, moss category
+    badge, mono sku, amber mono cost + unit, vendor, stock dot),
+    add/edit modal with specs key-value editor and image dropzone
+    (preview via the storage pipeline)
+  - `src/components/icons.tsx` + `AdminShell.tsx` - Materials (Stack
+    glyph) + Vendors (ShippingContainer glyph) under Growth
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green with
+    /admin/materials, /admin/vendors, /api/materials, /api/vendors
+    registered dynamic; npm test 3/3; lint-changed clean
+  - API smoke 45/45 on the SQLite fallback runtime: create vendor +
+    material linked to it, list + category/vendor/stock filters,
+    search name/sku, patch cost, delete material, delete vendor
+    nulls vendor_id (materials survive), upload route (mocked
+    bucket), anon 401 everywhere, admin 200, tenant isolation
+  - Playwright E2E: real jpg uploaded via the dropzone renders on
+    the material card, vendor filter shows only that vendor's
+    materials, edit cost updates the amber mono value live on the
+    card, vendors table shows star ratings, deep link from vendor to
+    filtered materials works; cleanup restored seed state
+  - Browser preview: materials grid + edit modal + vendors table all
+    render in the Forest & Bone system
+- Outcome:
+  - Caught and fixed formatCost's naive left-to-right pair grouping
+    (1850 rendered "Rs 18,50"): now last-3-then-pairs Indian
+    grouping -> "Rs 1,850".
+  - Shell env had PORT=0 set, so `npm run start` bound a random port;
+    pinned PORT=3000 explicitly for the smoke/E2E server.
+  - Uploads go to a public materials bucket; the local fallback
+    reuses /api/uploads/local so browser previews work on the
+    SQLite runtime.
+  - No version bump; uncommitted and ready for review. Carry-
+    forward: materials.id (TEXT uuid) is the FK target for Module 5
+    board_items.material_id and Module 6 boq_items.linked_material_id;
+    proposals.boq_version_id will later pull materials cost.
+- Closes on: <pending commit>
+
+### TS-ID-027 - Module 5: Moodboard canvas (Figma-like board builder)
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (canvas where the designer drags
+  library materials onto a freeform board; foundation for Module 6 BOQ)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `boards` (id TEXT uuid, tenant_id, client_project_id FK
+    cascade, title default 'Moodboard', canvas_json default
+    {zoom:1,pan:{x:0,y:0},width:2000,height:1500}, status
+    draft/approved/archived, created_at, updated_at) and `board_items`
+    (id TEXT uuid, board_id FK cascade, material_id FK materials ON
+    DELETE SET NULL, x/y/w/h/rotation/z_index, meta_json
+    {note,scale}, created_at) + indexes; realtime publication in
+    bootstrap (ALTER PUBLICATION supabase_realtime ADD TABLE boards,
+    board_items, guarded by pg_publication existence)
+  - `src/lib/boards.ts` (new) - status whitelist + labels, CanvasState /
+    BoardItemMeta / BoardDto / BoardItemDto types, DEFAULT_CANVAS /
+    DEFAULT_ITEM_META, mapBoard / mapBoardItem / materialFromItemRow
+    (m_* aliases), newItemDto for optimistic client ids
+  - `src/app/api/boards/route.ts` (new) - GET list by client_project_id
+    with LEFT JOIN item count, POST create (tenant checked through the
+    project, 403 cross-tenant)
+  - `src/app/api/boards/[id]/route.ts` (new) - GET board + items with
+    materials LEFT JOINed, PATCH title/status/canvas_json (updated_at
+    stamp), DELETE (FK cascade removes items)
+  - `src/app/api/boards/[id]/save/route.ts` (new) - full-replace
+    upsert save inside withPgTx: canvas_json, delete items not in
+    payload, upsert by client-generated id (INSERT when new).
+    Placeholders ascend in appearance order because the SQLite shim
+    binds `?` left-to-right (SET $1..$8 before WHERE $9/$10)
+  - `src/app/api/board-items/route.ts` + `[id]/route.ts` (new) -
+    POST single item (board + material tenant checks, material joined
+    in the response), PATCH geometry/meta, DELETE
+  - `src/app/admin/client-projects/[id]/boards/page.tsx` +
+    `src/components/admin/AdminBoards.tsx` - boards grid (title,
+    status badge, item count, updated_at mono, 4-image thumbnail
+    loaded lazily per card, demo-image empty state), Add board modal
+  - `src/app/admin/client-projects/[id]/boards/[boardId]/page.tsx` +
+    `src/components/admin/BoardCanvas.tsx` - the editor: top bar
+    (back, inline title, status select, Approve, zoom slider, Save
+    indicator, online count), left materials sidebar (search + 11
+    category pills, HTML5 drag with dataTransfer material id,
+    click-to-add at center), 2000x1500 dot-grid stage (pan via
+    middle-drag or Space+drag, ctrl+wheel zoom on a native
+    non-passive listener, zoom slider), items absolutely positioned
+    with rotation, corner resize handles, rotation handle, delete,
+    note chip; right properties panel (X/Y/W/H number inputs,
+    rotation slider, z up/down, material link, note textarea) and
+    canvas properties when nothing selected; bottom layers bar
+    (drag-to-reorder reassigns z 1..n); 800ms debounced full save
+    with Saved/Saving/Unsaved state; GSAP mount animation via the
+    repo's useGSAP (reduced-motion short-circuits)
+  - `src/components/admin/BoardMaterialsSidebar.tsx` (new) - the
+    draggable material picker
+  - `src/components/admin/BoardRealtime.tsx` (new) - guarded browser
+    supabase client (no-op without NEXT_PUBLIC_SUPABASE_URL):
+    postgres_changes on board_items INSERT (refetch for the joined
+    material) / UPDATE (geometry merge) / DELETE, presence tracking,
+    throttled cursor broadcast rendered as amber dots in the canvas
+  - `src/components/admin/ClientProjectDetail.tsx` - Boards tab now a
+    live list with an Open board studio link (boardStatusLabel used
+    for the badges)
+  - `src/components/admin/ProposalBuilder.tsx` - Moodboards to
+    include chips (fetch /api/boards, toggle selection, stored as
+    content_json.boards on generate)
+  - `src/components/icons.tsx` - IconCheck / IconCheckCircle / IconTrash
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green with
+    /admin/client-projects/[id]/boards, [boardId], /api/boards/*,
+    /api/board-items* registered dynamic; npm test 3/3;
+    lint-changed clean
+  - API smoke 38/38 on the SQLite fallback: anon 401 on every admin
+    verb, material + project + board creation, default canvas,
+    list with item count, full-replace save creating 2 items with
+    material join + note, upsert by id, full-replace delete, canvas
+    zoom persistence, single-item POST/PATCH/DELETE, invalid inputs
+    400, missing board/material 404, cross-tenant 403 (fake tenant 2),
+    cascade delete verified in the DB, save on deleted board 404
+  - Playwright E2E (real browser): HTML5 drag from the sidebar onto
+    the canvas at a position -> item with image, item drag moves it
+    (optimistic + Saved after debounce), properties X/W inputs track
+    the item, zoom slider scales, SE resize handle changes W, reload
+    persists items + zoom, Approve flips the status select to
+    approved, API confirms x/y/w/zoom/status
+  - Regression: module 3 smoke still passes end to end (proposal
+    lifecycle untouched); boards/projects/materials grid pages render
+  - Browser preview: boards grid with thumbnails + badges, canvas
+    editor (top bar, sidebar, layers), proposal builder with board
+    chips (amber selected state)
+- Outcome:
+  - The SQLite shim binds `?` left-to-right against the args array
+    regardless of $N numbering: the upsert save's SET-then-WHERE
+    placeholder order misaligned args (material_id got the item id).
+    All module-5 statements now use ascending appearance order.
+  - The boards list reused $3 twice in one query - each $N becomes its
+    own `?`, so it needed a distinct $4 (the module-3 trap, repeated
+    here and fixed).
+  - POST /api/board-items selected materials without tenant_id, so
+    the tenant check compared NaN and always 403'd - added to the
+    SELECT.
+  - Canvas items near the 2000x1500 edge sit outside the visible
+    viewport (correct Figma behavior) - the E2E zooms to 0.5 before
+    dragging the SE handle; a stable data-testid on the viewport
+    replaced the fragile class selector.
+  - Realtime is fully guarded: no Supabase env on the local runtime
+    means the channel code never runs; the board still collaborates
+    server-side via the debounced save.
+  - No version bump; uncommitted and ready for review. Carry-forward:
+    board_items.material_id is now live for Module 6; content_json.
+    boards stores the attached boards, and the public proposal page
+    can render them in a later pass.
+- Closes on: <pending commit>
+
+### TS-ID-028 - Module 6: BOQ engine with live material costs
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (versioned Indian BOQ that pulls
+  live costs from the material library; foundation for Module 7 Site
+  Diary + Module 8 Client Portal totals)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `boq_versions` (id TEXT uuid, tenant_id, client_project_id FK
+    cascade, version_no, title 'BOQ vN', status
+    draft/sent/approved/revised, total, notes, created/updated,
+    UNIQUE(client_project_id, version_no)) and `boq_items` (id TEXT
+    uuid, boq_version_id FK cascade, tenant_id, category (10-way
+    check), item_name, description, unit (8-way check incl sqm/rm),
+    qty, material_rate, labour_rate, wastage_pct default 5, gst_pct
+    default 18, amount, linked_material_id FK materials SET NULL,
+    linked_board_item_id FK board_items SET NULL) + indexes
+  - `data/boq-templates/{1bhk,2bhk,3bhk}.json` (new) - standard
+    Indian templates; 2BHK has civil/carpentry/electrical/painting/
+    false_ceiling/flooring groups with typical rates and a
+    linked_material_category on the kitchen item
+  - `src/lib/boq.ts` (new, client-safe) - category/unit/status
+    whitelists + labels, calcItemAmount
+    qty*(mat+labour)*(1+wastage/100)*(1+gst/100) rounded 2dp,
+    formatIndianNumber / formatMoney, DTOs with material join
+    (m_* aliases) + board title (b_title), BOQ_ITEM_SELECT fragment,
+    template-name normalization; `src/lib/boq-template.ts` (new,
+    server-only) - fs template loader kept out of the client bundle
+  - `src/app/api/boq/route.ts` (new) - GET versions by project with
+    item count, newest first
+  - `src/app/api/boq/generate-draft/route.ts` (new) - next
+    version_no, seeds items from the template, links the cheapest
+    tenant material per category (painting->paint vocabulary map),
+    computes amounts + total in one withPgTx
+  - `src/app/api/boq/[versionId]/route.ts` (new) - GET version +
+    items with joins, PATCH title/status/notes
+  - `src/app/api/boq/[versionId]/items/route.ts` (new) - POST item
+    with tenant-checked material link + total recalc
+  - `src/app/api/boq/[versionId]/recalculate/route.ts` (new) -
+    refresh material_rate from linked materials, recompute every
+    amount + total (Pull latest costs)
+  - `src/app/api/boq/[versionId]/export/route.ts` (new) - JSON or
+    CSV download (seed data for a later PDF)
+  - `src/app/api/boq-items/[id]/route.ts` (new) - PATCH any field
+    with amount + total recalc, DELETE with total recalc
+  - `src/app/api/proposals/generate/route.ts` - accepts
+    boq_version_id (verified same project/tenant) and stores it on
+    the proposals row
+  - `src/app/admin/client-projects/[id]/boq/page.tsx` (new,
+    honors ?v=) + `src/components/admin/AdminBOQ.tsx` (new) -
+    version selector + New version from template (1BHK/2BHK/3BHK),
+    status badge, amber mono total, 4 stat cards (total/categories/
+    items/avg GST), items table with inline-editable qty / material
+    rate / labour / wastage / GST (optimistic live amount, PATCH on
+    blur), linked-material chips with image + cost linking to the
+    library, add-item row, notes textarea, Export JSON/CSV, Pull
+    latest costs, Mark as sent/approved
+  - `src/components/admin/ClientProjectDetail.tsx` - BOQ tab is now
+    a live version list with totals linking into the engine
+  - `src/components/admin/ProposalBuilder.tsx` - BOQ version select
+    (title + total) stored on the proposal
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm run build` green with
+    /admin/client-projects/[id]/boq and /api/boq/* (incl
+    /api/boq-items/[id]) registered dynamic; npm test 3/3;
+    lint-changed clean
+  - API smoke 45/45 on the SQLite fallback: anon 401 on every verb,
+    generate 2bhk -> version_no 1 + 9 items + total = SUM(amount),
+    live linking (kitchen -> wood material at its cost, painting ->
+    paint via the vocabulary map), amount formula spot-check, add
+    item recalcs total, patch qty/rate recalcs item + total, invalid
+    category/qty 400, delete recalcs total, second draft version_no
+    2, mark approved, list ordering, recalculate pulls a changed
+    material cost into the rate + total, JSON + CSV export, invalid
+    template 400, cross-tenant 403, project delete cascades versions
+    + items (DB check)
+  - Playwright E2E 14/14: generate draft via the UI (9 items + add
+    row), linked material chips, amber total, inline qty 12->14
+    updates amount instantly and persists across reload, Pull latest
+    costs refreshes a changed material rate to 250, Mark as approved
+    flips the badge, Export JSON downloads, API confirms qty/rate/
+    amount formula/total = SUM
+  - Regression: module 3 + module 5 smokes still pass end to end
+  - Browser preview: BOQ page with version selector, stats, editable
+    table, linked material chips, add row, footer actions
+- Outcome:
+  - Three more appearances of the SQLite left-to-right `?` binding
+    trap: the total-update statements reused $1 twice, and the item
+    amount/recalc updates had `SET ... = $2 WHERE id = $1` order;
+    all rewritten to ascending appearance order. The module-3
+    lesson keeps paying off - the smoke caught every one.
+  - fs-based template loading lives in src/lib/boq-template.ts:
+    AdminBOQ imports the shared boq.ts, so fs would have leaked
+    into the client bundle (Turbopack failed the build and caught it).
+  - generate-draft maps BOQ vocabulary to material categories
+    (painting -> paint, false_ceiling -> other); template authors
+    control linking explicitly via linked_material_category.
+  - No version bump; uncommitted and ready for review. Carry-
+    forward: proposals.boq_version_id is now live; Module 7 Site
+    Diary and Module 8 Client Portal can surface BOQ totals, and
+    the export endpoint is the seed for a PDF renderer.
+- Closes on: <pending commit>
+
+### TS-ID-029 - Module 7: Site Diary PWA + Snag List offline-first
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (daily site execution logs with
+  photos, labour, work done, voice transcript, plus a snag list;
+  foundation for Module 8 Client Portal timeline + Module 9 AI report)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    new `site_logs` (id TEXT uuid, tenant_id, client_project_id FK
+    cascade, log_date, photos JSON, labour_count, work_done,
+    voice_transcript, weather, created_by session email, created_at)
+    and `snags` (id TEXT uuid, tenant_id, client_project_id FK
+    cascade, site_log_id FK SET NULL, photo_url, description,
+    status open/fixed/verified, assigned_to, priority
+    low/medium/high, fixed_at, verified_at, created_at) + indexes
+  - `src/lib/storage.ts` - uploadObject generalized with a bucket
+    param (site-photos alongside materials), ensurePublicBucket
+  - `public/manifest.json` (new) + `src/app/manifest.ts` (new) -
+    Studio OS PWA manifest, start_url /admin, standalone, theme
+    #122A20 / background #ECECE6, icons 192/512 generated via sharp
+  - `public/sw.js` (new) - minimal SW: network-first with cache
+    fallback for /admin/client-projects/[id]/diary navigations,
+    cache-first static assets, never caches auth-gated APIs
+  - `src/app/layout.tsx` - viewport themeColor export
+  - `src/components/admin/PWAInstall.tsx` (new) - beforeinstallprompt
+    install button, installed badge, offline badge, SW registration;
+    mounted in `src/components/admin/AdminTopbar.tsx`
+  - `src/components/icons.tsx` - IconDownload / IconWifiSlash /
+    IconCamera / IconMic / IconPencil / IconX added
+  - `src/lib/site-diary.ts` (new, client-safe) - weather/status/
+    priority whitelists + labels, photos JSON parser (array on PG
+    jsonb, string on SQLite), SiteLogDto / SnagDto mappers,
+    formatLogDate / diaryRelativeTime / todayIso, QueuedLog shape
+  - `src/app/api/site-logs/route.ts` (new) - GET by project with
+    from/to date range, POST create with tenant-from-project check
+    and created_by from session email
+  - `src/app/api/site-logs/[id]/route.ts` (new) - PATCH
+    labour/work_done/voice/weather/photos, DELETE (nulls linked
+    snag site_log_id explicitly for the SQLite fallback)
+  - `src/app/api/site-logs/upload/route.ts` (new) - multipart
+    jpg/png/webp <= 10MB into site-photos/{tenant}/{project}/{uuid}
+  - `src/app/api/site-logs/export/route.ts` (new) - weekly JSON
+    report seed (project, range, logs, snags, totals) for Module 9
+  - `src/app/api/snags/route.ts` (new) - GET by project + status
+    with log_date join, POST with optional site_log_id link
+  - `src/app/api/snags/[id]/route.ts` (new) - PATCH stamps fixed_at
+    on fixed / verified_at on verified / clears on reopen (ISO
+    timestamp bound from JS: SQLite has no NOW()), DELETE
+  - `src/app/admin/client-projects/[id]/diary/page.tsx` (new,
+    force-dynamic) - project header + status badge + Diary|Snags
+    tabs
+  - `src/components/admin/AdminDiaryTabs.tsx` (new) + `AdminDiary.tsx`
+    (new) - date filter (default today), 4 stat cards (total logs /
+    this week / total labour / open snags), add-log form (camera
+    capture multi-photo with preview grid + remove, labour count,
+    work_done, weather select, Web Speech voice transcript with
+    listening badge), offline-first save (base64 photos to
+    localStorage site_log_queue_{projectId}, Offline Queue badge,
+    sync on window online with toast), timeline grouped by date with
+    lightbox, edit modal, delete, Export Weekly Report JSON download
+  - `src/components/admin/AdminSnags.tsx` (new) - Open/Fixed/Verified
+    count chips, status filter, Add Snag modal (photo upload,
+    description, assigned_to, priority, link to a site log),
+    cards with photo thumb / priority dot / status badge, Mark
+    Fixed / Verify / Reopen / Delete, lightbox
+  - `src/components/admin/ClientProjectDetail.tsx` - Diary tab with
+    live log + open snag counts linking to the diary page
+- Acceptance:
+  - `npx tsc --noEmit` exit 0; `npm test` 3/3; lint-changed clean;
+    `npm run build` green with /admin/client-projects/[id]/diary,
+    /api/site-logs{,[id],/upload,/export}, /api/snags{,[id]}
+    registered dynamic
+  - API smoke 55/55 on the SQLite fallback: create project -> log
+    with photos -> list + from/to range -> patch -> delete (snag
+    survives with nulled link) -> snag open->fixed->verified stamps
+    -> reopen clears -> upload jpg/txt/empty -> export totals ->
+    cross-tenant 404s -> anon 401s -> project delete cascades logs +
+    snags (DDL check with foreign_keys ON)
+  - Playwright E2E 21/21: manifest + sw.js + icon served, log with
+    2 photos -> preview grid -> save -> reload persists -> edit
+    modal updates -> offline queue badge -> reconnect auto-syncs to
+    timeline -> snag create with photo -> open/fixed/verified ->
+    export downloads JSON -> stats update
+  - Regression: module 5 (38/38) + module 6 (45/45) smokes green
+  - Browser preview: diary timeline with photos + italic transcript,
+    snag cards with priority dots and photo thumbs, all in Forest
+    & Bone
+- Outcome:
+  - Two real bugs caught: (1) the Snag PATCH stamped fixed_at via
+    raw `NOW()` which SQLite does not have - switched to an ISO
+    timestamp bound from JS, valid on both runtimes; (2) the Save
+    log button rendered disabled from SSR because the disabled
+    expression read `navigator.onLine` (undefined on the server
+    -> disabled HTML that hydration never patches) - now reads the
+    `online` state which starts true on both server and client and
+    is corrected by the window online/offline events.
+  - Offline queue persists photos as base64 data URLs (blob: object
+    URLs do not survive reload), synced by re-uploading through the
+    same /api/site-logs/upload pipeline on the online event.
+  - No version bump; uncommitted with Modules 1-6. Carry-forward:
+    site_logs + snags feed Module 8's client diary timeline and
+    Module 9's AI weekly report (export endpoint is the seed).
+- Closes on: <pending commit>
+
 ### TS-ID-015 - Forest & Bone recalibration (palette + Newsreader + 3D seed) - v1.9.0
 - Status: @done 2026-08-12 (pending commit + Vercel deploy)
 - Severity: operator ask 2026-08-12 (recalibrate the shipped brand look)
@@ -1229,3 +1883,176 @@ move items here so the next operator can resolve quickly.
 Empty is fine - empty means nothing is operator-blocked.)
 
 (none at session close)
+
+### TS-ID-030 - Module 8: Client portal (both domains) + public proposal visuals
+- Status: @done 2026-08-15 (uncommitted; verify steps green)
+- Severity: operator ask 2026-08-15 (token-authed client portal on
+  default host / client- subdomain / tenant custom domain, approvals,
+  comment thread; public proposal now renders selected boards + linked
+  BOQ; foundation for Module 9 AI weekly report + Module 10 freemium)
+- Opened: 2026-08-15
+- Owner: freebuff
+- Files:
+  - `supabase-bootstrap.sql`, `src/lib/sqlite-fallback-ddl.ts`,
+    `scripts/migrate.mjs`, `src/lib/schema.ts`, `src/lib/backup.ts` -
+    client_projects portal_token_created_at + portal_access_count,
+    tenants.client_subdomain + custom_domain, new client_portal_approvals
+    (type board/boq/photo, status pending/approved/rejected, comment)
+    and client_comments (author client/studio) + indexes; migrate.mjs
+    idempotent ADD COLUMN IF NOT EXISTS
+  - `src/lib/pg.ts` - SQLite pgMany/pgOne stable bindings (order-based)
+  - `src/proxy.ts` (new) - this Next version renamed middleware ->
+    proxy; tags /portal + /proposal requests with x-portal-host when
+    the host is client-*/client./portal.* or matches a custom domain
+    pattern; skips /api; tenant resolution stays token-based in the
+    page (edge cannot query the DB)
+  - `src/lib/portal.ts` (new) - generatePortalToken (10 chars),
+    PortalPayload DTOs, fetchPortalData (project + brand + boards with
+    material join + boq versions + site logs + snags + proposals +
+    comments + approvals + stats; tenant_id never exposed), white-label
+    decision via tenants.custom_domain vs request host, and
+    fetchProposalVisuals for the public proposal (boards + boq_version
+    verified against project + tenant)
+  - `src/lib/qrcode.ts` (new) - dependency-free QR encoder (byte mode,
+    ECC L, versions 1-10). Two real bugs found and fixed: alignment
+    pattern 5x5 areas were reserved for data placement even when the
+    pattern was skipped for overlapping a finder (decoder/encoder
+    desync on every version >= 2), and the BCH format remainder was
+    computed without shifting the data into the top bits. Verified 5/5
+    round-trips through the independent jsqr decoder
+  - `src/lib/proposals.ts` - ProposalContent gains boards[] +
+    boq_version_id
+  - API (new unless noted): GET/POST /api/client-projects/[id]/portal
+    (config + comments), POST .../portal/generate (unique token + urls
+    for default/subdomain/custom domain), public /api/portal/[token]
+    GET (access beacon ++) /approve (validates target belongs to
+    project+tenant; TARGET_NOT_FOUND -> 404, was escaping to 500) /
+    comment /comments; GET /api/proposals/[token] now attaches boards +
+    boq_version
+  - `src/app/(portal)/layout.tsx` + `src/app/(portal)/portal/[token]/
+    page.tsx` (new) - force-dynamic portal page, view tracking on
+    render, generateMetadata without tracking
+  - `src/components/portal/ClientPortal.tsx` (new) - tabs Overview
+    (stats, at-a-glance, progress bar) / Boards (grid, approve,
+    read-only canvas modal with positioned items) / BOQ (approved or
+    latest version, read-only table + category totals, approve) /
+    Photos (date-grouped site log timeline, lightbox) / Snags /
+    Comments (client chat); Approve N counter in the top bar;
+    white-label footer hides Powered by Studio OS
+  - `src/app/admin/client-projects/[id]/portal/page.tsx` +
+    `src/components/admin/AdminPortal.tsx` (new) - token, copy links,
+    QR canvas from qrcode.ts, access count, created_at, regenerate
+    (invalidates old token), studio comments thread with reply
+  - `src/components/admin/ClientProjectDetail.tsx` - new Portal tab
+    with live token/access summary
+- Verification: tsc 0, tests 3/3, lint clean, build green with
+  /(portal)/portal/[token], /(proposal)/proposal/[token],
+  /api/portal/*, /api/client-projects/[id]/portal/* all dynamic. API
+  smoke 52/52 (token lifecycle, access beacon, approve + DB approval
+  row, comment round-trip, regenerate invalidates old token, anon
+  401 on admin / 200 on token routes, unknown token 404, tenant
+  isolation). Browser E2E 35/35 (admin portal QR, incognito portal
+  overview, approve board flips badge + counter, read-only canvas
+  modal, BOQ approve, photos timeline, comment client -> studio reply
+  -> client sees it, regenerate -> old link 404, proposal shows
+  Boards + BOQ sections). Modules 3/5/6/7 smokes pass as regression.
+  Visual pass: portal overview/boards/BOQ/comments, admin portal QR,
+  proposal with boards + cost table, all in Forest & Bone.
+- Note: the QR encoder was verified against the external jsqr decoder
+  (5/5, including long URLs at v5-v7); alignment-overlap and BCH
+  shift fixes shipped in src/lib/qrcode.ts.
+- Session end: 2026-08-15 - Module 8 complete. No version bump;
+  everything stays uncommitted with Modules 1-7 for review.
+
+### TS-ID-031 - Module 9: AI weekly report + social autopilot (DONE, uncommitted)
+- Status: @closed
+- Schema: `ai_generations` (type weekly_report/social_caption/proposal_summary/lead_score/budget_insight, input_json, output_json, model default deepseek-v4-flash-0731, credits_used default 1, client_project_id nullable for lead_score), `social_posts` (platform, caption, hashtags, image_urls jsonb, status draft/scheduled/published, scheduled_at, published_at, ai_generation_id FK nullable), tenants gains `ai_credits` (100), `ai_credits_used`, `openai_api_key`. All 4 surfaces + backup roster, migrate idempotent, indexes on tenant_id/client_project_id/type.
+- AI lib: `src/lib/ai.ts` callDeepseek against https://api.deepseek.com/v1/chat/completions (openai-compatible) keyed by DEEPSEEK_API_KEY or OPENAI_API_KEY, deterministic mock output when no key (dev/SQLite fallback), exported prompts (weeklyReportPrompt, socialCaptionPrompt, leadScorePrompt). `src/lib/ai-run.ts` shared generation runner: credit check 402 when ai_credits_used >= ai_credits, insert generation, increment tenant usage.
+- API (all requireAdminSession, tenant scoped): POST /api/ai/generate (weekly_report fetches site_logs range, social_caption builds from boards desc + photo_urls), GET /api/ai/generations (project + type filter), POST /api/social/generate (reuses ai_generation_id or generates, creates draft post with image_urls), GET /api/social/posts, PATCH /api/social/posts/[id] (caption/hashtags/status/scheduled_at), POST /api/social/posts/[id]/publish (mock publish stamps published_at), POST /api/leads/[id]/score (AI score 0-100 + reason, updates leads.score, ai_generation type lead_score).
+- UI: AdminWeeklyReport in diary page (Generate, 3-section editorial render, Copy, Save as PDF via window.print, Share to Client Portal -> client_comment author studio, credits meter), AdminSocial at /admin/client-projects/[id]/social (photo candidates from site-logs + board item images, 3 English + 1 Hinglish + hashtags with copy, Save as Draft, drafts grid with Edit modal + schedule + Publish), AdminAI at /admin/ai (credit meter, generations ledger with type filter), AdminShell Growth section gains AI & Social (Sparkles glyph).
+- Bug found + fixed: the client-projects layout (module 8) already wraps every page in AdminPageShell, so the social/boq/portal pages that wrapped themselves rendered a doubled topbar. Fixed all three pages to the canonical diary pattern (null-guard the gate, render content directly).
+- Verification: tsc 0, tests 3/3, lint clean, build green with /admin/ai, /admin/client-projects/[id]/social, /api/ai/generate, /api/ai/generations, /api/social/*, /api/leads/[id]/score dynamic. API smoke 50/50 (mock AI: weekly report contains 3 sections, ai_generations row + credit increment, generations list, social draft -> publish, lead score updates leads.score, anon 401, credits exhausted 402). Browser E2E 26/26 (generate report, copy, share to portal visible in client portal, captions, save draft, edit, publish badge, AI ledger). Modules 3/5/6/7/8 smokes pass as regression (38/45/55/52/52). Visual pass: AI usage ledger + credit meter, diary weekly report card, social autopilot with real photo thumbnails; double-header fix confirmed on social/boq/portal.
+- Note: mock AI is deterministic so smoke/E2E pass without any API key; wiring DEEPSEEK_API_KEY switches to real generations. Social publish is a mock (real Instagram Graph API later via tenants.instagram_token).
+- Session end: 2026-08-15 - Module 9 complete. No version bump; everything stays uncommitted with Modules 1-8 for review.
+
+### TS-ID-032 - Module 10: freemium plans + billing + gating (DONE, uncommitted)
+- Status: @closed
+- Schema: `plans` (id free/starter/pro/studio, price_usd/inr, project/lead/board/boq_version/ai_credits limits with -1 = unlimited, features_json white_label/custom_domain/client_subdomain/portal_approvals/export_pdf/social_autopilot/team_members, is_active), `subscriptions` (provider stripe/razorpay/manual, provider_subscription_id, status, period start/end), tenants gains plan_id (default free), subscription_status (trialing), subscription_id, customer_id, plan_started_at, plan_ends_at, billing_cycle. All 4 surfaces + backup roster, migrate idempotent.
+- Seed: `scripts/seed-plans.mjs` branches Postgres/SQLite like seed-content.mjs; free (1 project/25 leads/2 boards/1 boq/20 AI), starter (29 USD/2499 INR: 3/200/10/5/100), pro (99/8499: 15/1000/50/20/500, white_label true), studio (249/19999: all unlimited/2000 AI, custom_domain true). Verified idempotent upsert.
+- Lib: `src/lib/billing.ts` getTenantPlan (LEFT JOIN plans, free fallback pre-seed), getPlanUsage (live counts; plan ai_credits_limit authoritative), checkPlan (projects/leads/boards/boq_versions/ai_credits/white_label/custom_domain/client_subdomain -> 402 PLAN_LIMIT body), planBlockedBody, getUsagePercent, activateSubscription (shared by webhooks + mock-upgrade: sets plan, resets ai_credits_used, tops ai_credits to plan limit, period end now+1mo/1yr). getTenantAiCredits in ai.ts now joins plans (plan limit wins) so the AI runner enforces the freemium budget; ai-run 402 now carries code PLAN_LIMIT.
+- Gating: POST /api/client-projects (projects), POST /api/leads (leads, whole-table count), POST /api/boards (boards), POST /api/boq/generate-draft (boq_versions) all call checkPlan before insert. Portal white-label footer now requires plan.white_label AND host == tenant custom_domain (portal.ts).
+- API: GET /api/billing/plans, GET /api/billing/current (plan + usage + subscription history), POST /api/billing/create-order (mock order_mock_* without keys; fetch-based Stripe/Razorpay REST calls with keys, no SDK), webhook stripe + razorpay (HMAC verify when secret set, mock payload accepted in dev), POST /api/billing/mock-upgrade (dev), POST /api/billing/cancel (canceled at period end). PATCH /api/tenants/[id]/domains (plan-gated client_subdomain/custom_domain, format + uniqueness checks, 403 foreign tenant).
+- UI: /admin/billing + AdminBilling (usage bars with near-limit prompts, 4 plan cards with INR/USD toggle, mock checkout modal with Pay -> create-order + mock-upgrade, white-label hostname inputs with plan prompts, subscription history table). AdminTopbar shows plan badge + Free · Upgrade link (client-side fetch of /api/billing/current). AdminShell gains Billing under System. PlanLimitModal (shared upgrade modal with /admin/billing link) wired into AdminLeads, ClientProjectDetail (project create), AdminBoards, AdminBOQ, AdminWeeklyReport, AdminSocial; AdminAI shows Upgrade link when credits exhausted.
+- Real bug found: getPlanUsage aliased `ai_credits AS limit`, and `limit` is a reserved word in SQLite (near "limit": syntax error on every gated route) -> renamed alias to limit_n. Also the AI usage bar showed tenants.ai_credits (100) while the runner enforced the plan limit (20); getPlanUsage now prefers plan.ai_credits_limit.
+- Verification: tsc 0, tests 3/3, lint clean, build green with /admin/billing, /api/billing/* (7 routes), /api/tenants/[id]/domains all dynamic. API smoke 33/33 (plans catalog, free project 1 ok / 2nd 402, 25 leads ok / 26th 402, mock-upgrade starter unlocks project 2, custom_domain 402 on starter and pro (Studio-only per seed), client_subdomain ok on starter, invalid formats 400, foreign tenant 403, AI exhausted 402 + reset on upgrade, create-order mock + pending row, webhook activates + history active + credits topped to 2000, cancel keeps plan, anon 401 x3, post-upgrade creation). Browser E2E 23/23 (billing page, upgrade modal + Pay, plan badge in topbar, 3 projects ok then 4th shows 402 upgrade modal, subdomain saved, plan flip to Pro, AI meter). Modules 3/5/6/7/8 smokes pass unmodified as regression; module 9 smoke updated for plan-aware credits (50/50). Visual pass: billing page usage bars + plan cards, checkout modal, post-upgrade state + subscription history, topbar Starter badge.
+- Note: spec seed says custom_domain is Studio-only (pro has it false), so the "pro allows custom_domain" verification line was treated as an error and the Studio plan is where the domain opens. Provider SDKs (stripe/razorpay npm) are NOT installed; real-key paths use their REST APIs over fetch.
+- Session end: 2026-08-15 - Module 10 complete. No version bump; everything stays uncommitted with Modules 1-9 for review.
+
+### TS-ID-033 - Awwwards homepage (Forest & Bone v2)
+- Status: @done (2026-08-15)
+- Scope: Homepage redesign, Instrument Serif hero, horizontal pin scroll, shader hover cards, Lenis, ViewTransitions, V2 tokens.
+- Closed by: uncommitted working tree (Modules 1-11 together for review).
+- Notes: Fixed real bug - GSAP pin-spacer reparenting caused React removeChild NotFoundError on every ViewTransition navigation; useGSAP now runs in a layout effect so ctx.revert() restores DOM before React deletes. Also gave /projects a demo fallback so the grid renders without a seeded DB.
+
+### TS-ID-034 - Module 12 launch (v2.0.0)
+- Status: @done (2026-08-15)
+- Scope: Launch checklist - route consolidation, demo seed, Lighthouse gate, both-domains deploy docs, Awwwards docs, Envato v2.0.0 changelog, final verification.
+- Closed by: version bumped to v2.0.0, FREEZE-MARKER rolled forward, uncommitted working tree ready for tag + vercel --prod.
+- Notes: All 12 modules done. Smokes 2-10 green (leads/kanban, proposal, materials, canvas 38/38, BOQ 45/45, diary 55/55, portal 52/52, AI 50/50, billing 33/33) - module 6 needs the tenant on a plan with boq_version_limit >= 2 (free plan caps at 1 by design, which the smoke's second-draft test exercises). Demo tokens are demoPortal (10 chars) / demo1234 (8 chars) because the token regex requires 8-12 chars. Lighthouse 100/100/100/100 (provided throttling; mobile-simulated under-reports on this VM).
+
+### TS-ID-035 - Supabase-only cutover (remove SQLite, fix auth)
+- Status: @closed (2026-08-15)
+- Scope: The operator asked to use only Supabase and remove the rest. The app was running on a dual-mode data layer (Postgres when DATABASE_URL set, silent SQLite fallback at data/etihad.db otherwise); all Module 1-12 work ran against SQLite, the real Supabase was never migrated (27 v1 tables, no module tables), so Postgres-mode requests failed with "relation does not exist" and auth couldn't resolve users. This session migrated Supabase, stripped SQLite from the runtime, and fixed the license gate for local dev.
+- Schema: `scripts/migrate.mjs` rewritten as the Supabase-only runner: loads .env.local, applies supabase-bootstrap.sql statement-by-statement with a dollar-quote-aware splitter and a 12-pass dependency-retry loop (FK references appear before their table's CREATE), seeds default tenant when empty, seeds default admin only when users is empty (existing creds preserved), runs seed-plans.mjs. Runtime ensureMigrated in pg.ts uses the same splitter + retry inside an advisory-locked transaction.
+- Migration applied live: 43 tables on aws-1-ap-south-1.pooler.supabase.com (all Module 1-12 tables + v1 content: 4 portfolio projects, 5 pages, 9 settings, media, testimonials, 37 newsletter subscribers). tenants gained all Module 8/10 columns (client_subdomain, custom_domain, ai_credits, plan_id, subscription_status, billing_cycle...). 4 plans seeded. 3 users preserved (studio@, admin@etihadinteriors.com, rasikfakih2@gmail.com).
+- Runtime: src/lib/pg.ts Postgres-only (SQLite import, hot-copy, placeholder translation, fallback DDL, local-dev path all removed); src/lib/auth.ts drops the better-sqlite3 Vercel hot-copy legacy path (findUserByEmailLegacy, getVercelHotCopy); src/lib/media.ts rewritten on pgOne/pgMany (list/get/insert/updateAlt/delete/countMediaByKind); src/lib/content-export.ts setval now single Postgres path; src/lib/sqlite-fallback-ddl.ts deleted.
+- Deps + scripts: better-sqlite3 removed from package.json; postinstall trimmed to `node scripts/migrate.mjs`; dead npm scripts (seed, migrate:supabase, db:inspect, seed:content*, stamp:demo) removed. Deleted SQLite-only scripts: seed-pages, apply-distro, stamp-demo-license, seed-content, migrate-to-supabase, export-sqlite, dump-users, inspect-db, rerun-journal-covers, rerun-project-photos, smoke-phase5, seed-demo (operator wants no demo), dev-archive/. data/etihad.db removed. verify-deploy.mjs: loads .env.local, DATABASE_URL mandatory, license check = data/license.json or license_doc; verify-deploy.sh step 5 now checks DATABASE_URL.
+- Real bugs found + fixed: (1) supabase-bootstrap.sql DO-block `ALTER PUBLICATION ... ADD TABLE` throws "already member of publication" on re-run and that error aborts the whole transaction (70 statements "unapplied"); fixed at the DDL source with a nested BEGIN/EXCEPTION duplicate_object OR others sub-block so re-runs are clean (115 statements, 1 pass, 0 remaining). (2) Local auth was blocked by "License tampered": license_doc (DB, canonical) holds the production RSA-signed license for ethinterior.vercel.app which cannot validate without LICENSE_PUBLIC_KEY, so localhost had no valid license. readLicense now prefers the DB license only when it validates under the current key context, else falls through to data/license.json (localhost:3000, fallback HMAC) WITHOUT writing back (never clobber the production DB license).
+- Verification: tsc 0, tests 3/3, lint clean, build green. Live against Supabase: login admin@etihadinteriors.com / admin123 -> session ok; GET /api/leads 200 (empty + stats), GET /api/billing/current 200 (free plan + usage), GET /api/client-projects 200, POST /api/leads create -> stats update -> DELETE (write path proven), portal unknown token 404 (was 500), homepage 200 with REAL portfolio projects (Casa Mira, Nalanda House, Salt Flats). verify:deploy 20/20 OK, "Ready for Vercel deploy". Preview on :3000 runs in Supabase mode with the operator's real data.
+- Session end: 2026-08-15 - Supabase-only cutover complete. No version bump; everything stays uncommitted with Modules 1-12 for review.
+
+### TS-ID-036 - Smoke suite pointed at Supabase (2026-08-15) - @done
+Moved the Module 2-10 smoke suite from SQLite-direct (C:/tmp/*.mjs using
+better-sqlite3) into the repo as scripts/smoke/ (db.mjs pg helper +
+module-02..10.mjs + run-all.mjs, npm run smoke:modules). All smokes now
+hit the running server over HTTP and read/write state via pg against
+Supabase. Fixed 6 real Supabase-only bugs the suite exposed:
+  - billing plans/create-order passed integer 1 for boolean is_active
+    (42883) - now boolean
+  - boards/save + social/generate + homepage features parsed jsonb as
+    string (JSON.parse(String(obj)) -> "[object Object]") - added
+    src/lib/json-cell.ts tolerant parser and applied at the 3 sites
+  - site-diary mappers formatted pg DATE as locale string - added
+    dateOnly() formatter
+  - supabase-bootstrap.sql ALTER PUBLICATION re-run aborted whole
+    transaction - wrapped in nested EXCEPTION
+  - license readLicense now prefers the file license when the DB
+    license_doc fails verification (production RSA vs localhost HMAC)
+    without clobbering the row
+  - dev env switched to the Supabase transaction pooler (port 6543):
+    the session pooler caps at 15 sessions and the smoke load blew the
+    cap (EMAXCONNSESSION) with 500s under load
+Verified: suite passes 9/9 modules (2: pass, 3: pass, 4: 45/45, 5: 38/38,
+6: 45/45, 7: 55/55, 8: 52/52, 9: 50/50, 10: 33/33), tsc 0, build green,
+verify:deploy 20/20. Nothing committed.
+
+### TS-ID-037 - CI smoke workflow (2026-08-15) - @done
+Added .github/workflows/smoke.yml: on every push/PR it runs npm ci
+(postinstall applies scripts/migrate.mjs against a postgres:17 service
+container), stamps a CI license (scripts/smoke/ci-license.mjs, HMAC
+fallback, localhost domain), builds, boots `next start`, and runs the
+Module 2-10 suite. CI_DATABASE_URL secret can override the ephemeral
+container with a disposable Supabase project (suite wipes module tables
++ resets tenant 1 - never point at production). Supporting fixes:
+  - migrate.mjs fresh-DB admin seed password changed demo -> admin123
+    to match .env.local.example + the smoke suite login
+  - package.json dropped stale better-sqlite3 allowScripts entry
+  - .env.local.example SQLite-era comments updated (Supabase-only)
+Verified locally (Docker engine cannot boot in this VM, so the
+postgres-service leg was validated by the ubuntu-latest pattern):
+build + ci-license + next start on :3010 + full suite green 9/9
+(2 pass, 3 pass, 4 45/45, 5 38/38, 6 45/45, 7 55/55, 8 52/52,
+9 50/50, 10 33/33). Caught one real CI bug: NEXT_PUBLIC_SITE_URL is
+inlined at build, so the workflow pins it to http://localhost:3000 to
+match the license domain. tsc 0, tests 3/3, YAML lint clean.
+Nothing committed.

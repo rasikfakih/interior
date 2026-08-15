@@ -23,6 +23,12 @@ type Tab =
   | "users"
   | "export-import"
   | "newsletter"
+  | "leads"
+  | "clientProjects"
+  | "materials"
+  | "vendors"
+  | "ai"
+  | "billing"
   | "install";
 
 type NavItem = { key: Tab; label: string; icon: NavIconName };
@@ -39,8 +45,18 @@ const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
       { key: "team", label: "Team", icon: "team" },
       { key: "menus", label: "Menus", icon: "menus" },
       { key: "forms", label: "Forms", icon: "forms" },
+      { key: "leads", label: "Leads", icon: "leads" },
+      { key: "clientProjects", label: "Client projects", icon: "clientProjects" },
       { key: "newsletter", label: "Newsletter", icon: "newsletter" },
       { key: "redirects", label: "Redirects", icon: "redirects" },
+    ],
+  },
+  {
+    group: "Growth",
+    items: [
+      { key: "materials", label: "Materials", icon: "materials" },
+      { key: "vendors", label: "Vendors", icon: "vendors" },
+      { key: "ai", label: "AI & Social", icon: "sparkles" },
     ],
   },
   {
@@ -56,6 +72,7 @@ const NAV_GROUPS: { group: string; items: NavItem[] }[] = [
       { key: "users", label: "Users", icon: "users" },
       { key: "export-import", label: "Export / Import", icon: "export" },
       { key: "settings", label: "Settings", icon: "settings" },
+      { key: "billing", label: "Billing", icon: "license" },
       { key: "install", label: "Install", icon: "install" },
       { key: "license", label: "License", icon: "license" },
     ],
@@ -181,6 +198,16 @@ function TabPanel({ tab, role }: { tab: Tab; role: string }) {
   if (tab === "menus") return <RoutePanel title="Menus" probe="/api/menus" push="/admin/menus" />;
   if (tab === "forms")
     return <RoutePanel title="Forms" probe="/api/forms" push="/admin/forms" note={`Your role: ${role}.`} />;
+  if (tab === "leads")
+    return <RoutePanel title="Leads" probe="/api/leads" push="/admin/leads" note={`Your role: ${role}.`} />;
+  if (tab === "clientProjects")
+    return <RoutePanel title="Client projects" probe="/api/client-projects" push="/admin/client-projects" note={`Your role: ${role}.`} />;
+  if (tab === "materials")
+    return <RoutePanel title="Materials" probe="/api/materials" push="/admin/materials" note={`Your role: ${role}.`} />;
+  if (tab === "vendors")
+    return <RoutePanel title="Vendors" probe="/api/vendors" push="/admin/vendors" note={`Your role: ${role}.`} />;
+  if (tab === "ai")
+    return <RoutePanel title="AI & Social" probe="/api/ai/generations" push="/admin/ai" note={`Your role: ${role}.`} />;
   if (tab === "redirects")
     return <RoutePanel title="Redirects" probe="/api/redirects" push="/admin/redirects" note={`Your role: ${role}.`} />;
   if (tab === "users")
@@ -199,6 +226,8 @@ function TabPanel({ tab, role }: { tab: Tab; role: string }) {
   if (tab === "site-identity") return <RoutePanel title="Site identity" probe="/api/site-identity" push="/admin/site-identity" />;
   if (tab === "newsletter") return <RoutePanel title="Newsletter" probe="/api/newsletter-subscribers" push="/admin/newsletter" />;
   if (tab === "install") return <RoutePanel title="Install" probe="/api/install/stamp" push="/admin/install" />;
+  if (tab === "billing")
+    return <RoutePanel title="Billing" probe="/api/billing/current" push="/admin/billing" note={`Your role: ${role}.`} />;
   return null;
 }
 

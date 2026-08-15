@@ -24,8 +24,8 @@ grep -q '"framework": "nextjs"' vercel.json || { echo "framework missing"; exit 
 echo "  ok"
 echo
 
-echo "[5/7] Demo SQLite seed present?"
-test -f data/etihad.db || { echo "running seed-pages.mjs"; node scripts/seed-pages.mjs; }
+echo "[5/7] DATABASE_URL present (Supabase-only runtime)?"
+test -n "$DATABASE_URL" || { echo "missing — set DATABASE_URL in .env.local / Vercel env"; exit 1; }
 echo "  ok"
 echo
 

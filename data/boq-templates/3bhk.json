@@ -1,0 +1,45 @@
+{
+  "name": "3BHK Standard",
+  "categories": [
+    {
+      "category": "civil",
+      "items": [
+        { "item_name": "Site protection & cleaning", "unit": "lot", "qty": 1, "material_rate": 6000, "labour_rate": 3500 },
+        { "item_name": "Debris disposal", "unit": "lot", "qty": 1, "material_rate": 2500, "labour_rate": 1800 }
+      ]
+    },
+    {
+      "category": "carpentry",
+      "items": [
+        { "item_name": "Modular kitchen - base units", "unit": "rft", "qty": 14, "material_rate": 2200, "labour_rate": 400, "linked_material_category": "wood" },
+        { "item_name": "Wardrobe - hinged", "unit": "sqft", "qty": 110, "material_rate": 1800, "labour_rate": 300 },
+        { "item_name": "Loft + shutter storage", "unit": "sqft", "qty": 40, "material_rate": 1400, "labour_rate": 250 }
+      ]
+    },
+    {
+      "category": "electrical",
+      "items": [
+        { "item_name": "Point wiring", "unit": "nos", "qty": 42, "material_rate": 350, "labour_rate": 150 },
+        { "item_name": "DB dressing", "unit": "set", "qty": 2, "material_rate": 8000, "labour_rate": 2000 }
+      ]
+    },
+    {
+      "category": "painting",
+      "items": [
+        { "item_name": "Wall painting - emulsion", "unit": "sqft", "qty": 1500, "material_rate": 22, "labour_rate": 18 }
+      ]
+    },
+    {
+      "category": "false_ceiling",
+      "items": [
+        { "item_name": "Gypsum false ceiling", "unit": "sqft", "qty": 500, "material_rate": 85, "labour_rate": 45 }
+      ]
+    },
+    {
+      "category": "flooring",
+      "items": [
+        { "item_name": "Vitrified tiles laying", "unit": "sqft", "qty": 750, "material_rate": 45, "labour_rate": 35 }
+      ]
+    }
+  ]
+}

@@ -1,56 +1,34 @@
 /**
- * Postgres access surface for the v1.1.2 runtime.
+ * Postgres access surface for Studio OS v2.0.
  *
- * Primary path: Postgres via DATABASE_URL. Boot-migrate runs
- * supabase-bootstrap.sql behind a Postgres advisory lock so
- * cold-starts self-heal schema drift.
- *
- * Vercel fallback: if DATABASE_URL is unset, `getPool()`
- * returns a tiny proxy that throws on first query. Until the
- * operator supplies DATABASE_URL on Vercel, that path makes
- * the failure loud at the first DB-touching request.
- *
- * Local-dev fallback: when DATABASE_URL is unset and we are
- * NOT on Vercel, `getPool()` opens the local SQLite
- * (data/etihad.db) and runs each query against better-sqlite3.
- * This kept login working while the operator configured
- * DATABASE_URL. The Postgres-first design is preserved when
- * DATABASE_URL is present.
- *
- * When DATABASE_URL is set, only Postgres runs. When unset,
- * local SQLite is used. The cool-down timer for the SQLite
- * Vercel hot-copy is gone because Phase 1 made Postgres the
- * only durable surface - but a local SQLite devpath keeps
- * `npm run dev` and the localhost dev experience working.
+ * Supabase (Postgres) is the single database. There is no SQLite
+ * fallback: DATABASE_URL must be set. On cold start `ensureMigrated`
+ * applies supabase-bootstrap.sql (idempotent CREATE TABLE IF NOT
+ * EXISTS + ALTER TABLE ADD COLUMN IF NOT EXISTS) behind a Postgres
+ * advisory lock so schema drift self-heals. Scripts/migrate.mjs does
+ * the same explicitly at install time.
  */
 
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import pg from 'pg';
-import Database from 'better-sqlite3';
-import { SQLITE_FALLBACK_DDL } from '@/lib/sqlite-fallback-ddl';
 
 let _pool: pg.Pool | null = null;
-let _sqlite: Database.Database | null = null;
 let _ensureMigrated: Promise<void> | null = null;
 
-function isVercel(): boolean {
-  return Boolean(process.env.VERCEL) || Boolean(process.env.VERCEL_ENV);
+export function isPostgres(): boolean {
+  return Boolean(process.env.DATABASE_URL);
 }
 
 function poolUrl(): string {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      'DATABASE_URL is not set. v1.1.2 prefers Postgres; provide one ' +
-        'or run on a host where local SQLite is reachable.'
+      'DATABASE_URL is not set. Studio OS v2.0 is Supabase-only; ' +
+        'provide DATABASE_URL in .env.local or the environment.'
     );
   }
   return url;
-}
-
-export function isPostgres(): boolean {
-  return Boolean(process.env.DATABASE_URL);
 }
 
 export function getPool(): pg.Pool {
@@ -61,15 +39,12 @@ export function getPool(): pg.Pool {
     ssl: url.includes('supabase.com') || url.includes('sslmode=require')
       ? { rejectUnauthorized: false }
       : undefined,
-    // Neon serverless caps pooled connections at 15 sessions total.
-    // Each warm Vercel lambda owns its own module-singleton pool, so
-    // max:10 per lambda meant two concurrent warm lambdas (>15) blew
-    // the limit and the detail pages' catch->notFound() surfaced that
-    // as flapping 404s during the deploy rollout. max:1 serializes
-    // queries within a lambda (requests are effectively sequential)
-    // and caps total sessions at the number of warm lambdas. The
-    // connection timeout makes pool exhaustion fail fast and loud
-    // instead of hanging a request on an unavailable session.
+    // max:1 serializes queries within a lambda (requests are effectively
+    // sequential) and caps total sessions at the number of warm lambdas,
+    // keeping pooled-connection caps (e.g. Neon 15, Supabase pooler)
+    // from being blown by concurrent warm lambdas. The connection
+    // timeout makes pool exhaustion fail fast and loud instead of
+    // hanging a request on an unavailable session.
     max: 1,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
@@ -77,213 +52,11 @@ export function getPool(): pg.Pool {
   return _pool;
 }
 
-function pgOneOffline(): never {
-  throw new Error(
-    'pg.ts was called without DATABASE_URL set and Postgres runtime unavailable. ' +
-      'Configure DATABASE_URL on Vercel or run locally where the SQLite fallback applies.'
-  );
-}
-
-/**
- * pgQuery / pgOne / pgMany short-circuit to the local SQLite
- * copy when (a) DATABASE_URL is unset AND (b) we are not on
- * Vercel. When on Vercel without DATABASE_URL, we throw the
- * same way Postgres-first does - operator config is broken, and
- * masking it would silently break durable writes. Phase 1's
- * hotcopy-out of /tmp is gone because Postgres is canonical.
- */
-function isLocalDevPath(): boolean {
-  return !process.env.DATABASE_URL && !isVercel();
-}
-
-/**
- * Read-only Vercel hot-copy path: when DATABASE_URL is unset on
- * Vercel the bundled SQLite at data/etihad.db is copied to a
- * /tmp file (per Vercel region) so the read-only reader survives
- * Vercel's ephemeral cold-start deploy. Writes still evaporate
- * across cold starts until the operator provides DATABASE_URL.
- * The Phase 2+ plan removes this path entirely.
- */
-function isVercelFallbackPath(): boolean {
-  return !process.env.DATABASE_URL && isVercel();
-}
-
-function getVercelHotCopyPath(): string {
-  if (process.env.ETIHAD_DB_PATH) return process.env.ETIHAD_DB_PATH;
-  const id = process.env.VERCEL_REGION || 'global';
-  return `/tmp/etihad-${id}.db`;
-}
-
-function ensureHotCopy(): void {
-  if (!isVercelFallbackPath()) return;
-  try {
-    const source = path.join(process.cwd(), 'data', 'etihad.db');
-    if (!fs.existsSync(source)) return;
-    const target = getVercelHotCopyPath();
-    if (fs.existsSync(target)) return;
-    const dir = path.dirname(target);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.copyFileSync(source, target);
-  } catch {
-    // best-effort
-  }
-}
-
-function getSqlite(): Database.Database {
-  if (_sqlite) return _sqlite;
-  ensureHotCopy();
-  const target = isVercelFallbackPath()
-    ? getVercelHotCopyPath()
-    : path.join(process.cwd(), 'data', 'etihad.db');
-  const dir = path.dirname(target);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const db = new Database(target, {
-    readonly: false,
-    fileMustExist: false,
-  });
-  db.pragma('journal_mode = DELETE');
-  db.pragma('synchronous = NORMAL');
-  // Apply fallback schema on first open. Idempotent.
-  for (const ddl of SQLITE_FALLBACK_DDL) {
-    try {
-      db.exec(ddl);
-    } catch (e: unknown) {
-      console.error('[pg.ts] fallback DDL error:', (e as Error)?.message ?? String(e));
-    }
-  }
-  _sqlite = db;
-  applyFallbackAdditiveMigrations(db);
-  return db;
-}
-
-// TS-006 additive migrations for the SQLite fallback path. The
-// SQLITE_FALLBACK_DDL only adds columns to tables that don't yet
-// exist; older SQLite seeds miss the TS-006 columns so this loop
-// inspects each table's existing columns and ALTER TABLE ADD COLUMN
-// only when missing. Idempotent.
-function applyFallbackAdditiveMigrations(db: Database.Database) {
-  const ADDS: Array<{
-    table: string;
-    column: string;
-    def: string;
-  }> = [
-    { table: "site_identity", column: "logo_url", def: "TEXT" },
-    { table: "site_identity", column: "favicon_url", def: "TEXT" },
-    { table: "newsletter_subscribers", column: "active", def: "INTEGER DEFAULT 1" },
-    // StudioOS v2.0 Phase 0 column additions.
-    { table: "tenants", column: "seats", def: "INTEGER DEFAULT 1" },
-    { table: "tenants", column: "support_notes", def: "TEXT" },
-    { table: "tenants", column: "last_health_at", def: "DATETIME" },
-    { table: "tenants", column: "storage_used_bytes", def: "INTEGER DEFAULT 0" },
-    { table: "tenants", column: "health_status", def: "TEXT DEFAULT 'unknown'" },
-    { table: "media", column: "folder", def: "TEXT" },
-    { table: "media", column: "is_pinned", def: "INTEGER DEFAULT 0" },
-    { table: "pages", column: "robots", def: "TEXT DEFAULT 'index,follow'" },
-    { table: "users", column: "is_active", def: "INTEGER DEFAULT 1" },
-    { table: "users", column: "tenant_id", def: "INTEGER" },
-    // created_at carries no DEFAULT here: SQLite forbids non-constant
-    // defaults on ADD COLUMN. The users INSERT supplies CURRENT_TIMESTAMP.
-    { table: "users", column: "created_at", def: "DATETIME" },
-    { table: "license_log", column: "revenue_cents", def: "INTEGER DEFAULT 0" },
-  ];
-  for (const a of ADDS) {
-    try {
-      const cols = db
-        .prepare(`PRAGMA table_info(${a.table})`)
-        .all() as Array<{ name: string }>;
-      if (!cols.find((c) => c.name === a.column)) {
-        db.exec(
-          `ALTER TABLE ${a.table} ADD COLUMN ${a.column} ${a.def}`
-        );
-      }
-    } catch (e: unknown) {
-      // best-effort; missing table means the DDL pass hasn't run for
-      // this row yet (e.g. cold-start race), in which case the next
-      // open will retry.
-      console.error(
-        `[pg.ts] additive migration ${a.table}.${a.column} error:`,
-        (e as Error)?.message ?? String(e)
-      );
-    }
-  }
-}
-
-function placeholderToSqlite(text: string, params: ReadonlyArray<unknown>): {
-  sql: string;
-  args: unknown[];
-} {
-  // better-sqlite3 binds numbers, strings, bigints, buffers and null
-  // only. Coerce booleans to 1/0 (Postgres bool parity) and undefined
-  // to null so the same params work on both runtimes.
-  const args = [...params].map((a) =>
-    typeof a === "boolean" ? (a ? 1 : 0) : a === undefined ? null : a
-  );
-  let i = 0;
-  const sql = text
-    .replace(/\$(\d+)/g, () => `?`)
-    // Postgres-cast syntax (`$3::jsonb`) is meaningless to SQLite; strip
-    // it so the same query text runs on both runtimes. Postgres ignores
-    // nothing here because this branch only executes on the SQLite path.
-    .replace(/::jsonb/gi, "");
-  // SQLite supports dynamic placeholder via `?`, no numbered match needed.
-  // The above replace strips $1/$2 pushes a sequence, but we still
-  // want sqlite's parameter binding to consume them deterministically.
-  // Better-sqlite3 parameter order matches sqlite `?` left-to-right.
-  i++;
-  void i;
-  return { sql, args };
-}
-
-async function sqliteExec(text: string, params: ReadonlyArray<unknown>): Promise<unknown[]> {
-  const db = getSqlite();
-  const { sql, args } = placeholderToSqlite(text, params);
-  const trimmed = sql.trim().toUpperCase();
-  // Write attempts on a non-durable handle are loud, no-op'd:
-  // the Vercel hot-copy SQLite (/tmp/etihad-<region>.db) is wiped
-  // on every cold start, so silently accepting a write makes the
-  // post-write GET on the same container return 200 while the
-  // next container has a fresh DB. Phase 5 durable fix ships with
-  // Postgres. Here we surface a tag in the response that the live
-  // smoke can detect.
-  if (isVercelFallbackPath() && !trimmed.startsWith('SELECT') && !trimmed.startsWith('WITH')) {
-    // Return zero rows + a side-band hint. Routes ignore unknown
-    // fields on read; the superadmin/metrics page probes this and
-    // surfaces the warning to the operator.
-    return [{ rows: [], rowCount: 0, __ephemeral_writable: true }];
-  }
-  if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
-    const rows = db.prepare(sql).all(...args);
-    return [{ rows: rows as unknown[], rowCount: rows.length }];
-  }
-  if (/RETURNING/i.test(sql)) {
-    // INSERT/UPDATE ... RETURNING: better-sqlite3's .run() drops the
-    // returned rows; .all() returns them (SQLite 3.35+). Keeps the
-    // dev shim contract with Postgres RETURNING.
-    const rows = db.prepare(sql).all(...args);
-    return [{ rows: rows as unknown[], rowCount: rows.length }];
-  }
-  const r = db.prepare(sql).run(...args);
-  // better-sqlite3 `run` returns { changes, lastInsertRowid }. Wrap.
-  const out: { rows: unknown[]; rowCount: number } = {
-    rows: [],
-    rowCount: r.changes ?? 0,
-  };
-  if (typeof r.lastInsertRowid === 'number') {
-    (out as unknown as { lastInsertRowid: number }).lastInsertRowid = r.lastInsertRowid;
-  }
-  return [out];
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic default; call sites pass concrete Row types
 export async function pgQuery<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
 ): Promise<{ rows: Row[]; rowCount: number }> {
-  if (isLocalDevPath() || isVercelFallbackPath()) {
-    const result = (await sqliteExec(text, params)) as { rows: Row[]; rowCount: number }[];
-    const head = result[0] ?? { rows: [], rowCount: 0 };
-    return head;
-  }
   const pool = getPool();
   const res = await pool.query(text, params as unknown[]);
   return { rows: res.rows as Row[], rowCount: res.rowCount ?? 0 };
@@ -294,16 +67,6 @@ export async function pgOne<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
 ): Promise<Row | null> {
-  if (isLocalDevPath() || isVercelFallbackPath()) {
-    const result = (await sqliteExec(text, params)) as unknown[];
-    if (Array.isArray(result) && result.length === 0) return null;
-    const head = result[0] as { rows: Row[] };
-    if (head && Array.isArray(head.rows) && head.rows.length > 0) return head.rows[0];
-    if (text.toUpperCase().includes('RETURNING')) {
-      return { lastInsertRowid: (result[1] as { lastInsertRowid?: number } | undefined)?.lastInsertRowid ?? null } as unknown as Row;
-    }
-    return null;
-  }
   const { rows } = await pgQuery<Row>(text, params);
   return rows[0] ?? null;
 }
@@ -313,10 +76,6 @@ export async function pgMany<Row = any>(
   text: string,
   params: ReadonlyArray<unknown> = []
 ): Promise<Row[]> {
-  if (isLocalDevPath() || isVercelFallbackPath()) {
-    const result = (await sqliteExec(text, params)) as { rows: Row[] }[];
-    return result[0]?.rows ?? [];
-  }
   const { rows } = await pgQuery<Row>(text, params);
   return rows;
 }
@@ -324,57 +83,6 @@ export async function pgMany<Row = any>(
 export async function withPgTx<T>(
   fn: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> {
-  if (isLocalDevPath()) {
-    // StudioOS Phase 1: the local SQLite fallback now executes
-    // transactional writes for real (BEGIN/COMMIT around the fn) so
-    // routes that rely on withPgTx behave identically to Postgres in
-    // the dev loop. The query shim mirrors sqliteExec (placeholders,
-    // ::jsonb strip, RETURNING via better-sqlite3).
-    const db = getSqlite();
-    const client = {
-      async query(text: string, params: ReadonlyArray<unknown> = []) {
-        const { sql, args } = placeholderToSqlite(text, params);
-        const trimmed = sql.trim().toUpperCase();
-        if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH')) {
-          const rows = db.prepare(sql).all(...args);
-          return { rows: rows as unknown[], rowCount: rows.length };
-        }
-        if (/RETURNING/i.test(sql)) {
-          const rows = db.prepare(sql).all(...args);
-          return { rows: rows as unknown[], rowCount: rows.length };
-        }
-        const r = db.prepare(sql).run(...args);
-        const out: { rows: unknown[]; rowCount: number; lastInsertRowid?: number } = {
-          rows: [],
-          rowCount: r.changes ?? 0,
-        };
-        if (typeof r.lastInsertRowid === 'number') {
-          out.lastInsertRowid = r.lastInsertRowid;
-        }
-        return out;
-      },
-    } as unknown as pg.PoolClient;
-    db.exec('BEGIN');
-    try {
-      const result = await fn(client);
-      db.exec('COMMIT');
-      return result;
-    } catch (e) {
-      try { db.exec('ROLLBACK'); } catch { /* ignore */ }
-      throw e;
-    }
-  }
-  if (isVercelFallbackPath()) {
-    // Vercel fallback SQLite is opened readonly by default (writes
-    // evaporate anyway). Transactions on a readonly handle are
-    // a no-op. Run the callback synchronously.
-    const synthetic = {
-      async query() {
-        return { rows: [], rowCount: 0 };
-      },
-    } as unknown as pg.PoolClient;
-    return await fn(synthetic);
-  }
   const pool = getPool();
   const client = await pool.connect();
   try {
@@ -399,10 +107,6 @@ export async function closePool(): Promise<void> {
     await _pool.end();
     _pool = null;
   }
-  if (_sqlite) {
-    try { _sqlite.close(); } catch { /* ignore */ }
-    _sqlite = null;
-  }
 }
 
 function loadBootstrapDdl(): string {
@@ -410,79 +114,108 @@ function loadBootstrapDdl(): string {
   return fs.readFileSync(p, 'utf8');
 }
 
+/**
+ * Split DDL into statements, tracking dollar-quoted blocks (the one
+ * `DO $$ ... $$;` realtime publication block) so their internal
+ * semicolons are not treated as statement terminators.
+ */
+function splitStatements(sql: string): string[] {
+  const stmts: string[] = [];
+  let cur = '';
+  let inDollar = false;
+  for (const line of sql.split(/\r?\n/)) {
+    cur += line + '\n';
+    const n = (line.match(/\$\$/g) ?? []).length;
+    if (n > 0) {
+      if (inDollar) {
+        if (n % 2 === 1) inDollar = false;
+      } else if (n % 2 === 1) {
+        inDollar = true;
+      }
+    }
+    if (!inDollar && /;\s*$/.test(line)) {
+      const s = cur.trim();
+      if (s) stmts.push(s);
+      cur = '';
+    }
+  }
+  const rest = cur.trim();
+  if (rest) stmts.push(rest);
+  return stmts;
+}
+
 export async function ensureMigrated(): Promise<void> {
   if (_ensureMigrated) return _ensureMigrated;
   _ensureMigrated = (async () => {
+    const pool = getPool();
+    const client = await pool.connect();
     try {
-      if (isLocalDevPath() || isVercelFallbackPath()) {
-        // SQLite fallback: rely on scripts/migrate.mjs (run via
-        // postinstall) to declare the schema. Just ensure the file
-        // is reachable.
-        const dbPath = isVercelFallbackPath()
-          ? getVercelHotCopyPath()
-          : path.join(process.cwd(), 'data', 'etihad.db');
-        if (isVercelFallbackPath()) {
-          ensureHotCopy();
-        } else {
-          const dir = path.dirname(dbPath);
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      await client.query('SELECT pg_advisory_xact_lock(7421971972240957)');
+      await client.query('BEGIN');
+      // Statement-by-statement with retry passes: the bootstrap file
+      // may reference a table (FK) before its CREATE appears, so a
+      // single multi-statement run aborts on fresh databases. Every
+      // statement is idempotent (IF NOT EXISTS), so re-runs are safe
+      // and "already exists" rows are treated as applied.
+      const statements = splitStatements(loadBootstrapDdl());
+      const remaining = new Map(statements.map((s, i) => [i, s]));
+      for (let pass = 1; pass <= 12 && remaining.size > 0; pass++) {
+        let progressed = false;
+        for (const [i, s] of remaining) {
+          try {
+            await client.query(s);
+            remaining.delete(i);
+            progressed = true;
+          } catch (e) {
+            if (/already exists|duplicate key/i.test(String((e as Error)?.message ?? ''))) {
+              remaining.delete(i);
+              progressed = true;
+            }
+          }
         }
-        if (!fs.existsSync(dbPath)) {
-          new Database(dbPath).close();
-        }
-        return;
+        if (!progressed) break;
       }
-      const pool = getPool();
-      const client = await pool.connect();
+      if (remaining.size > 0) {
+        const first = remaining.values().next().value as string;
+        throw new Error(
+          `bootstrap DDL left ${remaining.size} statement(s) unapplied; first: ${first
+            .slice(0, 120)
+            .replace(/\s+/g, ' ')}`
+        );
+      }
+      await client.query('COMMIT');
+    } catch (e) {
       try {
-        await client.query(
-          'SELECT pg_advisory_xact_lock(7421971972240957)'
-        );
-        const ddl = loadBootstrapDdl();
-        await client.query(ddl);
-        // Additive Postgres migrations: CREATE TABLE IF NOT EXISTS never
-        // alters an existing table, so older live tables miss columns that
-        // the code expects. `tenant_data.kind` is required by operator-store
-        // (SELECT/UPDATE/INSERT ... kind = 'distro'); the shipped bootstrap
-        // DDL omitted it. Each ADD COLUMN IF NOT EXISTS is idempotent.
-        await client.query(
-          `ALTER TABLE tenant_data ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'distro'`
-        );
-      } finally {
-        client.release();
+        await client.query('ROLLBACK');
+      } catch {
+        // ignore rollback failure
       }
-    } catch (err) {
-      // Never cache a failed migration. The promise is stored in
-      // _ensureMigrated so concurrent first-callers share one run, but a
-      // rejection must not be memoized: one transient blip (cold-start
-      // connect, pooler turbulence during a deploy rollout) would poison
-      // this lambda for life, keeping /api/health red and every gated
-      // call rethrowing until the lambda is recycled. Reset so the next
-      // caller retries. A genuinely broken schema fails loud on every
-      // call, which is what the health canary is for.
-      _ensureMigrated = null;
-      throw err;
+      throw e;
+    } finally {
+      client.release();
     }
-  })();
+  })().catch((err) => {
+    // Never cache a failed migration: one transient blip (cold-start
+    // connect, pooler turbulence) must not poison this lambda for life.
+    // A genuinely broken schema fails loud on every call.
+    _ensureMigrated = null;
+    throw err;
+  });
   return _ensureMigrated;
 }
 
-void pgOneOffline;
-
 /**
- * Force a no-op reset hook for tests / hot reloads.
- * When the SQLite fallback or Postgres pool is leaked by a
- * module reload (Next.js dev), close handles here.
+ * Reset hook for tests / hot reloads: drop the memoized migration
+ * promise and close leaked handles so the next call reconnects.
  */
 export function _resetForHotReload(): void {
   _ensureMigrated = null;
-  if (_sqlite) {
-    try { _sqlite.close(); } catch { /* ignore */ }
-    _sqlite = null;
-  }
   if (_pool) {
-    try { _pool.end().catch(() => {}); } catch { /* ignore */ }
+    try {
+      _pool.end().catch(() => {});
+    } catch {
+      // ignore
+    }
     _pool = null;
   }
 }
-void _resetForHotReload;

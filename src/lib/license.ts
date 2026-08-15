@@ -64,6 +64,14 @@ function readLicenseFile(): License | null {
  * (b) a first-read import source, so a build-time stamped file
  * migrates into the DB automatically on the first read. A DB failure
  * degrades to the file rather than taking the license down.
+ *
+ * The DB license is only preferred when it validates under the
+ * current key context (RSA when LICENSE_PUBLIC_KEY is set, else the
+ * fallback HMAC used by the localhost stamping tooling). A DB license
+ * signed for production (RSA) must not lock out a local dev box that
+ * has no public key, so an unverifiable DB row falls through to the
+ * file license without writing back - the file is the localhost
+ * authoring surface and must never clobber a real DB license.
  */
 export async function readLicense(): Promise<License | null> {
   let fromDb: License | null = null;
@@ -82,13 +90,16 @@ export async function readLicense(): Promise<License | null> {
       (err as Error)?.message ?? err
     );
   }
-  if (fromDb) return fromDb;
+  if (fromDb && isLicenseFresh(fromDb) && verifySignature(fromDb)) return fromDb;
 
   const fileLicense = readLicenseFile();
-  if (fileLicense) {
+  if (fileLicense && !fromDb) {
     // One-time migration: seed the durable store from the legacy file
-    // so advance / re-issue persist from here on. Best-effort; a
-    // failed import never masks the file license.
+    // so advance / re-issue persist from here on. Only when there is
+    // NO DB row at all - an existing DB license (even one that does
+    // not validate locally) is the production surface and must not be
+    // replaced by a localhost dev file. Best-effort; a failed import
+    // never masks the file license.
     try {
       await writeLicense(fileLicense);
     } catch (err) {

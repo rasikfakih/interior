@@ -1,4 +1,4 @@
-import { ensureMigrated, isPostgres, pgMany, withPgTx } from "@/lib/pg";
+import { ensureMigrated, pgMany, withPgTx } from "@/lib/pg";
 
 /**
  * Phase 6: tenant content export / import.
@@ -162,27 +162,14 @@ export async function importTenantContent(raw: unknown): Promise<ImportResult> {
   // not fail the import - next auto-insert is the only casualty).
   try {
     await ensureMigrated();
-    if (isPostgres()) {
-      for (const t of ALL_TABLES) {
-        try {
-          await pgMany(
-            `SELECT setval(pg_get_serial_sequence('${t}', 'id'),
-             COALESCE(MAX(id), 1)) FROM "${t}"`
-          );
-        } catch {
-          /* sequence missing - fine */
-        }
-      }
-    } else {
-      for (const t of ALL_TABLES) {
-        try {
-          await pgMany(
-            `UPDATE sqlite_sequence SET seq = (SELECT COALESCE(MAX(id), 0) FROM "${t}") WHERE name = $1`,
-            [t]
-          );
-        } catch {
-          /* sqlite_sequence row missing - fine */
-        }
+    for (const t of ALL_TABLES) {
+      try {
+        await pgMany(
+          `SELECT setval(pg_get_serial_sequence('${t}', 'id'),
+           COALESCE(MAX(id), 1)) FROM "${t}"`
+        );
+      } catch {
+        /* sequence missing - fine */
       }
     }
   } catch {

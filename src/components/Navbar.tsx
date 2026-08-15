@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 export type NavLink = { href: string; label: string; is_button?: boolean };
 
 const DEFAULT_LINKS: NavLink[] = [
-  { href: "/projects-v2", label: "Selected work" },
+  { href: "/projects", label: "Selected work" },
   { href: "/about", label: "Studio" },
   { href: "/journal", label: "Journal" },
   { href: "/contact", label: "Contact" },
@@ -223,7 +223,7 @@ export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) =
               aria-label="Toggle theme"
               className="w-11 h-11 md:w-9 md:h-9 rounded-full border hairline-strong flex items-center justify-center hover:bg-[var(--surface-strong)] transition-colors"
             >
-              <span className="text-xs font-mono uppercase tracking-[0.16em]">
+              <span aria-hidden className="text-xs font-mono uppercase tracking-[0.16em]">
                 {theme === "dark" ? "Lt" : "Dk"}
               </span>
             </button>

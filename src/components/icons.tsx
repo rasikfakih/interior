@@ -7,9 +7,19 @@ import {
   ArrowUpRight,
   ArrowsLeftRight,
   BookOpen,
+  Briefcase,
   ChartBar,
+  Camera,
+  Check,
+  CheckCircle,
+  Trash,
   CloudArrowUp,
   DownloadSimple,
+  Download,
+  Microphone,
+  PencilSimple,
+  WifiSlash,
+  X,
   EnvelopeSimple,
   FrameCorners,
   Gauge,
@@ -28,8 +38,11 @@ import {
   Plus,
   Quotes,
   SignOut,
+  ShippingContainer,
+  Sparkle,
   SquaresFour,
   Stack,
+  Star,
   Terminal,
   TextAa,
   TextB,
@@ -37,6 +50,7 @@ import {
   TextHSix,
   TextItalic,
   UserCircle,
+  UserFocus,
   Users,
 } from "@phosphor-icons/react/dist/ssr";
 import type { ComponentType } from "react";
@@ -126,6 +140,56 @@ export function IconPlus(props: IconProps) {
   return <Plus weight="duotone" {...props} />;
 }
 
+/** Rating star (fill via weight). */
+export function IconStar(props: IconProps) {
+  return <Star weight="fill" {...props} />;
+}
+
+/** Confirm / saved state. */
+export function IconCheck(props: IconProps) {
+  return <Check weight="bold" {...props} />;
+}
+
+/** Confirmed circle state. */
+export function IconCheckCircle(props: IconProps) {
+  return <CheckCircle weight="duotone" {...props} />;
+}
+
+/** Delete / remove. */
+export function IconTrash(props: IconProps) {
+  return <Trash weight="duotone" {...props} />;
+}
+
+/** Download (PWA install affordance). */
+export function IconDownload(props: IconProps) {
+  return <Download weight="duotone" {...props} />;
+}
+
+/** Camera (site diary photo capture). */
+export function IconCamera(props: IconProps) {
+  return <Camera weight="duotone" {...props} />;
+}
+
+/** Microphone (voice transcript dictation). */
+export function IconMic(props: IconProps) {
+  return <Microphone weight="duotone" {...props} />;
+}
+
+/** Pencil (inline edit affordance). */
+export function IconPencil(props: IconProps) {
+  return <PencilSimple weight="duotone" {...props} />;
+}
+
+/** Close / dismiss. */
+export function IconX(props: IconProps) {
+  return <X weight="duotone" {...props} />;
+}
+
+/** Network disconnected (offline badge). */
+export function IconWifiSlash(props: IconProps) {
+  return <WifiSlash weight="duotone" {...props} />;
+}
+
 /** Console nav glyphs (tenant admin + operator sidebar). */
 export type NavIconName =
   | "pages"
@@ -143,6 +207,10 @@ export type NavIconName =
   | "settings"
   | "identity"
   | "newsletter"
+  | "leads"
+  | "clientProjects"
+  | "materials"
+  | "vendors"
   | "install"
   | "license"
   | "tenants"
@@ -151,7 +219,8 @@ export type NavIconName =
   | "announcements"
   | "backup"
   | "distro"
-  | "rotate";
+  | "rotate"
+  | "sparkles";
 
 const NAV_GLYPHS: Record<NavIconName, ComponentType<IconProps>> = {
   pages: SquaresFour,
@@ -169,6 +238,10 @@ const NAV_GLYPHS: Record<NavIconName, ComponentType<IconProps>> = {
   settings: GearSix,
   identity: IdentificationBadge,
   newsletter: EnvelopeSimple,
+  leads: UserFocus,
+  clientProjects: Briefcase,
+  materials: Stack,
+  vendors: ShippingContainer,
   install: Terminal,
   license: Key,
   tenants: Stack,
@@ -178,6 +251,7 @@ const NAV_GLYPHS: Record<NavIconName, ComponentType<IconProps>> = {
   backup: CloudArrowUp,
   distro: Palette,
   rotate: ArrowCounterClockwise,
+  sparkles: Sparkle,
 };
 
 /** One duotone entry point for every console nav glyph. */

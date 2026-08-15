@@ -228,7 +228,7 @@ export default function HeroClient({ data }: { data: HeroData }) {
                   <IconArrowUpRight aria-hidden className="inline" />
                 </Link>
               </Magnetic>
-              <Link href="/projects-v2" className="btn-ghost">
+              <Link href="/projects" className="btn-ghost">
                 See selected work
               </Link>
             </div>

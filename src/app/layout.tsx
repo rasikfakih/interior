@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Geist,
   Geist_Mono,
   Newsreader,
+  Instrument_Serif,
   Inter_Tight,
   Space_Grotesk,
 } from "next/font/google";
@@ -43,16 +44,38 @@ const newsreader = Newsreader({
 });
 
 /**
+ * Module 11 (Forest & Bone v2): Instrument Serif is the display face
+ * for the Awwwards homepage - a single-weight editorial serif with
+ * the drawn, slightly naive quality the brand brief asks for. It
+ * carries the hero display role only; Newsreader stays the body serif
+ * and Geist the UI face.
+ */
+const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
+  display: "swap",
+});
+
+/**
  * Customizer font tokens (Phase 1 Theme tab options). Loaded so the
  * per-tenant theme engine can emit var(--font-inter-tight) /
  * var(--font-space-grotesk) stacks; the default display/body stays
  * Newsreader + Geist regardless.
+ *
+ * preload: false - these two faces are only used when a tenant picks
+ * them in the theme customizer. Without preload the browser only
+ * downloads them when the DOM actually references the stack, which on
+ * the default surfaces is never (saves ~180KB of font transfer and
+ * keeps LCP out of the font stall).
  */
 const interTight = Inter_Tight({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-inter-tight",
   display: "swap",
+  preload: false,
 });
 
 const spaceGrotesk = Space_Grotesk({
@@ -60,7 +83,12 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["400", "500", "600"],
   variable: "--font-space-grotesk",
   display: "swap",
+  preload: false,
 });
+
+export const viewport: Viewport = {
+  themeColor: "#122A20",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://etihadinteriors.com"),
@@ -88,7 +116,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} ${interTight.variable} ${spaceGrotesk.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} ${instrument.variable} ${interTight.variable} ${spaceGrotesk.variable}`}
     >
       <body className="font-sans antialiased bg-canvas text-ink">
         <SessionProvider>

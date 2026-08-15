@@ -1,53 +1,15 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import path from 'path';
-import fs from 'fs';
-import Database from 'better-sqlite3';
 import { ensureMigrated, pgOne } from '@/lib/pg';
 
 /**
- * Credentials provider for v1.1.2 runtime.
+ * Credentials provider for Studio OS v2.0.
  *
- * Postgres is the canonical surface when DATABASE_URL is set.
- * When DATABASE_URL is unset (Vercel hasn't received its env
- * value yet), the auth path falls through to the SQLite hot-copy
- * so login keeps working. This keeps login robust across operator
- * actions between env-var setup and the Postgres-only cutover.
- *
- * The hot-copy lives at /tmp/etihad-{region}.db on Vercel. The
- * file is copied on first request from data/etihad.db which is
- * generated at install time by scripts/migrate.mjs (postinstall
- * on Vercel).
+ * Supabase (Postgres) is the single database; users live in the app's
+ * public.users table (id, email, password_hash, role). Login reads via
+ * the pg surface, so there is no SQLite path anywhere in auth.
  */
-
-function isVercelSqlitePath(): boolean {
-  return !process.env.DATABASE_URL && Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
-}
-
-function getVercelHotCopy(): Database.Database | null {
-  if (!isVercelSqlitePath()) return null;
-  try {
-    const id = process.env.VERCEL_REGION || 'global';
-    const target = `/tmp/etihad-${id}.db`;
-    if (!fs.existsSync(target)) {
-      const source = path.join(process.cwd(), 'data', 'etihad.db');
-      if (fs.existsSync(source)) {
-        fs.copyFileSync(source, target);
-      } else {
-        const seed = new Database(target);
-        seed.pragma('journal_mode = DELETE');
-        seed.close();
-        return null;
-      }
-    }
-    const db = new Database(target, { readonly: true, fileMustExist: false });
-    db.pragma('journal_mode = DELETE');
-    return db;
-  } catch {
-    return null;
-  }
-}
 
 type UserRow = {
   id: number | string;
@@ -63,19 +25,6 @@ async function findUserByEmail(email: string): Promise<UserRow | null> {
      WHERE email = $1 LIMIT 1`,
     [email]
   );
-}
-
-function findUserByEmailLegacy(email: string): UserRow | null {
-  const db = getVercelHotCopy();
-  if (!db) return null;
-  try {
-    const row = db
-      .prepare(`SELECT id, email, password_hash, role FROM users WHERE email = ? LIMIT 1`)
-      .get(email) as UserRow | undefined;
-    return row ?? null;
-  } finally {
-    try { db.close(); } catch { /* ignore */ }
-  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -94,9 +43,6 @@ export const authOptions: NextAuthOptions = {
           user = await findUserByEmail(credentials.email);
         } catch {
           user = null;
-        }
-        if (!user) {
-          user = findUserByEmailLegacy(credentials.email);
         }
         if (!user) return null;
 

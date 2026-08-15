@@ -8,13 +8,21 @@
     serif;
   --font-mono: var(--font-geist-mono), "JetBrains Mono", monospace;
 
+  /* Forest & Bone v2 (Module 11): Instrument Serif for the Awwwards
+     hero role. Consumed via .font-hero so the admin console keeps
+     Newsreader for its display headings. */
+  --font-hero: var(--font-instrument), var(--font-newsreader), serif;
+  --font-accent: var(--font-geist-sans), system-ui, sans-serif;
+
   --z-nav: 50;
   --z-grain: 60;
   --z-modal: 80;
   --z-cursor: 90;
 
-  --radius-control: 2px;
-  --radius-card: 2px;
+  /* v2: one radius, 8px, whole system (admin + public). */
+  --radius: 8px;
+  --radius-control: 8px;
+  --radius-card: 8px;
   --radius-pill: 9999px;
 }
 
@@ -63,6 +71,20 @@
       #7d6233 100%
     );
     --shadow-ambient: 0 30px 60px -30px rgba(18, 42, 32, 0.28);
+
+    /* Forest & Bone v2 aliases (Module 11). Same hues, friendlier
+       names, plus the v2 paper-soft panel and clay line tone. */
+    --paper: #ecece6;
+    --paper-soft: #f5f3f0;
+    --clay: #d6cbb3;
+    --moss: #56605a;
+    --amber: #c0964f;
+    --line-soft: rgba(214, 203, 179, 0.33);
+    --shadow-soft: 0 8px 32px rgba(18, 42, 32, 0.08);
+
+    /* Paper grain: SVG noise at 4% on bone sections. Applied via
+       .paper-grain::before so it never touches the admin console. */
+    --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
   }
 
   .dark {
@@ -235,6 +257,50 @@
     font-size: 10.5px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
+  }
+
+  /* v2 editorial eyebrow: Cabinet Grotesk spirit, Geist execution.
+     Used sparingly (max one per 3 sections). */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-accent);
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--moss);
+  }
+
+  /* v2 hero display: Instrument Serif, tight leading. */
+  .font-hero {
+    font-family: var(--font-hero);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* v2 paper grain: 4% SVG noise over a bone section. */
+  .paper-grain {
+    position: relative;
+  }
+  .paper-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--grain-url);
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    z-index: 1;
+  }
+
+  /* v2 soft paper panel (billing/pricing/feature cards on the public
+     marketing surface). */
+  .paper-card {
+    background: var(--paper-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
   }
 
   .btn-primary {

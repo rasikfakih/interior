@@ -1,8 +1,8 @@
 FREEZE-MARKER
 
-# Etihad Interiors Theme v1.18.0 - Freeze Marker (rolled forward)
+# Etihad Interiors Theme v2.0.0 - Freeze Marker (rolled forward)
 
-This file is the authoritative freeze marker for v1.18.0. Until
+This file is the authoritative freeze marker for v2.0.0. Until
 something changes it, the codebase's freeze boundaries are:
 
 ## Frozen manifest (inherited from v1.1.0)
@@ -694,3 +694,45 @@ Freeze marker is changed only via:
   - Recording the rollout procedure in this file's git history
 
 Pull this file's commit log to recover any change to this state.
+
+## v2.0.0 increment (Studio OS, Modules 1-12)
+
+What v2.0.0 adds on top of v1.18.0, frozen under the same buyer
+contract. The v1.18.0 freeze said "no schema, route, or block-registry
+changes to frozen surfaces without operator approval"; the operator
+approved Modules 1-12, and this marker rolls the freeze forward so the
+v2.0.0 surface is the new shipped contract:
+
+- New tables (all four surfaces + `scripts/migrate.mjs`, idempotent):
+  `leads`, `client_projects`, `proposals`, `vendors`, `materials`,
+  `boards`, `board_items`, `boq_versions`, `boq_items`, `site_logs`,
+  `snags`, `client_portal_approvals`, `client_comments`, `ai_generations`,
+  `social_posts`, `plans`, `subscriptions`.
+- `tenants` gains `client_subdomain`, `custom_domain`, `ai_credits`,
+  `ai_credits_used`, `openai_api_key`, `plan_id`, `subscription_status`,
+  `subscription_id`, `customer_id`, `plan_started_at`, `plan_ends_at`,
+  `billing_cycle` (defaults keep existing tenants on the free plan).
+- New routes under `src/app` (all `force-dynamic`, tenant-scoped):
+  `/admin/leads(+board)`, `/admin/client-projects/*`,
+  `/admin/materials`, `/admin/vendors`, `/admin/ai`, `/admin/billing`,
+  `/proposal/[token]`, `/portal/[token]`, `/manifest.ts`,
+  `/api/leads/*`, `/api/client-projects/*`, `/api/proposals/*`,
+  `/api/vendors/*`, `/api/materials/*`, `/api/boards/*`, `/api/boq/*`,
+  `/api/site-logs/*`, `/api/snags/*`, `/api/portal/*`, `/api/ai/*`,
+  `/api/social/*`, `/api/billing/*`, `/api/tenants/[id]/domains`.
+- New libs: `src/lib/billing.ts`, `src/lib/ai.ts`, `src/lib/ai-run.ts`,
+  `src/lib/portal.ts`, `src/lib/leads.ts`, `src/lib/use-gsap.ts`,
+  `src/components/home/*` (HomeV2, HorizontalProjects, ShaderHoverCard),
+  `src/components/admin/*` (AdminLeads, LeadKanban, AdminMaterials,
+  AdminVendors, AdminBoards, AdminBOQ, AdminDiary, AdminSnags,
+  AdminSocial, AdminAI, AdminBilling, PlanLimitModal, AdminWeeklyReport).
+- `src/proxy.ts` (middleware) tags `/portal/*` + `/proposal/*` with
+  `x-portal-host`; `/api` and admin routes never enter the proxy.
+- `next.config.mjs` gains a permanent `/projects-v2/:path*` ->
+  `/projects/:path*` redirect; the `projects-v2` route and component
+  directories are deleted.
+- Public homepage is the Module 11 Awwwards redesign (Forest & Bone v2
+  tokens in `src/app/globals.css`, Instrument Serif, GSAP pin, shader
+  hover, Lenis, ViewTransitions).
+- Scripts: `scripts/seed-plans.mjs`, `scripts/seed-demo.mjs`,
+  `scripts/lighthouse-budget.mjs`.

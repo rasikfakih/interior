@@ -1,666 +1,221 @@
 #!/usr/bin/env node
 /**
- * Idempotent SQL migration, declarative per-table shape.
+ * scripts/migrate.mjs - Supabase-only migration runner.
  *
- * Each table is created in isolation. A failure on one table does
- * not skip the next. Each column-add is also per-table / per-row
- * isolated.
+ * Studio OS v2.0 uses Supabase (Postgres) as the single database.
+ * There is no SQLite fallback. This script:
+ *
+ *   1. Reads DATABASE_URL from .env.local (or the process env).
+ *   2. Applies supabase-bootstrap.sql statement by statement with a
+ *      dependency-retry loop (FK references may appear before the
+ *      referenced table's CREATE, so statements are re-passed until
+ *      the graph converges). All CREATEs are IF NOT EXISTS and all
+ *      ALTERs are ADD COLUMN IF NOT EXISTS, so re-runs are safe.
+ *   3. Seeds a default tenant (slug "studio") when tenants is empty.
+ *   4. Seeds a default admin user (admin@etihadinteriors.com /
+ *      admin123, the ADMIN_PASSWORD documented in .env.local.example)
+ *      only when users is empty, so existing credentials are kept.
+ *   5. Seeds the four freemium plans via seed-plans.mjs so billing
+ *      gates have limits to read.
  *
  * Run from repo root:
  *   node scripts/migrate.mjs
  *
- * Invoked automatically by `npm install` via the `postinstall` hook
- * declared in package.json. Re-runnable. Safe to run repeatedly.
+ * Invoked by `npm install` (postinstall). Re-runnable and safe to run
+ * repeatedly.
  */
-import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
+import url from "url";
+import pg from "pg";
 import bcrypt from "bcryptjs";
 
-const DB_PATH = path.join(process.cwd(), "data", "etihad.db");
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(__dirname, "..");
 
-if (!fs.existsSync(path.dirname(DB_PATH))) {
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-}
-
-// Defensive: if the file exists but the magic bytes aren't "SQLite format 3",
-// treat it as corrupted and recreate. Cache artifacts from prior builds on
-// shared Vercel images have hit this in practice.
-if (fs.existsSync(DB_PATH)) {
-  try {
-    const fd = fs.openSync(DB_PATH, "r");
-    const buf = Buffer.alloc(16);
-    fs.readSync(fd, buf, 0, 16, 0);
-    fs.closeSync(fd);
-    const magic = buf.slice(0, 15).toString("utf8");
-    if (magic !== "SQLite format 3") {
-      console.log("- corrupted file detected, removing");
-      fs.unlinkSync(DB_PATH);
-      for (const sfx of ["-journal", "-wal", "-shm"]) {
-        const p = DB_PATH + sfx;
-        if (fs.existsSync(p)) {
-          try {
-            fs.unlinkSync(p);
-          } catch {}
-        }
-      }
-    }
-  } catch {
-    // best-effort
+// Load .env.local so the script works without shelling the env around.
+function loadEnvLocal() {
+  const envPath = path.join(repoRoot, ".env.local");
+  if (!fs.existsSync(envPath)) return;
+  const text = fs.readFileSync(envPath, "utf8");
+  for (const line of text.split(/\r?\n/)) {
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq <= 0) continue;
+    const key = line.slice(0, eq).trim();
+    const value = line.slice(eq + 1).trim();
+    if (!process.env[key]) process.env[key] = value;
   }
 }
+loadEnvLocal();
 
-const sqlite = new Database(DB_PATH);
-sqlite.pragma("journal_mode = WAL");
-
-function run(label, sql) {
-  try {
-    sqlite.exec(sql);
-    console.log(`+ ${label}`);
-    return true;
-  } catch (e) {
-    // CREATE TABLE IF NOT EXISTS + ALTER TABLE ADD COLUMN produce
-    // "already exists" errors when the schema matches the desired state.
-    // That's idempotency working correctly — log as a quiet "ok" instead
-    // of a noisy failure.
-    if (e && / already exists/i.test(e.message || "")) {
-      console.log(`= ${label} (already in place)`);
-      return true;
-    }
-    console.log(`- ${label}: ${e.message}`);
-    return false;
-  }
-}
-
-function columnsOf(table) {
-  try {
-    return sqlite
-      .prepare(`PRAGMA table_info(${table})`)
-      .all()
-      .map((c) => c.name);
-  } catch {
-    return [];
-  }
-}
-
-function ensureColumn(table, column, def) {
-  const cols = columnsOf(table);
-  if (cols.includes(column)) return;
-  run(
-    `column ${table}.${column}`,
-    `ALTER TABLE ${table} ADD COLUMN ${column} ${def}`
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  console.error(
+    "DATABASE_URL is not set. Studio OS v2.0 is Supabase-only; " +
+      "provide DATABASE_URL in .env.local or the environment."
   );
+  process.exit(1);
 }
 
-const TABLES = [
-  {
-    name: "projects",
-    create: `CREATE TABLE projects (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      title TEXT NOT NULL,
-      category TEXT NOT NULL,
-      location TEXT,
-      description TEXT NOT NULL,
-      before_image TEXT,
-      after_image TEXT,
-      model_3d TEXT,
-      is_published INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["location_city", "TEXT"],
-      ["year", "TEXT"],
-      ["description_json", "TEXT"],
-      ["gallery_media_ids", "TEXT"],
-      ["scope", "TEXT"],
-      ["poster_media_id", "INTEGER"],
-      ["order_index", "INTEGER DEFAULT 0"],
-    ],
-  },
-  {
-    name: "testimonials",
-    create: `CREATE TABLE testimonials (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      role TEXT,
-      photo TEXT,
-      quote TEXT NOT NULL,
-      is_published INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["avatar_media_id", "INTEGER"],
-      ["quote_json", "TEXT"],
-      ["order_index", "INTEGER DEFAULT 0"],
-    ],
-  },
-  {
-    name: "team_members",
-    create: `CREATE TABLE team_members (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      role TEXT,
-      bio TEXT,
-      photo TEXT,
-      order_index INTEGER DEFAULT 0,
-      is_published INTEGER DEFAULT 1
-    )`,
-    columns: [
-      ["avatar_media_id", "INTEGER"],
-      ["bio_json", "TEXT"],
-    ],
-  },
-  {
-    name: "journal_posts",
-    create: `CREATE TABLE journal_posts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      title TEXT NOT NULL,
-      content TEXT NOT NULL,
-      cover_image TEXT,
-      is_published INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["excerpt", "TEXT"],
-      ["content_json", "TEXT"],
-      ["cover_media_id", "INTEGER"],
-      ["gallery_media_ids", "TEXT"],
-      ["category", "TEXT"],
-      ["author_name", "TEXT"],
-    ],
-  },
-  {
-    name: "settings",
-    create: `CREATE TABLE settings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      key TEXT UNIQUE NOT NULL,
-      value TEXT NOT NULL
-    )`,
-    columns: [],
-  },
-  {
-    name: "users",
-    create: `CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      role TEXT DEFAULT 'admin'
-    )`,
-    columns: [
-      ["is_active", "INTEGER DEFAULT 1"],
-      ["tenant_id", "INTEGER"],
-      ["created_at", "DATETIME DEFAULT CURRENT_TIMESTAMP"],
-    ],
-  },
-  {
-    name: "media",
-    create: `CREATE TABLE media (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      kind TEXT NOT NULL,
-      mime TEXT NOT NULL,
-      size INTEGER NOT NULL,
-      original_name TEXT NOT NULL,
-      storage_path TEXT NOT NULL,
-      url TEXT NOT NULL,
-      alt TEXT,
-      width INTEGER,
-      height INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["folder", "TEXT"],
-      ["is_pinned", "INTEGER DEFAULT 0"],
-    ],
-  },
-  {
-    name: "pages",
-    create: `CREATE TABLE pages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      title TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'draft',
-      seo_title TEXT,
-      seo_description TEXT,
-      og_media_id INTEGER,
-      is_front INTEGER DEFAULT 0,
-      published_at DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["robots", "TEXT DEFAULT 'index,follow'"],
-    ],
-  },
-  {
-    name: "page_blocks",
-    create: `CREATE TABLE page_blocks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      page_id INTEGER NOT NULL,
-      type TEXT NOT NULL,
-      data TEXT NOT NULL,
-      order_index INTEGER NOT NULL DEFAULT 0
-    )`,
-    columns: [],
-  },
-  {
-    name: "menus",
-    create: `CREATE TABLE menus (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      location TEXT UNIQUE NOT NULL
-    )`,
-    columns: [],
-  },
-  {
-    name: "menu_items",
-    create: `CREATE TABLE menu_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      menu_id INTEGER NOT NULL,
-      parent_id INTEGER,
-      label TEXT NOT NULL,
-      href TEXT NOT NULL,
-      target TEXT,
-      order_index INTEGER NOT NULL DEFAULT 0,
-      is_button INTEGER DEFAULT 0
-    )`,
-    columns: [],
-  },
-  {
-    name: "site_identity",
-    create: `CREATE TABLE site_identity (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      brand_name TEXT NOT NULL DEFAULT 'Etihad Interiors',
-      tagline TEXT,
-      logo_media_id INTEGER,
-      favicon_media_id INTEGER,
-      accent_mode TEXT DEFAULT 'auto',
-      footer_credit TEXT
-    )`,
-    columns: [],
-  },
-  {
-    name: "translations",
-    create: `CREATE TABLE translations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      locale TEXT NOT NULL,
-      namespace TEXT NOT NULL,
-      key TEXT NOT NULL,
-      value TEXT NOT NULL,
-      UNIQUE (locale, namespace, key)
-    )`,
-    columns: [],
-  },
-  {
-    name: "revisions",
-    create: `CREATE TABLE revisions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      entity_type TEXT NOT NULL,
-      entity_id INTEGER NOT NULL,
-      payload TEXT NOT NULL,
-      saved_by_id INTEGER,
-      saved_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "audit_log",
-    create: `CREATE TABLE audit_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      kind TEXT NOT NULL,
-      message TEXT NOT NULL,
-      meta TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "tenants",
-    create: `CREATE TABLE tenants (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      studio_name TEXT NOT NULL,
-      owner_email TEXT,
-      domain TEXT,
-      tier TEXT NOT NULL DEFAULT 'personal',
-      theme_distro TEXT,
-      state TEXT NOT NULL DEFAULT 'pending',
-      hmac_key TEXT,
-      installed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      expires_at DATETIME,
-      revoked_at DATETIME
-    )`,
-    columns: [
-      ["seats", "INTEGER DEFAULT 1"],
-      ["support_notes", "TEXT"],
-      ["last_health_at", "DATETIME"],
-      ["storage_used_bytes", "INTEGER DEFAULT 0"],
-      ["health_status", "TEXT DEFAULT 'unknown'"],
-    ],
-  },
-  {
-    name: "tenant_data",
-    create: `CREATE TABLE tenant_data (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tenant_id INTEGER NOT NULL,
-      kind TEXT NOT NULL DEFAULT 'distro',
-      data TEXT NOT NULL,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "project_rooms",
-    create: `CREATE TABLE project_rooms (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      project_id INTEGER NOT NULL,
-      name TEXT NOT NULL,
-      slug TEXT NOT NULL,
-      description TEXT,
-      model_3d TEXT,
-      cover_media_id INTEGER,
-      hotspots TEXT,
-      order_index INTEGER NOT NULL DEFAULT 0,
-      is_published INTEGER DEFAULT 1
-    )`,
-    columns: [],
-  },
-  {
-    name: "form_definitions",
-    create: `CREATE TABLE form_definitions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      title TEXT NOT NULL,
-      fields TEXT NOT NULL,
-      submit_label TEXT,
-      success_message TEXT,
-      is_published INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "form_submissions",
-    create: `CREATE TABLE form_submissions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      form_id INTEGER NOT NULL,
-      payload TEXT NOT NULL,
-      read_at DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "redirects",
-    create: `CREATE TABLE redirects (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      source TEXT NOT NULL,
-      destination TEXT NOT NULL,
-      status_code INTEGER DEFAULT 301,
-      is_active INTEGER DEFAULT 1
-    )`,
-    columns: [],
-  },
-  {
-    name: "usage_events",
-    create: `CREATE TABLE usage_events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tenant_id INTEGER,
-      kind TEXT NOT NULL,
-      path TEXT,
-      meta TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    name: "license_log",
-    create: `CREATE TABLE license_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tenant_id INTEGER NOT NULL,
-      action TEXT NOT NULL,
-      tier TEXT,
-      seats INTEGER,
-      expires_at DATETIME,
-      issued_by TEXT,
-      revenue_cents INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [
-      ["revenue_cents", "INTEGER DEFAULT 0"],
-    ],
-  },
-  {
-    name: "announcements",
-    create: `CREATE TABLE announcements (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      body TEXT NOT NULL,
-      audience TEXT NOT NULL DEFAULT 'all',
-      is_active INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-  {
-    // Durable license store (singleton row id=1). Mirrors the
-    // supabase-bootstrap.sql license_doc table for the local SQLite
-    // dev path. The signed license document is stored whole in `data`.
-    name: "license_doc",
-    create: `CREATE TABLE license_doc (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      data TEXT NOT NULL,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    columns: [],
-  },
-];
-
-console.log("Migration: declarative run");
+const pool = new pg.Pool({
+  connectionString: dbUrl,
+  ssl: dbUrl.includes("supabase.com") || dbUrl.includes("sslmode=require")
+    ? { rejectUnauthorized: false }
+    : undefined,
+  max: 1,
+});
 
 let allOk = true;
 
-console.log("--- Phase 1: CREATE TABLE per-table ---");
-for (const t of TABLES) {
-  const ok = run(`table ${t.name}`, t.create);
-  if (!ok && t.name === "projects") {
-    // projects is critical; if its CREATE TABLE failed for ANY reason
-    // we want to be loud, but still continue.
+/**
+ * Split DDL into statements. Tracks dollar-quoted blocks (the one
+ * `DO $$ ... $$;` realtime publication block) so their internal
+ * semicolons are not treated as statement terminators.
+ */
+function countDollars(line) {
+  const m = line.match(/\$\$/g);
+  return m ? m.length : 0;
+}
+
+function splitStatements(sql) {
+  const stmts = [];
+  let cur = "";
+  let inDollar = false;
+  const lines = sql.split(/\r?\n/);
+  for (const line of lines) {
+    cur += line + "\n";
+    const n = countDollars(line);
+    if (n > 0) {
+      if (inDollar) {
+        // Inside a dollar-quoted block: an odd count closes it.
+        if (n % 2 === 1) inDollar = false;
+      } else if (n % 2 === 1) {
+        // Outside: an odd count opens a block that stays open.
+        inDollar = true;
+      }
+    }
+    if (!inDollar && /;\s*$/.test(line)) {
+      const s = cur.trim();
+      if (s) stmts.push(s);
+      cur = "";
+    }
+  }
+  const rest = cur.trim();
+  if (rest) stmts.push(rest);
+  return stmts;
+}
+
+function isIdempotentOk(e) {
+  const msg = String(e?.message || "");
+  return /already exists|duplicate key/i.test(msg);
+}
+
+async function main() {
+  console.log("Supabase migration start");
+
+  // 1. Full bootstrap DDL, statement by statement with retry passes.
+  const ddlPath = path.join(repoRoot, "supabase-bootstrap.sql");
+  const ddl = fs.readFileSync(ddlPath, "utf8");
+  const statements = splitStatements(ddl);
+  const remaining = new Map();
+  statements.forEach((s, i) => remaining.set(i, s));
+
+  let applied = 0;
+  let skips = 0;
+  for (let pass = 1; pass <= 12 && remaining.size > 0; pass++) {
+    let progressed = false;
+    for (const [i, s] of remaining) {
+      try {
+        await pool.query(s);
+        remaining.delete(i);
+        applied++;
+        progressed = true;
+      } catch (e) {
+        if (isIdempotentOk(e)) {
+          remaining.delete(i);
+          skips++;
+          progressed = true;
+        }
+      }
+    }
+    if (!progressed) break;
+  }
+  console.log(`+ bootstrap DDL: ${applied} applied, ${skips} already in place`);
+  if (remaining.size > 0) {
+    for (const [i, s] of remaining) {
+      console.log(`- statement ${i} failed: ${s.slice(0, 90).replace(/\s+/g, " ")}...`);
+      allOk = false;
+    }
+  }
+
+  // 2. Default tenant when empty (v1 data may already carry one).
+  const tenant = await pool.query(
+    `SELECT id, slug FROM tenants ORDER BY id LIMIT 1`
+  );
+  if (tenant.rows.length === 0) {
+    try {
+      await pool.query(
+        `INSERT INTO tenants (slug, studio_name, owner_email, state, plan_id, subscription_status)
+         VALUES ($1, $2, $3, 'active', 'free', 'active')
+         ON CONFLICT (slug) DO NOTHING`,
+        ["studio", "Etihad Interiors", "admin@etihadinteriors.com"]
+      );
+      console.log("+ default tenant (studio)");
+    } catch (e) {
+      console.log(`- default tenant: ${e.message}`);
+      allOk = false;
+    }
+  } else {
+    console.log(`= tenant present: ${tenant.rows[0].slug} (id ${tenant.rows[0].id})`);
+  }
+
+  // 3. Default admin user when users is empty (keeps existing creds).
+  const user = await pool.query(`SELECT id FROM users ORDER BY id LIMIT 1`);
+  if (user.rows.length === 0) {
+    const hash = bcrypt.hashSync("admin123", 10);
+    try {
+      await pool.query(
+        `INSERT INTO users (email, password_hash, role)
+         VALUES ($1, $2, 'admin')
+         ON CONFLICT (email) DO NOTHING`,
+        ["admin@etihadinteriors.com", hash]
+      );
+      console.log("+ default admin user (admin@etihadinteriors.com / admin123)");
+    } catch (e) {
+      console.log(`- default admin user: ${e.message}`);
+      allOk = false;
+    }
+  } else {
+    console.log("= users present, keeping existing credentials");
+  }
+
+  // 4. Freemium plans.
+  try {
+    await import("./seed-plans.mjs");
+    console.log("+ plans seeded");
+  } catch (e) {
+    console.log(`- plans seed: ${e.message}`);
     allOk = false;
   }
-}
 
-console.log("--- Phase 2: ALTER TABLE per-column ---");
-for (const t of TABLES) {
-  for (const [name, def] of t.columns) {
-    ensureColumn(t.name, name, def);
-  }
-}
-
-console.log("--- Phase 3: FTS5 admin_search ---");
-run(
-  "virtual table admin_search",
-  `CREATE VIRTUAL TABLE IF NOT EXISTS admin_search USING fts5(
-     entity, kind, title, body, slug,
-     tokenize = 'porter unicode61'
-   )`
-);
-
-console.log("--- Phase 4: seed identity + admin user + menus ---");
-
-// Default site_identity row
-const sid = sqlite.prepare("SELECT id FROM site_identity LIMIT 1").get();
-if (!sid) {
-  run(
-    "site_identity seed",
-    `INSERT INTO site_identity (brand_name, tagline, accent_mode, footer_credit)
-     VALUES ('Your Studio', 'A studio of considered spaces. Set your tagline in /admin/settings.', 'auto', 'Powered by Interior Studio Theme')`
+  const count = await pool.query(
+    `SELECT COUNT(*) AS c FROM information_schema.tables
+     WHERE table_schema = 'public'`
   );
-}
+  console.log(`Supabase migration done (${count.rows[0].c} tables).`);
 
-// Default tenant - studio (Etihad demo)
-const studioTenant = sqlite.prepare("SELECT id FROM tenants LIMIT 1").get();
-if (!studioTenant) {
-  run(
-    "tenants seed (default studio)",
-    `INSERT INTO tenants (slug, studio_name, owner_email, domain, tier, theme_distro, state, hmac_key)
-     VALUES ('studio', 'Etihad Interiors', 'admin@etihadinteriors.com', 'ethinterior.vercel.app', 'business', '${JSON.stringify({
-       brand_name: 'Etihad Interiors',
-       palette: { ink: '#1a1814', accent: '#8a5d3b', paper: '#efe6d2' },
-       accent_mode: 'auto',
-       footer_credit: 'Powered by Etihad Interiors Theme v1.1.0',
-       hero_text: 'Homes built around how you live',
-       default_locales: ['en', 'hi', 'mr'],
-     }).replaceAll("'", "''")}', 'active', 'etihad-interiors-license-fallback-2026')`
-  );
-}
-
-// Default admin user - demonstrates the expected admin identity.
-// Remove any stale rows that were inserted by earlier seeds
-// (e.g. studio@etihadinteriors.com from a v1.1.0 build) and insert
-// Default user seed. The env row is the admin row the operator
-// expected to log in with. This keeps the users table
-// predictable regardless of which bundled SQLite shipped in
-// the deploy.
-//
-// When the operator sets a second pair of env vars
-// SUPABASE_OPERATOR_EMAIL + SUPABASE_OPERATOR_PASSWORD, two
-// rows are seeded: the admin row at ADMIN_EMAIL and a second
-// row at SUPABASE_OPERATOR_EMAIL. Both survive subsequent
-// migrations. Without the operator pair, only the admin row
-// is seeded, which matches v1.0.0 / v1.1.0 behaviour.
-function seedDefaultAdmin() {
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@etihadinteriors.com";
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
-  const operatorEmail = process.env.SUPABASE_OPERATOR_EMAIL || "";
-  const operatorPassword = process.env.SUPABASE_OPERATOR_PASSWORD || "";
-
-  const protectedEmails = [adminEmail];
-  if (operatorEmail && operatorEmail !== adminEmail) {
-    protectedEmails.push(operatorEmail);
-  }
-
-  try {
-    const stale = sqlite
-      .prepare(
-        `SELECT id, email FROM users WHERE email NOT IN (${protectedEmails
-          .map(() => "?")
-          .join(",")})`
-      )
-      .all(...protectedEmails);
-    if (stale.length > 0) {
-      sqlite
-        .prepare(
-          `DELETE FROM users WHERE email NOT IN (${protectedEmails
-            .map(() => "?")
-            .join(",")})`
-        )
-        .run(...protectedEmails);
-      console.log(
-        `- users seed: removed ${stale.length} stale row(s) (${stale.map((s) => s.email).join(", ")})`
-      );
-    }
-
-    const passwordHash = bcrypt.hashSync(adminPassword, 10);
-    sqlite
-      .prepare(
-        `INSERT INTO users (email, password_hash, role)
-         VALUES (?, ?, 'admin')
-         ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash, role = 'admin'`
-      )
-      .run(adminEmail, passwordHash);
-    console.log(`+ users seed (admin) -> ${adminEmail}`);
-
-    if (operatorEmail && operatorEmail !== adminEmail && operatorPassword) {
-      const operatorRole =
-        (process.env.SUPABASE_OPERATOR_ROLE || "superadmin").toLowerCase() ===
-        "admin"
-          ? "admin"
-          : "superadmin";
-      const operatorHash = bcrypt.hashSync(operatorPassword, 10);
-      sqlite
-        .prepare(
-          `INSERT INTO users (email, password_hash, role)
-           VALUES (?, ?, ?)
-           ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash, role = excluded.role`
-        )
-        .run(operatorEmail, operatorHash, operatorRole);
-      console.log(
-        `+ users seed (operator) -> ${operatorEmail} (role=${operatorRole})`
-      );
-    }
-  } catch (e) {
-    console.log(`- users seed failed: ${e.message}`);
+  if (!allOk) {
+    console.log("");
+    console.log("WARNING: one or more statements did not apply cleanly.");
+    console.log("Check the logs above; re-running is safe.");
+    process.exitCode = 1;
   }
 }
 
-function seedDefaultSettings() {
-  const defaults = [
-    ["contact_email", "studio@example.com"],
-    ["contact_phone", ""],
-    ["studio_address", ""],
-    ["calendly_url", ""],
-    ["site_seo_title", "Studio — Residential Interior Design"],
-    ["site_seo_description", "A residential studio shaping considered spaces."],
-    ["instagram_url", ""],
-    ["year_established", ""],
-    ["residences_delivered", ""],
-  ];
-  for (const [k, v] of defaults) {
-    try {
-      sqlite
-        .prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`)
-        .run(k, v);
-    } catch (e) {
-      console.log(`- settings ${k}: ${e.message}`);
-    }
-  }
-  console.log("+ settings seeds (defaults)");
-}
-
-function seedMenus() {
-  let primary = sqlite
-    .prepare("SELECT id FROM menus WHERE location = 'primary'")
-    .get();
-  if (!primary) {
-    const r = sqlite
-      .prepare(`INSERT INTO menus (location) VALUES ('primary')`)
-      .run();
-    primary = { id: Number(r.lastInsertRowid) };
-    console.log("+ menus primary");
-  }
-  const primaryCount = sqlite
-    .prepare("SELECT COUNT(*) AS c FROM menu_items WHERE menu_id = ?")
-    .get(primary.id);
-  if (primaryCount.c === 0) {
-    const insert = sqlite.prepare(
-      `INSERT INTO menu_items (menu_id, label, href, target, order_index, is_button)
-       VALUES (?, ?, ?, ?, ?, ?)`
-    );
-    [
-      ["Selected work", "/projects", null, 0, 0],
-      ["Studio", "/about", null, 1, 0],
-      ["Journal", "/journal", null, 2, 0],
-      ["Contact", "/contact", null, 3, 0],
-    ].forEach(([label, href, target, order, button]) =>
-      insert.run(primary.id, label, href, target, order, button)
-    );
-    console.log("+ menu_items primary");
-  }
-}
-
-try {
-  seedDefaultAdmin();
-  seedDefaultSettings();
-  seedMenus();
-} catch (e) {
-  console.log(`- seed step: ${e.message}`);
-}
-
-sqlite.close();
-console.log("Migration done.");
-
-if (!allOk) {
-  console.log("");
-  console.log("WARNING: One or more tables did not create cleanly.");
-  console.log("Run again or check the script logs above for a real cause.");
-}
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exitCode = 1;
+  })
+  .finally(() => pool.end());
