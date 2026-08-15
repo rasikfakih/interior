@@ -210,7 +210,6 @@
   "208": "AdminWeeklyReport.tsx",
   "209": "LogoWall.tsx",
   "210": "page.tsx",
-  "211": "route.ts",
   "212": "license-key.test.ts",
   "213": "I18nProvider.tsx",
   "214": "smoke-phase2.mjs",
@@ -219,14 +218,11 @@
   "217": "page.tsx",
   "218": "page.tsx",
   "219": "page.tsx",
-  "220": "ProcessStickyStack.tsx",
   "221": "page.tsx",
   "222": "Awwwards reel - 30s storyboard",
   "223": "license-key.test.ts",
   "224": "AdminDiaryTabs.tsx",
   "225": "LeadsTabs.tsx",
   "226": "package.json",
-  "227": "page.tsx",
-  "228": "page.tsx",
   "229": "route.ts"
 }

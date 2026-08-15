@@ -4904,3 +4904,15 @@ via a direct parameterized DELETE guarded by id + name; token now 404,
 project count back to 1/3. Middleware host-tagging itself was already
 verified locally in Module 12; the remaining hop (edge -> middleware on
 the wildcard host) needs the dashboard domain add.
+
+### 2026-08-15 - DEPLOY.md wildcard documentation (310427e)
+Rewrote the DEPLOY.md Domains section against Vercel's current docs:
+wildcard domains are available on all plans (corrected the earlier
+"Pro required" claim) but only on a custom domain and only with Vercel
+nameservers (ns1/ns2.vercel-dns.com); *.vercel.app wildcards are not
+supported (CLI rejects, API alias_in_use - verified). Added the exact
+dashboard path, the keep-existing-records warning for the nameserver
+switch, the edge-404s-unconfigured-hosts behavior, and updated the
+local host-simulation examples to the supported client-*.etha-interiors.com
+family. Sources: vercel.com/docs/domains/working-with-domains/add-a-domain
+and vercel.com/docs/platforms/multi-tenant-platforms/limits.

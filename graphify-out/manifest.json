@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786796941.857445,
-    "ast_hash": "699d027cdb97cecb6dcc84d35ac407d9",
+    "mtime": 1786797362.7559924,
+    "ast_hash": "d01bd17d4a2e65df488ca15259045688",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -2515,8 +2515,8 @@
     "semantic_hash": ""
   },
   "docs/DEPLOY.md": {
-    "mtime": 1786795724.996782,
-    "ast_hash": "521e6817becaa1ca76f5def5c91d0dd3",
+    "mtime": 1786797348.7839234,
+    "ast_hash": "8cd81a4c758089160950418db1e52687",
     "semantic_hash": ""
   },
   "docs/PERF.md": {
