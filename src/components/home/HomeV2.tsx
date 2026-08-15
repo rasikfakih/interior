@@ -123,7 +123,7 @@ function Hero() {
   return (
     <section ref={scope} className="relative grid min-h-dvh grid-cols-1 md:grid-cols-10 items-end md:items-center overflow-hidden">
       <div className="md:col-span-6 container-page pb-10 md:pb-0 z-10 relative">
-        <p className="eyebrow dark:text-[#9AA89E]" data-reveal-line>
+        <p className="eyebrow" data-reveal-line>
           Studio OS for interior designers - Kalyan, Maharashtra
         </p>
         <h1 className="font-hero mt-6 text-[13vw] md:text-[7.5vw] leading-[0.92] tracking-tight">
@@ -131,7 +131,7 @@ function Hero() {
           <span data-reveal-line className="block">around how</span>
           <span data-reveal-line className="block">you live.</span>
         </h1>
-        <p data-reveal-line className="mt-6 max-w-[44ch] font-serif text-lg md:text-xl leading-relaxed text-[#56605a]">
+        <p data-reveal-line className="mt-6 max-w-[44ch] font-serif text-lg md:text-xl leading-relaxed text-ink-mute">
           We start at the kitchen table, not the mood board. Every material,
           every bill, every site photo in one place.
         </p>
@@ -139,13 +139,13 @@ function Hero() {
           <Link
             ref={ctaRef}
             href="/projects"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#C0964F] px-6 py-4 text-sm font-medium text-[#122A20] transition-transform duration-200 will-change-transform"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#C0964F] px-6 py-4 text-sm font-medium text-ink dark:text-[#122A20] transition-transform duration-200 will-change-transform"
           >
             See live demo <ArrowRight size={16} weight="bold" />
           </Link>
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 rounded-lg border border-[#122A20] px-6 py-4 text-sm font-medium text-[#122A20] hover:bg-[#122A20] hover:text-[#ECECE6] transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg border border-[var(--ink)] px-6 py-4 text-sm font-medium text-ink hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors"
           >
             Explore boards
           </Link>
@@ -154,7 +154,7 @@ function Hero() {
 
       <div
         ref={imageWrap}
-        className="md:col-span-4 h-[46dvh] md:h-full relative overflow-hidden md:border-l border-[rgba(214,203,179,0.33)]"
+        className="md:col-span-4 h-[46dvh] md:h-full relative overflow-hidden md:border-l border-[var(--line-soft)]"
       >
         <Image
           src={IMAGES.living}
@@ -167,8 +167,8 @@ function Hero() {
         />
         <div className="absolute inset-0 bg-[#122A20]/10" />
         <div className="absolute bottom-5 left-5 paper-card px-4 py-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#56605a]">2BHK · BOQ v1</p>
-          <p className="font-mono text-sm text-[#122A20] mt-1">Rs 18,45,320 live</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-mute">2BHK · BOQ v1</p>
+          <p className="font-mono text-sm text-ink mt-1">Rs 18,45,320 live</p>
         </div>
       </div>
     </section>
@@ -183,15 +183,14 @@ function StatsBar() {
     { value: "100%", label: "offline diary" },
   ];
   return (
-    <section className="border-y border-[rgba(214,203,179,0.33)] bg-[#F5F3F0]">
+    <section className="border-y border-[var(--line-soft)] bg-[var(--paper-soft)]">
       <div className="container-page grid grid-cols-2 md:grid-cols-4 gap-y-8 py-10 md:py-12">
         {stats.map((s) => (
           <div key={s.label} className="flex flex-col gap-1">
-            {/* Deep-amber text role: bright #C0964F fails 3:1 large-text
-                contrast on the paper-soft band. #8A6A2E clears it and
-                reads as the same amber family. */}
-            <span className="font-mono text-4xl md:text-5xl tracking-tight text-[#8A6A2E]">{s.value}</span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a]">{s.label}</span>
+            {/* Accent text role via the AA token (light #735a2f, dark
+                #e0c686): bright amber is decorative only. */}
+            <span className="font-mono text-4xl md:text-5xl tracking-tight text-accent-deep">{s.value}</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">{s.label}</span>
           </div>
         ))}
       </div>
@@ -201,15 +200,15 @@ function StatsBar() {
 
 function Manifesto() {
   return (
-    <section className="paper-grain bg-[#ECECE6]">
+    <section className="paper-grain bg-canvas">
       <div className="container-page grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-20 md:py-32">
         <div className="md:sticky md:top-28 self-start">
           <p className="eyebrow">The system</p>
-          <h2 className="font-hero mt-4 text-4xl md:text-[4.5rem] leading-[0.95] tracking-tight text-[#122A20]">
+          <h2 className="font-hero mt-4 text-4xl md:text-[4.5rem] leading-[0.95] tracking-tight text-ink">
             Excel is where good studios go to die.
           </h2>
         </div>
-        <div className="space-y-6 font-serif text-lg md:text-xl leading-relaxed text-[#122A20] max-w-[52ch]">
+        <div className="space-y-6 font-serif text-lg md:text-xl leading-relaxed text-ink max-w-[52ch]">
           <p>
             The interior trade runs on scattered WhatsApp messages, eleven
             versions of a rates sheet, and a memory of what was approved last
@@ -235,20 +234,20 @@ function Manifesto() {
 
 function Features() {
   return (
-    <section className="bg-[#F5F3F0]">
+    <section className="bg-[var(--paper-soft)]">
       <div className="container-page py-20 md:py-28">
         <p className="eyebrow">What is inside</p>
-        <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-[#122A20]">
+        <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-ink">
           One console for the whole job.
         </h2>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {FEATURES.map((f) => (
             <div key={f.title} className="paper-card p-6 group hover:border-[#C0964F]/60 transition-colors">
-              <f.icon size={22} weight="duotone" className="text-[#C0964F]" />
-              <h3 className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-[#122A20]">
+              <f.icon size={22} weight="duotone" className="text-[var(--amber)]" />
+              <h3 className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-ink">
                 {f.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#56605a]">{f.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-mute">{f.body}</p>
             </div>
           ))}
         </div>
@@ -270,25 +269,25 @@ function Pricing({ plans }: { plans: HomePlan[] }) {
   const lim = (n: number) => (n === -1 ? "Unlimited" : String(n));
 
   return (
-    <section className="bg-[#ECECE6]">
+    <section className="bg-canvas">
       <div className="container-page py-20 md:py-28">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow">Pricing</p>
-            <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-[#122A20]">
+            <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight text-ink">
               Start free, scale when the jobs land.
             </h2>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#56605a]">Show</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-mute">Show</span>
             {(["INR", "USD"] as const).map((c) => (
               <button
                 key={c}
                 onClick={() => setInr(c === "INR")}
                 className={`rounded-lg border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors ${
                   inr === (c === "INR")
-                    ? "border-[#C0964F] bg-[#C0964F]/15 text-[#735a2f]"
-                    : "border-[#D6CBB3] text-[#56605a] hover:text-[#122A20]"
+                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-accent-deep"
+                    : "border-[var(--clay)] text-ink-mute hover:text-ink"
                 }`}
               >
                 {c}
@@ -300,24 +299,24 @@ function Pricing({ plans }: { plans: HomePlan[] }) {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {list.map((p) => (
             <div key={p.id} className="paper-card p-6 flex flex-col">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a]">{p.name}</p>
-              <p className="font-mono text-3xl text-[#122A20] mt-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">{p.name}</p>
+              <p className="font-mono text-3xl text-ink mt-3">
                 {inr ? `Rs ${p.priceInr.toLocaleString("en-IN")}` : `$${p.priceUsd}`}
-                <span className="text-xs text-[#56605a]"> / mo</span>
+                <span className="text-xs text-ink-mute"> / mo</span>
               </p>
-              <ul className="mt-5 space-y-2 text-sm text-[#56605a]">
-                <li className="flex justify-between"><span>Projects</span><span className="font-mono text-[#122A20]">{lim(p.projectLimit)}</span></li>
-                <li className="flex justify-between"><span>Leads</span><span className="font-mono text-[#122A20]">{lim(p.leadLimit)}</span></li>
-                <li className="flex justify-between"><span>Boards</span><span className="font-mono text-[#122A20]">{lim(p.boardLimit)}</span></li>
-                <li className="flex justify-between"><span>AI credits</span><span className="font-mono text-[#122A20]">{lim(p.aiCreditsLimit)}</span></li>
+              <ul className="mt-5 space-y-2 text-sm text-ink-mute">
+                <li className="flex justify-between"><span>Projects</span><span className="font-mono text-ink">{lim(p.projectLimit)}</span></li>
+                <li className="flex justify-between"><span>Leads</span><span className="font-mono text-ink">{lim(p.leadLimit)}</span></li>
+                <li className="flex justify-between"><span>Boards</span><span className="font-mono text-ink">{lim(p.boardLimit)}</span></li>
+                <li className="flex justify-between"><span>AI credits</span><span className="font-mono text-ink">{lim(p.aiCreditsLimit)}</span></li>
               </ul>
               <div className="mt-5 flex-1" />
               <Link
                 href="/admin/billing"
                 className={`mt-6 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-[10px] font-mono uppercase tracking-[0.16em] transition-colors ${
                   p.id === "free"
-                    ? "border border-[#122A20] text-[#122A20] hover:bg-[#122A20] hover:text-[#ECECE6]"
-                    : "bg-[#122A20] text-[#ECECE6] hover:bg-[#1E3A30]"
+                    ? "border border-[var(--ink)] text-ink hover:bg-[var(--ink)] hover:text-[var(--paper)]"
+                    : "bg-[var(--ink)] text-[var(--paper)] hover:opacity-90"
                 }`}
               >
                 {p.id === "free" ? "Start free" : "Upgrade"} <ArrowRight size={13} weight="bold" />
@@ -340,7 +339,7 @@ function FinalCta() {
         </h2>
         <Link
           href="/admin"
-          className="mt-10 inline-flex items-center gap-2 rounded-lg bg-[#C0964F] px-8 py-4 text-sm font-medium text-[#122A20] hover:bg-[#D2B06A] transition-colors"
+          className="mt-10 inline-flex items-center gap-2 rounded-lg bg-[#C0964F] px-8 py-4 text-sm font-medium text-ink dark:text-[#122A20] hover:bg-[#D2B06A] transition-colors"
         >
           Open the console <ArrowRight size={16} weight="bold" />
         </Link>

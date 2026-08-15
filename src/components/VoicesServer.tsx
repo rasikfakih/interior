@@ -94,11 +94,11 @@ export default async function VoicesServer({
                       alt=""
                       width={44}
                       height={44}
-                      className="w-11 h-11 rounded-full object-cover"
+                      className="w-11 h-11 rounded-lg object-cover"
                     />
                   ) : (
                     <span
-                      className="inline-flex items-center justify-center w-11 h-11 rounded-full font-mono text-base font-medium"
+                      className="inline-flex items-center justify-center w-11 h-11 rounded-lg font-mono text-base font-medium"
                       style={{
                         background: "var(--accent-deep)",
                         color: "var(--bg)",

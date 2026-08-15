@@ -59,12 +59,12 @@ export default async function StudioServer() {
                     alt=""
                     width={80}
                     height={80}
-                    className="w-20 h-20 rounded-full object-cover"
+                    className="w-20 h-20 rounded-lg object-cover"
                   />
                 ) : (
                   <span
                     aria-hidden
-                    className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
+                    className="w-14 h-14 rounded-lg flex items-center justify-center font-mono text-xl"
                     style={{
                       background: "var(--accent-deep)",
                       color: "var(--bg)",

@@ -2,15 +2,17 @@
 
 @theme {
   --font-sans: var(--font-geist-sans), "Inter", system-ui, sans-serif;
-  --font-display: var(--font-newsreader), var(--font-geist-sans),
-    "Inter", system-ui, sans-serif;
+  /* M0 (2026-08-15): one display voice across the whole product -
+     Instrument Serif. Newsreader stays as --font-serif for long-form
+     editorial body copy (the /demo agency site reads in it). */
+  --font-display: var(--font-instrument), var(--font-newsreader), serif;
   --font-serif: var(--font-newsreader), "Iowan Old Style", "Times New Roman",
     serif;
   --font-mono: var(--font-geist-mono), "JetBrains Mono", monospace;
 
-  /* Forest & Bone v2 (Module 11): Instrument Serif for the Awwwards
-     hero role. Consumed via .font-hero so the admin console keeps
-     Newsreader for its display headings. */
+  /* Forest & Bone v2: Instrument Serif for the Awwwards hero role.
+     --font-display now resolves to the same face, so .font-hero is
+     an explicit weight/leading variant rather than a second voice. */
   --font-hero: var(--font-instrument), var(--font-newsreader), serif;
   --font-accent: var(--font-geist-sans), system-ui, sans-serif;
 
@@ -110,6 +112,18 @@
       #6e5226 100%
     );
     --shadow-ambient: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+
+    /* Forest & Bone v2 aliases, dark variant (M0: the .dark block now
+       carries the full v2 set so paper-card, clay tints, moss text and
+       soft shadows flip with the rest of the system instead of staying
+       light on dark canvases). */
+    --paper: #101d16;
+    --paper-soft: #15241d;
+    --clay: #24362c;
+    --moss: #9aa39a;
+    --amber: #d2b06a;
+    --line-soft: rgba(234, 234, 228, 0.14);
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
   }
 
   html {

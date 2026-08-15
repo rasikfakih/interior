@@ -50,7 +50,7 @@ export default function HorizontalProjects({ projects }: { projects: HomeProject
   return (
     <section ref={scope} className="relative overflow-hidden bg-canvas">
       <div className="container-page pt-16 md:pt-24">
-        <p className="eyebrow dark:text-[#9AA89E]">Selected work</p>
+        <p className="eyebrow">Selected work</p>
         <h2 className="font-hero mt-3 text-4xl md:text-6xl tracking-tight">
           Rooms we have built.
         </h2>
@@ -70,21 +70,21 @@ export default function HorizontalProjects({ projects }: { projects: HomeProject
             />
             <div className="mt-4 flex items-end justify-between gap-4">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-mute">
                   {String(i + 1).padStart(2, "0")} · {p.category} · {p.year}
                 </p>
-                <h3 className="font-hero mt-1 text-3xl md:text-5xl tracking-tight group-hover:text-[#735a2f] transition-colors">
+                <h3 className="font-hero mt-1 text-3xl md:text-5xl tracking-tight group-hover:text-accent-deep transition-colors">
                   {p.title}
                 </h3>
               </div>
               <Link
                 href={`/projects/${p.slug}`}
-                className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#122A20] border-b border-[#C0964F] pb-0.5 hover:text-[#735a2f] transition-colors shrink-0"
+                className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink border-b border-[var(--accent)] pb-0.5 hover:text-accent-deep transition-colors shrink-0"
               >
                 Open project
               </Link>
             </div>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#56605a]">
+            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-mute">
               {p.location}
             </p>
           </article>

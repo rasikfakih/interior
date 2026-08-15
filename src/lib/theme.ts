@@ -28,7 +28,12 @@ export type ThemePalette = {
   accent_mode?: "auto" | "light" | "dark";
 };
 
-export type ThemeFontToken = "newsreader" | "geist" | "inter-tight" | "space-grotesk";
+export type ThemeFontToken =
+  | "instrument"
+  | "newsreader"
+  | "geist"
+  | "inter-tight"
+  | "space-grotesk";
 export type RadiusScale = "sharp" | "soft" | "pill";
 
 /**
@@ -60,6 +65,7 @@ export const DEFAULT_PALETTE: ThemePalette = {
 };
 
 export const FONT_TOKENS: ThemeFontToken[] = [
+  "instrument",
   "newsreader",
   "geist",
   "inter-tight",
@@ -70,7 +76,12 @@ export const FONT_TOKENS: ThemeFontToken[] = [
 // src/app/layout.tsx. A token whose font is not loaded falls back to
 // the system stack, so an old bundle serving a new distro degrades
 // gracefully instead of breaking.
+//
+// M0 (2026-08-15): Instrument Serif is the one display voice. Tenants
+// without an explicit font choice fall back to instrument (see
+// customizerVars), and the admin theme picker now offers it.
 const DISPLAY_FONT_STACKS: Record<ThemeFontToken, string> = {
+  instrument: 'var(--font-instrument), var(--font-newsreader), Georgia, serif',
   newsreader: 'var(--font-newsreader), Georgia, "Iowan Old Style", serif',
   geist: 'var(--font-geist-sans), "Inter", system-ui, sans-serif',
   "inter-tight": "var(--font-inter-tight), var(--font-geist-sans), system-ui, sans-serif",
@@ -78,6 +89,7 @@ const DISPLAY_FONT_STACKS: Record<ThemeFontToken, string> = {
 };
 
 const BODY_FONT_STACKS: Record<ThemeFontToken, string> = {
+  instrument: 'var(--font-instrument), var(--font-newsreader), Georgia, serif',
   newsreader: 'var(--font-newsreader), Georgia, "Iowan Old Style", serif',
   geist: 'var(--font-geist-sans), "Inter", system-ui, sans-serif',
   "inter-tight": "var(--font-inter-tight), var(--font-geist-sans), system-ui, sans-serif",
@@ -142,13 +154,18 @@ export function parseCustomizer(data: unknown): ThemeCustomizer {
  */
 export function customizerVars(c: ThemeCustomizer): Record<string, string> {
   const out: Record<string, string> = {};
-  const f = c.fonts;
-  if (f?.display && DISPLAY_FONT_STACKS[f.display]) {
-    out["--font-display"] = DISPLAY_FONT_STACKS[f.display];
-  }
-  if (f?.body && BODY_FONT_STACKS[f.body]) {
-    out["--font-sans"] = BODY_FONT_STACKS[f.body];
-  }
+  const f = c.fonts ?? {};
+  // One display voice: Instrument Serif unless the tenant explicitly
+  // chose another stack in the theme customizer. Always emitted so the
+  // public pages and admin console agree regardless of distro state.
+  out["--font-display"] =
+    f.display && DISPLAY_FONT_STACKS[f.display]
+      ? DISPLAY_FONT_STACKS[f.display]
+      : DISPLAY_FONT_STACKS.instrument;
+  out["--font-sans"] =
+    f.body && BODY_FONT_STACKS[f.body]
+      ? BODY_FONT_STACKS[f.body]
+      : 'var(--font-geist-sans), "Inter", system-ui, sans-serif';
   if (c.radius_scale === "soft") {
     out["--radius-control"] = "12px";
     out["--radius-card"] = "14px";

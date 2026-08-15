@@ -221,7 +221,7 @@ export const Navbar = ({ navLinks = DEFAULT_LINKS }: { navLinks?: NavLink[] }) =
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="w-11 h-11 md:w-9 md:h-9 rounded-full border hairline-strong flex items-center justify-center hover:bg-[var(--surface-strong)] transition-colors"
+              className="w-11 h-11 md:w-9 md:h-9 rounded-lg border hairline-strong flex items-center justify-center hover:bg-[var(--surface-strong)] transition-colors"
             >
               <span aria-hidden className="text-xs font-mono uppercase tracking-[0.16em]">
                 {theme === "dark" ? "Lt" : "Dk"}

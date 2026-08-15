@@ -52,7 +52,7 @@ function MonogramCircle({
 }) {
   return (
     <span
-      className="inline-flex items-center justify-center w-11 h-11 rounded-full font-mono text-base font-medium ei-mono"
+      className="inline-flex items-center justify-center w-11 h-11 rounded-lg font-mono text-base font-medium ei-mono"
       style={{
         background: tone,
         color: "var(--bg)",

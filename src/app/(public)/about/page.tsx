@@ -117,12 +117,12 @@ export default async function AboutPage() {
                         alt=""
                         width={56}
                         height={56}
-                        className="w-14 h-14 rounded-full object-cover"
+                        className="w-14 h-14 rounded-lg object-cover"
                       />
                     ) : (
                       <div
                         aria-hidden
-                        className="w-14 h-14 rounded-full flex items-center justify-center font-mono text-xl"
+                        className="w-14 h-14 rounded-lg flex items-center justify-center font-mono text-xl"
                         style={{
                           background: "var(--accent-deep)",
                           color: "var(--bg)",
