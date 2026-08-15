@@ -16,6 +16,7 @@ import {
   type BoqVersionDto,
 } from "@/lib/boq";
 import { IconPlus, IconTrash, IconArrowLeft } from "@/components/icons";
+import { IMAGES } from "@/lib/images";
 import PlanLimitModal from "./PlanLimitModal";
 
 type Toast = { kind: "ok" | "err"; msg: string };
@@ -25,8 +26,6 @@ const INPUT_CLS =
 
 const LABEL_CLS =
   "block font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a] mb-2";
-
-const DEMO_FALLBACK = "/demo/living-room-1.jpg";
 
 export default function AdminBOQ({
   projectId,
@@ -257,7 +256,7 @@ export default function AdminBOQ({
       {versions.length === 0 && !version ? (
         <div className="surface-tile rounded-[var(--radius-card)] p-8 flex flex-col items-center gap-3 text-center">
           <Image
-            src={DEMO_FALLBACK}
+            src={IMAGES.detail}
             alt=""
             width={640}
             height={420}

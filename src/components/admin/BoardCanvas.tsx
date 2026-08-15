@@ -34,7 +34,6 @@ const INPUT_CLS =
   "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-2.5 py-1.5 text-sm font-mono focus:border-[var(--accent-deep)] focus:outline-none";
 
 const MIN_SIZE = 40;
-const DEMO_FALLBACK = "/demo/living-room-1.jpg";
 
 type DragMode =
   | { kind: "move"; startX: number; startY: number; origX: number; origY: number }

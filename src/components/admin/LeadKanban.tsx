@@ -23,6 +23,7 @@ import {
 } from "@/lib/leads";
 import LeadCard from "./LeadCard";
 import { IconPlus } from "@/components/icons";
+import { IMAGES, KANBAN_ART } from "@/lib/images";
 
 type Toast = { kind: "ok" | "err"; msg: string };
 
@@ -31,16 +32,6 @@ const INPUT_CLS =
 
 const LABEL_CLS =
   "font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a]";
-
-// One demo photo per column empty state (real imagery, not a div).
-const COLUMN_ART: Record<string, string> = {
-  new: "entry-1.jpg",
-  qualified: "living-room-1.jpg",
-  site_visit: "bathroom-1.jpg",
-  quote_sent: "kitchen-1.jpg",
-  won: "bedroom-1.jpg",
-  lost: "outdoor-1.jpg",
-};
 
 const COLUMNS: { key: string; label: string }[] = LEAD_STATUSES.map((s) => ({
   key: s,
@@ -349,11 +340,10 @@ function EmptyColumn({ status, label }: { status: string; label: string }) {
       </p>
       <div className="relative h-20 w-full overflow-hidden rounded-lg">
         <Image
-          src={`/demo/${COLUMN_ART[status] ?? "placeholder.jpg"}`}
+          src={KANBAN_ART[status] ?? IMAGES.detail}
           alt=""
           fill
           sizes="300px"
-          unoptimized
           className="object-cover"
         />
       </div>

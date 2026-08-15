@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { PortalPayload } from "@/lib/portal";
 import { boardStatusLabel } from "@/lib/boards";
+import { IMAGES } from "@/lib/images";
 import { boqCategoryLabel, boqStatusLabel } from "@/lib/boq";
 import {
   clientProjectStatusLabel,
@@ -420,7 +421,7 @@ function BoardThumb({
   if (imgs.length === 0) {
     return (
       <div className="relative h-32 w-full overflow-hidden rounded-lg">
-        <Image src="/demo/kitchen-1.jpg" alt="" fill sizes="300px" unoptimized className="object-cover" />
+        <Image src={IMAGES.kitchen} alt="" fill sizes="300px" className="object-cover" />
       </div>
     );
   }

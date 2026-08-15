@@ -14,6 +14,7 @@ import {
   type VendorDto,
 } from "@/lib/materials";
 import { IconPlus } from "@/components/icons";
+import { IMAGES, materialImageUrl } from "@/lib/images";
 
 type Toast = { kind: "ok" | "err"; msg: string };
 
@@ -22,8 +23,6 @@ const INPUT_CLS =
 
 const LABEL_CLS =
   "block font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a] mb-2";
-
-const DEMO_FALLBACK = "/demo/living-room-1.jpg";
 
 // Semantic stock dots stay inside the Forest & Bone ramp: moss for
 // healthy stock, amber for low, ink for empty, clay for retired.
@@ -207,7 +206,7 @@ export default function AdminMaterials({
       {materials.length === 0 ? (
         <div className="rounded-lg border hairline bg-[rgba(214,203,179,0.35)] p-8 flex flex-col items-center gap-4 text-center">
           <div className="relative h-36 w-full max-w-md overflow-hidden rounded-lg">
-            <Image src="/demo/kitchen-1.jpg" alt="" fill sizes="500px" unoptimized className="object-cover" />
+            <Image src={IMAGES.kitchen} alt="" fill sizes="500px" className="object-cover" />
           </div>
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#56605a]">
             No materials yet, add your first stone/wood
@@ -252,7 +251,7 @@ function MaterialCard({ material, onOpen }: { material: MaterialDto; onOpen: () 
     >
       <div className="relative h-40 w-full overflow-hidden bg-[rgba(214,203,179,0.35)]">
         <Image
-          src={material.imageUrl || DEMO_FALLBACK}
+          src={materialImageUrl(material)}
           alt={material.name}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"

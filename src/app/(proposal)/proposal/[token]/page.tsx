@@ -6,6 +6,7 @@ import { fetchProposalVisuals } from "@/lib/portal";
 import { getStudioBrand } from "@/lib/studio-brand";
 import { resolveThemeFull, themeVarsStyle } from "@/lib/theme";
 import { boqCategoryLabel } from "@/lib/boq";
+import { IMAGES } from "@/lib/images";
 import {
   formatRupees,
   parseContentJson,
@@ -371,11 +372,10 @@ export default async function ProposalPage({ params }: Params) {
                       ) : (
                         <div className="relative h-28 w-full overflow-hidden rounded-md">
                           <Image
-                            src="/demo/kitchen-1.jpg"
+                            src={IMAGES.kitchen}
                             alt=""
                             fill
                             sizes="300px"
-                            unoptimized
                             className="object-cover"
                           />
                         </div>

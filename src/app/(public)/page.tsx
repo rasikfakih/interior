@@ -3,6 +3,7 @@ import HomeV2 from "@/components/home/HomeV2";
 import { getFrontPage } from "@/lib/pages";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 import { parseJsonCell } from "@/lib/json-cell";
+import { IMAGES } from "@/lib/images";
 
 // WordPress-grade live update: every page that depends on
 // admin-edited data renders dynamically. Admin writes call
@@ -124,7 +125,7 @@ const DEMO_PROJECTS: HomeProject[] = [
     category: "Apartment",
     location: "Kalyan",
     year: "2026",
-    image: "/demo/living-room-1.jpg",
+    image: IMAGES.living,
   },
   {
     slug: "demo-bedroom",
@@ -132,7 +133,7 @@ const DEMO_PROJECTS: HomeProject[] = [
     category: "Apartment",
     location: "Kalyan",
     year: "2026",
-    image: "/demo/bedroom-1.jpg",
+    image: IMAGES.bedroom,
   },
   {
     slug: "demo-kitchen",
@@ -140,15 +141,31 @@ const DEMO_PROJECTS: HomeProject[] = [
     category: "Apartment",
     location: "Kalyan",
     year: "2026",
-    image: "/demo/kitchen-1.jpg",
+    image: IMAGES.kitchen,
+  },
+  {
+    slug: "demo-bathroom",
+    title: "Bathroom",
+    category: "Apartment",
+    location: "Kalyan",
+    year: "2026",
+    image: IMAGES.bathroom,
   },
   {
     slug: "demo-entry",
-    title: "Entry",
+    title: "Entry Hall",
     category: "Villa",
     location: "Kalyan",
     year: "2025",
-    image: "/demo/entry-1.jpg",
+    image: IMAGES.entry,
+  },
+  {
+    slug: "demo-outdoor",
+    title: "Outdoor Deck",
+    category: "Villa",
+    location: "Kalyan",
+    year: "2025",
+    image: IMAGES.outdoor,
   },
 ];
 

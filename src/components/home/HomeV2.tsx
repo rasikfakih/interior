@@ -14,6 +14,7 @@ import {
 } from "@phosphor-icons/react";
 import type { HomePlan, HomeProject } from "@/app/(public)/page";
 import { useReducedMotion } from "@/lib/use-gsap";
+import { IMAGES } from "@/lib/images";
 import HorizontalProjects from "./HorizontalProjects";
 
 const FEATURES: { icon: typeof Kanban; title: string; body: string }[] = [
@@ -156,7 +157,7 @@ function Hero() {
         className="md:col-span-4 h-[46dvh] md:h-full relative overflow-hidden md:border-l border-[rgba(214,203,179,0.33)]"
       >
         <Image
-          src="/demo/living-room-1.jpg"
+          src={IMAGES.living}
           alt="A living room finished by the studio"
           fill
           priority

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { boardStatusLabel, type BoardDto } from "@/lib/boards";
 import { relativeTime, shortDate } from "@/lib/proposals";
 import { IconPlus, IconArrowLeft } from "@/components/icons";
+import { IMAGES } from "@/lib/images";
 import PlanLimitModal from "./PlanLimitModal";
 
 type Toast = { kind: "ok" | "err"; msg: string };
@@ -17,7 +18,6 @@ const INPUT_CLS =
 const LABEL_CLS =
   "block font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a] mb-2";
 
-const DEMO_THUMB = "/demo/living-room-1.jpg";
 
 export default function AdminBoards({
   projectId,
@@ -111,7 +111,7 @@ export default function AdminBoards({
       {boards.length === 0 ? (
         <div className="surface-tile rounded-[var(--radius-card)] p-8 flex flex-col items-center gap-3 text-center">
           <Image
-            src={DEMO_THUMB}
+            src={IMAGES.living}
             alt=""
             width={640}
             height={420}
@@ -220,7 +220,7 @@ function BoardThumb({ board }: { board: BoardDto }) {
     return (
       <div className="relative aspect-[4/3] rounded-[var(--radius-card)] overflow-hidden bg-[#d6cbb3]/40">
         <Image
-          src={DEMO_THUMB}
+          src={IMAGES.living}
           alt=""
           fill
           className="object-cover opacity-50"

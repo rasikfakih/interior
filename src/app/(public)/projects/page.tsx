@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ensureMigrated, pgMany } from "@/lib/pg";
 import { getStudioBrand } from "@/lib/studio-brand";
+import { IMAGES } from "@/lib/images";
 import Hero from "@/components/projects/Hero";
 import NumbersStrip from "@/components/projects/NumbersStrip";
 import ProjectsClient from "./ProjectsClient";
@@ -33,10 +34,12 @@ type DbProjectRow = {
 // Demo fallback so the marketing grid renders real images even before
 // the portfolio DB is seeded (same pattern as the homepage).
 const DEMO_ITEMS: DbProjectRow[] = [
-  { slug: "demo-living", title: "Living Room", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/living-room-1.jpg", after_image: null, model_3d: null },
-  { slug: "demo-bedroom", title: "Master Bedroom", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/bedroom-1.jpg", after_image: null, model_3d: null },
-  { slug: "demo-kitchen", title: "Kitchen", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: "/demo/kitchen-1.jpg", after_image: null, model_3d: null },
-  { slug: "demo-entry", title: "Entry", category: "Villa", location: "Kalyan", year: "2025", scope: "Villa", before_image: "/demo/entry-1.jpg", after_image: null, model_3d: null },
+  { slug: "demo-living", title: "Living Room", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: IMAGES.living, after_image: null, model_3d: null },
+  { slug: "demo-bedroom", title: "Master Bedroom", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: IMAGES.bedroom, after_image: null, model_3d: null },
+  { slug: "demo-kitchen", title: "Kitchen", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: IMAGES.kitchen, after_image: null, model_3d: null },
+  { slug: "demo-bathroom", title: "Bathroom", category: "Apartment", location: "Kalyan", year: "2026", scope: "2BHK", before_image: IMAGES.bathroom, after_image: null, model_3d: null },
+  { slug: "demo-entry", title: "Entry Hall", category: "Villa", location: "Kalyan", year: "2025", scope: "Villa", before_image: IMAGES.entry, after_image: null, model_3d: null },
+  { slug: "demo-outdoor", title: "Outdoor Deck", category: "Villa", location: "Kalyan", year: "2025", scope: "Villa", before_image: IMAGES.outdoor, after_image: null, model_3d: null },
 ];
 
 async function getDbProjects() {

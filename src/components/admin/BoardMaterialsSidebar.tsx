@@ -8,8 +8,7 @@ import {
   type MaterialDto,
 } from "@/lib/materials";
 import { IconPlus } from "@/components/icons";
-
-const DEMO_FALLBACK = "/demo/living-room-1.jpg";
+import { materialImageUrl } from "@/lib/images";
 
 /** Material list the designer drags onto the board. */
 export function BoardMaterialsSidebar({
@@ -106,7 +105,7 @@ export function BoardMaterialsSidebar({
                 title="Drag onto the canvas, or click to add at center"
               >
                 <img
-                  src={m.imageUrl ?? DEMO_FALLBACK}
+                  src={materialImageUrl(m)}
                   alt=""
                   draggable={false}
                   className="h-11 w-11 shrink-0 rounded object-cover"

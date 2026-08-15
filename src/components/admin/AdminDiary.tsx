@@ -22,6 +22,7 @@ import {
   IconX,
 } from "@/components/icons";
 import AdminWeeklyReport from "./AdminWeeklyReport";
+import { IMAGES } from "@/lib/images";
 
 type Toast = { kind: "ok" | "err" | "info"; msg: string };
 type PendingPhoto = { id: string; file: File; preview: string };
@@ -37,7 +38,6 @@ const INPUT_CLS =
   "w-full bg-canvas border hairline rounded-[var(--radius-control)] px-3 py-2 text-sm focus:border-[var(--accent-deep)] focus:outline-none";
 const LABEL_CLS =
   "block font-mono text-[10px] uppercase tracking-[0.22em] text-[#56605a] mb-2";
-const DEMO_FALLBACK = "/demo/living-room-1.jpg";
 
 /** Minimal Web Speech API typing (not in lib.dom). */
 type SpeechRecognitionLike = {
@@ -710,7 +710,7 @@ export default function AdminDiary({
           <div className="surface-tile rounded-[var(--radius-card)] p-8 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={DEMO_FALLBACK}
+              src={IMAGES.process}
               alt=""
               className="mx-auto mb-4 h-24 w-36 rounded-[var(--radius-control)] object-cover opacity-80"
             />
