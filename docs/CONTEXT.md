@@ -4886,3 +4886,21 @@ with the project's production env (no local-only keys present; the
 pulled DATABASE_URL is the same Supabase transaction pooler). No backup
 of the prior local env exists - if any local-only test keys were there,
 re-add them.
+
+### 2026-08-15 - Wildcard portal verification (blocked on dashboard)
+Attempted the end-to-end client-subdomain check. Wildcard
+*.ethinterior.vercel.app is still NOT in the project domains (API
+shows only the apex); client-demo.ethinterior.vercel.app fails TLS and
+resolves to a non-serving IP. Key finding: with an unconfigured Host,
+Vercel's edge returns 404 BEFORE the deployment middleware runs, so the
+client-host path cannot be exercised until the wildcard is a real
+project domain (the apex portal works fine - 200 - for the same token).
+Verified the full portal chain on the apex with a real token
+(d5e7e227UK): created a client_project via the live API, generated the
+portal token, portal API 200 (project + brand "Etihad Interiors"),
+portal page 200 with project name + Overview. No DELETE endpoint exists
+for client_projects (durable by design), so the test row was removed
+via a direct parameterized DELETE guarded by id + name; token now 404,
+project count back to 1/3. Middleware host-tagging itself was already
+verified locally in Module 12; the remaining hop (edge -> middleware on
+the wildcard host) needs the dashboard domain add.
