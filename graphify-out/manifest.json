@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "vercel.json": {
-    "mtime": 1783344907.5822406,
-    "ast_hash": "cea5bfd971e38f09e9f46da227be357c",
+    "mtime": 1786795658.077864,
+    "ast_hash": "b672f3ad0846be7b67477fda98e90950",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -740,8 +740,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1786795550.7371047,
-    "ast_hash": "dc97dbb4ef16d284dd89095a03bb2e6e",
+    "mtime": 1786795730.0339735,
+    "ast_hash": "e082290f5c9fde80e83b377a0513922a",
     "semantic_hash": ""
   },
   "SHIP.md": {
@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786795567.2303655,
-    "ast_hash": "86e5038bd8ddeb652b4243aaa8703d50",
+    "mtime": 1786796036.3216093,
+    "ast_hash": "9d0dace386b185d96967aa98951220f9",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -2515,8 +2515,8 @@
     "semantic_hash": ""
   },
   "docs/DEPLOY.md": {
-    "mtime": 1786787391.7138171,
-    "ast_hash": "707e029da4cd5d2a45b37472a959801b",
+    "mtime": 1786795724.996782,
+    "ast_hash": "521e6817becaa1ca76f5def5c91d0dd3",
     "semantic_hash": ""
   },
   "docs/PERF.md": {

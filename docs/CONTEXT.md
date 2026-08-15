@@ -4850,3 +4850,18 @@ green on 8fc57d8.
 Added CI + Smoke suite badge links to README under the title
 (badge.svg?branch=main for both workflows; verified 200 image/svg+xml).
 Pushed as 722ce8d.
+
+### 2026-08-15 - Deploy prep (vercel.json fix + live verification)
+User asked to deploy main to Vercel. No Vercel auth on this machine
+(no ~/.vercel/auth.json, no VERCEL_TOKEN, CLI logged out) - the
+`vercel --prod` step is blocked on the operator. Verified live
+ethinterior.vercel.app end to end anonymously: serves v2 homepage,
+login admin@etihadinteriors.com/admin123 against the real Supabase
+returns a session, gated /api/leads 200 with session / 401 anon,
+/portal/<unknown> 404. etha-interiors.com does NOT point at Vercel
+(A record 216.198.79.195, not 76.76.21.21) - registrar + dashboard
+step. Fixed stale vercel.json (installCommand rebuilt deleted
+better-sqlite3; now plain npm install so postinstall migrate
+self-heals and fails loudly without DATABASE_URL) and removed
+SQLite/seed-demo references from DEPLOY.md + README. Committed as
+bb06176.
