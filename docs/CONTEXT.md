@@ -4832,3 +4832,16 @@ better-sqlite3 allowScripts removed; .env.local.example SQLite
 comments updated. Docker Desktop engine cannot boot in this VM (no
 nested virtualization), so the container leg is validated by the
 standard GHA pattern; all other legs ran locally against Supabase.
+
+### 2026-08-15 - TS-ID-038 - First GitHub Actions runs
+Pushed v2.0.0 (6abf631) to origin/main and drove the real runner to
+green. Five runner-only bugs fixed: seed-plans unconditional SSL
+(fixed + awaited seedPlans in migrate), stale SQLite-era ci.yml
+revived for Supabase-only, homepage `is_active = 1` boolean violation
+(masked by the static plan fallback), 4 dark-mode homepage contrast
+failures (fixed via ink-pinned h2s + light-moss dark eyebrows), and a
+shallow-checkout break in lint-changed (fetch-depth: 0). One transient
+build failure re-ran green. Docker engine boots in this VM (took ~12
+min), so the full plain-Postgres path was reproduced locally: migrate,
+suite 9/9, contrast 72/0, verify:deploy, lint. Final: both workflows
+green on 8fc57d8.

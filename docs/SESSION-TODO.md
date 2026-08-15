@@ -2056,3 +2056,31 @@ build + ci-license + next start on :3010 + full suite green 9/9
 inlined at build, so the workflow pins it to http://localhost:3000 to
 match the license domain. tsc 0, tests 3/3, YAML lint clean.
 Nothing committed.
+
+### TS-ID-038 - First CI runs on GitHub, fixes for the ubuntu runner (2026-08-15) - @done
+Pushed the v2.0.0 tree (6abf631) and iterated with the real runner.
+Bugs the ubuntu runner surfaced that local Supabase runs could not:
+  1. seed-plans.mjs forced ssl on its pg pool -> "The server does not
+     support SSL connections" against the plain-Postgres service
+     container; npm ci (postinstall migrate) failed. Fixed: SSL
+     conditional on URL; seedPlans() exported and awaited by
+     migrate.mjs (was fire-and-forget on import).
+  2. Revived stale ci.yml (SQLite-era: assumed seed-pages/apply-distro
+     postinstall): postgres service + DATABASE_URL env + CI license
+     stamp + removed duplicate setup-node.
+  3. check-boolean-sql.mjs caught src/app/(public)/page.tsx
+     `is_active = 1` (boolean = integer, 42883 on Postgres). The query
+     error was masked by HomeV2's static plan fallback. Fixed to
+     `is_active = TRUE`.
+  4. check-contrast caught 4 dark-theme WCAG AA failures on the v2
+     homepage: paper-band h2s inherited --ink (light in dark) on light
+     sections (1.01-1.06:1) and moss eyebrows on dark canvas failed
+     2.79:1. Fixed: h2s pinned to ink, eyebrows get dark:text-[#9AA89E]
+     (7.35:1). check-contrast now 72 pass / 0 fail.
+  5. lint-changed failed: checkout@v4 default shallow (depth 1) lacks
+     github.event.before. Fixed with fetch-depth: 0.
+  One transient build failure (ef7784e) re-ran green (8fc57d8).
+Final state on main: Smoke suite + CI both green on 8fc57d8.
+Verified locally end to end on a postgres:17 container (Docker engine
+booted in this VM after all): migrate, full smoke suite, contrast,
+verify:deploy, lint. tsc 0. Nothing left uncommitted on main.

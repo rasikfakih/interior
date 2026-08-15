@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1786792969.490953,
-    "ast_hash": "d0f8375ae1199dc7acd3977fc33b78b8",
+    "mtime": 1786793548.91564,
+    "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
   "next.config.mjs": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "scripts/migrate.mjs": {
-    "mtime": 1786792366.2452266,
-    "ast_hash": "9d209622acceaef86564a08639172d77",
+    "mtime": 1786793510.881258,
+    "ast_hash": "4f37bfd95799cdc6d46bf08886dfe0c9",
     "semantic_hash": ""
   },
   "scripts/push.example.sh": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "src/app/(public)/page.tsx": {
-    "mtime": 1786791037.3565767,
-    "ast_hash": "f6b85b746319191a8625c06e9b54db2e",
+    "mtime": 1786794037.8135016,
+    "ast_hash": "d6febb93339065d5ea38e2ea34e3e906",
     "semantic_hash": ""
   },
   "src/app/(public)/projects/ProjectsClient.tsx": {
@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "docs/CONTEXT.md": {
-    "mtime": 1786793169.8037658,
-    "ast_hash": "8dbc6b033b2234d2e2a297552a269c1c",
+    "mtime": 1786795484.0909796,
+    "ast_hash": "4965ba2d9aebc81243dfa2dd0ce2743a",
     "semantic_hash": ""
   },
   "docs/OPERATOR_QUICKREF.md": {
@@ -1285,8 +1285,8 @@
     "semantic_hash": ""
   },
   "docs/SESSION-TODO.md": {
-    "mtime": 1786793169.7887926,
-    "ast_hash": "7fd5ce56e9a9d896853c3d91bccaafea",
+    "mtime": 1786795484.075974,
+    "ast_hash": "7299baca992c7c475445c7fdd48a00e5",
     "semantic_hash": ""
   },
   "src/app/api/settings/[key]/route.ts": {
@@ -1820,8 +1820,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1786619987.4330113,
-    "ast_hash": "9cc04c98d8d1ce6b6b172198ea1a3dce",
+    "mtime": 1786794990.661314,
+    "ast_hash": "a692230e8ee4741a1e7757874dd78687",
     "semantic_hash": ""
   },
   "docs/DEMO-WALKTHROUGH-2026-08-15.md": {
@@ -2415,8 +2415,8 @@
     "semantic_hash": ""
   },
   "scripts/seed-plans.mjs": {
-    "mtime": 1786789580.6958685,
-    "ast_hash": "3c335a500ae7106354028ab180314272",
+    "mtime": 1786793506.690645,
+    "ast_hash": "39b4df84fb8310c9803bf76b2c032b92",
     "semantic_hash": ""
   },
   "src/app/admin/billing/page.tsx": {
@@ -2480,13 +2480,13 @@
     "semantic_hash": ""
   },
   "src/components/home/HomeV2.tsx": {
-    "mtime": 1786786956.38544,
-    "ast_hash": "7778e67adbecae5aea56f5651b9d5819",
+    "mtime": 1786794589.754007,
+    "ast_hash": "82aff984c8a133d58681e39339f6e013",
     "semantic_hash": ""
   },
   "src/components/home/HorizontalProjects.tsx": {
-    "mtime": 1786784445.2519166,
-    "ast_hash": "2fd757e3ffb6c36c0fb2d7f58fd426ee",
+    "mtime": 1786794585.0906792,
+    "ast_hash": "3276e9cad946cf13e6b3bf2709c9a0e7",
     "semantic_hash": ""
   },
   "src/components/home/ShaderHoverCard.tsx": {

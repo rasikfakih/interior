@@ -222,5 +222,7 @@
   "220": "route.ts",
   "221": "page.tsx",
   "222": "Awwwards reel - 30s storyboard",
-  "223": "BeforeAfterSlider.tsx"
+  "223": "BeforeAfterSlider.tsx",
+  "224": "AdminDiaryTabs.tsx",
+  "225": "LeadsTabs.tsx"
 }
