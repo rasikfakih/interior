@@ -1,5 +1,8 @@
 # Etihad Interiors Theme (Envato)
 
+[![CI](https://github.com/rasikfakih/interior/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rasikfakih/interior/actions/workflows/ci.yml)
+[![Smoke suite](https://github.com/rasikfakih/interior/actions/workflows/smoke.yml/badge.svg?branch=main)](https://github.com/rasikfakih/interior/actions/workflows/smoke.yml)
+
 A premium residential interior design theme. Sold on Envato. White-label
 for any studio buyer via `/admin` + `theme.distro.json`. Includes an
 operator console (`/superadmin`, gated) for the licensing studio.
